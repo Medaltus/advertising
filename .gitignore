@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Local env
+.env.local
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Vercel
+.vercel

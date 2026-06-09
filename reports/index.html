@@ -1,0 +1,2084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Medaltus Ad Dashboard</title>
+<style>
+:root { color-scheme: dark; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh;
+  background-color: #06060a;
+  background-image:
+    repeating-linear-gradient(0deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
+    repeating-linear-gradient(90deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
+    repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(212,175,55,0.06) 10px,rgba(212,175,55,0.06) 11px),
+    repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(212,175,55,0.06) 10px,rgba(212,175,55,0.06) 11px),
+    radial-gradient(ellipse at 15% 5%,rgba(129,140,248,0.12) 0%,transparent 45%),
+    radial-gradient(ellipse at 85% 90%,rgba(56,189,248,0.08) 0%,transparent 45%),
+    radial-gradient(ellipse at 50% 50%,rgba(99,102,241,0.04) 0%,transparent 60%);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  padding: 32px 28px 80px;
+  -webkit-font-smoothing: antialiased;
+}
+.glass {
+  background: linear-gradient(160deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.03) 50%,rgba(255,255,255,0.06) 100%);
+  border: 1px solid rgba(255,255,255,0.13);
+  border-top: 1px solid rgba(255,255,255,0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(40px) saturate(1.6) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(1.6) brightness(1.1);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5),0 2px 0 rgba(255,255,255,0.08) inset,0 -2px 4px rgba(0,0,0,0.4) inset,0 0 1px rgba(255,255,255,0.15) inset;
+  position: relative;
+}
+.glass::before { content:'';position:absolute;top:0;left:8px;right:8px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.25) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.25) 70%,transparent 95%);border-radius:16px 16px 0 0;pointer-events:none; }
+.glass:hover,.chart-card:hover,.kpi-card:hover { background:linear-gradient(160deg,rgba(255,255,255,0.16) 0%,rgba(255,255,255,0.06) 40%,rgba(255,255,255,0.1) 100%);border-color:rgba(129,140,248,0.35);border-top-color:rgba(255,255,255,0.35); }
+.glass,.chart-card,.kpi-card { transition:background 0.4s ease,border-color 0.4s ease,box-shadow 0.4s ease; }
+/* Loading */
+#loading { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:16px; }
+#loading .spinner { width:44px;height:44px;border:3px solid rgba(255,255,255,0.06);border-top-color:#818cf8;border-radius:50%;animation:spin 0.8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loading p { color:rgba(255,255,255,0.35);font-size:14px;letter-spacing:0.5px; }
+#error-banner { display:none;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.25);border-radius:14px;padding:16px 20px;margin-bottom:20px;color:#ff6b6b;font-size:13px;word-break:break-word;backdrop-filter:blur(12px); }
+#dashboard { display:none; }
+/* Header — sticky */
+.header { margin-bottom:0;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;position:sticky;top:56px;z-index:150;background:linear-gradient(180deg,rgba(6,6,10,0.98) 0%,rgba(6,6,10,0.97) 85%,transparent 100%);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding-top:16px;padding-bottom:20px;margin-left:-28px;margin-right:-28px;padding-left:28px;padding-right:28px; }
+.header-label { font-size:20px;font-weight:700;letter-spacing:3px;color:rgba(129,140,248,0.6);text-transform:uppercase;margin-bottom:8px; }
+.header h1 { font-size:32px;font-weight:800;margin:0;background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.7) 50%,rgba(129,140,248,0.8) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-0.5px; }
+.subtitle { font-size:12px;color:rgba(255,255,255,0.3);margin:8px 0 0;letter-spacing:0.3px; }
+/* Tabs */
+.tab-bar { display:flex;gap:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:4px;backdrop-filter:blur(20px);box-shadow:0 4px 16px rgba(0,0,0,0.3); }
+.tab-btn { padding:7px 16px;border-radius:9px;border:none;background:transparent;color:rgba(255,255,255,0.4);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.25s ease; }
+.tab-btn.active { background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(129,140,248,0.12));color:#fff;box-shadow:0 2px 12px rgba(129,140,248,0.25),0 0 1px rgba(129,140,248,0.4);border:1px solid rgba(129,140,248,0.2); }
+.tab-btn:hover:not(.active) { color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.06); }
+/* Brand selector */
+.brand-selector { display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding:16px 20px;background:linear-gradient(160deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.1);border-radius:14px;backdrop-filter:blur(20px); }
+.brand-pill { padding:6px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.45);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap; }
+.brand-pill:hover { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.8); }
+.brand-pill.active { color:#fff;border-color:transparent;background:var(--brand-color,rgba(129,140,248,0.35));box-shadow:0 2px 10px rgba(0,0,0,0.3); }
+.brand-pill.all-pill.active { background:linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.15));border-color:rgba(129,140,248,0.3); }
+/* KPI Cards */
+.kpi-row { display:flex;gap:14px;margin-bottom:20px;flex-wrap:wrap; }
+.kpi-card {
+  background:linear-gradient(160deg,rgba(255,255,255,0.1) 0%,rgba(255,255,255,0.03) 40%,rgba(255,255,255,0.06) 100%);
+  border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:20px 22px;flex:1 1 0;min-width:150px;
+  backdrop-filter:blur(40px) saturate(1.6) brightness(1.1);-webkit-backdrop-filter:blur(40px) saturate(1.6) brightness(1.1);
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 2px 0 rgba(255,255,255,0.08) inset,0 -2px 4px rgba(0,0,0,0.3) inset,0 0 1px rgba(255,255,255,0.12) inset;
+  position:relative;transition:transform 0.2s ease,box-shadow 0.2s ease,border-color 0.2s ease;
+}
+.kpi-card:hover { transform:translateY(-3px);box-shadow:0 12px 48px rgba(0,0,0,0.6),0 2px 0 rgba(255,255,255,0.1) inset; }
+.kpi-card::before { content:'';position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.25) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.25) 70%,transparent 95%);pointer-events:none; }
+.kpi-label { font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:10px; }
+.kpi-value { font-size:28px;font-weight:700;color:#fff;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;line-height:1.1; }
+.kpi-sub { font-size:12px;color:rgba(255,255,255,0.3);margin-top:6px; }
+.kpi-sub.warn { color:#ff6b6b; }
+.kpi-forecast { margin-top:10px;padding:8px 10px;border-radius:10px;background:linear-gradient(135deg,rgba(129,140,248,0.14) 0%,rgba(129,140,248,0.04) 100%);border:1px solid rgba(129,140,248,0.22); }
+.kpi-forecast-label { font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(129,140,248,0.7);margin-bottom:3px; }
+.kpi-forecast-value { font-size:16px;font-weight:700;color:rgba(255,255,255,0.9);font-family:'SF Mono','Menlo','Monaco','Courier New',monospace; }
+.mom { font-size:12px;font-weight:700;display:flex;align-items:center;gap:4px;margin-top:6px; }
+.mom.positive { color:#4ade80; }
+.mom.negative { color:#ff6b6b; }
+.mom-badge { display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:5px;font-size:10px; }
+.mom.positive .mom-badge { background:rgba(74,222,128,0.12); }
+.mom.negative .mom-badge { background:rgba(255,107,107,0.12); }
+.prev-row { margin-top:8px;font-size:11px;color:rgba(255,255,255,0.25); }
+.prev-row span { color:rgba(255,255,255,0.45);font-family:'SF Mono','Menlo','Monaco','Courier New',monospace; }
+@keyframes kpiPulse { 0%,100%{text-shadow:0 0 8px rgba(255,255,255,0.1);}50%{text-shadow:0 0 20px rgba(255,255,255,0.2),0 0 40px rgba(129,140,248,0.1);} }
+.kpi-value { animation:kpiPulse 4s ease-in-out infinite; }
+/* Chart cards */
+.charts-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px; }
+.chart-card {
+  background:linear-gradient(160deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.025) 40%,rgba(255,255,255,0.05) 100%);
+  border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.2);border-radius:18px;padding:24px 22px;
+  backdrop-filter:blur(40px) saturate(1.6) brightness(1.1);-webkit-backdrop-filter:blur(40px) saturate(1.6) brightness(1.1);
+  box-shadow:0 8px 40px rgba(0,0,0,0.5),0 2px 0 rgba(255,255,255,0.08) inset,0 -2px 4px rgba(0,0,0,0.4) inset,0 0 1px rgba(255,255,255,0.12) inset;
+  position:relative;
+}
+.chart-card::before { content:'';position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.25) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.25) 70%,transparent 95%);pointer-events:none;z-index:1; }
+.chart-card.full-width { grid-column:1 / -1; }
+.section-title { font-size:18px;font-weight:700;color:#fff;margin:0;letter-spacing:-0.2px; }
+.section-sub { font-size:12px;color:rgba(255,255,255,0.3);margin:4px 0 0; }
+.section-header { margin-bottom:18px; }
+.chart-wrap { position:relative;width:100%; }
+/* Table */
+.table-wrap { overflow-x:auto; }
+table { width:100%;border-collapse:collapse;font-size:13px; }
+thead th { text-align:right;padding:12px 12px;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;user-select:none; }
+thead th:hover { color:rgba(255,255,255,0.6); }
+thead th:first-child { text-align:left; }
+tbody td { text-align:right;padding:11px 12px;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.04); }
+tbody td:first-child { text-align:left;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600; }
+tbody tr { transition:background 0.15s ease; }
+tbody tr:hover { background:rgba(129,140,248,0.04); }
+tbody tr.highlighted { background:rgba(129,140,248,0.08); }
+.acos-good { color:#4ade80; }
+.acos-mid { color:#f59e0b; }
+.acos-bad { color:#ff6b6b; }
+.dot { display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle;box-shadow:0 0 6px currentColor; }
+/* Market ticker */
+.market-ticker { position:fixed;top:0;left:0;right:0;z-index:200;background:linear-gradient(180deg,rgba(6,6,10,0.98) 0%,rgba(6,6,10,0.95) 70%,rgba(6,6,10,0.0) 100%);border-bottom:1px solid rgba(255,255,255,0.06);padding:6px 0;overflow:hidden;backdrop-filter:blur(20px); }
+.market-ticker-track { display:flex;white-space:nowrap;animation:marketTickerScroll 35s linear infinite; }
+@keyframes marketTickerScroll { 0%{transform:translateX(0);}100%{transform:translateX(-50%);} }
+.market-ticker-item { display:inline-flex;align-items:center;gap:5px;padding:0 20px;font-size:11px;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace; }
+.market-ticker-item .mt-symbol { color:rgba(255,255,255,0.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;font-size:10px;letter-spacing:0.5px; }
+.market-ticker-item .mt-price { color:rgba(255,255,255,0.7);font-weight:500; }
+.market-ticker-item .mt-change { font-size:10px;font-weight:600; }
+.market-ticker-item .mt-change.up { color:#4ade80; }
+.market-ticker-item .mt-change.down { color:#ff6b6b; }
+.market-ticker-item .mt-dot { width:3px;height:3px;border-radius:50%;background:rgba(212,175,55,0.4); }
+.market-ticker-loading { display:flex;align-items:center;justify-content:center;padding:2px 0;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px; }
+/* Stats ticker */
+.ticker-bar { position:fixed;bottom:0;left:0;right:0;z-index:100;background:linear-gradient(180deg,rgba(6,6,10,0.0) 0%,rgba(6,6,10,0.95) 30%,rgba(6,6,10,0.98) 100%);border-top:1px solid rgba(255,255,255,0.06);padding:10px 0;overflow:hidden;backdrop-filter:blur(20px); }
+.ticker-track { display:flex;white-space:nowrap;animation:tickerScroll 50s linear infinite; }
+@keyframes tickerScroll { 0%{transform:translateX(0);}100%{transform:translateX(-50%);} }
+.ticker-item { display:inline-flex;align-items:center;gap:6px;padding:0 24px;font-size:12px;color:rgba(255,255,255,0.5);font-family:'SF Mono','Menlo','Monaco','Courier New',monospace; }
+.ticker-item .ticker-label { color:rgba(255,255,255,0.3);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:1px; }
+.ticker-item .ticker-val { color:rgba(255,255,255,0.7); }
+.ticker-item .ticker-dot { width:4px;height:4px;border-radius:50%;background:rgba(129,140,248,0.5); }
+/* Refresh timer */
+.refresh-timer { display:flex;align-items:center;gap:10px;background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:6px 14px 6px 10px;backdrop-filter:blur(20px);font-size:12px;color:rgba(255,255,255,0.5);white-space:nowrap;flex-shrink:0; }
+.refresh-ring-wrap { width:24px;height:24px;position:relative;flex-shrink:0; }
+.refresh-ring-bg,.refresh-ring-fg { position:absolute;top:0;left:0;width:100%;height:100%; }
+.refresh-ring-bg circle { fill:none;stroke:rgba(255,255,255,0.08);stroke-width:2.5; }
+.refresh-ring-fg circle { fill:none;stroke:rgba(129,140,248,0.7);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:62.83;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s linear; }
+.refresh-ring-icon { position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;color:rgba(129,140,248,0.8);line-height:1; }
+.refresh-timer .timer-text { font-variant-numeric:tabular-nums; }
+.refresh-timer .timer-label { color:rgba(255,255,255,0.35); }
+/* AI Agent panels */
+.agents-section { margin-bottom:28px; }
+.agents-header { display:flex;align-items:center;gap:12px;margin-bottom:16px; }
+.agents-header h2 { font-size:18px;font-weight:700;color:#fff;margin:0; }
+.agents-badge { font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(129,140,248,0.9);background:linear-gradient(135deg,rgba(129,140,248,0.12),rgba(129,140,248,0.04));padding:4px 12px;border-radius:8px;border:1px solid rgba(129,140,248,0.15); }
+.run-all-btn { margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:10px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);transition:all 0.2s; }
+.run-all-btn:hover { background:linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2));color:#c7d2fe;box-shadow:0 4px 20px rgba(129,140,248,0.2); }
+.run-all-btn:disabled,.run-all-btn.running { opacity:0.35;pointer-events:none; }
+.agents-row { display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px; }
+.agent-panel { border-radius:16px;border:1px solid rgba(255,255,255,0.12);border-top:1px solid rgba(255,255,255,0.2);overflow:hidden;background:linear-gradient(160deg,rgba(255,255,255,0.09) 0%,rgba(255,255,255,0.025) 40%,rgba(255,255,255,0.05) 100%);backdrop-filter:blur(40px) saturate(1.6) brightness(1.1);box-shadow:0 8px 36px rgba(0,0,0,0.5),0 2px 0 rgba(255,255,255,0.08) inset;position:relative;transition:border-color 0.25s ease,box-shadow 0.25s ease,transform 0.2s ease; }
+.agent-panel:hover { border-color:rgba(255,255,255,0.2);transform:translateY(-2px); }
+.agent-panel::before { content:'';position:absolute;top:0;left:8px;right:8px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.25) 30%,rgba(255,255,255,0.35) 50%,rgba(255,255,255,0.25) 70%,transparent 95%);pointer-events:none;z-index:1; }
+.agent-panel-header { display:flex;align-items:center;gap:10px;padding:16px 18px;cursor:pointer;background:transparent;transition:background 0.2s; }
+.agent-panel-header:hover { background:rgba(255,255,255,0.03); }
+.agent-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0; }
+.agent-icon.analytics { background:linear-gradient(135deg,rgba(74,222,128,0.25),rgba(74,222,128,0.08));box-shadow:0 2px 12px rgba(74,222,128,0.15); }
+.agent-icon.strategy { background:linear-gradient(135deg,rgba(245,158,11,0.25),rgba(245,158,11,0.08));box-shadow:0 2px 12px rgba(245,158,11,0.15); }
+.agent-icon.forecast { background:linear-gradient(135deg,rgba(56,189,248,0.25),rgba(56,189,248,0.08));box-shadow:0 2px 12px rgba(56,189,248,0.15); }
+.agent-icon.market { background:linear-gradient(135deg,rgba(236,72,153,0.25),rgba(236,72,153,0.08));box-shadow:0 2px 12px rgba(236,72,153,0.15); }
+.agent-panel-header .agent-name { font-size:13px;font-weight:600;color:#fff; }
+.agent-panel-header .agent-desc { font-size:11px;color:rgba(255,255,255,0.3);margin-top:2px; }
+.agent-panel-header .chevron { margin-left:auto;color:rgba(255,255,255,0.25);font-size:12px;transition:transform 0.25s ease; }
+.agent-panel.expanded .chevron { transform:rotate(180deg); }
+.agent-panel-body { display:none;padding:0 18px 18px; }
+.agent-panel.expanded .agent-panel-body { display:block; }
+.agent-status { display:flex;align-items:center;gap:8px;padding:10px 0;font-size:12px;color:rgba(255,255,255,0.35); }
+.agent-status .pulse { width:8px;height:8px;border-radius:50%;background:#818cf8;box-shadow:0 0 8px rgba(129,140,248,0.5);animation:pulse 1.5s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.3;} }
+.agent-output { background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:16px;font-size:12.5px;line-height:1.7;color:rgba(255,255,255,0.75);max-height:320px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word; }
+.agent-output h4 { color:#fff;font-size:13px;margin:14px 0 6px; }
+.agent-output h4:first-child { margin-top:0; }
+.agent-output .good { color:#4ade80; }
+.agent-output .warn { color:#f59e0b; }
+.agent-output .bad { color:#ff6b6b; }
+.agent-input-row { display:flex;gap:8px;margin-top:12px; }
+.agent-input { flex:1;padding:11px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.25);color:#fff;font-size:12px;font-family:inherit;outline:none;resize:none;transition:border-color 0.2s; }
+.agent-input::placeholder { color:rgba(255,255,255,0.2); }
+.agent-input:focus { border-color:rgba(129,140,248,0.4); }
+.agent-run-btn { padding:11px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(129,140,248,0.12));border:1px solid rgba(129,140,248,0.25);color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap; }
+.agent-run-btn:hover { background:linear-gradient(135deg,rgba(129,140,248,0.45),rgba(129,140,248,0.2));color:#c7d2fe; }
+.agent-run-btn:disabled { opacity:0.35;cursor:not-allowed; }
+.footer { margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.04);text-align:center;font-size:11px;color:rgba(255,255,255,0.15);letter-spacing:0.5px; }
+/* Spacer below sticky header */
+.header-spacer { height:24px; }
+/* WLOS */
+#wlos-container { display:grid;grid-template-columns:1fr 1fr;gap:12px; }
+.wlos-card {
+  background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 40%,rgba(255,255,255,0.04) 100%);
+  border:1px solid rgba(255,255,255,0.1);border-top:1px solid rgba(255,255,255,0.15);
+  border-radius:14px;padding:12px 16px;
+  backdrop-filter:blur(24px) saturate(1.4);
+  box-shadow:0 4px 16px rgba(0,0,0,0.3),0 1px 0 rgba(255,255,255,0.06) inset;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.wlos-card:hover { border-color:rgba(255,255,255,0.18);transform:translateY(-1px); }
+.wlos-section-label {
+  grid-column:1/-1;display:flex;align-items:center;gap:12px;
+  padding:6px 0 2px;margin-top:4px;
+}
+.wlos-section-label:first-child { margin-top:0;padding-top:0; }
+.wlos-section-label span { font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap; }
+.wlos-section-label span.win-label { color:#4ade80; }
+.wlos-section-label span.loss-label { color:#ff6b6b; }
+.wlos-section-label span.opportunity-label { color:#818cf8; }
+.wlos-section-label span.strategy-label { color:#f59e0b; }
+.wlos-section-label::after { content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,0.1),transparent); }
+.type-badge { display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-right:8px; }
+.type-badge.win { background:rgba(74,222,128,0.12);color:#4ade80; }
+.type-badge.loss { background:rgba(255,107,107,0.12);color:#ff6b6b; }
+.type-badge.opportunity { background:rgba(129,140,248,0.12);color:#818cf8; }
+.type-badge.strategy { background:rgba(245,158,11,0.12);color:#f59e0b; }
+.priority-badge { font-size:10px;color:rgba(255,255,255,0.3);margin-left:4px; }
+.brand-tag { font-size:11px;font-weight:600;margin-left:6px; }
+.finding { font-size:12px;color:rgba(255,255,255,0.8);margin:6px 0 3px;line-height:1.5; }
+.action { font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4; }
+.status-select {
+  float:right;margin-top:2px;padding:3px 8px;border-radius:6px;
+  font-size:10px;font-weight:600;font-family:inherit;
+  border:1px solid rgba(255,255,255,0.1);cursor:pointer;
+  outline:none;appearance:none;-webkit-appearance:none;
+  background-repeat:no-repeat;background-position:right 6px center;background-size:8px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(255,255,255,0.4)'/%3E%3C/svg%3E");
+  padding-right:20px;transition:all 0.2s;
+}
+.status-select:hover { border-color:rgba(255,255,255,0.25); }
+.status-select.s-open { background-color:rgba(56,189,248,0.1);color:#38bdf8;border-color:rgba(56,189,248,0.25); }
+.status-select.s-monitor { background-color:rgba(167,139,250,0.1);color:#a78bfa;border-color:rgba(167,139,250,0.25); }
+.status-select.s-in-progress { background-color:rgba(245,158,11,0.1);color:#f59e0b;border-color:rgba(245,158,11,0.25); }
+.status-select.s-complete { background-color:rgba(74,222,128,0.1);color:#4ade80;border-color:rgba(74,222,128,0.25); }
+.status-select option { background:#1a1a2e;color:#fff; }
+
+@media (max-width:900px) {
+  .charts-grid { grid-template-columns:1fr; }
+  .kpi-row { gap:8px; }
+  .kpi-card { min-width:120px; }
+  .kpi-value { font-size:22px; }
+  .agents-row { grid-template-columns:1fr !important; }
+  .brand-selector { gap:6px; }
+  #wlos-container { grid-template-columns:1fr; }
+}
+
+@media print {
+  @page { size: landscape; margin: 8mm; }
+
+  *, *::before, *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  body {
+    background: #06060a !important;
+    padding-top: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Hide UI chrome that makes no sense in print */
+  .market-ticker,
+  #pdf-export-btn,
+  #qc-btn,
+  .refresh-timer,
+  .tab-bar,
+  #loading,
+  #error-banner,
+  .agents-header,
+  #agent-panels,
+  .agent-panel,
+  .header-spacer { display: none !important; }
+
+  /* Un-stick the sticky header so it doesn't repeat */
+  .header {
+    position: relative !important;
+    top: auto !important;
+    background: #06060a !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding-top: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Ensure dashboard and all sections are visible */
+  #dashboard { display: block !important; overflow: visible !important; }
+  .section { page-break-inside: avoid; break-inside: avoid; }
+  .kpi-card { page-break-inside: avoid; break-inside: avoid; }
+  .kpi-grid { page-break-inside: avoid; break-inside: avoid; }
+
+  /* Charts — canvas prints as bitmap, force visibility */
+  canvas { display: block !important; }
+
+  /* Tables */
+  table { page-break-inside: auto; }
+  tr { page-break-inside: avoid; break-inside: avoid; }
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+</head>
+<body style="padding-top:56px;">
+
+<div class="market-ticker" id="market-ticker" style="display:none;">
+  <div class="market-ticker-loading" id="market-ticker-loading">MARKET DATA LOADING...</div>
+  <div class="market-ticker-track" id="market-ticker-track" style="display:none;"></div>
+</div>
+
+<div id="loading"><div class="spinner"></div><p>Pulling latest brand data from Google Sheets...</p></div>
+<div id="error-banner"></div>
+
+<div id="dashboard">
+  <div class="header">
+    <div>
+      <div class="header-label">Medaltus Portfolio</div>
+      <h1>All Brands Dashboard</h1>
+      <p class="subtitle" id="subtitle"></p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="refresh-timer" id="refresh-timer" style="display:none;">
+          <div class="refresh-ring-wrap">
+            <svg class="refresh-ring-bg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+            <svg class="refresh-ring-fg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" id="refresh-ring-circle"/></svg>
+            <div class="refresh-ring-icon">&#8635;</div>
+          </div>
+          <span class="timer-label">Last refreshed:</span>
+          <span class="timer-text" id="refresh-time">0:00</span>
+          <span class="timer-label">ago</span>
+        </div>
+        <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border:1px solid rgba(251,191,36,0.3);color:rgba(251,191,36,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.35),rgba(251,191,36,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08))'">&#9741; QC Check</button>
+        <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
+      </div>
+      <div class="tab-bar" id="month-tabs"></div>
+    </div>
+  </div>
+  <div class="header-spacer"></div>
+
+  <!-- Brand Selector -->
+  <div class="brand-selector" id="brand-selector"></div>
+
+  <!-- KPI Row -->
+  <div class="kpi-row" id="kpi-row-1"></div>
+  <div class="kpi-row" id="kpi-row-2" style="margin-bottom:32px;"></div>
+
+  <!-- AI Agents -->
+  <div class="agents-section" id="agents-section" style="display:none;">
+    <div class="agents-header">
+      <h2>AI Agents</h2>
+      <span class="agents-badge">Powered by Claude</span>
+      <button class="run-all-btn" id="run-all-btn" onclick="runAllAgents()">&#9654; Run All Agents</button>
+    </div>
+    <div class="agents-row">
+      <div class="agent-panel expanded" id="panel-analytics">
+        <div class="agent-panel-header" onclick="togglePanel('analytics')">
+          <div class="agent-icon analytics">&#9679;</div>
+          <div><div class="agent-name">Portfolio Analysis</div><div class="agent-desc">Brand performance, anomalies & QC</div></div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="agent-panel-body">
+          <div id="analytics-status" class="agent-status"><div class="pulse"></div> Analyzing brands...</div>
+          <div id="analytics-output" class="agent-output" style="display:none;"></div>
+          <div class="agent-input-row">
+            <input class="agent-input" id="analytics-input" placeholder="Ask about any brand's performance..." />
+            <button class="agent-run-btn" onclick="runAgent('analytics')">Ask</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-panel expanded" id="panel-strategy">
+        <div class="agent-panel-header" onclick="togglePanel('strategy')">
+          <div class="agent-icon strategy">&#9670;</div>
+          <div><div class="agent-name">Budget Strategy</div><div class="agent-desc">Cross-brand budget allocation</div></div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="agent-panel-body">
+          <div id="strategy-status" class="agent-status"><div class="pulse"></div> Building strategy...</div>
+          <div id="strategy-output" class="agent-output" style="display:none;"></div>
+          <div class="agent-input-row">
+            <input class="agent-input" id="strategy-input" placeholder="e.g. Which brands should get more budget?" />
+            <button class="agent-run-btn" onclick="runAgent('strategy')">Run</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-panel expanded" id="panel-forecast">
+        <div class="agent-panel-header" onclick="togglePanel('forecast')">
+          <div class="agent-icon forecast">&#9650;</div>
+          <div><div class="agent-name">Forecasting</div><div class="agent-desc">Brand projections & trends</div></div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="agent-panel-body">
+          <div id="forecast-status" class="agent-status"><div class="pulse"></div> Building forecasts...</div>
+          <div id="forecast-output" class="agent-output" style="display:none;"></div>
+          <div class="agent-input-row">
+            <input class="agent-input" id="forecast-input" placeholder="e.g. Which brands are trending up?" />
+            <button class="agent-run-btn" onclick="runAgent('forecast')">Run</button>
+          </div>
+        </div>
+      </div>
+      <div class="agent-panel expanded" id="panel-market">
+        <div class="agent-panel-header" onclick="togglePanel('market')">
+          <div class="agent-icon market">&#9673;</div>
+          <div><div class="agent-name">Market Conditions</div><div class="agent-desc">Platform & seasonal intel</div></div>
+          <span class="chevron">&#9660;</span>
+        </div>
+        <div class="agent-panel-body">
+          <div id="market-status" class="agent-status"><div class="pulse"></div> Scanning market...</div>
+          <div id="market-output" class="agent-output" style="display:none;"></div>
+          <div class="agent-input-row">
+            <input class="agent-input" id="market-input" placeholder="e.g. Any Amazon policy changes?" />
+            <button class="agent-run-btn" onclick="runAgent('market')">Run</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1: Brand Comparison + ACOS by Brand -->
+  <div class="charts-grid" id="charts-row-1">
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+        <div class="section-header" style="margin-bottom:0;">
+          <div class="section-title">Brand Performance</div>
+          <div class="section-sub" id="brand-bar-sub"></div>
+        </div>
+        <div class="tab-bar" id="brand-bar-tabs" style="flex-shrink:0;"></div>
+      </div>
+      <div class="chart-wrap" style="height:320px;"><canvas id="chart-brand-bar"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="section-header">
+        <div class="section-title">ACOS by Brand</div>
+        <div class="section-sub" id="acos-bar-sub">Green &lt;25% · Amber 25–40% · Red &gt;40%</div>
+      </div>
+      <div class="chart-wrap" style="height:320px;"><canvas id="chart-acos-bar"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Charts Row 2: Monthly Trend + Channel Breakdown -->
+  <div class="charts-grid">
+    <div class="chart-card full-width">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
+        <div class="section-header" style="margin-bottom:0;">
+          <div class="section-title" id="trend-title">Monthly Trend</div>
+          <div class="section-sub">Full months shown; partial month paces linearly</div>
+        </div>
+        <div class="tab-bar" id="trend-tabs"></div>
+      </div>
+      <div class="chart-wrap" style="height:280px;"><canvas id="chart-trend"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Brand Leaderboard Table -->
+  <div class="chart-card glass" style="margin-bottom:24px;">
+    <div class="section-header">
+      <div class="section-title">Brand Leaderboard</div>
+      <div class="section-sub" id="table-sub">Click headers to sort</div>
+    </div>
+    <div class="table-wrap">
+      <table id="leaderboard-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('name')" style="text-align:left;">Brand &#8597;</th>
+            <th onclick="sortTable('spend')">Ad Spend &#8597;</th>
+            <th onclick="sortTable('adSales')">Ad Sales &#8597;</th>
+            <th onclick="sortTable('acos')">ACOS &#8597;</th>
+            <th onclick="sortTable('totalSales')">Total Sales &#8597;</th>
+            <th onclick="sortTable('tacos')">TACOS &#8597;</th>
+            <th onclick="sortTable('orders')">Orders &#8597;</th>
+            <th onclick="sortTable('cpc')">CPC &#8597;</th>
+            <th onclick="sortTable('cpm')">CPM &#8597;</th>
+            <th onclick="sortTable('cr')">CVR &#8597;</th>
+            <th onclick="sortTable('salesVolume')">Share &#8597;</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Campaigns by Brand -->
+  <div class="chart-card glass" style="margin-bottom:24px;" id="campaigns-section">
+    <div class="section-header">
+      <div class="section-title">Campaigns by Brand</div>
+      <div class="section-sub" id="campaigns-sub">Campaign detail · selected month</div>
+    </div>
+    <div id="campaigns-container"></div>
+  </div>
+
+  <!-- WLOS Section -->
+  <div class="chart-card glass" style="margin-bottom:24px;" id="wlos-section">
+    <div class="section-header">
+      <div class="section-title">Wins, Losses, Opportunities &amp; Strategies</div>
+      <div class="section-sub" id="wlos-sub">Strategic findings from latest analysis</div>
+    </div>
+    <div id="wlos-container"></div>
+  </div>
+
+  <div class="footer" id="footer"></div>
+</div>
+
+<div class="ticker-bar" id="ticker-bar" style="display:none;">
+  <div class="ticker-track" id="ticker-track"></div>
+</div>
+
+<script>
+const SHEET_ID = '11FfiFyI4v40WZNBfe04KiwT5jB1g74L5VPnV2AJ3X6c';
+const BRAND_COLORS = {
+  'Skinuva':'#818cf8','dearcloud':'#fbbf24','The Creme Shop':'#e879f9',
+  'Cloud Cafe':'#7dd3fc','evolis':'#34d399','HighOnLove':'#f43f5e',
+  'Just Bjorn':'#60a5fa','eraclea':'#f97316','MiGuard':'#2dd4bf',
+  'PB & Jay':'#fb923c','Amala':'#ec4899','Beautility':'#a78bfa',
+  'Collagelee':'#86efac','Hillside':'#8b5cf6','Dazzle Dry':'#94a3b8',
+  'Medaltus':'#64748b','Prohibition Wellness':'#a3e635','Lipstains Gold':'#facc15'
+};
+const VOLUME_KEYS = new Set(['spend','adSales','totalSales','impressions','clicks','orders']);
+
+let API_SUPPLEMENT = {};
+
+function mergeApiSupplement(data) {
+  const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const today = new Date();
+  const existing = new Set(data.monthly.map(m => m.month));
+  Object.entries(API_SUPPLEMENT).forEach(([monthKey, apiEntry]) => {
+    const [mName, yr] = monthKey.split(' ');
+    const mIdx = mo.indexOf(mName);
+    const yrNum = parseInt(yr);
+    const isCurrentMonth = mIdx === today.getMonth() && yrNum === today.getFullYear();
+    if (existing.has(monthKey)) {
+      if (isCurrentMonth) {
+        // Current partial month: API always wins — remove Google Sheet version
+        const idx = data.monthly.findIndex(m => m.month === monthKey);
+        if (idx !== -1) data.monthly.splice(idx, 1);
+      } else {
+        // Historical month: keep Google Sheet data (has real totalSales/TACOS from Easy-Insight)
+        // but supplement campaigns if missing
+        const em = data.monthly.find(m => m.month === monthKey);
+        if (em) {
+          (apiEntry.brands || []).forEach(ab => {
+            const eb = em.brands.find(b => b.name === ab.name);
+            if (eb && (!eb.campaigns || !eb.campaigns.length) && ab.campaigns && ab.campaigns.length)
+              eb.campaigns = ab.campaigns;
+          });
+        }
+        return;
+      }
+    }
+    const daysInMonth = new Date(yrNum, mIdx + 1, 0).getDate();
+    data.monthly.push({
+      month: monthKey, brands: apiEntry.brands,
+      partial: isCurrentMonth,
+      daysElapsed: isCurrentMonth ? Math.max(1, today.getDate() - 1) : null,
+      daysInMonth,
+      spend: apiEntry.spend, adSales: apiEntry.adSales, acos: apiEntry.acos,
+      totalSales: apiEntry.totalSales != null ? apiEntry.totalSales : null,
+      tacos: apiEntry.tacos != null ? apiEntry.tacos : null,
+      impressions: apiEntry.impressions, clicks: apiEntry.clicks,
+      orders: apiEntry.orders != null ? apiEntry.orders : null, ctr: apiEntry.ctr, cpc: apiEntry.cpc, cr: null, aov: apiEntry.aov != null ? apiEntry.aov : (apiEntry.orders > 0 && apiEntry.adSales > 0 ? Math.round(apiEntry.adSales / apiEntry.orders * 100) / 100 : null),
+      _source: 'api',
+    });
+  });
+  data.monthly.sort((a, b) => {
+    const [am, ay] = a.month.split(' '), [bm, by] = b.month.split(' ');
+    return ay !== by ? parseInt(ay) - parseInt(by) : mo.indexOf(am) - mo.indexOf(bm);
+  });
+}
+
+// ── Helpers ──
+function parseNum(s) {
+  if (!s || s === 'N/A' || s === '—' || s.includes('DIV/0') || s.includes('#REF') || s.trim() === '') return null;
+  const clean = s.replace(/\\/g,'').replace(/[$, ]/g,'').replace(/%$/,'').trim();
+  const n = parseFloat(clean);
+  return isNaN(n) ? null : n;
+}
+function fmt(n, p, d) { p=p==null?'$':p; d=d||0; if(n==null||isNaN(n)) return '—'; const a=Math.abs(n); if(a>=1e6) return p+(n/1e6).toFixed(1)+'M'; if(a>=1e3) return p+(n/1e3).toFixed(1)+'K'; return p+n.toFixed(d); }
+function pct(n) { return n==null||isNaN(n)?'—':n.toFixed(1)+'%'; }
+function momPct(c, p) { return p==null||c==null||p===0?null:((c-p)/Math.abs(p))*100; }
+function fv(md, key) {
+  if (!md||!md.partial||!md.daysElapsed||!md.daysInMonth) return null;
+  const v = md[key]; if (v==null||isNaN(v)) return null;
+  if (VOLUME_KEYS.has(key)) return (v/md.daysElapsed)*md.daysInMonth;
+  if (key==='acos'){ const s=fv(md,'spend'), r=fv(md,'adSales'); return s&&r?(s/r)*100:v; }
+  if (key==='tacos'){ const s=fv(md,'spend'), t=fv(md,'totalSales'); return s&&t?(s/t)*100:v; }
+  return v;
+}
+function extractText(r) {
+  if (typeof r==='string') { const t=r.trim(); if(t[0]==='{'||t[0]==='['){try{return extractText(JSON.parse(t));}catch(e){}} return r; }
+  if (Array.isArray(r)) { const t=r.filter(b=>b&&b.type==='text'&&b.text).map(b=>b.text); if(t.length) return extractText(t.join('\n')); return JSON.stringify(r); }
+  if (r&&typeof r==='object') { if(typeof r.fileContent==='string') return extractText(r.fileContent); if(typeof r.content==='string') return extractText(r.content); if(typeof r.text==='string') return extractText(r.text); if(Array.isArray(r.content)) return extractText(r.content); return JSON.stringify(r); }
+  return String(r);
+}
+
+function identifyBrand(campaignName, brands) {
+  const n = campaignName.toLowerCase();
+  const sorted = brands.slice().sort((a, b) => b.length - a.length);
+  return sorted.find(b => n.startsWith(b.toLowerCase())) || 'Other';
+}
+
+// ── Parser ──
+function parseSheet(text) {
+  // Clean HTML entities and escape sequences
+  text = text.replace(/&#10;/g, ' ').replace(/\\\-/g, '-').replace(/\\#/g, '#').replace(/\\!/g, '!');
+
+  const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Split text into discrete tables (groups of pipe-delimited lines)
+  const lines = text.split('\n');
+  const tables = [];
+  let cur = [];
+  for (const line of lines) {
+    if (line.trim().startsWith('|')) {
+      cur.push(line.trim());
+    } else {
+      if (cur.length > 0) { tables.push(cur); cur = []; }
+    }
+  }
+  if (cur.length > 0) tables.push(cur);
+
+  function isSep(line) { return /^\|\s*[-:]+/.test(line); }
+  function splitRow(line) {
+    const parts = line.split('|');
+    return parts.slice(1, parts.length - 1).map(c => c.trim());
+  }
+  function dataRows(tbl) { return tbl.filter(l => !isSep(l)); }
+
+  // Classify each table
+  let channelTable = null, totalsTable = null;
+  const brandTables = [];
+
+  for (const tbl of tables) {
+    const rows = dataRows(tbl);
+    if (rows.length < 2) continue;
+    const hdr = splitRow(rows[0]);
+    const h0 = (hdr[0] || '').toLowerCase();
+    const h1 = (hdr[1] || '').toLowerCase();
+    if (h0.replace('/', ' ') === 'month year' || h0 === 'month/year') {
+      channelTable = tbl;
+    } else if (!totalsTable && hdr.length === 5 && h0.includes('ad spend')) {
+      totalsTable = tbl;
+    } else if (h0 === 'month' && h1.includes('brand')) {
+      brandTables.push(tbl);
+    }
+  }
+
+  // Extract ordered month list from channel table
+  const months = [];
+  if (channelTable) {
+    for (const row of dataRows(channelTable).slice(1)) {
+      const cells = splitRow(row);
+      if (cells[0] && cells[0].match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) {
+        months.push(cells[0]);
+      }
+    }
+  }
+
+  // Channel data keyed by month name
+  const channels = {};
+  if (channelTable) {
+    for (const row of dataRows(channelTable).slice(1)) {
+      const c = splitRow(row);
+      const m = c[0];
+      if (!m || !m.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) continue;
+      const chans = [];
+      if (parseNum(c[1]) != null) chans.push({ channel: 'Amazon', adSpend: parseNum(c[1]), adSales: parseNum(c[2]), acos: parseNum(c[3]) });
+      if (parseNum(c[4]) != null) chans.push({ channel: 'Google', adSpend: parseNum(c[4]), adSales: parseNum(c[5]), acos: parseNum(c[6]) });
+      if (parseNum(c[7]) != null) chans.push({ channel: 'Walmart', adSpend: parseNum(c[7]), adSales: parseNum(c[8]), acos: parseNum(c[9]) });
+      if (chans.length) channels[m] = chans;
+    }
+  }
+
+  // Monthly totals — rows parallel channel table rows (no month column)
+  const monthTotals = {};
+  if (totalsTable && months.length) {
+    const tRows = dataRows(totalsTable).slice(1);
+    tRows.forEach((row, i) => {
+      if (i >= months.length) return;
+      const c = splitRow(row);
+      const spend = parseNum(c[0]);
+      if (spend == null) return;
+      monthTotals[months[i]] = {
+        spend,
+        adSales: parseNum(c[1]),
+        acos: parseNum(c[2]),
+        totalSales: parseNum(c[3]),
+        tacos: parseNum(c[4])
+      };
+    });
+  }
+
+  // Brand data from brand tables (cols: MONTH, BRAND NAME, SPEND, AD SALES, ACOS, TOTAL SALES, TACOS, IMPRESSIONS, CLICKS, CTR, CPC, CR, PPC ORDERS, AOV, %FROM ADS, SALES VOL, MoM ACOS, MoM TACOS)
+  const brandData = {};
+  let lastSeenMonth = null;
+  for (const tbl of brandTables) {
+    for (const row of dataRows(tbl).slice(1)) {
+      const c = splitRow(row);
+      const month = c[0] ? c[0].trim() : '';
+      const brand = c[1] ? c[1].trim() : '';
+      if (!brand) continue;
+      if (brand.toUpperCase() === 'BRAND NAME') continue;
+      if (month.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) lastSeenMonth = month;
+      if (brand.toUpperCase() === 'TOTAL') {
+        // Use TOTAL row to set/override monthly totals
+        if (lastSeenMonth && !monthTotals[lastSeenMonth]) {
+          const spend = parseNum(c[2]);
+          if (spend != null) {
+            monthTotals[lastSeenMonth] = {
+              spend, adSales: parseNum(c[3]), acos: parseNum(c[4]),
+              totalSales: parseNum(c[5]), tacos: parseNum(c[6])
+            };
+          }
+        }
+        continue;
+      }
+      if (!lastSeenMonth) continue;
+      if (!brandData[lastSeenMonth]) brandData[lastSeenMonth] = [];
+      brandData[lastSeenMonth].push({
+        name: brand,
+        spend:       parseNum(c[2]),
+        adSales:     parseNum(c[3]),
+        acos:        parseNum(c[4]),
+        totalSales:  parseNum(c[5]),
+        tacos:       parseNum(c[6]),
+        impressions: parseNum(c[7]),
+        clicks:      parseNum(c[8]),
+        ctr:         parseNum(c[9]),
+        cpc:         parseNum(c[10]),
+        cr:          parseNum(c[11]),
+        orders:      parseNum(c[12]),
+        aov:         parseNum(c[13]),
+        pctFromAds:  parseNum(c[14]),
+        salesVolume: parseNum(c[15]),
+        momAcos:     parseNum(c[16]),
+        momTacos:    parseNum(c[17])
+      });
+    }
+  }
+
+  // Build unified monthly array
+  const allMonthSet = new Set([...months, ...Object.keys(brandData)]);
+  const monthly = [];
+  const today = new Date();
+
+  for (const month of allMonthSet) {
+    const totals = monthTotals[month];
+    const brands = (brandData[month] || []).filter(b => b.spend != null || b.adSales != null);
+    if (!totals && brands.length === 0) continue;
+    const ct = computeTotals(brands);
+    const spend = (totals && totals.spend) || ct.spend;
+    if (!spend) continue;
+
+    const [mName, yr] = month.split(' ');
+    const mIdx = mo.indexOf(mName);
+    if (mIdx < 0) continue;
+    const yrNum = parseInt(yr);
+    const isCurrentMonth = mIdx === today.getMonth() && yrNum === today.getFullYear();
+    const daysInMonth = new Date(yrNum, mIdx + 1, 0).getDate();
+
+    monthly.push({
+      month, brands,
+      partial: isCurrentMonth,
+      daysElapsed: isCurrentMonth ? Math.max(1, today.getDate() - 1) : null,
+      daysInMonth,
+      spend:      totals ? totals.spend      : ct.spend,
+      adSales:    totals ? totals.adSales    : ct.adSales,
+      acos:       totals ? totals.acos       : ct.acos,
+      totalSales: totals ? totals.totalSales : ct.totalSales,
+      tacos:      totals ? totals.tacos      : ct.tacos,
+      impressions: ct.impressions,
+      clicks:      ct.clicks,
+      orders:      ct.orders,
+      ctr:         ct.ctr,
+      cpc:         ct.cpc,
+      cr:          ct.cr,
+      aov:         ct.aov,
+    });
+  }
+
+  monthly.sort((a, b) => {
+    const [am, ay] = a.month.split(' '), [bm, by] = b.month.split(' ');
+    return ay !== by ? parseInt(ay) - parseInt(by) : mo.indexOf(am) - mo.indexOf(bm);
+  });
+
+  // Parse campaign data — scan ALL tables for AMAZON/GOOGLE/WALMART rows
+  const campaignsByMonth = {};
+  const CAMP_SOURCES = new Set(['AMAZON','GOOGLE','WALMART']);
+  const knownBrands = Object.keys(BRAND_COLORS);
+  for (const tbl of tables) {
+    for (const row of dataRows(tbl)) {
+      const c = splitRow(row);
+      const source = (c[0] || '').trim().toUpperCase();
+      if (!CAMP_SOURCES.has(source)) continue;
+      const month = (c[1] || '').trim();
+      const name  = (c[2] || '').trim();
+      // Skip header rows and rows with no month/name
+      if (!month || !name || name.toUpperCase() === 'NAME') continue;
+      if (!month.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) continue;
+      const spend = parseNum(c[3]);
+      if (!spend || spend <= 0) continue;
+      const brand = identifyBrand(name, knownBrands);
+      if (!campaignsByMonth[month]) campaignsByMonth[month] = {};
+      if (!campaignsByMonth[month][brand]) campaignsByMonth[month][brand] = [];
+      campaignsByMonth[month][brand].push({
+        name, source,
+        spend,
+        adSales:     parseNum(c[4]),
+        acos:        parseNum(c[5]),
+        roas:        parseNum(c[6]),
+        impressions: parseNum(c[7]) != null ? Math.round(parseNum(c[7])) : null,
+        clicks:      parseNum(c[8]) != null ? Math.round(parseNum(c[8])) : null,
+        orders:      parseNum(c[12]),
+      });
+    }
+  }
+  monthly.forEach(m => {
+    const mc = campaignsByMonth[m.month] || {};
+    m.brands.forEach(b => {
+      const sheetCamps = (mc[b.name] || []).sort((a, x) => (x.spend || 0) - (a.spend || 0));
+      // Prefer sheet campaigns; fall back to any already set on b (e.g. from API supplement)
+      if (sheetCamps.length > 0) {
+        b.campaigns = sheetCamps;
+      } else if (!b.campaigns) {
+        b.campaigns = [];
+      }
+    });
+  });
+
+  return { monthly, channels };
+}
+
+function computeTotals(brands) {
+  const sum = (key) => brands.reduce((s, b) => s + (b[key] || 0), 0);
+  const spend = sum('spend'), adSales = sum('adSales'), totalSales = sum('totalSales');
+  const clicks = sum('clicks'), impressions = sum('impressions'), orders = sum('orders');
+  return {
+    spend, adSales, totalSales,
+    acos: adSales > 0 ? (spend / adSales) * 100 : null,
+    tacos: totalSales > 0 ? (spend / totalSales) * 100 : null,
+    impressions, clicks, orders,
+    ctr: impressions > 0 ? (clicks / impressions) * 100 : null,
+    cpc: clicks > 0 ? spend / clicks : null,
+    cr: clicks > 0 ? (orders / clicks) * 100 : null,
+    aov: orders > 0 ? adSales / orders : null,
+  };
+}
+
+// ── State ──
+Chart.defaults.color = 'rgba(255,255,255,0.4)';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+
+let DATA = null, selectedMonth = null, selectedBrand = 'All', trendMode = 'spend_vs_sales', brandBarMode = 'spend', charts = {}, sortKey = 'name', sortDir = 1, tabsExpanded = false;
+
+function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+// ── KPI card builder ──
+function kpi(label, value, opts) {
+  opts = opts || {};
+  const el = document.createElement('div'); el.className = 'kpi-card';
+  let h = `<div class="kpi-label">${label}</div><div class="kpi-value">${value}</div>`;
+  if (opts.sub) h += `<div class="kpi-sub${opts.warn?' warn':''}">${opts.sub}</div>`;
+  if (opts.fFmt != null) {
+    h += `<div class="kpi-forecast"><div class="kpi-forecast-label">Forecast${opts.days?' · '+opts.days:''}</div><div class="kpi-forecast-value">${opts.fFmt}</div>`;
+    if (opts.fMom != null && isFinite(opts.fMom)) {
+      const c = (opts.inv ? opts.fMom <= 0 : opts.fMom >= 0) ? 'positive' : 'negative';
+      h += `<div class="mom ${c}" style="font-size:11px;margin-top:3px;"><span class="mom-badge" style="width:15px;height:15px;">${opts.fMom>=0?'▲':'▼'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% vs prev</div>`;
+    }
+    h += `</div>`;
+  }
+  if (opts.prev) h += `<div class="prev-row">prev: <span>${opts.prev}</span></div>`;
+  if (opts.mom != null && isFinite(opts.mom)) {
+    const c = (opts.inv ? opts.mom <= 0 : opts.mom >= 0) ? 'positive' : 'negative';
+    h += `<div class="mom ${c}"><span class="mom-badge">${opts.mom>=0?'▲':'▼'}</span>${opts.mom>0?'+':''}${opts.mom.toFixed(1)}% MoM</div>`;
+  }
+  if (opts.accent) el.style.borderColor = opts.accent + '40';
+  el.innerHTML = h; return el;
+}
+
+// ── Main render ──
+function render() {
+  if (!DATA || !DATA.monthly.length) return;
+  const md = DATA.monthly.find(m => m.month === selectedMonth); if (!md) return;
+  const idx = DATA.monthly.indexOf(md), prev = idx > 0 ? DATA.monthly[idx - 1] : null;
+  const ip = md.partial, days = ip ? `${md.daysElapsed}/${md.daysInMonth} days` : null;
+  const f = k => ip ? fv(md, k) : null;
+
+  // Agents only on current partial month
+  document.getElementById('agents-section').style.display = ip ? 'block' : 'none';
+
+  // Subtitle
+  const ms = DATA.monthly.map(m => m.month.replace(/\s\d{4}$/, '')), yr = DATA.monthly[DATA.monthly.length-1].month.split(' ')[1];
+  document.getElementById('subtitle').textContent = `Google Sheets + Amazon Ads API · ${ms[0]} – ${ms[ms.length-1]} ${yr}`;
+
+  // Month tabs — 3 most recent visible by default, "+ X more" expands older
+  (function buildTabs() {
+    const tb = document.getElementById('month-tabs'); tb.innerHTML = '';
+    const all = DATA.monthly;
+    const recentCount = 3;
+    const older = all.slice(0, Math.max(0, all.length - recentCount));
+    const recent = all.slice(-recentCount);
+
+    if (older.length > 0) {
+      const expBtn = document.createElement('button');
+      expBtn.className = 'tab-btn';
+      expBtn.style.cssText = 'font-size:11px;padding:6px 10px;white-space:nowrap;opacity:0.7;';
+      expBtn.textContent = tabsExpanded ? '← Less' : ('+ ' + older.length + ' more');
+      expBtn.onclick = () => { tabsExpanded = !tabsExpanded; buildTabs(); };
+      tb.appendChild(expBtn);
+    }
+
+    const visible = tabsExpanded ? all : recent;
+    visible.forEach(m => {
+      const parts = m.month.split(' ');
+      const mName = parts[0] + (m.partial ? ' ⏳' : '');
+      const yr = parts[1] || '';
+      const b = document.createElement('button');
+      b.className = 'tab-btn' + (m.month === selectedMonth ? ' active' : '');
+      b.style.cssText = 'line-height:1;padding:6px 12px;';
+      b.innerHTML = '<span style="display:block;font-size:13px;font-weight:600;">' + mName + '</span>' +
+                    '<span style="display:block;font-size:10px;font-weight:400;opacity:0.5;margin-top:2px;">' + yr + '</span>';
+      b.onclick = () => { selectedMonth = m.month; render(); };
+      tb.appendChild(b);
+    });
+  })();
+
+  // Brand selector
+  renderBrandSelector(md);
+
+  // Get display data (brand or aggregate)
+  const bdata = getBrandData(md, selectedBrand);
+  const prevBdata = prev ? getBrandData(prev, selectedBrand) : null;
+
+  // KPI Row 1
+  const r1 = document.getElementById('kpi-row-1'); r1.innerHTML = '';
+  const roas = bdata.spend > 0 ? bdata.adSales / bdata.spend : null;
+  const prevRoas = prevBdata && prevBdata.spend > 0 ? prevBdata.adSales / prevBdata.spend : null;
+  const fRoas = ip ? (() => { const s = f('spend'), r = f('adSales'); return s && r ? r/s : null; })() : null;
+  const accent = selectedBrand !== 'All' ? BRAND_COLORS[selectedBrand] : null;
+
+  const k1 = [
+    { l: 'Ad Spend', v: fmt(bdata.spend), k: 'spend', sub: ip ? 'Month in progress' : null, warn: ip },
+    { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales' },
+    { l: 'ROAS', v: roas ? roas.toFixed(1) + 'x' : '—', pf: prevRoas ? prevRoas.toFixed(1) + 'x' : null, mm: momPct(roas, prevRoas), ff: fRoas, ffm: fRoas ? fRoas.toFixed(1) + 'x' : null, fmm: fRoas && prevRoas ? momPct(fRoas, prevRoas) : null },
+    { l: 'ACOS', v: pct(bdata.acos), k: 'acos', inv: true },
+    { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales' },
+    { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', inv: true },
+  ];
+  k1.forEach(x => {
+    const o = { sub: x.sub, warn: x.warn, inv: x.inv, days, accent };
+    if (x.k) {
+      const pv = prevBdata ? prevBdata[x.k] : null;
+      const isPct = x.k.includes('acos') || x.k.includes('tacos');
+      o.prev = pv != null ? (isPct ? pct(pv) : fmt(pv)) : null;
+      o.mom = ip ? null : momPct(bdata[x.k], pv);  // No MoM on partial/current month
+      const fval = f(x.k);
+      if (fval != null) { o.fFmt = isPct ? pct(fval) : fmt(fval); o.fMom = prev ? momPct(fval, prevBdata ? prevBdata[x.k] : null) : null; }
+    } else {
+      o.prev = x.pf; o.mom = ip ? null : x.mm;
+      if (x.ff != null) { o.fFmt = x.ffm; o.fMom = x.fmm; }
+    }
+    r1.appendChild(kpi(x.l, x.v, o));
+  });
+
+  // KPI Row 2
+  const r2 = document.getElementById('kpi-row-2'); r2.innerHTML = '';
+  const k2 = [
+    { l: 'Impressions', v: fmt(bdata.impressions, '', 0), k: 'impressions', px: '', dc: 0 },
+    { l: 'Clicks', v: fmt(bdata.clicks, '', 0), k: 'clicks', px: '', dc: 0 },
+    { l: 'CTR', v: pct(bdata.ctr), k: 'ctr', ip2: true },
+    { l: 'CPC', v: bdata.cpc != null ? '$' + bdata.cpc.toFixed(2) : '—', k: 'cpc', inv: true, dl: true },
+    { l: 'Orders', v: bdata.orders != null ? Math.round(bdata.orders).toLocaleString() : '—', k: 'orders', ord: true },
+    { l: 'AOV', v: bdata.aov != null ? '$' + bdata.aov.toFixed(2) : '—', k: 'aov', dl: true },
+  ];
+  k2.forEach(x => {
+    const o = { inv: x.inv, days, accent };
+    const pv = prevBdata ? prevBdata[x.k] : null;
+    if (x.ip2) o.prev = pv != null ? pct(pv) : null;
+    else if (x.dl) o.prev = pv != null ? '$' + pv.toFixed(2) : null;
+    else if (x.ord) o.prev = pv != null ? Math.round(pv).toLocaleString() : null;
+    else o.prev = pv != null ? fmt(pv, x.px != null ? x.px : '$', x.dc || 0) : null;
+    o.mom = ip ? null : momPct(bdata[x.k], pv);
+    const fval = f(x.k);
+    if (fval != null) {
+      if (x.ip2) o.fFmt = pct(fval);
+      else if (x.dl) o.fFmt = '$' + fval.toFixed(2);
+      else if (x.ord) o.fFmt = Math.round(fval).toLocaleString();
+      else o.fFmt = fmt(fval, x.px != null ? x.px : '$', x.dc || 0);
+      o.fMom = prevBdata ? momPct(fval, prevBdata[x.k]) : null;
+    }
+    r2.appendChild(kpi(x.l, x.v, o));
+  });
+
+  renderBrandBar(md);
+  renderAcosBar(md);
+  renderTrend();
+  renderTable(md, prev);
+  renderCampaignsByBrand();
+  renderWLOS();
+  buildTicker(md);
+  document.getElementById('footer').textContent = 'Medaltus Ad Reports · All Brands · Google Sheets + Amazon Ads API · ' + new Date().toLocaleDateString();
+}
+
+function getBrandData(md, brand) {
+  if (brand === 'All') {
+    return {
+      spend: md.spend, adSales: md.adSales, acos: md.acos, totalSales: md.totalSales,
+      tacos: md.tacos, impressions: md.impressions, clicks: md.clicks, ctr: md.ctr,
+      cpc: md.cpc, cr: md.cr, orders: md.orders, aov: md.aov != null ? md.aov : (md.orders > 0 && md.adSales > 0 ? md.adSales / md.orders : null),
+    };
+  }
+  const b = md.brands.find(b => b.name === brand);
+  if (!b) return {};
+  return {
+    spend: b.spend, adSales: b.adSales, acos: b.acos, totalSales: b.totalSales,
+    tacos: b.tacos, impressions: b.impressions, clicks: b.clicks, ctr: b.ctr,
+    cpc: b.cpc, cr: b.cr, orders: b.orders, aov: b.aov != null ? b.aov : (b.orders > 0 && b.adSales > 0 ? b.adSales / b.orders : null),
+  };
+}
+
+function renderBrandSelector(md) {
+  const el = document.getElementById('brand-selector'); el.innerHTML = '';
+  const allBtn = document.createElement('button');
+  allBtn.className = 'brand-pill all-pill' + (selectedBrand === 'All' ? ' active' : '');
+  allBtn.textContent = '⬛ All Brands';
+  allBtn.onclick = () => { selectedBrand = 'All'; render(); };
+  el.appendChild(allBtn);
+
+  const brands = md.brands.filter(b => b.spend > 0).sort((a, b) => (b.spend || 0) - (a.spend || 0));
+  brands.forEach(b => {
+    const btn = document.createElement('button');
+    const color = BRAND_COLORS[b.name] || '#666';
+    btn.className = 'brand-pill' + (selectedBrand === b.name ? ' active' : '');
+    btn.style.setProperty('--brand-color', color + '55');
+    if (selectedBrand === b.name) btn.style.background = color + '33';
+    btn.innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;"></span>${b.name}`;
+    btn.onclick = () => { selectedBrand = b.name; render(); };
+    el.appendChild(btn);
+  });
+}
+
+function renderBrandBar(md) {
+  // Tab bar
+  const tb = document.getElementById('brand-bar-tabs'); tb.innerHTML = '';
+  ['spend','adSales','totalSales'].forEach(m => {
+    const b = document.createElement('button'); b.className = 'tab-btn' + (brandBarMode === m ? ' active' : '');
+    b.textContent = m === 'spend' ? 'Ad Spend' : m === 'adSales' ? 'Ad Sales' : 'Total Sales';
+    b.onclick = () => { brandBarMode = m; renderBrandBar(md); }; tb.appendChild(b);
+  });
+  document.getElementById('brand-bar-sub').textContent = selectedMonth;
+
+  const brands = md.brands.filter(b => (b[brandBarMode] || 0) > 0).sort((a, b) => (b[brandBarMode] || 0) - (a[brandBarMode] || 0));
+  const colors = brands.map(b => {
+    const base = BRAND_COLORS[b.name] || '#666';
+    return selectedBrand === 'All' || selectedBrand === b.name ? base + 'EE' : base + '55';
+  });
+
+  kill('brand-bar');
+  charts['brand-bar'] = new Chart(document.getElementById('chart-brand-bar'), {
+    type: 'bar',
+    data: {
+      labels: brands.map(b => b.name),
+      datasets: [{ data: brands.map(b => b[brandBarMode] || 0), backgroundColor: colors, borderRadius: 5, barThickness: 16 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => '$' + c.raw.toLocaleString() }, backgroundColor: 'rgba(15,15,20,0.95)', titleFont: { weight: 700 }, bodyFont: { family: "'SF Mono','Menlo',monospace" }, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 12, cornerRadius: 10 }
+      },
+      scales: {
+        x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'SF Mono','Menlo',monospace", size: 11 }, callback: v => fmt(v) }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+        y: { ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
+function renderAcosBar(md) {
+  document.getElementById('acos-bar-sub').textContent = selectedMonth + ' · Green <25% · Amber 25–40% · Red >40%';
+  const brands = md.brands.filter(b => b.acos != null && b.adSales > 0 && b.spend > 0).sort((a, b) => (a.acos || 999) - (b.acos || 999));
+  const colors = brands.map(b => {
+    const a = b.acos || 0;
+    const base = a < 25 ? '#4ade80' : a < 40 ? '#f59e0b' : '#ff6b6b';
+    return selectedBrand === 'All' || selectedBrand === b.name ? base + 'EE' : base + '44';
+  });
+
+  kill('acos-bar');
+  charts['acos-bar'] = new Chart(document.getElementById('chart-acos-bar'), {
+    type: 'bar',
+    data: {
+      labels: brands.map(b => b.name),
+      datasets: [{ data: brands.map(b => b.acos), backgroundColor: colors, borderRadius: 5, barThickness: 16 }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => c.raw.toFixed(1) + '%' }, backgroundColor: 'rgba(15,15,20,0.95)', bodyFont: { family: "'SF Mono','Menlo',monospace" }, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 12, cornerRadius: 10 }
+      },
+      scales: {
+        x: { ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 11 }, callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+        y: { ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
+function renderTrend() {
+  const tb = document.getElementById('trend-tabs'); tb.innerHTML = '';
+  ['spend_vs_sales', 'efficiency', 'volume'].forEach(m => {
+    const b = document.createElement('button'); b.className = 'tab-btn' + (trendMode === m ? ' active' : '');
+    b.textContent = m === 'spend_vs_sales' ? 'Spend vs Sales' : m === 'efficiency' ? 'Efficiency' : 'Volume';
+    b.onclick = () => { trendMode = m; renderTrend(); }; tb.appendChild(b);
+  });
+
+  const titleEl = document.getElementById('trend-title');
+  const tdata = DATA.monthly.map(m => {
+    const bd = getBrandData(m, selectedBrand);
+    return { month: m.month, ...bd, roas: bd.spend > 0 ? bd.adSales / bd.spend : 0 };
+  });
+  titleEl.textContent = selectedBrand === 'All' ? 'Portfolio Monthly Trend' : selectedBrand + ' — Monthly Trend';
+
+  const base = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: 'rgba(255,255,255,0.6)', usePointStyle: true, pointStyle: 'circle', font: { size: 12 } } },
+      tooltip: { backgroundColor: 'rgba(15,15,20,0.95)', bodyFont: { family: "'SF Mono','Menlo',monospace" }, borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 12, cornerRadius: 10 }
+    },
+    scales: {
+      x: { ticks: { color: 'rgba(255,255,255,0.4)', font: { size: 12 } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } },
+      y: { ticks: { color: 'rgba(255,255,255,0.3)', font: { family: "'SF Mono','Menlo',monospace", size: 11 } }, grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } }
+    }
+  };
+  const accent = selectedBrand !== 'All' ? (BRAND_COLORS[selectedBrand] || '#818cf8') : '#818cf8';
+
+  kill('trend');
+  if (trendMode === 'spend_vs_sales') {
+    base.scales.y.ticks.callback = v => fmt(v);
+    base.plugins.tooltip.callbacks = { label: c => '$' + c.raw.toLocaleString() };
+    charts['trend'] = new Chart(document.getElementById('chart-trend'), {
+      type: 'line',
+      data: {
+        labels: tdata.map(d => d.month),
+        datasets: [
+          { label: 'Ad Spend', data: tdata.map(d => d.spend), borderColor: '#4ade80', backgroundColor: 'rgba(74,222,128,0.1)', fill: true, tension: .3, pointRadius: 4, borderWidth: 2.5, pointBackgroundColor: '#4ade80' },
+          { label: 'Ad Sales', data: tdata.map(d => d.adSales), borderColor: accent, backgroundColor: accent + '20', fill: true, tension: .3, pointRadius: 4, borderWidth: 2.5, pointBackgroundColor: accent },
+          { label: 'Total Sales', data: tdata.map(d => d.totalSales), borderColor: '#38bdf8', backgroundColor: 'rgba(56,189,248,0.05)', fill: false, tension: .3, pointRadius: 4, borderWidth: 2, pointBackgroundColor: '#38bdf8', borderDash: [5,3] }
+        ]
+      }, options: base
+    });
+  } else if (trendMode === 'efficiency') {
+    base.scales.y.ticks.callback = v => v + '%';
+    base.plugins.tooltip.callbacks = { label: c => c.dataset.label + (c.dataset.label.includes('ROAS') ? ': ' + c.raw.toFixed(1) + 'x' : ': ' + c.raw.toFixed(1) + '%') };
+    charts['trend'] = new Chart(document.getElementById('chart-trend'), {
+      type: 'line',
+      data: {
+        labels: tdata.map(d => d.month),
+        datasets: [
+          { label: 'ACOS', data: tdata.map(d => d.acos), borderColor: '#f59e0b', pointBackgroundColor: '#f59e0b', tension: .3, pointRadius: 4, borderWidth: 2.5 },
+          { label: 'TACOS', data: tdata.map(d => d.tacos), borderColor: '#818cf8', pointBackgroundColor: '#818cf8', tension: .3, pointRadius: 4, borderWidth: 2.5 },
+          { label: 'ROAS (x)', data: tdata.map(d => d.roas), borderColor: '#4ade80', pointBackgroundColor: '#4ade80', tension: .3, pointRadius: 4, borderWidth: 2.5 }
+        ]
+      }, options: base
+    });
+  } else {
+    base.scales.y.ticks.callback = v => fmt(v, '', 0);
+    base.plugins.tooltip.callbacks = { label: c => Math.round(c.raw).toLocaleString() };
+    charts['trend'] = new Chart(document.getElementById('chart-trend'), {
+      type: 'bar',
+      data: {
+        labels: tdata.map(d => d.month),
+        datasets: [
+          { label: 'Orders', data: tdata.map(d => d.orders), backgroundColor: 'rgba(129,140,248,0.8)', borderRadius: 6, barPercentage: .6 },
+          { label: 'Clicks', data: tdata.map(d => d.clicks), backgroundColor: 'rgba(56,189,248,0.5)', borderRadius: 6, barPercentage: .6 }
+        ]
+      }, options: base
+    });
+  }
+}
+
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = -1; }
+  const md = DATA.monthly.find(m => m.month === selectedMonth); if (!md) return;
+  const prev = DATA.monthly[DATA.monthly.indexOf(md) - 1] || null;
+  renderTable(md, prev);
+}
+
+function renderTable(md, prev) {
+  document.getElementById('table-sub').textContent = selectedMonth + ' — Click column headers to sort';
+  const tbody = document.getElementById('leaderboard-tbody'); tbody.innerHTML = '';
+  const brands = md.brands.filter(b => b.spend > 0 || b.adSales > 0);
+  const sorted = [...brands].sort((a, b) => {
+    const av = a[sortKey] || 0, bv = b[sortKey] || 0;
+    if (sortKey === 'name') return sortDir * a.name.localeCompare(b.name);
+    return sortDir * (bv - av);
+  });
+
+  const fDol = v => v != null ? '$' + v.toLocaleString() : '—';
+  const fPct = v => v != null ? v.toFixed(1) + '%' : '—';
+
+  sorted.forEach(b => {
+    const color = BRAND_COLORS[b.name] || '#666';
+    const isSelected = selectedBrand === b.name;
+    const ac = b.acos != null ? (b.acos < 25 ? 'acos-good' : b.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
+    const tr = document.createElement('tr');
+    if (isSelected) tr.className = 'highlighted';
+
+    // Get prev brand data for MoM
+    const pb = prev ? prev.brands.find(x => x.name === b.name) : null;
+
+    function momCell(cur, prv, fmtFn, inv) {
+      if (cur == null) return '—';
+      let html = fmtFn(cur);
+      if (prv != null && prv !== 0) {
+        const pct = ((cur - prv) / Math.abs(prv) * 100).toFixed(0);
+        if (Number(pct) !== 0) {
+          const pos = inv ? Number(pct) < 0 : Number(pct) > 0;
+          const clr = pos ? '#4ade80' : '#ff6b6b';
+          const arr = Number(pct) > 0 ? '▲' : '▼';
+          html += `<div style="font-size:10px;font-weight:600;color:${clr};">${arr} ${Math.abs(pct)}%</div>`;
+        }
+      }
+      return html;
+    }
+
+    // Compute derived metrics if not already set
+    const bCr  = b.cr != null ? b.cr : (b.orders > 0 && b.clicks > 0 ? (b.orders / b.clicks * 100) : null);
+    const bSv  = b.salesVolume != null ? b.salesVolume : (b.adSales > 0 && md.adSales > 0 ? (b.adSales / md.adSales * 100) : null);
+
+    tr.innerHTML = `
+      <td><span class="dot" style="background:${color}"></span><span style="color:${color}">${b.name}</span></td>
+      <td>${fDol(b.spend)}</td>
+      <td>${fDol(b.adSales)}</td>
+      <td class="${ac}">${b.acos != null && b.adSales > 0 ? b.acos.toFixed(1) + '%' : 'N/A'}</td>
+      <td>${fDol(b.totalSales)}</td>
+      <td>${fPct(b.tacos)}</td>
+      <td>${b.orders != null ? Math.round(b.orders).toLocaleString() : '—'}</td>
+      <td>${b.cpc != null ? '$' + b.cpc.toFixed(2) : '—'}</td>
+      <td>${b.impressions > 0 ? '$' + (b.spend / b.impressions * 1000).toFixed(2) : '—'}</td>
+      <td>${fPct(bCr)}</td>
+      <td>${bSv != null ? bSv.toFixed(1) + '%' : '—'}</td>`;
+    tr.onclick = () => { selectedBrand = selectedBrand === b.name ? 'All' : b.name; render(); };
+    tbody.appendChild(tr);
+  });
+
+  // ── Totals row ──
+  const totalRow = document.createElement('tr');
+  totalRow.style.cssText = 'border-top:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);cursor:default;';
+  const acTot = md.acos != null ? (md.acos < 25 ? 'acos-good' : md.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
+  totalRow.innerHTML =
+    '<td style="font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.55);font-size:11px;text-transform:uppercase;">PORTFOLIO</td>' +
+    '<td>' + fDol(md.spend) + '</td>' +
+    '<td>' + fDol(md.adSales) + '</td>' +
+    '<td class="' + acTot + '">' + (md.acos != null ? md.acos.toFixed(1) + '%' : '—') + '</td>' +
+    '<td>' + (md.totalSales != null ? fDol(md.totalSales) : '—') + '</td>' +
+    '<td>' + (md.tacos != null ? md.tacos.toFixed(1) + '%' : '—') + '</td>' +
+    '<td>' + (md.orders != null ? Math.round(md.orders).toLocaleString() : '—') + '</td>' +
+    '<td>' + (md.cpc != null ? '$' + md.cpc.toFixed(2) : '—') + '</td>' +
+    '<td>' + (md.impressions > 0 ? '$' + (md.spend / md.impressions * 1000).toFixed(2) : '—') + '</td>' +
+    '<td>—</td>' +
+    '<td>—</td>';
+  tbody.appendChild(totalRow);
+}
+
+// ── Campaigns by Brand ──
+function renderCampaignsByBrand() {
+  const container = document.getElementById('campaigns-container');
+  if (!container) return;
+  container.innerHTML = '';
+  if (!DATA || !DATA.monthly.length) return;
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  if (!md) return;
+
+  // For API supplement months, ensure campaigns are attached directly from supplement
+  const suppEntry = API_SUPPLEMENT[selectedMonth];
+  if (suppEntry) {
+    md.brands.forEach(b => {
+      if (!b.campaigns || !b.campaigns.length) {
+        const sb = (suppEntry.brands || []).find(s => s.name === b.name);
+        if (sb && sb.campaigns && sb.campaigns.length) b.campaigns = sb.campaigns;
+      }
+    });
+  }
+
+  document.getElementById('campaigns-sub').textContent =
+    'Campaign detail · ' + selectedMonth + (selectedBrand !== 'All' ? ' · ' + selectedBrand : '');
+
+  const brandsToShow = selectedBrand === 'All'
+    ? md.brands.filter(b => b.spend > 0)
+    : md.brands.filter(b => b.name === selectedBrand && b.spend > 0);
+
+  const activeBrands = brandsToShow
+    .filter(b => b.campaigns && b.campaigns.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  if (!activeBrands.length) {
+    container.innerHTML = '<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.2);font-size:13px;">' +
+      'No campaign data for ' + selectedMonth +
+      '</div>';
+    return;
+  }
+
+  activeBrands.forEach(brand => {
+    const campaigns = brand.campaigns;
+    const color = BRAND_COLORS[brand.name] || '#666';
+    const isSelected = selectedBrand === brand.name;
+    const acosColor = brand.acos != null ? (brand.acos < 25 ? '#4ade80' : brand.acos < 40 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.4)';
+
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'display:flex;align-items:center;gap:10px;padding:13px 20px 10px;background:' + (isSelected ? color + '18' : 'rgba(255,255,255,0.025)') + ';border-top:1px solid rgba(255,255,255,0.07);';
+    hdr.innerHTML =
+      '<span style="width:10px;height:10px;border-radius:50%;background:' + color + ';box-shadow:0 0 8px ' + color + '44;display:inline-block;flex-shrink:0;"></span>' +
+      '<span style="font-weight:700;font-size:13px;color:' + color + ';letter-spacing:.2px;">' + brand.name + '</span>' +
+      '<span style="font-size:11px;color:rgba(255,255,255,0.3);">' + campaigns.length + ' campaign' + (campaigns.length !== 1 ? 's' : '') + '</span>' +
+      '<span style="margin-left:auto;display:flex;gap:24px;font-family:\'SF Mono\',\'Menlo\',monospace;font-size:12px;">' +
+        '<span style="color:rgba(255,255,255,0.4);">Spend <span style="color:rgba(255,255,255,0.8);">' + fmt(brand.spend) + '</span></span>' +
+        '<span style="color:rgba(255,255,255,0.4);">Sales <span style="color:rgba(255,255,255,0.8);">' + fmt(brand.adSales) + '</span></span>' +
+        '<span style="color:' + acosColor + ';">ACoS ' + (brand.acos != null ? brand.acos.toFixed(1) + '%' : '—') + '</span>' +
+      '</span>';
+    container.appendChild(hdr);
+
+    const colHdr = document.createElement('div');
+    colHdr.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:6px 20px;border-bottom:1px solid rgba(255,255,255,0.05);';
+    colHdr.innerHTML =
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Campaign</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Spend</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Sales</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">ACoS</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Impr.</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Clicks</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CTR</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CPC</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CR</span>' +
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Orders</span>';
+    container.appendChild(colHdr);
+
+    campaigns.forEach(c => {
+      const ac = c.acos != null ? (c.acos < 25 ? '#4ade80' : c.acos < 40 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.3)';
+      const srcBadge = c.source !== 'AMAZON' ? '<span style="font-size:9px;color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:4px;margin-left:6px;">' + c.source + '</span>' : '';
+      const row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .15s;';
+      row.onmouseenter = () => { row.style.background = 'rgba(129,140,248,0.04)'; };
+      row.onmouseleave = () => { row.style.background = ''; };
+      const cCtr = (c.clicks && c.impressions) ? (c.clicks/c.impressions*100) : null;
+      const cCpc = (c.clicks && c.spend) ? (c.spend/c.clicks) : null;
+      const cCr  = (c.clicks && c.orders) ? (c.orders/c.clicks*100) : null;
+      row.innerHTML =
+        '<span style="font-size:12px;color:rgba(255,255,255,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:12px;" title="' + c.name + '">' + c.name + srcBadge + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.85);text-align:right;">' + fmt(c.spend) + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.85);text-align:right;">' + (c.adSales != null ? fmt(c.adSales) : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:' + ac + ';text-align:right;">' + (c.acos != null ? c.acos.toFixed(1) + '%' : '—') + '</span>' +
+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (c.impressions != null ? c.impressions.toLocaleString() : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (c.clicks != null ? c.clicks.toLocaleString() : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (cCtr != null ? cCtr.toFixed(2) + '%' : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (cCpc != null ? '$' + cCpc.toFixed(2) : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (cCr != null ? cCr.toFixed(1) + '%' : '—') + '</span>' +
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">' + (c.orders != null ? c.orders.toLocaleString() : '—') + '</span>';
+      container.appendChild(row);
+    });
+  });
+}
+
+// ── Agent Logic ──
+function togglePanel(name) { document.getElementById('panel-' + name).classList.toggle('expanded'); }
+
+function buildDataSummary() {
+  if (!DATA) return '';
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  let s = `MEDALTUS PORTFOLIO — ALL BRANDS AD PERFORMANCE\n\nSelected Month: ${selectedMonth}`;
+  if (md) {
+    if (md.partial) s += ` [PARTIAL: ${md.daysElapsed}/${md.daysInMonth} days]`;
+    s += `\nPortfolio Totals: Spend=$${md.spend?.toLocaleString()}, AdSales=$${md.adSales?.toLocaleString()}, ACOS=${md.acos?.toFixed(1)}%, TotalSales=$${md.totalSales?.toLocaleString()}, TACOS=${md.tacos?.toFixed(1)}%, Orders=${md.orders}\n`;
+    if (selectedBrand !== 'All') {
+      const b = md.brands.find(x => x.name === selectedBrand);
+      if (b) s += `\nSelected Brand (${b.name}): Spend=$${b.spend}, AdSales=$${b.adSales}, ACOS=${b.acos}%, TotalSales=$${b.totalSales}, TACOS=${b.tacos}%, Orders=${b.orders}, CPC=$${b.cpc}, CVR=${b.cr}%\n`;
+    }
+    s += '\nBrand Breakdown:\n';
+    md.brands.filter(b => b.spend > 0).sort((a, b2) => (b2.spend||0) - (a.spend||0)).forEach(b => {
+      s += `  ${b.name}: Spend=$${b.spend}, AdSales=$${b.adSales}, ACOS=${b.acos}%, TotalSales=$${b.totalSales}, TACOS=${b.tacos}%, Orders=${b.orders}, CPC=$${b.cpc}, CVR=${b.cr}%, Share=${b.salesVolume}%\n`;
+    });
+  }
+  s += '\nMONTHLY PORTFOLIO TRENDS:\n';
+  DATA.monthly.forEach(m => {
+    s += `${m.month}: Spend=$${m.spend}, AdSales=$${m.adSales}, ACOS=${m.acos?.toFixed(1)}%, TotalSales=$${m.totalSales}, TACOS=${m.tacos?.toFixed(1)}%\n`;
+  });
+  return s;
+}
+
+const AGENT_PROMPTS = {
+  analytics: `You are an analytics agent for Medaltus, a multi-brand advertising agency. Analyze performance across ALL brands in the portfolio.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with the most critical portfolio-level findings. Then cover:
+1. PORTFOLIO OVERVIEW: Top-line totals, ACOS vs 30% goal, MoM change
+2. TOP PERFORMERS: Which brands have the best ACOS/ROAS this month? Call out specific numbers.
+3. UNDERPERFORMERS: Which brands are dragging down the portfolio? Why?
+4. ANOMALIES: Any unusual MoM spikes, drops, or outliers?
+5. PACING: If partial month, how is the portfolio tracking vs last month?
+
+Be specific with numbers. Plain text only, no HTML or markdown bold. Under 400 words.`,
+
+  strategy: `You are a paid media strategist for Medaltus managing a portfolio of CPG and wellness brands.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with your top budget recommendations. Then cover:
+1. BUDGET REALLOCATION: Which brands deserve more budget vs less? Give specific rationale.
+2. SCALING OPPORTUNITIES: Brands with strong ACOS (<25%) that could absorb more spend
+3. EFFICIENCY FIXES: Brands with poor ACOS (>40%) — what's the likely fix?
+4. BRAND MIX: Is the portfolio too concentrated in one brand (Skinuva)? What's the risk?
+
+Be specific, cite numbers. Plain text only. Under 400 words.`,
+
+  forecast: `You are a forecasting analyst for Medaltus's advertising portfolio.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with projected performance. Then cover:
+1. MONTH-END FORECAST: Project portfolio totals for spend, ad sales, total sales, ACOS, TACOS
+2. BRAND FORECASTS: For the top 5 brands by spend, project their month-end performance
+3. TRENDS: Which brands are on improving ACOS trends? Worsening?
+4. ALERTS: Any brands that look like they'll significantly miss or beat last month?
+
+Cite specific numbers. Plain text only. Under 400 words.`,
+
+  market: `You are a market intelligence analyst covering digital advertising for CPG/wellness brands on Amazon, Google, and Walmart. Today: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •). Then cover:
+1. SEASONAL FACTORS: What shopping events or seasonal trends affect these brand categories right now?
+2. PLATFORM UPDATES: Recent changes to Amazon Ads, Google Shopping, Walmart Connect that impact this portfolio
+3. CPM/CPC TRENDS: Are costs rising or falling seasonally?
+4. RISKS: What to watch in the next 2-4 weeks
+
+Plain text only. Under 400 words.`
+};
+
+async function runAllAgents() {
+  const btn = document.getElementById('run-all-btn'); btn.classList.add('running'); btn.textContent = 'Running...';
+  ['analytics','strategy','forecast','market'].forEach(name => {
+    try { localStorage.removeItem(agentCacheKey(name)); } catch(e) {}
+  });
+  ['analytics','strategy','forecast','market'].forEach(n => {
+    const s = document.getElementById(n+'-status'), o = document.getElementById(n+'-output');
+    if (s) { s.style.display = 'flex'; s.innerHTML = '<div class="pulse"></div> Waiting...'; }
+    if (o) o.style.display = 'none';
+  });
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  let done = 0;
+  const onDone = () => { done++; if (done >= 4) { btn.classList.remove('running'); btn.textContent = '▶ Run All Agents'; } };
+  try { await runAgent('analytics', 'Run your automatic portfolio analysis.'); } catch(e){} onDone();
+  await delay(3000);
+  try { await runAgent('strategy', 'Which brands should get more or less budget this month? Focus on concrete reallocation recommendations.'); } catch(e){} onDone();
+  await delay(3000);
+  try { await runAgent('forecast', 'Project month-end performance for the portfolio and the top 5 brands by spend.'); } catch(e){} onDone();
+  await delay(3000);
+  try { await runAgent('market', 'Give your current market conditions briefing for this brand portfolio.'); } catch(e){} onDone();
+}
+
+async function runAgent(name, autoPrompt) {
+  const outputEl = document.getElementById(name+'-output');
+  const statusEl = document.getElementById(name+'-status');
+  const inputEl = document.getElementById(name+'-input');
+  const userQ = inputEl ? inputEl.value.trim() : '';
+  if (statusEl) { statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="pulse"></div> Thinking...'; }
+  outputEl.style.display = 'none';
+  const dataSummary = buildDataSummary();
+  let prompt = AGENT_PROMPTS[name] + '\n\nData:\n' + dataSummary;
+  if (userQ) prompt += '\n\nUser question: ' + userQ;
+  if (autoPrompt) prompt += '\n\n' + autoPrompt;
+  try {
+    const _agentResp = await fetch('/api/claude', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    if (!_agentResp.ok) throw new Error('Claude API error: ' + _agentResp.status);
+    const text = (await _agentResp.json()).text || '';
+    if (!userQ) saveAgentCache(name, text);
+    const formatted = formatAgentOutput(text);
+    if (statusEl) statusEl.style.display = 'none';
+    await typeAgentOutput(outputEl, formatted, 8);
+    outputEl.scrollTop = 0;
+    if (inputEl) inputEl.value = '';
+  } catch(err) {
+    outputEl.textContent = 'Agent error: ' + (err.message || err);
+    outputEl.style.display = 'block';
+    if (statusEl) statusEl.style.display = 'none';
+  }
+}
+
+function formatAgentOutput(rawText) {
+  let t = rawText;
+  let prev = '';
+  while (t !== prev) { prev = t; t = t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'); }
+  t = t.replace(/<[^>]*>/g,'');
+  t = t.replace(/\*\*([^*]+)\*\*/g,'$1').replace(/\*([^*]+)\*/g,'$1');
+  t = t.replace(/^KEY TAKEAWAYS:\s*/m,'');
+  t = t.replace(/^• (.+)$/gm,'<div style="padding:4px 0 4px 12px;border-left:2px solid rgba(129,140,248,0.4);margin:3px 0;color:rgba(255,255,255,0.95);font-size:12.5px;">$1</div>');
+  t = t.replace(/^([A-Z][A-Z\s&/]+:)/gm,'<h4>$1</h4>');
+  t = t.replace(/(\d+[\d,.]*%)/g,'<span style="color:#fff;font-weight:600">$1</span>');
+  t = t.replace(/(\$[\d,.]+[KMB]?)/g,'<span style="color:#fff;font-weight:600">$1</span>');
+  t = t.replace(/\b(under \d+%|below \d+%|improving|efficient|on track|favorable)\b/gi,'<span class="good">$1</span>');
+  t = t.replace(/\b(above \d+%|over \d+%|declining|inefficient|concern|risk|warning)\b/gi,'<span class="warn">$1</span>');
+  t = t.replace(/\b(critical|very high|poor|failing|well above)\b/gi,'<span class="bad">$1</span>');
+  return t;
+}
+
+function typeAgentOutput(el, html, speed) {
+  speed = speed || 12;
+  return new Promise(resolve => {
+    el.innerHTML = ''; el.style.display = 'block';
+    const tokens = html.match(/(<[^>]+>)|([^<]+)/g) || [];
+    let i = 0, charIdx = 0, built = '';
+    function typeStep() {
+      if (i >= tokens.length) { el.innerHTML = built; resolve(); return; }
+      const token = tokens[i];
+      if (token.startsWith('<')) { built += token; i++; typeStep(); return; }
+      if (charIdx < token.length) {
+        built += token[charIdx]; charIdx++;
+        el.innerHTML = built + '<span style="display:inline-block;width:2px;height:14px;background:rgba(129,140,248,0.7);animation:pulse 0.8s infinite;vertical-align:middle;margin-left:2px;"></span>';
+        el.scrollTop = el.scrollHeight;
+        setTimeout(typeStep, speed);
+      } else { charIdx = 0; i++; typeStep(); }
+    }
+    typeStep();
+  });
+}
+
+// ── Ticker ──
+function buildTicker(md) {
+  if (!md) return;
+  const items = [];
+  items.push({ l: 'Portfolio Spend', v: '$' + ((md.spend||0)/1000).toFixed(1) + 'K' });
+  items.push({ l: 'Portfolio Sales', v: '$' + ((md.adSales||0)/1000).toFixed(1) + 'K' });
+  items.push({ l: 'ACOS', v: md.acos != null ? md.acos.toFixed(1) + '%' : '—' });
+  items.push({ l: 'Total Sales', v: '$' + ((md.totalSales||0)/1000).toFixed(1) + 'K' });
+  items.push({ l: 'TACOS', v: md.tacos != null ? md.tacos.toFixed(1) + '%' : '—' });
+  items.push({ l: 'Orders', v: md.orders != null ? Math.round(md.orders).toLocaleString() : '—' });
+  md.brands.filter(b => b.spend > 0).sort((a,b2) => (b2.spend||0) - (a.spend||0)).slice(0, 6).forEach(b => {
+    items.push({ l: b.name + ' ACOS', v: b.acos != null && b.adSales > 0 ? b.acos.toFixed(1) + '%' : 'N/A' });
+    items.push({ l: b.name + ' Spend', v: '$' + ((b.spend||0)/1000).toFixed(1) + 'K' });
+  });
+  if (md.partial) items.push({ l: 'Pacing', v: md.daysElapsed + '/' + md.daysInMonth + ' days' });
+  items.push({ l: 'Brands', v: md.brands.filter(b => b.spend > 0).length + ' Active' });
+  items.push({ l: 'Month', v: selectedMonth });
+
+  const track = document.getElementById('ticker-track');
+  let html = '';
+  for (let rep = 0; rep < 2; rep++) {
+    items.forEach(it => { html += `<span class="ticker-item"><span class="ticker-dot"></span><span class="ticker-label">${it.l}</span><span class="ticker-val">${it.v}</span></span>`; });
+  }
+  track.innerHTML = html;
+  document.getElementById('ticker-bar').style.display = 'block';
+}
+
+// ── Market Ticker ──
+function renderTickerHtml(indices, track, loadingEl) {
+  let html = '';
+  for (let rep = 0; rep < 3; rep++) {
+    indices.forEach(idx => {
+      const dirClass = idx.direction === 'up' ? 'up' : idx.direction === 'down' ? 'down' : 'flat';
+      const arrow = idx.direction === 'up' ? '▲' : idx.direction === 'down' ? '▼' : '—';
+      html += `<span class="market-ticker-item"><span class="mt-dot"></span><span class="mt-symbol">${idx.symbol}</span><span class="mt-price">${idx.priceStr || idx.price}</span><span class="mt-change ${dirClass}">${arrow} ${idx.change}</span></span>`;
+    });
+  }
+  track.innerHTML = html;
+  loadingEl.style.display = 'none';
+  track.style.display = 'flex';
+}
+
+async function loadMarketTicker() {
+  const bar = document.getElementById('market-ticker');
+  const track = document.getElementById('market-ticker-track');
+  const loadingEl = document.getElementById('market-ticker-loading');
+  bar.style.display = 'block';
+
+  const YF_SYMBOLS = [
+    ['%5EGSPC','SPX','S&P 500'],
+    ['%5EDJI','DJI','Dow Jones'],
+    ['%5EIXIC','IXIC','NASDAQ'],
+    ['%5ERUT','RUT','Russell 2K'],
+    ['%5ETNX','TNX','10Y Yield'],
+    ['%5EVIX','VIX','VIX'],
+    ['DX-Y.NYB','DXY','USD Index'],
+    ['CL%3DF','CL','WTI Crude'],
+    ['GC%3DF','GC','Gold'],
+  ];
+
+  const fmtPrice = (p) => {
+    if (p == null) return '—';
+    if (p >= 10000) return p.toLocaleString(undefined, {maximumFractionDigits: 0});
+    if (p >= 1000)  return p.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    if (p >= 100)   return p.toFixed(2);
+    return p.toFixed(3);
+  };
+
+  const fetchOne = async ([sym, id]) => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5000);
+    try {
+      const r = await fetch(
+        `https://query2.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`,
+        {signal: controller.signal, headers: {Accept: 'application/json'}}
+      );
+      clearTimeout(timer);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const d = await r.json();
+      const meta = d.chart.result[0].meta;
+      const price = meta.regularMarketPrice;
+      const prev  = meta.previousClose || meta.chartPreviousClose || price;
+      const diff  = prev ? ((price - prev) / Math.abs(prev) * 100) : 0;
+      return {
+        symbol: id,
+        priceStr: fmtPrice(price),
+        change: (diff >= 0 ? '+' : '') + diff.toFixed(2) + '%',
+        direction: diff > 0.05 ? 'up' : diff < -0.05 ? 'down' : 'flat'
+      };
+    } finally { clearTimeout(timer); }
+  };
+
+  // Step 1: try Yahoo Finance
+  try {
+    const settled = await Promise.allSettled(YF_SYMBOLS.map(fetchOne));
+    const indices = settled.filter(r => r.status === 'fulfilled').map(r => r.value);
+    if (indices.length >= 4) {
+      renderTickerHtml(indices, track, loadingEl);
+      return;
+    }
+    throw new Error(`Only ${indices.length} symbols fetched`);
+  } catch(e) {
+    console.warn('[Market Ticker] Yahoo Finance failed:', e.message || e);
+  }
+
+  // Step 2: fall back to askClaude
+  try {
+    const prompt = `You must respond with ONLY a valid JSON array. No other text, no markdown, no explanation.
+
+Return exactly this structure for 9 market items:
+[{"symbol":"SPX","priceStr":"5,300.00","change":"+0.8%","direction":"up"},...]
+
+Items: SPX (S&P 500), DJI (Dow Jones), IXIC (NASDAQ), RUT (Russell 2000), TNX (10-Year Yield as percent), VIX, DXY (USD Index), CL (WTI Crude Oil), GC (Gold).
+
+Use reasonable recent values from your knowledge. Direction must be "up", "down", or "flat".
+Respond with ONLY the JSON array starting with [`;
+
+    const _mktResp = await fetch('/api/claude', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const _mktData = await _mktResp.json();
+    let text = (_mktData.text || '').replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+    const arrMatch = text.match(/\[[\s\S]*\]/);
+    if (!arrMatch) throw new Error('No JSON array in response');
+    const indices = JSON.parse(arrMatch[0]);
+    if (!Array.isArray(indices) || indices.length === 0) throw new Error('Empty array');
+    renderTickerHtml(indices, track, loadingEl);
+  } catch(e2) {
+    console.warn('[Market Ticker] askClaude fallback failed:', e2.message || e2);
+    loadingEl.textContent = 'MARKET DATA UNAVAILABLE';
+    loadingEl.style.color = 'rgba(255,255,255,0.15)';
+  }
+}
+
+// ── Refresh Timer ──
+function startRefreshTimer() {
+  const timerEl = document.getElementById('refresh-timer'), timeEl = document.getElementById('refresh-time'), ringCircle = document.getElementById('refresh-ring-circle');
+  const circumference = 2 * Math.PI * 10; timerEl.style.display = 'flex'; let elapsed = 0;
+  setInterval(() => {
+    elapsed++;
+    const mins = Math.floor(elapsed/60), secs = elapsed % 60;
+    timeEl.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+    ringCircle.style.strokeDashoffset = circumference * (1 - (elapsed % 300) / 300);
+  }, 1000);
+}
+
+// ── WLOS ──
+function getWlosDataHash() {
+  if (!DATA || !selectedMonth) return '';
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  if (!md) return '';
+  const brands = (md.brands || []).filter(b => b.spend > 0)
+    .sort((a, b) => (b.spend || 0) - (a.spend || 0)).slice(0, 8)
+    .map(b => `${b.name}:${b.spend}:${b.acos}`).join(',');
+  return [selectedMonth, md.spend, md.adSales, md.acos, md.totalSales, md.orders, md.daysElapsed || '', brands].join('|');
+}
+
+function wlosHashKey(hash) {
+  let h = 0;
+  for (let i = 0; i < hash.length; i++) h = (Math.imul(31, h) + hash.charCodeAt(i)) | 0;
+  return 'medaltus_ai_wlos_v2_' + Math.abs(h).toString(36);
+}
+
+function renderWlosEntries(el, entries) {
+  const typeOrder = ['Win', 'Loss', 'Opportunity', 'Strategy'];
+  const grouped = {};
+  entries.forEach(w => { if (!grouped[w.type]) grouped[w.type] = []; grouped[w.type].push(w); });
+
+  typeOrder.forEach(type => {
+    const items = grouped[type];
+    if (!items || !items.length) return;
+
+    const label = document.createElement('div'); label.className = 'wlos-section-label';
+    const plural = type === 'Win' ? 'Wins' : type === 'Loss' ? 'Losses' : type === 'Opportunity' ? 'Opportunities' : 'Strategies';
+    label.innerHTML = `<span class="${type.toLowerCase()}-label">${plural}</span>`;
+    el.appendChild(label);
+
+    items.forEach(w => {
+      const d = document.createElement('div'); d.className = 'wlos-card';
+      const tc = w.type.toLowerCase();
+      const wlosKey = 'medwlos_' + selectedMonth + '_' + w.type + '_' + (w.brand || '') + '_' + (w.finding || '').substring(0, 40);
+      const savedStatus = localStorage.getItem(wlosKey) || 'Open';
+      const statusClass = 's-' + savedStatus.toLowerCase().replace(/\s+/g, '-');
+      const brandColor = BRAND_COLORS[w.brand] || 'rgba(255,255,255,0.5)';
+
+      d.innerHTML = `<span class="type-badge ${tc}">${w.type}</span><span class="priority-badge">${w.priority || ''}</span>
+        <span class="brand-tag" style="color:${brandColor}">${w.brand || ''}</span>
+        <select class="status-select ${statusClass}" data-wlos-key="${wlosKey}">
+          <option value="Open"${savedStatus === 'Open' ? ' selected' : ''}>Open</option>
+          <option value="Monitor"${savedStatus === 'Monitor' ? ' selected' : ''}>Monitor</option>
+          <option value="In Progress"${savedStatus === 'In Progress' ? ' selected' : ''}>In Progress</option>
+          <option value="Complete"${savedStatus === 'Complete' ? ' selected' : ''}>Complete</option>
+        </select>
+        <div class="finding">${w.finding || ''}</div><div class="action">${w.action || ''}</div>`;
+
+      const sel = d.querySelector('.status-select');
+      sel.addEventListener('change', function() {
+        localStorage.setItem(this.dataset.wlosKey, this.value);
+        this.className = 'status-select s-' + this.value.toLowerCase().replace(/\s+/g, '-');
+      });
+      el.appendChild(d);
+    });
+  });
+}
+
+async function generateAIWlos() {
+  const dataSummary = buildDataSummary();
+  const prompt = `You are an advertising strategist analyzing the Medaltus multi-brand portfolio. Generate WLOS (Wins, Losses, Opportunities, Strategies) entries based on the data below.
+
+Return ONLY a valid JSON array — no other text, no markdown fences. Each entry must follow this exact structure:
+{"type":"Win","priority":"High","brand":"Skinuva","finding":"specific observation with real numbers from the data","action":"concrete next step the team should take"}
+
+Requirements:
+- Exactly 16 total entries: 4 Wins, 4 Losses, 4 Opportunities, 4 Strategies
+- type: exactly Win, Loss, Opportunity, or Strategy
+- priority: exactly High, Medium, or Low
+- brand: the specific brand name, or "All Brands" for portfolio-level findings
+- finding: cite specific numbers (ACOS %, spend $, sales $, MoM change %) — reference the specific brand
+- action: specific and actionable, time-bound where possible
+- Wins and Losses focus on single brands with standout performance (positive or negative)
+- Opportunities and Strategies can be brand-specific or portfolio-level
+- Focus on the most recent month; reference MoM trends where relevant
+
+Data:
+${dataSummary}
+
+Return ONLY the JSON array starting with [`;
+
+  const _wlosResp = await fetch('/api/claude', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+  if (!_wlosResp.ok) throw new Error('Claude API error');
+  const text = (await _wlosResp.json()).text || '';
+  const clean = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+  const arrMatch = clean.match(/\[[\s\S]*\]/);
+  if (!arrMatch) throw new Error('No JSON array in response');
+  const entries = JSON.parse(arrMatch[0]);
+  if (!Array.isArray(entries) || entries.length === 0) throw new Error('Empty or invalid WLOS array');
+  return entries;
+}
+
+function renderWLOS() {
+  const section = document.getElementById('wlos-section');
+  const el = document.getElementById('wlos-container');
+  const sub = document.getElementById('wlos-sub');
+  el.innerHTML = '';
+  section.style.display = '';
+
+  // Add Regenerate button once
+  if (!document.getElementById('wlos-regen-btn')) {
+    const hdr = section.querySelector('.section-header');
+    if (hdr) {
+      const btn = document.createElement('button');
+      btn.id = 'wlos-regen-btn';
+      btn.textContent = '✨ Regenerate';
+      btn.style.cssText = 'margin-top:8px;padding:5px 14px;border-radius:10px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);transition:all 0.2s;';
+      btn.onmouseenter = () => { btn.style.background = 'linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'; btn.style.color = '#c7d2fe'; };
+      btn.onmouseleave = () => { btn.style.background = 'linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'; btn.style.color = 'rgba(129,140,248,0.9)'; };
+      btn.onclick = () => {
+        localStorage.removeItem(wlosHashKey(getWlosDataHash()));
+        renderWLOS();
+      };
+      hdr.appendChild(btn);
+    }
+  }
+
+  // Check cache — keyed by data hash so it auto-invalidates when data changes
+  const hash = getWlosDataHash();
+  const cacheKey = wlosHashKey(hash);
+  let cached = null;
+  try {
+    const raw = localStorage.getItem(cacheKey);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.entries) && parsed.entries.length > 0) cached = parsed;
+    }
+  } catch(e) {}
+
+  if (cached) {
+    const dt = new Date(cached.generatedAt);
+    sub.textContent = 'AI Analysis · ' + dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    renderWlosEntries(el, cached.entries);
+    return;
+  }
+
+  // No cache — generate
+  sub.textContent = 'Generating AI analysis...';
+  el.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;gap:12px;padding:24px 4px;color:rgba(255,255,255,0.35);font-size:13px;">
+    <div style="width:18px;height:18px;border:2px solid rgba(129,140,248,0.2);border-top-color:#818cf8;border-radius:50%;animation:spin 0.8s linear infinite;flex-shrink:0;"></div>
+    Analyzing portfolio performance and generating insights...
+  </div>`;
+
+  generateAIWlos().then(entries => {
+    try { localStorage.setItem(cacheKey, JSON.stringify({entries, generatedAt: Date.now()})); } catch(e) {}
+    sub.textContent = 'AI Analysis · ' + new Date().toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    el.innerHTML = '';
+    renderWlosEntries(el, entries);
+  }).catch(err => {
+    console.error('[WLOS AI] Generation failed:', err);
+    section.style.display = 'none';
+  });
+}
+
+// ── Agent cache helpers (keyed to same data fingerprint as WLOS) ──
+function agentCacheKey(name) {
+  return 'medaltus_agent_v1_' + name + '_' + wlosHashKey(getWlosDataHash());
+}
+
+function saveAgentCache(name, rawText) {
+  try { localStorage.setItem(agentCacheKey(name), JSON.stringify({rawText, generatedAt: Date.now()})); } catch(e) {}
+}
+
+function loadAgentCache(name) {
+  try {
+    const raw = localStorage.getItem(agentCacheKey(name));
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    return (p && p.rawText) ? p : null;
+  } catch(e) { return null; }
+}
+
+function showAgentFromCache(name, rawText, generatedAt) {
+  const outputEl = document.getElementById(name+'-output');
+  const statusEl = document.getElementById(name+'-status');
+  if (!outputEl) return;
+  const formatted = formatAgentOutput(rawText);
+  if (statusEl) statusEl.style.display = 'none';
+  outputEl.innerHTML = formatted;
+  outputEl.style.display = 'block';
+  const dt = new Date(generatedAt);
+  const stamp = document.createElement('div');
+  stamp.style.cssText = 'margin-top:10px;font-size:10px;color:rgba(255,255,255,0.18);text-align:right;';
+  stamp.textContent = 'Last updated ' + dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+  outputEl.appendChild(stamp);
+}
+
+const AGENT_AUTO_PROMPTS = {
+  analytics: 'Run your automatic portfolio analysis.',
+  strategy: 'Which brands should get more or less budget this month? Focus on concrete reallocation recommendations.',
+  forecast: 'Project month-end performance for the portfolio and the top 5 brands by spend.',
+  market: 'Give your current market conditions briefing for this brand portfolio.'
+};
+
+async function initAgents() {
+  const names = ['analytics', 'strategy', 'forecast', 'market'];
+  const delay = ms => new Promise(r => setTimeout(r, ms));
+  const toRun = [];
+
+  // Instantly restore from cache; queue anything missing
+  names.forEach(name => {
+    const cached = loadAgentCache(name);
+    if (cached) {
+      showAgentFromCache(name, cached.rawText, cached.generatedAt);
+    } else {
+      toRun.push(name);
+    }
+  });
+
+  if (toRun.length === 0) return;
+
+  // Auto-run uncached agents sequentially
+  for (let i = 0; i < toRun.length; i++) {
+    try { await runAgent(toRun[i], AGENT_AUTO_PROMPTS[toRun[i]]); }
+    catch(e) { console.warn('[Agents] Auto-run failed for', toRun[i], e); }
+    if (i < toRun.length - 1) await delay(2000);
+  }
+}
+
+// ── Init ──
+async function init() {
+  try {
+    const [text, _supplement] = await Promise.all([
+      fetch('/api/sheets').then(r => { if (!r.ok) throw new Error('Sheets API error: ' + r.status); return r.text(); }),
+      fetch('/data/api_supplement.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
+    ]);
+    API_SUPPLEMENT = _supplement;
+    DATA = parseSheet(text);
+    mergeApiSupplement(DATA);
+    if (!DATA.monthly.length) throw new Error('No brand data found. The sheet format may have changed.');
+    selectedMonth = DATA.monthly[DATA.monthly.length - 1].month;
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    render();
+    startRefreshTimer();
+    loadMarketTicker();
+    initAgents();
+  } catch(err) {
+    document.getElementById('loading').style.display = 'none';
+    const b = document.getElementById('error-banner'); b.style.display = 'block';
+    b.textContent = 'Failed to load: ' + (err.message || err);
+    console.error(err);
+  }
+}
+
+// Enter key support
+['analytics','strategy','forecast','market'].forEach(name => {
+  const input = document.getElementById(name+'-input');
+  if (input) input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); runAgent(name); } });
+});
+
+
+function exportPDF() {
+  const month = document.querySelector('.tab-btn.active')?.textContent?.trim() || 'Dashboard';
+  const prev = document.title;
+  document.title = 'Medaltus Ad Dashboard — ' + month;
+  window.print();
+  document.title = prev;
+}
+
+
+// ── Quality Control ──────────────────────────────────────────────────────────
+
+function openQC() {
+  const overlay = document.getElementById('qc-overlay');
+  overlay.style.display = 'flex';
+  // Wire close-on-backdrop-click once
+  if (!overlay._qcWired) {
+    overlay.addEventListener('click', function(e) { if (e.target === this) closeQC(); });
+    overlay._qcWired = true;
+  }
+  runQC();
+}
+
+function closeQC() {
+  document.getElementById('qc-overlay').style.display = 'none';
+}
+
+function qcRow(icon, label, detail, severity) {
+  // severity: 'ok' | 'warn' | 'error'
+  const colors = {
+    ok:    { bg: 'rgba(52,211,153,0.08)', border: 'rgba(52,211,153,0.2)',  icon: '#34d399', text: 'rgba(52,211,153,0.9)' },
+    warn:  { bg: 'rgba(251,191,36,0.08)', border: 'rgba(251,191,36,0.2)',  icon: '#fbbf24', text: 'rgba(251,191,36,0.9)' },
+    error: { bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.2)', icon: '#f87171', text: 'rgba(248,113,113,0.9)' },
+  }[severity] || { bg:'rgba(255,255,255,0.04)', border:'rgba(255,255,255,0.08)', icon:'#aaa', text:'#aaa' };
+
+  return `<div style="display:flex;align-items:flex-start;gap:12px;background:${colors.bg};border:1px solid ${colors.border};border-radius:12px;padding:12px 16px;margin-bottom:8px;">
+    <span style="font-size:16px;color:${colors.icon};flex-shrink:0;margin-top:1px;">${icon}</span>
+    <div>
+      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;">${label}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);">${detail}</div>
+    </div>
+  </div>`;
+}
+
+function fmtM(v) { return v == null ? '—' : '$' + v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+function runQC() {
+  const content = document.getElementById('qc-content');
+  const footer  = document.getElementById('qc-footer');
+  let rows = '';
+  let warns = 0, errors = 0;
+
+  // Get active month data
+  const activeTab = document.querySelector('.tab-btn.active');
+  const activeMonth = activeTab ? activeTab.textContent.trim() : null;
+  const months = Object.keys(API_SUPPLEMENT);
+  const checkMonth = activeMonth && API_SUPPLEMENT[activeMonth] ? activeMonth : months[months.length - 1];
+  const mData = API_SUPPLEMENT[checkMonth];
+
+  rows += `<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:12px;margin-top:4px;">Checking: ${checkMonth}</div>`;
+
+  // ── Check 1: brands with null total sales ─────────────────────────────────
+  const nullSales = (mData.brands || []).filter(b => b.totalSales == null && b.spend > 0);
+  if (nullSales.length === 0) {
+    rows += qcRow('✓', 'Total Sales: All brands mapped', 'SP-API ASIN→brand mapping complete for all active brands', 'ok');
+  } else {
+    errors++;
+    const names = nullSales.map(b => b.name).join(', ');
+    rows += qcRow('✗', `Total Sales missing for ${nullSales.length} brand${nullSales.length>1?'s':''}`, `${names} — ASIN→brand mapping gap. Run fetch_total_sales.py to rebuild cache.`, 'error');
+  }
+
+  // ── Check 2: brands where ad sales > total sales (impossible) ────────────
+  const adGtTotal = (mData.brands || []).filter(b =>
+    b.totalSales != null && b.adSales != null && b.totalSales > 0 && b.adSales > b.totalSales
+  );
+  if (adGtTotal.length === 0) {
+    rows += qcRow('✓', 'Ad Sales ≤ Total Sales for all brands', 'No brands show more ad-attributed sales than total sales', 'ok');
+  } else {
+    warns++;
+    const detail = adGtTotal.map(b => `${b.name} (Ad Sales ${fmtM(b.adSales)} vs Total ${fmtM(b.totalSales)})`).join('; ');
+    rows += qcRow('⚠', `Ad Sales exceeds Total Sales (${adGtTotal.length} brand${adGtTotal.length>1?'s':''})`, detail + ' — possible late-posting orders or API delay.', 'warn');
+  }
+
+  // ── Check 3: TACOS sanity (tacos > 100% is unusual) ─────────────────────
+  const highTacos = (mData.brands || []).filter(b => b.tacos != null && b.tacos > 80 && b.spend > 50);
+  if (highTacos.length === 0) {
+    rows += qcRow('✓', 'TACOS within normal range', 'No brands show TACOS > 80% with meaningful spend', 'ok');
+  } else {
+    warns++;
+    const detail = highTacos.map(b => `${b.name} (${b.tacos.toFixed(1)}%)`).join(', ');
+    rows += qcRow('⚠', `High TACOS detected`, `${detail} — verify total sales figures are complete`, 'warn');
+  }
+
+  // ── Check 4: Portfolio-level total sales vs sum of brand sales ────────────
+  const brandSum = (mData.brands || []).reduce((s, b) => s + (b.totalSales || 0), 0);
+  const portTotal = mData.totalSales;
+  if (portTotal && brandSum > 0) {
+    const diff = Math.abs(portTotal - brandSum);
+    const pct  = (diff / portTotal) * 100;
+    if (pct < 5) {
+      rows += qcRow('✓', 'Portfolio total matches brand sum', `Portfolio: ${fmtM(portTotal)} | Brand sum: ${fmtM(Math.round(brandSum))} (${pct.toFixed(1)}% diff)`, 'ok');
+    } else {
+      warns++;
+      rows += qcRow('⚠', 'Portfolio total vs brand sum mismatch', `Portfolio: ${fmtM(portTotal)} | Brand sum: ${fmtM(Math.round(brandSum))} (${pct.toFixed(1)}% gap) — some brands may have unmapped ASINs`, 'warn');
+    }
+  } else {
+    const mappedBrands = (mData.brands || []).filter(b => b.totalSales != null).length;
+    rows += qcRow('⚠', 'Cannot verify portfolio total', `${mappedBrands} of ${(mData.brands||[]).filter(b=>b.spend>0).length} active brands have total sales data`, mappedBrands === (mData.brands||[]).filter(b=>b.spend>0).length ? 'ok' : 'warn');
+    if (mappedBrands < (mData.brands||[]).filter(b=>b.spend>0).length) warns++;
+  }
+
+  // ── Check 5: Data freshness ───────────────────────────────────────────────
+  // API_SUPPLEMENT June entry — check if it has today's data
+  const juneBrands = (mData.brands || []).filter(b => b.spend > 0);
+  if (juneBrands.length > 0) {
+    rows += qcRow('✓', 'API data loaded', `${juneBrands.length} active brands in ${checkMonth}`, 'ok');
+  } else {
+    errors++;
+    rows += qcRow('✗', 'No brand data for this month', 'API_SUPPLEMENT may be stale — re-run morning script', 'error');
+  }
+
+  // ── Check 6: Brands with spend but zero ad sales ──────────────────────────
+  const spendNoSales = (mData.brands || []).filter(b => b.spend > 100 && (!b.adSales || b.adSales === 0));
+  if (spendNoSales.length === 0) {
+    rows += qcRow('✓', 'All high-spend brands have ad sales', 'No brands spending >$100 with $0 attributed ad sales', 'ok');
+  } else {
+    warns++;
+    const names = spendNoSales.map(b => `${b.name} (${fmtM(b.spend)} spend)`).join(', ');
+    rows += qcRow('⚠', `High spend, zero ad sales (${spendNoSales.length} brand${spendNoSales.length>1?'s':''})`, names + ' — may need attribution window time', 'warn');
+  }
+
+  content.innerHTML = rows;
+
+  // Summary line
+  if (errors === 0 && warns === 0) {
+    footer.innerHTML = '&#10003; All checks passed — data looks clean';
+  } else {
+    const parts = [];
+    if (errors) parts.push(`${errors} error${errors>1?'s':''}`);
+    if (warns)  parts.push(`${warns} warning${warns>1?'s':''}`);
+    footer.innerHTML = parts.join(', ') + ' found — see details above';
+  }
+}
+
+
+init();
+</script>
+
+<!-- QC Modal -->
+<div id="qc-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(18,18,28,0.98),rgba(12,12,20,0.99));border:1px solid rgba(251,191,36,0.25);border-radius:20px;padding:32px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(251,191,36,0.6);text-transform:uppercase;margin-bottom:4px;">Data Integrity</div>
+        <h2 style="font-size:22px;font-weight:800;color:#fff;margin:0;">Quality Control</h2>
+      </div>
+      <button onclick="closeQC()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.5);font-size:18px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">&times;</button>
+    </div>
+    <div id="qc-content"></div>
+    <div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);text-align:right;" id="qc-footer"></div>
+  </div>
+</div>
+
+</body>
+</html>

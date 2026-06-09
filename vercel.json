@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "functions": {
+    "api/sheets.js": { "memory": 512, "maxDuration": 30 },
+    "api/claude.js": { "memory": 256, "maxDuration": 30 }
+  },
+  "rewrites": [
+    { "source": "/", "destination": "/reports/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    }
+  ]
+}
