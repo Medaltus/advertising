@@ -648,11 +648,22 @@ function parseSheet(text) {
   }
   function dataRows(tbl) { return tbl.filter(l => !isSep(l)); }
 
+  // Pre-process: strip leading junk rows (all-empty rows, or group-label rows
+  // where the first cell is blank) so the real header is always at index 0.
+  // The Google Sheet prepends an empty row and/or a channel-group label row
+  // before the actual column headers.
+  const cleanTables = tables.map(tbl => {
+    const rows = dataRows(tbl);
+    let start = 0;
+    while (start < rows.length - 1 && !(splitRow(rows[start])[0] || '').trim()) start++;
+    return start > 0 ? rows.slice(start) : tbl;
+  });
+
   // Classify each table
   let channelTable = null, totalsTable = null;
   const brandTables = [];
 
-  for (const tbl of tables) {
+  for (const tbl of cleanTables) {
     const rows = dataRows(tbl);
     if (rows.length < 2) continue;
     const hdr = splitRow(rows[0]);
