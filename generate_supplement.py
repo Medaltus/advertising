@@ -17,12 +17,13 @@ The script:
 Then commit and push — Vercel auto-deploys.
 """
 
+import calendar
 import json
 import re
 import sys
 from pathlib import Path
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 MONTH_NAMES = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -126,7 +127,7 @@ def build_supplement(data: dict) -> dict:
                 'tacos':       None,
                 'impressions': impr,
                 'clicks':      clicks,
-                'ctr':         safe_div(clicks, impr),
+                'ctr':         safe_div(clicks * 100, impr),
                 'cpc':         safe_div(spend, clicks),
                 'cr':          None,
                 'orders':      purchases if purchases else None,
@@ -155,7 +156,7 @@ def build_supplement(data: dict) -> dict:
             'tacos':       None,
             'impressions': t_impr,
             'clicks':      t_clicks,
-            'ctr':         safe_div(t_clicks, t_impr),
+            'ctr':         safe_div(t_clicks * 100, t_impr),
             'cpc':         safe_div(t_spend, t_clicks),
             'cr':          None,
             'orders':      t_orders if t_orders else None,
@@ -169,6 +170,58 @@ def build_supplement(data: dict) -> dict:
         supplement.items(),
         key=lambda x: datetime.strptime(x[0], '%B %Y')
     ))
+
+
+def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
+    """
+    Populate totalSales and tacos in the supplement using SP-API data.
+    Calls SP-API once per calendar month that appears in the supplement.
+    """
+    parent = str(Path(__file__).parent.parent)
+    if parent not in sys.path:
+        sys.path.insert(0, parent)
+    from fetch_total_sales import fetch_brand_sales_for_period  # noqa
+
+    # Months before this date use the Google Sheet for totalSales.
+    # June 2026 and later always use SP-API.
+    API_ERA_START = (2026, 6)
+
+    today = date.today()
+
+    for mk, entry in supplement.items():
+        month_dt  = datetime.strptime(mk, '%B %Y')
+        if (month_dt.year, month_dt.month) < API_ERA_START:
+            # Pre-API era: totalSales comes from the Google Sheet.
+            continue
+
+        first_day = date(month_dt.year, month_dt.month, 1)
+
+        if month_dt.year == today.year and month_dt.month == today.month:
+            last_day = today - timedelta(days=1)
+        else:
+            _, last_num = calendar.monthrange(month_dt.year, month_dt.month)
+            last_day = date(month_dt.year, month_dt.month, last_num)
+
+        start_str = first_day.isoformat()
+        end_str   = last_day.isoformat()
+
+        print(f"\n  [{mk}] Fetching SP-API sales {start_str} → {end_str}…")
+        try:
+            brand_sales = fetch_brand_sales_for_period(cfg, start_str, end_str)
+        except Exception as exc:
+            print(f"  ⚠  SP-API failed for {mk}: {exc} — totalSales will be None")
+            continue
+
+        # Brand-level totalSales + tacos
+        for b in entry['brands']:
+            ts = brand_sales.get(b['name'])
+            b['totalSales'] = ts
+            b['tacos']      = acos_pct(b['spend'], ts) if ts else None
+
+        # Portfolio-level totalSales = sum of brand totals; tacos = spend / totalSales
+        t_total = sum(b['totalSales'] or 0 for b in entry['brands'])
+        entry['totalSales'] = round(t_total, 2) if t_total else None
+        entry['tacos']      = acos_pct(entry['spend'], entry['totalSales'])
 
 
 def main():
@@ -189,6 +242,19 @@ def main():
     print(f"  Fetched at: {fetched_at}  |  {len(data.get('brands', []))} brands")
 
     supplement = build_supplement(data)
+
+    # Enrich with SP-API total sales per calendar month
+    cfg_path = script_dir.parent / 'config.json'
+    if cfg_path.exists():
+        try:
+            cfg = json.loads(cfg_path.read_text())
+            print("\nEnriching with SP-API total sales…")
+            enrich_with_sp_sales(supplement, cfg)
+        except Exception as exc:
+            print(f"\n⚠  SP-API enrichment failed: {exc}")
+            print("   totalSales will be None — check config.json and SP-API credentials")
+    else:
+        print(f"\n⚠  config.json not found at {cfg_path} — skipping SP-API enrichment")
 
     out_dir.mkdir(parents=True, exist_ok=True)
     out_json.write_text(json.dumps(supplement, indent=2))
