@@ -625,6 +625,9 @@ function identifyBrand(campaignName, brands) {
 function parseSheet(text) {
   // Clean HTML entities and escape sequences
   text = text.replace(/&#10;/g, ' ').replace(/\\\-/g, '-').replace(/\\#/g, '#').replace(/\\!/g, '!');
+  // Merge wrapped cell content: a newline NOT followed by | or another newline
+  // is a line-break inside a cell value (e.g. "% SALES\nFROM ADS"). Join with space.
+  text = text.replace(/\n(?!\n)(?!\|)/g, ' ');
 
   const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
