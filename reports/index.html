@@ -656,9 +656,22 @@ function parseSheet(text) {
     const rows = dataRows(tbl);
     if (rows.length < 2) continue;
     const hdr = splitRow(rows[0]);
-    const h0 = (hdr[0] || '').toLowerCase();
-    const h1 = (hdr[1] || '').toLowerCase();
-    if (h0.replace('/', ' ') === 'month year' || h0 === 'month/year') {
+    const h0 = (hdr[0] || '').toLowerCase().trim();
+    const h1 = (hdr[1] || '').toLowerCase().trim();
+    const h2 = (hdr[2] || '').toLowerCase().trim();
+    const isMonthYearPrefix = (h0 === 'month/year' || h0.replace('/', ' ') === 'month year');
+
+    if (isMonthYearPrefix && h1 === 'month' && h2.includes('brand')) {
+      // Brand table with leading MONTH/YEAR prefix column — strip it client-side
+      // (Google Sheet exports MONTH/YEAR as first col; parser expects MONTH | BRAND NAME | ...)
+      const stripped = tbl.map(line => {
+        const parts = line.split('|');
+        // parts[0] = '' (before first |), parts[1] = MONTH/YEAR cell, parts[2..] = rest
+        if (parts.length > 2) { parts.splice(1, 1); }
+        return parts.join('|');
+      });
+      brandTables.push(stripped);
+    } else if (isMonthYearPrefix) {
       channelTable = tbl;
     } else if (!totalsTable && hdr.length === 5 && h0.includes('ad spend')) {
       totalsTable = tbl;
