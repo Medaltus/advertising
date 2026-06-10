@@ -42,12 +42,11 @@ function normalizeRows(rows) {
     }
     const c0 = (row[0] || '').trim();
     const c1 = (row[1] || '').trim();
-    // Brand data rows have the month value duplicated in both c0 and c1
-    if (c0 === c1) {
-      // Drop the redundant first column
+    // Brand rows: month duplicated in c0 and c1 — drop c0
+    // TOTAL rows: c0 is empty (sheet leaves MONTH/YEAR blank), c1 has the month — also drop c0
+    if (c0 === c1 || c0 === '') {
       return row.slice(1);
     }
-    // TOTAL rows and other rows already start with just the month in c0
     return row;
   });
 }
