@@ -1031,7 +1031,7 @@ function render() {
     { l: 'Clicks', v: fmt(bdata.clicks, '', 0), k: 'clicks', px: '', dc: 0 },
     { l: 'CTR', v: pct(bdata.ctr), k: 'ctr', ip2: true },
     { l: 'CPC', v: bdata.cpc != null ? '$' + bdata.cpc.toFixed(2) : '—', k: 'cpc', inv: true, dl: true },
-    { l: 'Orders', v: bdata.orders != null ? Math.round(bdata.orders).toLocaleString() : '—', k: 'orders', ord: true },
+    { l: 'Ad Orders', v: bdata.orders != null ? Math.round(bdata.orders).toLocaleString() : '—', k: 'orders', ord: true },
     { l: 'AOV', v: bdata.aov != null ? '$' + bdata.aov.toFixed(2) : '—', k: 'aov', dl: true },
   ];
   k2.forEach(x => {
