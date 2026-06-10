@@ -724,14 +724,24 @@ function parseSheet(text) {
       if (brand.toUpperCase() === 'BRAND NAME') continue;
       if (month.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) lastSeenMonth = month;
       if (brand.toUpperCase() === 'TOTAL') {
-        // Use TOTAL row to set/override monthly totals
-        if (lastSeenMonth && !monthTotals[lastSeenMonth]) {
+        // Use TOTAL row to set/override monthly totals.
+        // Always apply totalSales/tacos from this row — it comes from Easy-Insight
+        // (SP-API) and is more reliable than the totalsTable for those fields.
+        if (lastSeenMonth) {
           const spend = parseNum(c[2]);
           if (spend != null) {
-            monthTotals[lastSeenMonth] = {
-              spend, adSales: parseNum(c[3]), acos: parseNum(c[4]),
-              totalSales: parseNum(c[5]), tacos: parseNum(c[6])
-            };
+            if (!monthTotals[lastSeenMonth]) {
+              monthTotals[lastSeenMonth] = {
+                spend, adSales: parseNum(c[3]), acos: parseNum(c[4]),
+                totalSales: parseNum(c[5]), tacos: parseNum(c[6])
+              };
+            } else {
+              // Entry already set by totalsTable — fill in missing totalSales/tacos
+              if (monthTotals[lastSeenMonth].totalSales == null)
+                monthTotals[lastSeenMonth].totalSales = parseNum(c[5]);
+              if (monthTotals[lastSeenMonth].tacos == null)
+                monthTotals[lastSeenMonth].tacos = parseNum(c[6]);
+            }
           }
         }
         continue;
