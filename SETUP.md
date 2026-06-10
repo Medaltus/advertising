@@ -31,7 +31,7 @@ Go to https://github.com and sign up. GitHub is where your code lives — think 
 A "repo" is just a folder on GitHub.
 
 1. Go to https://github.com/new
-2. Under "Repository name" type: `medaltus-ad-dashboard`
+2. Under "Repository name" type: `advertising`
 3. Click **Private**
 4. **Do not** check any of the "Initialize this repository" boxes
 5. Click **Create repository**
@@ -70,7 +70,7 @@ git branch -M main
 
 Now, on the GitHub page you left open, copy the line that looks like this (yours will have your username):
 ```
-git remote add origin https://github.com/YOUR_USERNAME/medaltus-ad-dashboard.git
+git remote add origin https://github.com/Medaltus/advertising.git
 ```
 Paste it in Terminal and press Enter.
 
@@ -113,7 +113,7 @@ It will ask a few questions — answer them like this:
 - **In which directory is your code located?** → press Enter (current folder)
 - **Want to modify these settings?** → type `n` and press Enter
 
-Vercel will deploy. It'll give you a URL like `https://medaltus-ad-dashboard.vercel.app` — the dashboard won't fully work yet because we need to add the passwords in Step 6.
+Vercel will deploy. It'll give you a URL like `https://advertising.vercel.app` — the dashboard won't fully work yet because we need to add the passwords in Step 6.
 
 ---
 
@@ -169,7 +169,7 @@ After adding all three, scroll up and click **Redeploy** (or go to Deployments �
 
 ## Step 7 — Open Your Dashboard
 
-Go to your Vercel URL (e.g., `https://medaltus-ad-dashboard.vercel.app`).
+Go to your Vercel URL (e.g., `https://advertising.vercel.app`).
 
 The dashboard should load with live data. If something doesn't work, check:
 - Vercel → your project → **Functions** tab — it shows errors in plain English

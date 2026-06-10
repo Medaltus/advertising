@@ -10,6 +10,48 @@ const { getSheetsClient } = require('./config/_sheets_client');
 
 const SHEET_ID = process.env.SHEET_ID || '11FfiFyI4v40WZNBfe04KiwT5jB1g74L5VPnV2AJ3X6c';
 
+// The dashboard parser expects brand tables with:
+//   MONTH | BRAND NAME | SPEND | AD SALES | ACOS | TOTAL SALES | TACOS | ...
+//
+// The Google Sheet uses an extra leading MONTH/YEAR column:
+//   MONTH/YEAR | MONTH | BRAND NAME | SPEND | ...
+//
+// Brand rows duplicate the month: June 2026 | June 2026 | Amala | ...
+// TOTAL rows skip the duplicate:  June 2026 | TOTAL | $3,019.93 | ...
+//
+// This function normalises the table so the parser always sees:
+//   MONTH | BRAND NAME | SPEND | ...   (standard format)
+function normalizeRows(rows) {
+  if (!rows || rows.length === 0) return rows;
+
+  const headerCells = rows[0].map(c => (c || '').toString().trim().toLowerCase());
+  const h0 = headerCells[0] || '';
+  const h1 = headerCells[1] || '';
+
+  // Only normalise tables with the extra MONTH/YEAR prefix column
+  const hasMonthYearPrefix =
+    (h0 === 'month/year' || h0.replace('/', ' ') === 'month year') &&
+    (h1 === 'month');
+
+  if (!hasMonthYearPrefix) return rows;
+
+  return rows.map((row, rowIdx) => {
+    if (rowIdx === 0) {
+      // Header: drop the MONTH/YEAR column, keep MONTH | BRAND NAME | ...
+      return row.slice(1);
+    }
+    const c0 = (row[0] || '').trim();
+    const c1 = (row[1] || '').trim();
+    // Brand data rows have the month value duplicated in both c0 and c1
+    if (c0 === c1) {
+      // Drop the redundant first column
+      return row.slice(1);
+    }
+    // TOTAL rows and other rows already start with just the month in c0
+    return row;
+  });
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -31,8 +73,11 @@ module.exports = async function handler(req, res) {
         valueRenderOption: 'FORMATTED_VALUE',
       });
 
-      const rows = response.data.values || [];
+      let rows = response.data.values || [];
       if (rows.length === 0) continue;
+
+      // Normalise away the extra MONTH/YEAR prefix column if present
+      rows = normalizeRows(rows);
 
       // Find the max column count across all rows
       const maxCols = Math.max(...rows.map(r => r.length));

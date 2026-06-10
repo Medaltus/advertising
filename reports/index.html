@@ -531,9 +531,31 @@ function mergeApiSupplement(data) {
     const isCurrentMonth = mIdx === today.getMonth() && yrNum === today.getFullYear();
     if (existing.has(monthKey)) {
       if (isCurrentMonth) {
-        // Current partial month: API always wins — remove Google Sheet version
+        // Current partial month: API wins for ad metrics, but Google Sheet holds
+        // real Total Sales (from SP-API via Easy-Insight) — preserve those values.
         const idx = data.monthly.findIndex(m => m.month === monthKey);
-        if (idx !== -1) data.monthly.splice(idx, 1);
+        if (idx !== -1) {
+          const sheetEntry = data.monthly[idx];
+          // Portfolio-level totalSales / TACOS: fall back to sheet when API has null
+          if (apiEntry.totalSales == null && sheetEntry.totalSales != null)
+            apiEntry.totalSales = sheetEntry.totalSales;
+          if (apiEntry.tacos == null && sheetEntry.tacos != null)
+            apiEntry.tacos = sheetEntry.tacos;
+          // Brand-level totalSales / TACOS
+          if (apiEntry.brands && sheetEntry.brands) {
+            apiEntry.brands = apiEntry.brands.map(ab => {
+              const sb = sheetEntry.brands.find(b => b.name === ab.name);
+              if (sb) {
+                const merged = Object.assign({}, ab);
+                if (merged.totalSales == null && sb.totalSales != null) merged.totalSales = sb.totalSales;
+                if (merged.tacos == null && sb.tacos != null) merged.tacos = sb.tacos;
+                return merged;
+              }
+              return ab;
+            });
+          }
+          data.monthly.splice(idx, 1);
+        }
       } else {
         // Historical month: keep Google Sheet data (has real totalSales/TACOS from Easy-Insight)
         // but supplement campaigns if missing

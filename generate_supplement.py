@@ -63,8 +63,13 @@ def build_supplement(data: dict) -> dict:
         campaigns = brand.get('campaigns', [])
 
         # ── Aggregate timeline into monthly buckets ─────────────────────────
+        # NOTE: We do NOT aggregate the Amazon Ads 'totalSales' field.
+        # That field is a rolling attribution-window metric, not a true daily
+        # value — summing it across days inflates the number massively.
+        # Real Total Sales (from SP-API via Easy-Insight) lives in the Google
+        # Sheet and is preserved by the dashboard's merge logic.
         monthly: dict = defaultdict(lambda: {
-            'spend': 0.0, 'sales': 0.0, 'totalSales': 0.0,
+            'spend': 0.0, 'sales': 0.0,
             'impressions': 0, 'clicks': 0, 'purchases': 0,
         })
 
@@ -73,7 +78,6 @@ def build_supplement(data: dict) -> dict:
             m  = monthly[mk]
             m['spend']       += float(row.get('spend', 0) or 0)
             m['sales']       += float(row.get('sales', 0) or 0)
-            m['totalSales']  += float(row.get('totalSales', 0) or 0)
             m['impressions'] += int(row.get('impressions', 0) or 0)
             m['clicks']      += int(row.get('clicks', 0) or 0)
             m['purchases']   += int(row.get('purchases', 0) or 0)
@@ -89,7 +93,6 @@ def build_supplement(data: dict) -> dict:
         for mk, m in monthly.items():
             spend     = round(m['spend'], 2)
             sales     = round(m['sales'], 2)
-            total_sal = round(m['totalSales'], 2) if m['totalSales'] else None
             impr      = m['impressions']
             clicks    = m['clicks']
             purchases = m['purchases']
@@ -119,8 +122,8 @@ def build_supplement(data: dict) -> dict:
                 'spend':       spend,
                 'adSales':     sales,
                 'acos':        acos_pct(spend, sales),
-                'totalSales':  total_sal,
-                'tacos':       acos_pct(spend, total_sal) if total_sal else None,
+                'totalSales':  None,
+                'tacos':       None,
                 'impressions': impr,
                 'clicks':      clicks,
                 'ctr':         safe_div(clicks, impr),
@@ -143,14 +146,13 @@ def build_supplement(data: dict) -> dict:
         t_impr   = sum(b['impressions'] or 0 for b in brands)
         t_clicks = sum(b['clicks'] or 0 for b in brands)
         t_orders = sum(b['orders'] or 0 for b in brands)
-        t_tsales = round(sum(b['totalSales'] or 0 for b in brands), 2)
 
         entry.update({
             'spend':       t_spend,
             'adSales':     t_sales,
             'acos':        acos_pct(t_spend, t_sales),
-            'totalSales':  t_tsales if t_tsales else None,
-            'tacos':       acos_pct(t_spend, t_tsales) if t_tsales else None,
+            'totalSales':  None,
+            'tacos':       None,
             'impressions': t_impr,
             'clicks':      t_clicks,
             'ctr':         safe_div(t_clicks, t_impr),
