@@ -1877,7 +1877,11 @@ function renderWLOS() {
     renderWlosEntries(el, entries);
   }).catch(err => {
     console.error('[WLOS AI] Generation failed:', err);
-    section.style.display = 'none';
+    sub.textContent = 'AI Analysis unavailable';
+    el.innerHTML = `<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px;background:rgba(255,107,107,0.06);border:1px solid rgba(255,107,107,0.15);border-radius:12px;">
+      <span style="font-size:12px;color:rgba(255,255,255,0.4);">WLOS generation failed — ${err.message || 'Claude API error'}</span>
+      <button onclick="localStorage.removeItem(wlosHashKey(getWlosDataHash()));renderWLOS();" style="padding:5px 14px;border-radius:8px;font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;background:rgba(129,140,248,0.15);border:1px solid rgba(129,140,248,0.3);color:#a5b4fc;">Retry</button>
+    </div>`;
   });
 }
 
