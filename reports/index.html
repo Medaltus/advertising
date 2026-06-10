@@ -529,8 +529,10 @@ function mergeApiSupplement(data) {
     const mIdx = mo.indexOf(mName);
     const yrNum = parseInt(yr);
     const isCurrentMonth = mIdx === today.getMonth() && yrNum === today.getFullYear();
+    // June 2026 and later: SP-API is source of truth for totalSales
+    const isApiEra = yrNum > 2026 || (yrNum === 2026 && mIdx + 1 >= 6);
     if (existing.has(monthKey)) {
-      if (isCurrentMonth) {
+      if (isApiEra) {
         // Current partial month: API wins for ad metrics, but Google Sheet holds
         // real Total Sales (from SP-API via Easy-Insight) — preserve those values.
         const idx = data.monthly.findIndex(m => m.month === monthKey);
