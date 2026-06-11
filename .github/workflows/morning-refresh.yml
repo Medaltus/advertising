@@ -1,0 +1,51 @@
+name: Morning Ad Data Refresh
+
+on:
+  schedule:
+    # Runs at 7:00 AM ET (11:00 UTC) every day
+    - cron: '0 11 * * *'
+  workflow_dispatch:  # Lets you trigger it manually from GitHub
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out the repo
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # 3. Install dependencies
+      - name: Install Python dependencies
+        run: pip install requests
+
+      # 4. Write config.json from GitHub Secret
+      #    (Never commit config.json — it contains your SP-API credentials)
+      - name: Write config.json
+        env:
+          CONFIG_JSON: ${{ secrets.CONFIGJSON }}
+        run: echo "$CONFIG_JSON" > config.json
+
+      # 5. Fetch Amazon Ads data → ads_data.js
+      - name: Fetch Amazon Ads data
+        run: python3 fetch_ads_data.py
+
+      # 6. Generate the supplement JSON from ads_data.js
+      - name: Generate api_supplement.json
+        run: python3 generate_supplement.py
+
+      # 7. Commit and push the updated supplement file
+      - name: Commit and push updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/api_supplement.json
+          # Only commit if something actually changed
+          git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
+          git push

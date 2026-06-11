@@ -177,9 +177,10 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
     Populate totalSales and tacos in the supplement using SP-API data.
     Calls SP-API once per calendar month that appears in the supplement.
     """
-    parent = str(Path(__file__).parent.parent)
-    if parent not in sys.path:
-        sys.path.insert(0, parent)
+    # Support both local dev (script in deploy/ subdir) and CI (script at repo root)
+    for p in [str(Path(__file__).parent.parent), str(Path(__file__).parent)]:
+        if p not in sys.path:
+            sys.path.insert(0, p)
     from fetch_total_sales import fetch_brand_sales_for_period  # noqa
 
     # Months before this date use the Google Sheet for totalSales.
@@ -228,6 +229,8 @@ def main():
     script_dir = Path(__file__).parent.resolve()
     # ads_data.js lives next to fetch_ads_data.py, one level above deploy/
     ads_js  = script_dir.parent / 'ads_data.js'
+    if not ads_js.exists():
+        ads_js = script_dir / 'ads_data.js'  # CI fallback: repo root = deploy/
     out_dir = script_dir / 'data'
     out_json = out_dir / 'api_supplement.json'
 
@@ -245,6 +248,8 @@ def main():
 
     # Enrich with SP-API total sales per calendar month
     cfg_path = script_dir.parent / 'config.json'
+    if not cfg_path.exists():
+        cfg_path = script_dir / 'config.json'  # CI fallback: repo root = deploy/
     if cfg_path.exists():
         try:
             cfg = json.loads(cfg_path.read_text())
