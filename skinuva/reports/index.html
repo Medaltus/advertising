@@ -2105,6 +2105,8 @@ async function init(){
       fetch('/data/manual_totals.json').then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
     ]);
     injectJuneApiData();
+    renderAmazonSection('month');
+    renderGoogleSection('month');
     selectedMonth=DATA.monthly[DATA.monthly.length-1].month;
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
@@ -2636,9 +2638,6 @@ function renderGoogleSection(period){
 }
 
 
-// ── Initial render (both sections default to current month) ──
-renderAmazonSection('month');
-renderGoogleSection('month');
 </script>
 
 <!-- QC Modal -->
