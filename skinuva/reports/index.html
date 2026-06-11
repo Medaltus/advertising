@@ -598,6 +598,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
   canvas { max-width: 100% !important; }
   .ticker-bar { display: none !important; }
   .market-ticker { display: none !important; }
+  #pdf-export-btn, #qc-btn { display: none !important; }
   .audio-btn .audio-spinner, .audio-bars { display: none !important; }
   .agent-output { max-height: none !important; overflow: visible !important; }
   .agents-row { grid-template-columns: 1fr 1fr !important; }
@@ -655,6 +656,8 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
         <span class="timer-text" id="refresh-time">0:00</span>
         <span class="timer-label">ago</span>
       </div>
+      <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border:1px solid rgba(251,191,36,0.3);color:rgba(251,191,36,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.35),rgba(251,191,36,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08))'">&#9741; QC Check</button>
+      <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
       </div>
       <div class="tab-bar" id="month-tabs"></div>
     </div>
@@ -2229,6 +2232,160 @@ function startRefreshTimer(){
   if(input) input.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();runAgent(name);} });
 });
 
+// ── Export PDF ───────────────────────────────────────────────────────────────
+function exportPDF() {
+  const month = document.querySelector('.tab-btn.active')?.textContent?.trim() || 'Dashboard';
+  const prev = document.title;
+  document.title = 'Skinuva Ad Dashboard — ' + month;
+  window.print();
+  document.title = prev;
+}
+
+// ── Quality Control ──────────────────────────────────────────────────────────
+function openQC() {
+  const overlay = document.getElementById('qc-overlay');
+  overlay.style.display = 'flex';
+  if (!overlay._qcWired) {
+    overlay.addEventListener('click', function(e) { if (e.target === this) closeQC(); });
+    overlay._qcWired = true;
+  }
+  runQC();
+}
+
+function closeQC() {
+  document.getElementById('qc-overlay').style.display = 'none';
+}
+
+function qcRow(icon, label, detail, severity) {
+  const colors = {
+    ok:    { bg: 'rgba(52,211,153,0.08)',  border: 'rgba(52,211,153,0.2)',  icon: '#34d399', text: 'rgba(52,211,153,0.9)' },
+    warn:  { bg: 'rgba(251,191,36,0.08)',  border: 'rgba(251,191,36,0.2)',  icon: '#fbbf24', text: 'rgba(251,191,36,0.9)' },
+    error: { bg: 'rgba(248,113,113,0.08)', border: 'rgba(248,113,113,0.2)', icon: '#f87171', text: 'rgba(248,113,113,0.9)' },
+  }[severity] || { bg:'rgba(255,255,255,0.04)', border:'rgba(255,255,255,0.08)', icon:'#aaa', text:'#aaa' };
+  return `<div style="display:flex;align-items:flex-start;gap:12px;background:${colors.bg};border:1px solid ${colors.border};border-radius:12px;padding:12px 16px;margin-bottom:8px;">
+    <span style="font-size:16px;color:${colors.icon};flex-shrink:0;margin-top:1px;">${icon}</span>
+    <div>
+      <div style="font-size:13px;font-weight:600;color:#fff;margin-bottom:2px;">${label}</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);">${detail}</div>
+    </div>
+  </div>`;
+}
+
+function fmtM(v) { return v == null ? '—' : '$' + v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+function runQC() {
+  const content = document.getElementById('qc-content');
+  const footer  = document.getElementById('qc-footer');
+  let rows = '';
+  let warns = 0, errors = 0;
+
+  const month = selectedMonth || (DATA&&DATA.monthly.length ? DATA.monthly[DATA.monthly.length-1].month : null);
+  const md    = DATA && month ? DATA.monthly.find(m=>m.month===month) : null;
+  const chs   = DATA && month ? (DATA.channels[month]||[]) : [];
+  const totalRow    = chs.find(c=>c.channel==='Total Paid Media');
+  const channelRows = chs.filter(c=>c.channel!=='Total Paid Media'&&c.channel!=='Website Sales');
+
+  rows += `<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-bottom:12px;margin-top:4px;">Checking: ${month||'—'}</div>`;
+
+  // ── Check 1: Sheet data loaded ──
+  if (!DATA || !DATA.monthly.length) {
+    errors++;
+    rows += qcRow('✗', 'Sheet data not loaded', 'Google Sheet failed to parse — check /api/sheets and sheet format', 'error');
+    content.innerHTML = rows;
+    footer.innerHTML = '1 error found — ISSUES FOUND';
+    return;
+  }
+  rows += qcRow('✓', 'Sheet data loaded', `${DATA.monthly.length} month${DATA.monthly.length!==1?'s':''} parsed from Google Sheet`, 'ok');
+
+  // ── Check 2: API data loaded ──
+  const hasAmz  = typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON;
+  const hasGads = typeof GOOGLE_ADS_DATA !== 'undefined' && GOOGLE_ADS_DATA;
+  if (hasAmz && hasGads) {
+    rows += qcRow('✓', 'API data loaded', 'Amazon supplement + Google Ads JSON present', 'ok');
+  } else {
+    warns++;
+    const missing = [];
+    if (!hasAmz)  missing.push('Amazon supplement (skinuva_supplement.json)');
+    if (!hasGads) missing.push('Google Ads (google_ads_data.json)');
+    rows += qcRow('⚠', `API data missing: ${missing.join(', ')}`, 'Re-run morning workflow or check data/ files', 'warn');
+  }
+
+  // ── Check 3: Channel spend sum vs Total Paid Media ──
+  if (totalRow && channelRows.length) {
+    const sumSpend = channelRows.reduce((s,c)=>s+(c.adSpend||0), 0);
+    const diff = Math.abs(sumSpend - (totalRow.adSpend||0));
+    if (diff <= 1) {
+      rows += qcRow('✓', 'Channel spend sum matches Total Paid Media', `Sum ${fmtM(Math.round(sumSpend))} = Total ${fmtM(totalRow.adSpend)}`, 'ok');
+    } else {
+      warns++;
+      rows += qcRow('⚠', 'Channel spend sum mismatch', `Sum ${fmtM(Math.round(sumSpend))} vs Total Paid Media ${fmtM(totalRow.adSpend)} — $${diff.toFixed(2)} discrepancy`, 'warn');
+    }
+  }
+
+  // ── Check 4: TACOS ceiling (15%) ──
+  if (md && md.tacos != null) {
+    if (md.tacos <= 15) {
+      rows += qcRow('✓', 'TACOS within target', `${md.tacos.toFixed(1)}% — under 15% ceiling`, 'ok');
+    } else if (md.tacos <= 20) {
+      warns++;
+      rows += qcRow('⚠', 'TACOS above 15% target', `${md.tacos.toFixed(1)}% — review total sales coverage`, 'warn');
+    } else {
+      errors++;
+      rows += qcRow('✗', 'TACOS significantly elevated', `${md.tacos.toFixed(1)}% — well above 15% ceiling`, 'error');
+    }
+  }
+
+  // ── Check 5: Channel ACOS thresholds ──
+  const acosTargets = { Amazon: 35, Google: 30, Walmart: 35 };
+  const acosFails = channelRows.filter(c => {
+    const t = acosTargets[c.channel];
+    return t && c.acos != null && c.acos > t && (c.adSpend||0) > 50;
+  });
+  if (acosFails.length === 0) {
+    rows += qcRow('✓', 'Channel ACOS within thresholds', 'Amazon <35%, Google <30%, Walmart <35%', 'ok');
+  } else {
+    warns++;
+    const detail = acosFails.map(c=>`${c.channel} ${c.acos.toFixed(1)}% (target <${acosTargets[c.channel]}%)`).join(', ');
+    rows += qcRow('⚠', `ACOS above threshold (${acosFails.length} channel${acosFails.length>1?'s':''})`, detail, 'warn');
+  }
+
+  // ── Check 6: Channels with impressions but $0 spend (tracking gap) ──
+  const trackingIssues = channelRows.filter(c=>(c.impressions||0)>0 && (!c.adSpend||c.adSpend===0));
+  if (trackingIssues.length === 0) {
+    rows += qcRow('✓', 'No tracking anomalies', 'All channels with impressions have spend recorded', 'ok');
+  } else {
+    warns++;
+    rows += qcRow('⚠', 'Impressions recorded with $0 spend', trackingIssues.map(c=>c.channel).join(', ') + ' — verify tracking setup', 'warn');
+  }
+
+  // ── Check 7: Anomaly detection ──
+  const anomalies = [];
+  channelRows.forEach(c => {
+    if ((c.adSpend||0) < 0)             anomalies.push(`${c.channel}: negative spend (${fmtM(c.adSpend)})`);
+    if (c.acos != null && c.acos > 500) anomalies.push(`${c.channel}: ACOS ${c.acos.toFixed(0)}%`);
+    if (c.cvr  != null && c.cvr  > 50)  anomalies.push(`${c.channel}: CVR ${c.cvr.toFixed(1)}%`);
+    if (c.cpc  != null && c.cpc  > 20)  anomalies.push(`${c.channel}: CPC $${c.cpc.toFixed(2)}`);
+  });
+  if (anomalies.length === 0) {
+    rows += qcRow('✓', 'No anomalies detected', 'No impossible values (negative spend, ACOS >500%, CVR >50%, CPC >$20)', 'ok');
+  } else {
+    errors++;
+    rows += qcRow('✗', 'Anomalous values detected', anomalies.join('; '), 'error');
+  }
+
+  content.innerHTML = rows;
+
+  if (errors === 0 && warns === 0) {
+    footer.innerHTML = '&#10003; All checks passed — DASHBOARD VERIFIED';
+  } else {
+    const parts = [];
+    if (errors) parts.push(`${errors} error${errors>1?'s':''}`);
+    if (warns)  parts.push(`${warns} warning${warns>1?'s':''}`);
+    footer.innerHTML = parts.join(', ') + ' found — ISSUES FOUND';
+  }
+}
+
+
 init();
 
 // ── Inject June API data (Amazon + Google) into monthly tab structure ──
@@ -2483,4 +2640,20 @@ function renderGoogleSection(period){
 renderAmazonSection('month');
 renderGoogleSection('month');
 </script>
+
+<!-- QC Modal -->
+<div id="qc-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);align-items:center;justify-content:center;">
+  <div style="background:linear-gradient(145deg,rgba(18,18,28,0.98),rgba(12,12,20,0.99));border:1px solid rgba(251,191,36,0.25);border-radius:20px;padding:32px;max-width:640px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,0.6);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(251,191,36,0.6);text-transform:uppercase;margin-bottom:4px;">Data Integrity</div>
+        <h2 style="font-size:22px;font-weight:800;color:#fff;margin:0;">Quality Control</h2>
+      </div>
+      <button onclick="closeQC()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:rgba(255,255,255,0.5);font-size:18px;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">&times;</button>
+    </div>
+    <div id="qc-content"></div>
+    <div style="margin-top:20px;font-size:11px;color:rgba(255,255,255,0.25);text-align:right;" id="qc-footer"></div>
+  </div>
+</div>
+
 </body>
