@@ -2085,7 +2085,7 @@ async function callClaude(prompt, _unused) {
   const r = await fetch('/api/claude', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({messages: [{role: 'user', content: prompt}]})
+    body: JSON.stringify({prompt})
   });
   if (!r.ok) throw new Error('Claude API error: ' + r.status);
   return r.json();
