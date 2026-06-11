@@ -59,7 +59,7 @@ module.exports = async function handler(req, res) {
       const maxCols = Math.max(...rows.map(r => r.length));
       const tableLines = rows.map(row => {
         const padded = [...row, ...Array(maxCols - row.length).fill('')];
-        return '| ' + padded.join(' | ') + ' |';
+        return '| ' + padded.map(c => String(c || '').replace(/[\r\n]+/g, ' ')).join(' | ') + ' |';
       });
 
       output += tableLines.join('\n') + '\n\n';

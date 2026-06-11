@@ -946,40 +946,58 @@ function parseSheet(text, updatedDate) {
   }
   if(cur.length) tables.push(cur);
 
-  // ── Monthly totals: table whose first row starts with "Month" ──
+  // ── Monthly totals: table whose first row starts with "Month" (standard)
+  //    OR "Monthly Totals" in col 0 and "Month" in col 1 (Skinuva format) ──
   const monthly = [];
   for(const tbl of tables){
-    if(tbl[0][0]!=='Month') continue;
+    const h0=(tbl[0][0]||'').trim(), h1=(tbl[0][1]||'').trim();
+    const isSkinuvaMonthly=/monthly\s*totals?/i.test(h0)&&h1==='Month';
+    if(h0!=='Month'&&!isSkinuvaMonthly) continue;
+    const off=isSkinuvaMonthly?1:0; // col offset: Skinuva shifts data one column right
     for(let i=1;i<tbl.length;i++){
-      const r=tbl[i], month=r[0];
+      const r=tbl[i], month=r[off];
       if(!month||!month.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) continue;
-      const adSpend=parseNum(r[1]); if(adSpend==null) continue;
-      monthly.push({month,adSpend,adSales:parseNum(r[2]),acos:parseNum(r[3]),totalSales:parseNum(r[4]),tacos:parseNum(r[5]),impressions:parseNum(r[6]),clicks:parseNum(r[7]),ctr:parseNum(r[8]),cpc:parseNum(r[9]),orders:parseNum(r[10]),aov:parseNum(r[11]),cvr:parseNum(r[12]),pctFromAds:parseNum(r[13])});
+      const adSpend=parseNum(r[1+off]); if(adSpend==null) continue;
+      monthly.push({month,adSpend,adSales:parseNum(r[2+off]),acos:parseNum(r[3+off]),totalSales:parseNum(r[4+off]),tacos:parseNum(r[5+off]),impressions:parseNum(r[6+off]),clicks:parseNum(r[7+off]),ctr:parseNum(r[8+off]),cpc:parseNum(r[9+off]),orders:parseNum(r[10+off]),aov:parseNum(r[11+off]),cvr:parseNum(r[12+off]),pctFromAds:parseNum(r[13+off])});
     }
     break; // only one monthly totals table
   }
 
-  // ── Channel tables: header starts with "Channel" AND second column is exactly "Ad Spend" ──
+  // ── Channel tables: standard = col 0 "Channel", col 1 "Ad Spend"
+  //    Skinuva = col 0 "Month", col 1 "Channel", col 2 "Ad Spend" ──
   const channels = {};
   for(const tbl of tables){
-    if(!tbl[0] || tbl[0][0]!=='Channel' || tbl[0][1]!=='Ad Spend') continue;
+    if(!tbl[0]) continue;
+    const h0=(tbl[0][0]||'').trim(), h1=(tbl[0][1]||'').trim(), h2=(tbl[0][2]||'').trim();
+    const isStdCh=h0==='Channel'&&h1==='Ad Spend';
+    const isSkinuvaCh=h0==='Month'&&h1==='Channel'&&h2==='Ad Spend';
+    if(!isStdCh&&!isSkinuvaCh) continue;
 
+    const co=isSkinuvaCh?1:0; // channel col offset
+    let tableMonth=null;
     const adRows = [];
     let totalRow = null;
     for(let i=1;i<tbl.length;i++){
-      const r=tbl[i], ch=r[0]; if(!ch) continue;
-      const row = {channel:ch, adSpend:parseNum(r[1]), adSales:parseNum(r[2]), acos:parseNum(r[3]), totalSales:parseNum(r[4]), tacos:parseNum(r[5]), impressions:parseNum(r[6]), clicks:parseNum(r[7]), ctr:parseNum(r[8]), cpc:parseNum(r[9]), orders:parseNum(r[10]), aov:parseNum(r[11]), cvr:parseNum(r[12])};
-      if(ch==='Total Paid Media'){ totalRow=row; continue; }
+      const r=tbl[i];
+      // Skinuva: month name appears in col 0 of first data row
+      if(isSkinuvaCh&&!tableMonth&&r[0]&&r[0].match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) tableMonth=r[0];
+      const ch=r[co]; if(!ch) continue;
+      const row={channel:ch,adSpend:parseNum(r[1+co]),adSales:parseNum(r[2+co]),acos:parseNum(r[3+co]),totalSales:parseNum(r[4+co]),tacos:parseNum(r[5+co]),impressions:parseNum(r[6+co]),clicks:parseNum(r[7+co]),ctr:parseNum(r[8+co]),cpc:parseNum(r[9+co]),orders:parseNum(r[10+co]),aov:parseNum(r[11+co]),cvr:parseNum(r[12+co])};
+      if(ch==='Total Paid Media'){totalRow=row;continue;}
       if(AD_CHANNELS.has(ch)) adRows.push(row);
     }
-    if(!totalRow || totalRow.adSpend==null || adRows.length===0) continue;
+    if(!totalRow||totalRow.adSpend==null||adRows.length===0) continue;
 
-    // Match to monthly by Total Paid Media spend
+    // Skinuva: match directly by month name; standard: match by Total Paid Media spend proximity
     let best=null, bestD=Infinity;
-    for(const m of monthly){ const d=Math.abs((m.adSpend||0)-(totalRow.adSpend||0)); if(d<bestD){bestD=d;best=m.month;} }
-    // Append Total Paid Media as last row for the total line in Channel Breakdown
+    if(isSkinuvaCh&&tableMonth&&monthly.find(m=>m.month===tableMonth)){
+      best=tableMonth;
+    } else {
+      for(const m of monthly){const d=Math.abs((m.adSpend||0)-(totalRow.adSpend||0));if(d<bestD){bestD=d;best=m.month;}}
+      if(bestD>=100) best=null;
+    }
     if(totalRow) adRows.push(totalRow);
-    if(best && bestD<100 && !channels[best]) channels[best]=adRows; // first match wins, no overwriting
+    if(best&&!channels[best]) channels[best]=adRows; // first match wins, no overwriting
   }
 
   // Sort chronologically
