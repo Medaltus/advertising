@@ -7,9 +7,7 @@ on:
   workflow_dispatch:  # Lets you trigger it manually from GitHub
 
 jobs:
-  # ── Medaltus ─────────────────────────────────────────────────────────────────
-  medaltus:
-    name: Refresh Medaltus Data
+  refresh:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,13 +27,15 @@ jobs:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
         run: echo "$CONFIG_JSON" > config.json
 
+      # ── Amazon Ads (shared account — fetches all brands including Skinuva) ──
       - name: Fetch Amazon Ads data
         run: python3 fetch_ads_data.py
 
+      # ── Medaltus ─────────────────────────────────────────────────────────────
       - name: Generate api_supplement.json
         run: python3 generate_supplement.py
 
-      - name: Commit and push Medaltus data
+      - name: Commit Medaltus data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -43,66 +43,19 @@ jobs:
           git diff --cached --quiet || git commit -m "chore: daily Medaltus ad data refresh [skip ci]"
           git push
 
-  # ── Skinuva ──────────────────────────────────────────────────────────────────
-  skinuva:
-    name: Refresh Skinuva Data
-    runs-on: ubuntu-latest
-    needs: medaltus   # run after Medaltus so git push doesn't conflict
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: main   # always pull the latest (including Medaltus commit above)
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Install Python dependencies
-        run: pip install requests
-
-      # Write the Skinuva Amazon config.
-      # If Skinuva has its own Amazon Ads account, create a GitHub secret called
-      # SKINUVA_CONFIG_JSON with its credentials and it will be used here.
-      # If Skinuva is part of the Medaltus account, set SKINUVA_CONFIG_JSON to
-      # the same value as CONFIGJSON (but with "Skinuva" added to the brands list).
-      - name: Write Skinuva Amazon config
-        env:
-          SKINUVA_CONFIG_JSON: ${{ secrets.SKINUVA_CONFIG_JSON }}
-        run: |
-          if [ -n "$SKINUVA_CONFIG_JSON" ]; then
-            echo "$SKINUVA_CONFIG_JSON" > skinuva/config.json
-            echo "✓ Using SKINUVA_CONFIG_JSON secret"
-          else
-            echo "⚠ SKINUVA_CONFIG_JSON secret not set — skipping Amazon fetch"
-            echo '{}' > skinuva/config.json
-          fi
-
-      # Fetch Skinuva Amazon Ads data → skinuva/ads_data.js
-      - name: Fetch Skinuva Amazon Ads data
-        run: python3 skinuva/fetch_ads_data.py
-        continue-on-error: true   # don't block Google Ads if Amazon creds are missing
-
-      # Convert skinuva/ads_data.js → skinuva/data/skinuva_supplement.json
+      # ── Skinuva ──────────────────────────────────────────────────────────────
       - name: Generate skinuva_supplement.json
         run: python3 skinuva/generate_skinuva_supplement.py
-        continue-on-error: true
-
-      # Fetch Skinuva Google Ads data → skinuva/data/google_ads_data.json
-      - name: Write shared config for Google Ads
-        env:
-          CONFIG_JSON: ${{ secrets.CONFIGJSON }}
-        run: echo "$CONFIG_JSON" > config.json
+        continue-on-error: true   # don't block Google Ads if this fails
 
       - name: Fetch Skinuva Google Ads data
         run: python3 skinuva/fetch_google_ads.py
 
-      - name: Commit and push Skinuva data
+      - name: Commit Skinuva data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase   # pick up the Medaltus commit above
           git add skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json
           git diff --cached --quiet || git commit -m "chore: daily Skinuva ad data refresh [skip ci]"
