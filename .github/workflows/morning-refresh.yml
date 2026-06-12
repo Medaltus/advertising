@@ -35,28 +35,22 @@ jobs:
       - name: Generate api_supplement.json
         run: python3 generate_supplement.py
 
-      - name: Commit Medaltus data
-        run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/api_supplement.json
-          git diff --cached --quiet || git commit -m "chore: daily Medaltus ad data refresh [skip ci]"
-          git push
-
       # ── Skinuva ──────────────────────────────────────────────────────────────
       - name: Generate skinuva_supplement.json
         run: python3 skinuva/generate_skinuva_supplement.py
-        continue-on-error: true   # don't block Google Ads if this fails
+        continue-on-error: true
 
       - name: Fetch Skinuva Google Ads data
         run: python3 skinuva/fetch_google_ads.py
 
-      - name: Commit Skinuva data
+      # ── Commit everything ────────────────────────────────────────────────────
+      - name: Commit and push updated data
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase   # pick up the Medaltus commit above
-          git add skinuva/data/skinuva_supplement.json \
+          git pull --rebase
+          git add data/api_supplement.json \
+                  skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json
-          git diff --cached --quiet || git commit -m "chore: daily Skinuva ad data refresh [skip ci]"
+          git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
           git push
