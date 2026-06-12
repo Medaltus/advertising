@@ -945,7 +945,7 @@ function render() {
   const md = DATA.monthly.find(m => m.month === selectedMonth); if (!md) return;
   const idx = DATA.monthly.indexOf(md), prev = idx > 0 ? DATA.monthly[idx - 1] : null;
   const ip = md.partial, days = ip ? `${md.daysElapsed}/${md.daysInMonth} days` : null;
-  const f = k => ip ? fv(md, k) : null;
+  const f = k => ip ? fv({ ...md, ...bdata }, k) : null;
 
   // Agents only on current partial month
   document.getElementById('agents-section').style.display = ip ? 'block' : 'none';
