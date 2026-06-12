@@ -48,7 +48,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase
+          git pull --rebase --autostash
           git add data/api_supplement.json \
                   skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json
