@@ -2100,9 +2100,9 @@ async function init(){
     if(!DATA.monthly.length) throw new Error('No monthly data found. The sheet format may have changed.');
     // Load API data files then inject into monthly data
     await Promise.all([
-      fetch('/data/skinuva_supplement.json').then(r=>r.json()).then(d=>{if(d) SKINUVA_AMAZON=d;}).catch(()=>{}),
-      fetch('/data/google_ads_data.json').then(r=>r.json()).then(d=>{if(d) GOOGLE_ADS_DATA=d;}).catch(()=>{}),
-      fetch('/data/manual_totals.json').then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
+      fetch('/data/skinuva_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_AMAZON=d;}).catch(()=>{}),
+      fetch('/data/google_ads_data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) GOOGLE_ADS_DATA=d;}).catch(()=>{}),
+      fetch('/data/manual_totals.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
     ]);
     injectJuneApiData();
     renderAmazonSection('month');
