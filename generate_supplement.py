@@ -262,6 +262,22 @@ def main():
         print(f"\n⚠  config.json not found at {cfg_path} — skipping SP-API enrichment")
 
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # ── Merge with existing data to preserve historical months ──────────────
+    # Months outside the current lookback window are kept from the existing
+    # file untouched; months inside the window are updated with fresh data.
+    if out_json.exists():
+        try:
+            existing = json.loads(out_json.read_text())
+            merged = {**existing, **supplement}  # fresh data wins for overlapping months
+            supplement = dict(sorted(
+                merged.items(),
+                key=lambda x: datetime.strptime(x[0], '%B %Y')
+            ))
+            print(f"\n  Merged with existing file: {len(supplement)} total months retained")
+        except Exception as exc:
+            print(f"\n⚠  Could not merge with existing data: {exc} — writing fresh supplement")
+
     out_json.write_text(json.dumps(supplement, indent=2))
 
     print(f"\n✓ Wrote {out_json}")
