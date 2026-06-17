@@ -2390,11 +2390,19 @@ function runQC() {
 
 init();
 
-// ── Inject June API data (Amazon + Google) into monthly tab structure ──
+// ── Inject current month API data (Amazon + Google) into monthly tab structure ──
 function injectJuneApiData(){
   if(!DATA) return;
-  // Always replace sheet June data with combined API data — the sheet may be incomplete
+  // Always replace sheet current-month data with combined API data — the sheet may be incomplete
   // (e.g. missing Google Ads channel). API data is authoritative for the current month.
+
+  // Update tab button labels to current month name
+  const _curMonthName = new Date().toLocaleString('en-US', {month: 'long'});
+  const _amzBtn = document.getElementById('amazon-tab-month');
+  const _gBtn = document.getElementById('google-tab-month');
+  if (_amzBtn) _amzBtn.textContent = _curMonthName;
+  if (_gBtn) _gBtn.textContent = _curMonthName;
+
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
   const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
 
@@ -2527,7 +2535,7 @@ function renderAmazonSection(period){
   const acos=sales>0?spend/sales*100:null;
   const roas=spend>0?sales/spend:null;
   const cpc=clicks>0?spend/clicks:null;
-  const label=period==='month'?`June ${new Date().getFullYear()}`:'Past 31 Days';
+  const label=period==='month'?_currentMonthLabel():'Past 31 Days';
   const fetched=new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('amazon-sub').textContent=`Amazon Ads API · ${label} · ${tl.length} days · Fetched ${fetched}`;
 
@@ -2589,7 +2597,7 @@ function renderGoogleSection(period){
   const acos=sales>0?spend/sales*100:null;
   const roas=spend>0?sales/spend:null;
   const cpc=clicks>0?spend/clicks:null;
-  const label=period==='month'?`June ${new Date().getFullYear()}`:'Past 31 Days';
+  const label=period==='month'?_currentMonthLabel():'Past 31 Days';
   const fetched=new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   document.getElementById('google-sub').textContent=`Google Ads API · ${label} · ${tl.length} days · Fetched ${fetched}`;
 
