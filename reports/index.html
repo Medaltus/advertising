@@ -103,7 +103,7 @@ body {
 .section-header { margin-bottom:18px; }
 .chart-wrap { position:relative;width:100%; }
 /* Table */
-.table-wrap { overflow-x:auto;overflow-y:auto;max-height:520px; }
+.table-wrap { overflow-x:auto; }
 table { width:100%;border-collapse:collapse;font-size:13px; }
 thead th { text-align:right;padding:12px 12px;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;user-select:none;position:sticky;top:0;z-index:2;background:#0d0d12;box-shadow:0 1px 0 rgba(255,255,255,0.08); }
 thead th:hover { color:rgba(255,255,255,0.6); }
@@ -2162,6 +2162,7 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     render();
+    updateLeaderboardStickyTop();
     startRefreshTimer();
     loadMarketTicker();
     initAgents();
@@ -2172,6 +2173,18 @@ async function init() {
     console.error(err);
   }
 }
+
+// ── Sticky leaderboard header offset ──
+// Positions thead th just below the sticky page header so it stays visible
+// during page scroll without overlapping the title/tabs bar.
+function updateLeaderboardStickyTop() {
+  const hdr = document.querySelector('.header');
+  const top = hdr ? (56 + hdr.offsetHeight) : 56;
+  document.querySelectorAll('#leaderboard-table thead th').forEach(th => {
+    th.style.top = top + 'px';
+  });
+}
+window.addEventListener('resize', updateLeaderboardStickyTop);
 
 // Enter key support
 ['analytics','strategy','forecast','market'].forEach(name => {
