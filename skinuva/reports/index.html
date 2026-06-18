@@ -2277,11 +2277,17 @@ function startRefreshTimer(){
 
 // ── Export PDF ───────────────────────────────────────────────────────────────
 function exportPDF() {
+  const btn = document.getElementById('pdf-export-btn');
+  const origText = btn ? btn.innerHTML : '';
+  if (btn) { btn.innerHTML = '⏳ Preparing…'; btn.disabled = true; }
   const month = document.querySelector('.tab-btn.active')?.textContent?.trim() || 'Dashboard';
   const prev = document.title;
   document.title = 'Skinuva Ad Dashboard — ' + month;
-  window.print();
-  document.title = prev;
+  setTimeout(() => {
+    window.print();
+    document.title = prev;
+    if (btn) { btn.innerHTML = origText; btn.disabled = false; }
+  }, 300);
 }
 
 // ── Quality Control ──────────────────────────────────────────────────────────
