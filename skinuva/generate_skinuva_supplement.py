@@ -63,6 +63,51 @@ def month_key_from_date(date_str: str) -> str:
     return f"{MONTH_NAMES[dt.month - 1]} {dt.year}"
 
 
+def build_daily_archive(supplement: dict, google_path: Path) -> dict:
+    """
+    Store per-day Amazon + Google rows for arbitrary date-range queries.
+    Each entry: {"amazon": {...}, "google": {...}}
+    Merged into skinuva_daily_archive.json — new data wins, old days preserved.
+    """
+    entries = {}
+
+    # Amazon daily rows
+    for row in supplement.get('timeline', []):
+        d = row.get('date')
+        if not d:
+            continue
+        entries.setdefault(d, {'amazon': {}, 'google': {}})
+        entries[d]['amazon'] = {
+            'spend':       round(float(row.get('spend', 0) or 0), 2),
+            'adSales':     round(float(row.get('sales', 0) or 0), 2),
+            'totalSales':  round(float(row.get('totalSales', 0) or 0), 2),
+            'orders':      int(row.get('purchases', 0) or 0),
+            'clicks':      int(row.get('clicks', 0) or 0),
+            'impressions': int(row.get('impressions', 0) or 0),
+        }
+
+    # Google daily rows
+    if google_path.exists():
+        try:
+            gdata = json.loads(google_path.read_text())
+            for row in gdata.get('timeline', []):
+                d = row.get('date')
+                if not d:
+                    continue
+                entries.setdefault(d, {'amazon': {}, 'google': {}})
+                entries[d]['google'] = {
+                    'spend':       round(float(row.get('spend', 0) or 0), 2),
+                    'adSales':     round(float(row.get('sales', 0) or 0), 2),
+                    'conversions': round(float(row.get('conversions', 0) or 0), 1),
+                    'clicks':      int(row.get('clicks', 0) or 0),
+                    'impressions': int(row.get('impressions', 0) or 0),
+                }
+        except Exception as exc:
+            print(f"  ⚠  Could not read google_ads_data.json for daily archive: {exc}")
+
+    return entries
+
+
 def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path) -> dict:
     """
     Aggregate Amazon + Google timeline data by calendar month.
@@ -206,8 +251,24 @@ def main():
     monthly_path.write_text(json.dumps(merged, indent=2))
     print(f"✓ Updated {monthly_path} ({len(merged)} months: {', '.join(merged.keys())})")
 
+    # ── Build and merge skinuva_daily_archive.json (per-day rows for date range queries) ──
+    daily_path = out_dir / 'skinuva_daily_archive.json'
+    new_daily = build_daily_archive(supplement, google_path)
+
+    existing_daily = {}
+    if daily_path.exists():
+        try:
+            existing_daily = json.loads(daily_path.read_text())
+        except Exception:
+            pass
+
+    merged_daily = {**existing_daily, **new_daily}
+    merged_daily = dict(sorted(merged_daily.items()))  # YYYY-MM-DD sorts naturally
+    daily_path.write_text(json.dumps(merged_daily, indent=2))
+    print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
+
     print("\nNext steps:")
-    print("  git add skinuva/data/skinuva_supplement.json skinuva/data/google_ads_data.json skinuva/data/skinuva_monthly.json")
+    print("  git add skinuva/data/skinuva_supplement.json skinuva/data/google_ads_data.json skinuva/data/skinuva_monthly.json skinuva/data/skinuva_daily_archive.json")
     print("  git commit -m 'chore: refresh Skinuva ad data'")
     print("  git push  →  Vercel auto-deploys")
 

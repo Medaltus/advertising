@@ -55,6 +55,35 @@ def parse_ads_js(path: Path) -> dict:
     return json.loads(content)
 
 
+def build_daily_archive(data: dict) -> dict:
+    """
+    Store per-brand per-day ad rows for arbitrary date-range queries.
+    Structure: {"YYYY-MM-DD": {"brands": {"BrandName": {spend, adSales, orders, clicks, impressions}}}}
+    NOTE: totalSales is NOT included — it's a monthly SP-API metric, not a true daily value.
+    Merged into medaltus_daily_archive.json — new data wins, old days preserved.
+    """
+    entries: dict = {}
+
+    for brand in data.get('brands', []):
+        name     = brand.get('name', '')
+        timeline = brand.get('timeline', [])
+        for row in timeline:
+            d = row.get('date')
+            if not d:
+                continue
+            if d not in entries:
+                entries[d] = {'brands': {}}
+            entries[d]['brands'][name] = {
+                'spend':       round(float(row.get('spend', 0) or 0), 2),
+                'adSales':     round(float(row.get('sales', 0) or 0), 2),
+                'orders':      int(row.get('purchases', 0) or 0),
+                'clicks':      int(row.get('clicks', 0) or 0),
+                'impressions': int(row.get('impressions', 0) or 0),
+            }
+
+    return entries
+
+
 def build_supplement(data: dict) -> dict:
     supplement = {}
 
@@ -288,8 +317,29 @@ def main():
               f"adSales=${entry['adSales']:,.0f} | "
               f"acos={entry['acos']}%{partial}")
 
+    # ── Build and merge medaltus_daily_archive.json ──────────────────────────
+    daily_path = out_dir / 'medaltus_daily_archive.json'
+    new_daily = build_daily_archive(data)
+
+    existing_daily = {}
+    if daily_path.exists():
+        try:
+            existing_daily = json.loads(daily_path.read_text())
+        except Exception:
+            pass
+
+    # Merge per-day: new data wins for each brand's day row
+    for d, entry in new_daily.items():
+        if d not in existing_daily:
+            existing_daily[d] = {'brands': {}}
+        existing_daily[d]['brands'].update(entry['brands'])
+
+    merged_daily = dict(sorted(existing_daily.items()))
+    daily_path.write_text(json.dumps(merged_daily, indent=2))
+    print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
+
     print("\nNext steps:")
-    print("  git add deploy/data/api_supplement.json")
+    print("  git add deploy/data/api_supplement.json deploy/data/medaltus_daily_archive.json")
     print("  git commit -m 'chore: refresh ad supplement data'")
     print("  git push  →  Vercel auto-deploys")
 

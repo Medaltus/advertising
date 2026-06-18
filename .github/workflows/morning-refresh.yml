@@ -50,8 +50,10 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash
           git add data/api_supplement.json \
+                  data/medaltus_daily_archive.json \
                   skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json \
-                  skinuva/data/skinuva_monthly.json
+                  skinuva/data/skinuva_monthly.json \
+                  skinuva/data/skinuva_daily_archive.json
           git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
           git push

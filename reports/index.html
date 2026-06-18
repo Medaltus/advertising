@@ -300,6 +300,17 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
   table { page-break-inside: auto; }
   tr { page-break-inside: avoid; break-inside: avoid; }
 }
+/* Date Range Bar */
+.range-bar{display:flex;align-items:center;gap:8px;padding:10px 24px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;}
+.range-preset{padding:5px 12px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.3px;}
+.range-preset:hover,.range-preset.rp-active{background:rgba(129,140,248,0.2);border-color:rgba(129,140,248,0.4);color:#a78bfa;}
+.range-input{padding:5px 9px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.75);font-size:11px;font-family:inherit;cursor:pointer;color-scheme:dark;}
+.range-input:focus{outline:none;border-color:rgba(129,140,248,0.5);}
+.range-apply{padding:5px 14px;border-radius:7px;background:rgba(129,140,248,0.25);border:1px solid rgba(129,140,248,0.4);color:#a78bfa;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.range-apply:hover{background:rgba(129,140,248,0.4);}
+.range-clear{padding:5px 11px;border-radius:7px;background:rgba(255,100,100,0.1);border:1px solid rgba(255,100,100,0.2);color:rgba(255,120,120,0.7);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.range-clear:hover{background:rgba(255,100,100,0.2);}
+.range-active-pill{font-size:11px;color:#a78bfa;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:6px;padding:4px 10px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 </head>
@@ -342,6 +353,24 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 
   <!-- Brand Selector -->
   <div class="brand-selector" id="brand-selector"></div>
+
+  <!-- ── Date Range Control Bar ── -->
+  <div class="range-bar" id="range-bar">
+    <span style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:1px;text-transform:uppercase;">Range</span>
+    <button class="range-preset" id="rp-7" onclick="setRangePreset(7)">7D</button>
+    <button class="range-preset" id="rp-14" onclick="setRangePreset(14)">14D</button>
+    <button class="range-preset" id="rp-30" onclick="setRangePreset(30)">30D</button>
+    <button class="range-preset" id="rp-mtd" onclick="setRangePreset('mtd')">MTD</button>
+    <button class="range-preset" id="rp-lm" onclick="setRangePreset('last_month')">Last Month</button>
+    <button class="range-preset" id="rp-90" onclick="setRangePreset(90)">90D</button>
+    <span style="color:rgba(255,255,255,0.12);font-size:14px;margin:0 2px;">|</span>
+    <input type="date" class="range-input" id="range-start-input" />
+    <span style="color:rgba(255,255,255,0.3);font-size:12px;">→</span>
+    <input type="date" class="range-input" id="range-end-input" />
+    <button class="range-apply" onclick="applyCustomRange()">Apply</button>
+    <span id="range-active-pill" style="display:none;" class="range-active-pill"></span>
+    <button id="range-clear-btn" onclick="clearRange()" style="display:none;" class="range-clear">✕ Clear</button>
+  </div>
 
   <!-- KPI Row -->
   <div class="kpi-row" id="kpi-row-1"></div>
@@ -518,7 +547,8 @@ const BRAND_COLORS = {
 };
 const VOLUME_KEYS = new Set(['spend','adSales','totalSales','impressions','clicks','orders']);
 
-let API_SUPPLEMENT = {};
+let API_SUPPLEMENT = {}, MEDALTUS_DAILY = {};
+let rangeMode = false, rangeStart = null, rangeEnd = null;
 
 function mergeApiSupplement(data) {
   const mo = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -939,9 +969,120 @@ function kpi(label, value, opts) {
   el.innerHTML = h; return el;
 }
 
+// ── Date Range Helpers ──────────────────────────────────────────────────────
+function _isoToday(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function _isoOffset(days){const d=new Date();d.setDate(d.getDate()-days);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function setRangePreset(p){
+  const today=_isoToday(); let s,e=today; const now=new Date();
+  if(p==='mtd'){s=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';}
+  else if(p==='last_month'){const lm=new Date(now.getFullYear(),now.getMonth()-1,1),le=new Date(now.getFullYear(),now.getMonth(),0);s=lm.getFullYear()+'-'+String(lm.getMonth()+1).padStart(2,'0')+'-01';e=le.getFullYear()+'-'+String(le.getMonth()+1).padStart(2,'0')+'-'+String(le.getDate()).padStart(2,'0');}
+  else{s=_isoOffset(p-1);}
+  document.getElementById('range-start-input').value=s; document.getElementById('range-end-input').value=e;
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  const idMap={7:'7',14:'14',30:'30',mtd:'mtd',last_month:'lm',90:'90'};
+  document.getElementById('rp-'+idMap[p])?.classList.add('rp-active');
+  _activateRange(s,e);
+}
+function applyCustomRange(){
+  const s=document.getElementById('range-start-input').value,e=document.getElementById('range-end-input').value;
+  if(!s||!e||s>e){alert('Please select a valid start and end date.');return;}
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  _activateRange(s,e);
+}
+function _activateRange(s,e){
+  rangeMode=true; rangeStart=s; rangeEnd=e;
+  document.getElementById('range-active-pill').style.display=''; document.getElementById('range-active-pill').textContent=s+' → '+e;
+  document.getElementById('range-clear-btn').style.display=''; render();
+}
+function clearRange(){
+  rangeMode=false; rangeStart=null; rangeEnd=null;
+  document.getElementById('range-active-pill').style.display='none'; document.getElementById('range-clear-btn').style.display='none';
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  render();
+}
+
+function computeRangeMetrics(s,e){
+  const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  const brands={}, rows=[];
+  Object.entries(MEDALTUS_DAILY).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([d,entry])=>{
+    if(d<s||d>e) return;
+    const dayBrands={};
+    Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
+      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
+      brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
+      brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
+      dayBrands[bname]=brow;
+    });
+    rows.push({date:d,brands:dayBrands});
+  });
+  const brandList=Object.entries(brands).map(([name,b])=>({name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null})).sort((a,b)=>b.spend-a.spend);
+  const tS=rd(brandList.reduce((s,b)=>s+(b.spend||0),0)),tAs=rd(brandList.reduce((s,b)=>s+(b.adSales||0),0));
+  const tO=brandList.reduce((s,b)=>s+(b.orders||0),0),tI=brandList.reduce((s,b)=>s+(b.impressions||0),0),tC=brandList.reduce((s,b)=>s+(b.clicks||0),0);
+  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:null,tacos:null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
+}
+
+function renderRange(){
+  if(!MEDALTUS_DAILY||!Object.keys(MEDALTUS_DAILY).length){
+    const r1=document.getElementById('kpi-row-1');
+    if(r1) r1.innerHTML='<div style="padding:20px;color:rgba(255,255,255,0.4);font-size:13px;">Daily archive not yet available — run tomorrow\'s GitHub Action to populate it.</div>';
+    document.getElementById('kpi-row-2').innerHTML=''; return;
+  }
+  const m=computeRangeMetrics(rangeStart,rangeEnd);
+  const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
+  const roas=m.adSpend>0?m.adSales/m.adSpend:null;
+  document.getElementById('subtitle').textContent='Date Range View · Amazon Ad Metrics · '+rangeStart+' → '+rangeEnd;
+  const tb=document.getElementById('month-tabs'); if(tb) tb.style.opacity='0.3';
+  document.getElementById('agents-section').style.display='none';
+
+  // KPI Row 1
+  const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:'—',sub:'Monthly only'},{l:'TACOS',v:'—',sub:'Monthly only'}]
+    .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
+
+  // KPI Row 2
+  const r2=document.getElementById('kpi-row-2'); r2.innerHTML='';
+  [{l:'Impressions',v:m.impressions!=null?m.impressions.toLocaleString():'—'},{l:'Clicks',v:m.clicks!=null?m.clicks.toLocaleString():'—'},{l:'CTR',v:m.ctr!=null?m.ctr.toFixed(1)+'%':'—'},{l:'CPC',v:m.cpc!=null?'$'+m.cpc.toFixed(2):'—'},{l:'Orders',v:m.orders!=null?m.orders.toLocaleString():'—'},{l:'AOV',v:m.aov!=null?'$'+m.aov.toFixed(2):'—'}]
+    .forEach(x=>r2.appendChild(kpi(x.l,x.v,{})));
+
+  // Brand Leaderboard table
+  const brandData=m.brands;
+  const tableEl=document.getElementById('leaderboard-tbody');
+  if(tableEl){
+    document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
+    tableEl.innerHTML='';
+    brandData.forEach(b=>{
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${b.name}</td><td>${b.spend!=null?'$'+b.spend.toLocaleString():'—'}</td><td>${b.adSales!=null?'$'+b.adSales.toLocaleString():'—'}</td><td>${b.acos!=null?b.acos.toFixed(1)+'%':'—'}</td><td>—</td><td>—</td><td>${b.impressions!=null?b.impressions.toLocaleString():'—'}</td><td>${b.clicks!=null?b.clicks.toLocaleString():'—'}</td><td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td><td>${b.orders!=null?b.orders.toLocaleString():'—'}</td>`;
+      tableEl.appendChild(tr);
+    });
+    const noteRow=document.createElement('tr');
+    noteRow.innerHTML=`<td colspan="10" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
+    tableEl.appendChild(noteRow);
+  }
+
+  // Daily trend chart
+  if(document.getElementById('chart-trend')){
+    kill('trend');
+    const rows=m.rows;
+    const trendSpend=rows.map(r=>Object.values(r.brands).reduce((s,b)=>s+(b.spend||0),0));
+    const trendSales=rows.map(r=>Object.values(r.brands).reduce((s,b)=>s+(b.adSales||0),0));
+    charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'line',
+      data:{labels:rows.map(r=>r.date.slice(5)),datasets:[
+        {label:'Ad Spend',data:trendSpend,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.08)',fill:true,tension:.3,pointRadius:rows.length>60?0:2,borderWidth:2},
+        {label:'Ad Sales',data:trendSales,borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.08)',fill:true,tension:.3,pointRadius:rows.length>60?0:2,borderWidth:2}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
+      scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},maxTicksLimit:12},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
+  }
+  const footer=document.getElementById('footer'); if(footer) footer.textContent='Medaltus Portfolio · Date Range: '+rangeStart+' → '+rangeEnd;
+}
+
 // ── Main render ──
 function render() {
+  if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if (!DATA || !DATA.monthly.length) return;
+  const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
   const md = DATA.monthly.find(m => m.month === selectedMonth); if (!md) return;
   const idx = DATA.monthly.indexOf(md), prev = idx > 0 ? DATA.monthly[idx - 1] : null;
   const ip = md.partial, days = ip ? `${md.daysElapsed}/${md.daysInMonth} days` : null;
@@ -2007,10 +2148,12 @@ async function initAgents() {
 // ── Init ──
 async function init() {
   try {
-    const [text, _supplement] = await Promise.all([
+    const [text, _supplement, _daily] = await Promise.all([
       fetch('/api/sheets').then(r => { if (!r.ok) throw new Error('Sheets API error: ' + r.status); return r.text(); }),
-      fetch('/data/api_supplement.json').then(r => r.ok ? r.json() : {}).catch(() => ({}))
+      fetch('/data/api_supplement.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch('/data/medaltus_daily_archive.json', {cache:'no-store'}).then(r => r.ok ? r.json() : {}).catch(() => ({}))
     ]);
+    if (_daily) MEDALTUS_DAILY = _daily;
     API_SUPPLEMENT = _supplement;
     DATA = parseSheet(text);
     mergeApiSupplement(DATA);
