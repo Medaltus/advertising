@@ -617,6 +617,17 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
   .glass::before, .glass::after { display: none !important; }
   .chart-card::before { display: none !important; }
 }
+/* Date Range Bar */
+.range-bar{display:flex;align-items:center;gap:8px;padding:10px 24px;background:rgba(255,255,255,0.03);border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;}
+.range-preset{padding:5px 12px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.55);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;letter-spacing:.3px;}
+.range-preset:hover,.range-preset.rp-active{background:rgba(129,140,248,0.2);border-color:rgba(129,140,248,0.4);color:#a78bfa;}
+.range-input{padding:5px 9px;border-radius:7px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.75);font-size:11px;font-family:inherit;cursor:pointer;color-scheme:dark;}
+.range-input:focus{outline:none;border-color:rgba(129,140,248,0.5);}
+.range-apply{padding:5px 14px;border-radius:7px;background:rgba(129,140,248,0.25);border:1px solid rgba(129,140,248,0.4);color:#a78bfa;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;}
+.range-apply:hover{background:rgba(129,140,248,0.4);}
+.range-clear{padding:5px 11px;border-radius:7px;background:rgba(255,100,100,0.1);border:1px solid rgba(255,100,100,0.2);color:rgba(255,120,120,0.7);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;}
+.range-clear:hover{background:rgba(255,100,100,0.2);}
+.range-active-pill{font-size:11px;color:#a78bfa;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:6px;padding:4px 10px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 </head>
@@ -661,6 +672,23 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
       </div>
       <div class="tab-bar" id="month-tabs"></div>
     </div>
+  </div>
+  <!-- ── Date Range Control Bar ── -->
+  <div class="range-bar" id="range-bar">
+    <span style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:700;letter-spacing:1px;text-transform:uppercase;">Range</span>
+    <button class="range-preset" id="rp-7" onclick="setRangePreset(7)">7D</button>
+    <button class="range-preset" id="rp-14" onclick="setRangePreset(14)">14D</button>
+    <button class="range-preset" id="rp-30" onclick="setRangePreset(30)">30D</button>
+    <button class="range-preset" id="rp-mtd" onclick="setRangePreset('mtd')">MTD</button>
+    <button class="range-preset" id="rp-lm" onclick="setRangePreset('last_month')">Last Month</button>
+    <button class="range-preset" id="rp-90" onclick="setRangePreset(90)">90D</button>
+    <span style="color:rgba(255,255,255,0.12);font-size:14px;margin:0 2px;">|</span>
+    <input type="date" class="range-input" id="range-start-input" />
+    <span style="color:rgba(255,255,255,0.3);font-size:12px;">→</span>
+    <input type="date" class="range-input" id="range-end-input" />
+    <button class="range-apply" onclick="applyCustomRange()">Apply</button>
+    <span id="range-active-pill" style="display:none;" class="range-active-pill"></span>
+    <button id="range-clear-btn" onclick="clearRange()" style="display:none;" class="range-clear">✕ Clear</button>
   </div>
   <div class="kpi-row" id="kpi-row-1"></div>
   <div class="kpi-row" id="kpi-row-2" style="margin-bottom:36px;"></div>
@@ -853,7 +881,8 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 
 <script>
 const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
-let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={};
+let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={}, SKINUVA_DAILY={};
+let rangeMode=false, rangeStart=null, rangeEnd=null;
 
 const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48' };
 const VOLUME_KEYS = new Set(['adSpend','adSales','totalSales','impressions','clicks','orders']);
@@ -1138,7 +1167,9 @@ function kpi(label,value,opts){
 
 // ── Main render ──
 function render(){
+  if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
+  const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
   const md=DATA.monthly.find(m=>m.month===selectedMonth); if(!md) return;
   const idx=DATA.monthly.indexOf(md), prev=idx>0?DATA.monthly[idx-1]:null;
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
@@ -1245,13 +1276,16 @@ function render(){
   const prevMonth=idx>0?DATA.monthly[idx-1].month:null;
   const prevCh=prevMonth?DATA.channels[prevMonth]||[]:[];
   function findPrev(name){ return prevCh.find(x=>x.channel===name); }
-  function momLine(cur,prv,fmtFn,inv){
+  // momLine: fcastVal (optional) overrides cur for the % comparison so partial-month arrows
+  // reflect forecasted full-month vs prev-month rather than MTD vs prev-month.
+  function momLine(cur,prv,fmtFn,inv,fcastVal){
     if(cur==null) return '';
     let html='';
     if(prv!=null){
       html+=`<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">prev: ${fmtFn(prv)}</div>`;
+      const cmp=fcastVal!=null?fcastVal:cur;
       if(prv!==0){
-        const pct=((cur-prv)/Math.abs(prv)*100).toFixed(0);
+        const pct=((cmp-prv)/Math.abs(prv)*100).toFixed(0);
         if(Number(pct)!==0){
           const pos=inv?Number(pct)<0:Number(pct)>0;
           const neg=inv?Number(pct)>0:Number(pct)<0;
@@ -1267,6 +1301,9 @@ function render(){
   const fPct=v=>v+'%';
   const fNum=v=>v.toLocaleString();
   const fCpc=v=>'$'+v.toFixed(2);
+  // Linear forecast helper: volume metrics scale with days, rate metrics stay as-is
+  const _de=md.daysElapsed, _dm=md.daysInMonth;
+  const chFv=(val)=>ip&&_de&&val!=null?Math.round(val/_de*_dm*100)/100:null;
   allCh.forEach(c=>{
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
@@ -1275,22 +1312,23 @@ function render(){
       tr.style.cssText='border-top:2px solid rgba(255,255,255,0.15);font-weight:700;';
       tr.querySelectorAll('td').forEach(td=>td.style.color='#fff');
     }
-    // ACOS: show N/A if sales are $0 (even if sheet has a value) or if null
     const acosDisplay=(c.acos!=null && c.adSales>0)?c.acos:null;
     const ac=acosDisplay!=null?(acosDisplay>50?'acos-bad':acosDisplay<25?'acos-good':''):'';
-    // Orders: round to whole numbers (attribution models can produce fractional)
     const ordersDisplay=c.orders!=null?Math.round(c.orders):null;
     const p=findPrev(c.channel);
     const pOrders=p&&p.orders!=null?Math.round(p.orders):null;
     const totalStyle=isTotal?'font-weight:700;color:#fff;':'';
+    // Forecast volume metrics for %-comparison; rates (ACOS, CPC, AOV, CVR) use current value
+    const fSpend=chFv(c.adSpend), fSales=chFv(c.adSales), fImps=chFv(c.impressions);
+    const fClicks=chFv(c.clicks), fOrders=c.orders!=null?chFv(c.orders):null;
     tr.innerHTML=`<td style="${totalStyle}">${isTotal?'<span style="color:rgba(255,255,255,0.9);font-weight:700;">Total Paid Media</span>':'<span class="dot" style="background:'+col+'"></span><span style="color:'+col+'">'+c.channel+'</span>'}</td>
-      <td style="${totalStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}${momLine(c.adSpend,p&&p.adSpend,fDol)}</td>
-      <td style="${totalStyle}">${c.adSales!=null?fDol(c.adSales):'—'}${momLine(c.adSales,p&&p.adSales,fDol)}</td>
+      <td style="${totalStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}${momLine(c.adSpend,p&&p.adSpend,fDol,false,fSpend)}</td>
+      <td style="${totalStyle}">${c.adSales!=null?fDol(c.adSales):'—'}${momLine(c.adSales,p&&p.adSales,fDol,false,fSales)}</td>
       <td style="${totalStyle}" class="${ac}">${acosDisplay!=null?acosDisplay+'%':'N/A'}${momLine(acosDisplay,p&&p.adSales>0?p.acos:null,fPct,true)}</td>
-      <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}${momLine(c.impressions,p&&p.impressions,fNum)}</td>
-      <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}${momLine(c.clicks,p&&p.clicks,fNum)}</td>
+      <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}${momLine(c.impressions,p&&p.impressions,fNum,false,fImps)}</td>
+      <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}${momLine(c.clicks,p&&p.clicks,fNum,false,fClicks)}</td>
       <td style="${totalStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}${momLine(c.cpc,p&&p.cpc,fCpc,true)}</td>
-      <td style="${totalStyle}">${ordersDisplay!=null?fNum(ordersDisplay):'—'}${momLine(ordersDisplay,pOrders,fNum)}</td>
+      <td style="${totalStyle}">${ordersDisplay!=null?fNum(ordersDisplay):'—'}${momLine(ordersDisplay,pOrders,fNum,false,fOrders!=null?Math.round(fOrders):null)}</td>
       <td style="${totalStyle}">${c.aov!=null?fCpc(c.aov):'—'}${momLine(c.aov,p&&p.aov,fCpc)}</td>
       <td style="${totalStyle}">${c.cvr!=null?c.cvr+'%':'—'}${momLine(c.cvr,p&&p.cvr,fPct)}</td>`;
     tbody.appendChild(tr);
@@ -2104,6 +2142,7 @@ async function init(){
       fetch('/data/google_ads_data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) GOOGLE_ADS_DATA=d;}).catch(()=>{}),
       fetch('/data/manual_totals.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
       fetch('/data/skinuva_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_MONTHLY=d;}).catch(()=>{}),
+      fetch('/data/skinuva_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_DAILY=d;}).catch(()=>{}),
     ]);
     injectHistoricalApiData();
     injectJuneApiData();
@@ -2391,6 +2430,182 @@ function runQC() {
 
 
 init();
+
+// ── Date Range Helpers ──────────────────────────────────────────────────────
+function _isoToday(){const n=new Date();return n.getFullYear()+'-'+String(n.getMonth()+1).padStart(2,'0')+'-'+String(n.getDate()).padStart(2,'0');}
+function _isoOffset(days){const d=new Date();d.setDate(d.getDate()-days);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+
+function setRangePreset(p){
+  const today=_isoToday();
+  let s,e=today;
+  const now=new Date();
+  if(p==='mtd'){s=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-01';}
+  else if(p==='last_month'){
+    const lm=new Date(now.getFullYear(),now.getMonth()-1,1);
+    const le=new Date(now.getFullYear(),now.getMonth(),0);
+    s=lm.getFullYear()+'-'+String(lm.getMonth()+1).padStart(2,'0')+'-01';
+    e=le.getFullYear()+'-'+String(le.getMonth()+1).padStart(2,'0')+'-'+String(le.getDate()).padStart(2,'0');
+  } else {s=_isoOffset(p-1);}
+  document.getElementById('range-start-input').value=s;
+  document.getElementById('range-end-input').value=e;
+  // highlight active preset
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  const idMap={7:'7',14:'14',30:'30',mtd:'mtd',last_month:'lm',90:'90'};
+  document.getElementById('rp-'+idMap[p])?.classList.add('rp-active');
+  _activateRange(s,e);
+}
+
+function applyCustomRange(){
+  const s=document.getElementById('range-start-input').value;
+  const e=document.getElementById('range-end-input').value;
+  if(!s||!e||s>e){alert('Please select a valid start and end date.');return;}
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  _activateRange(s,e);
+}
+
+function _activateRange(s,e){
+  rangeMode=true; rangeStart=s; rangeEnd=e;
+  document.getElementById('range-active-pill').style.display='';
+  document.getElementById('range-active-pill').textContent=s+' → '+e;
+  document.getElementById('range-clear-btn').style.display='';
+  render();
+}
+
+function clearRange(){
+  rangeMode=false; rangeStart=null; rangeEnd=null;
+  document.getElementById('range-active-pill').style.display='none';
+  document.getElementById('range-clear-btn').style.display='none';
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  render();
+}
+
+function computeRangeMetrics(s,e){
+  const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  let a={spend:0,adSales:0,totalSales:0,orders:0,clicks:0,impressions:0};
+  let g={spend:0,adSales:0,conversions:0,clicks:0,impressions:0};
+  const rows=[];
+  Object.entries(SKINUVA_DAILY).sort((x,y)=>x[0].localeCompare(y[0])).forEach(([d,row])=>{
+    if(d<s||d>e) return;
+    const am=row.amazon||{}, gd=row.google||{};
+    a.spend+=am.spend||0; a.adSales+=am.adSales||0; a.totalSales+=am.totalSales||0;
+    a.orders+=am.orders||0; a.clicks+=am.clicks||0; a.impressions+=am.impressions||0;
+    g.spend+=gd.spend||0; g.adSales+=gd.adSales||0; g.conversions+=gd.conversions||0;
+    g.clicks+=gd.clicks||0; g.impressions+=gd.impressions||0;
+    rows.push({date:d,amz:am,ggl:gd});
+  });
+  const amzCh={channel:'Amazon',adSpend:rd(a.spend),adSales:rd(a.adSales),acos:a.adSales>0?rd(a.spend/a.adSales*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(a.spend/a.totalSales*100):null,impressions:a.impressions,clicks:a.clicks,ctr:a.impressions>0?rd(a.clicks/a.impressions*100):null,cpc:a.clicks>0?rd(a.spend/a.clicks):null,orders:a.orders,aov:a.orders>0?rd(a.adSales/a.orders):null,cvr:a.clicks>0?rd(a.orders/a.clicks*100):null};
+  const gCh={channel:'Google',adSpend:rd(g.spend),adSales:rd(g.adSales),acos:g.adSales>0?rd(g.spend/g.adSales*100):null,totalSales:null,tacos:null,impressions:g.impressions,clicks:g.clicks,ctr:g.impressions>0?rd(g.clicks/g.impressions*100):null,cpc:g.clicks>0?rd(g.spend/g.clicks):null,orders:Math.round(g.conversions),aov:null,cvr:null};
+  const allChs=[amzCh,gCh];
+  const tS=rd(allChs.reduce((s,c)=>s+(c.adSpend||0),0)),tAs=rd(allChs.reduce((s,c)=>s+(c.adSales||0),0));
+  const tO=allChs.reduce((s,c)=>s+(c.orders||0),0),tI=allChs.reduce((s,c)=>s+(c.impressions||0),0),tC=allChs.reduce((s,c)=>s+(c.clicks||0),0);
+  const totCh={channel:'Total Paid Media',adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(tS/a.totalSales*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null};
+  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(tS/a.totalSales*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,channels:[amzCh,gCh,totCh],rows};
+}
+
+function renderRange(){
+  if(!SKINUVA_DAILY||!Object.keys(SKINUVA_DAILY).length){
+    // No daily archive yet — fall back to normal render after clearing range mode
+    const r1=document.getElementById('kpi-row-1'),r2=document.getElementById('kpi-row-2');
+    if(r1) r1.innerHTML='<div style="padding:20px;color:rgba(255,255,255,0.4);font-size:13px;">Daily archive not yet available — run tomorrow\'s GitHub Action to populate it.</div>';
+    if(r2) r2.innerHTML='';
+    return;
+  }
+  const m=computeRangeMetrics(rangeStart,rangeEnd);
+  const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
+  const roas=m.adSpend>0?m.adSales/m.adSpend:null;
+
+  // Subtitle
+  document.getElementById('subtitle').textContent='Date Range View: Amazon & Google · '+rangeStart+' → '+rangeEnd;
+  // Dim month tabs
+  const tb=document.getElementById('month-tabs');
+  if(tb) tb.style.opacity='0.3';
+
+  // KPI Row 1
+  const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:pct(m.acos)},{l:'Total Sales',v:rd2(m.totalSales),sub:'Amazon only'},{l:'TACOS',v:pct(m.tacos),sub:'Amazon only'}]
+    .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
+
+  // KPI Row 2
+  const r2=document.getElementById('kpi-row-2'); r2.innerHTML='';
+  [{l:'Impressions',v:fmt(m.impressions,'',0)},{l:'Clicks',v:fmt(m.clicks,'',0)},{l:'CTR',v:pct(m.ctr)},{l:'CPC',v:m.cpc!=null?'$'+m.cpc.toFixed(2):'—'},{l:'Orders',v:m.orders!=null?m.orders.toLocaleString():'—'},{l:'AOV',v:m.aov!=null?'$'+m.aov.toFixed(2):'—'}]
+    .forEach(x=>r2.appendChild(kpi(x.l,x.v,{})));
+
+  // Spend bar chart
+  const chData=m.channels.filter(c=>c.adSpend>0&&c.channel!=='Total Paid Media');
+  document.getElementById('spend-sub').textContent=rangeStart+' → '+rangeEnd;
+  kill('spend');
+  charts['spend']=new Chart(document.getElementById('chart-spend'),{type:'bar',
+    data:{labels:chData.map(c=>c.channel),datasets:[{data:chData.map(c=>c.adSpend),backgroundColor:chData.map(c=>(CHANNEL_COLORS[c.channel]||'#666')+'DD'),borderRadius:6,barThickness:20}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
+    scales:{x:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>fmt(v)},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.6)',font:{size:12}},grid:{display:false},border:{display:false}}}}});
+
+  // Pie chart
+  const pieData=m.channels.filter(c=>c.adSales>0&&c.channel!=='Total Paid Media');
+  document.getElementById('pie-sub').textContent=rangeStart+' → '+rangeEnd;
+  kill('pie');
+  charts['pie']=new Chart(document.getElementById('chart-pie'),{type:'doughnut',
+    data:{labels:pieData.map(c=>c.channel),datasets:[{data:pieData.map(c=>c.adSales),backgroundColor:pieData.map(c=>(CHANNEL_COLORS[c.channel]||'#666')+'EE'),borderWidth:0,spacing:3}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'right',labels:{color:'rgba(255,255,255,0.6)',font:{size:12},usePointStyle:true,pointStyle:'circle',padding:12}},
+    tooltip:{callbacks:{label:c=>c.label+': $'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}}}});
+
+  // Daily trend chart
+  kill('trend');
+  const rows=m.rows;
+  charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'line',
+    data:{labels:rows.map(r=>r.date.slice(5)),datasets:[
+      {label:'Ad Spend',data:rows.map(r=>(r.amz.spend||0)+(r.ggl.spend||0)),borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.08)',fill:true,tension:.3,pointRadius:rows.length>60?0:2,borderWidth:2},
+      {label:'Ad Sales',data:rows.map(r=>(r.amz.adSales||0)+(r.ggl.adSales||0)),borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.08)',fill:true,tension:.3,pointRadius:rows.length>60?0:2,borderWidth:2}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
+    scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},maxTicksLimit:12},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>fmt(v)},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
+
+  // ACOS chart — daily Amazon ACOS over range
+  kill('acos');
+  const acosRows=rows.filter(r=>r.amz.adSales>0);
+  charts['acos']=new Chart(document.getElementById('chart-acos'),{type:'line',
+    data:{labels:acosRows.map(r=>r.date.slice(5)),datasets:[
+      {label:'Amazon ACOS',data:acosRows.map(r=>r.amz.adSales>0?Math.round(r.amz.spend/r.amz.adSales*1000)/10:null),borderColor:'#a78bfa',pointBackgroundColor:'#a78bfa',tension:.3,pointRadius:acosRows.length>60?0:3,borderWidth:2.5,spanGaps:true},
+      {label:'Google ACOS',data:rows.filter(r=>r.ggl.adSales>0).map(r=>({x:r.date.slice(5),y:Math.round(r.ggl.spend/r.ggl.adSales*1000)/10})),borderColor:CHANNEL_COLORS.Google,pointBackgroundColor:CHANNEL_COLORS.Google,tension:.3,pointRadius:rows.length>60?0:3,borderWidth:2.5,spanGaps:true}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,font:{size:12}}},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.raw.toFixed(1)+'%'},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
+    scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',maxTicksLimit:12},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
+
+  // Channel table
+  document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
+  const tbody=document.getElementById('channel-tbody'); tbody.innerHTML='';
+  const fDol=v=>'$'+Number(v).toLocaleString(),fPct=v=>v+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
+  m.channels.forEach(c=>{
+    const isTotal=c.channel==='Total Paid Media';
+    const tr=document.createElement('tr');
+    if(isTotal) tr.style.cssText='border-top:2px solid rgba(255,255,255,0.15);font-weight:700;';
+    const col=CHANNEL_COLORS[c.channel]||(isTotal?'rgba(255,255,255,0.7)':'#666');
+    const acD=(c.acos!=null&&c.adSales>0)?c.acos:null;
+    const ac=acD!=null?(acD>50?'acos-bad':acD<25?'acos-good':''):'';
+    const ordD=c.orders!=null?Math.round(c.orders):null;
+    const tStyle=isTotal?'font-weight:700;color:#fff;':'';
+    tr.innerHTML=`<td style="${tStyle}">${isTotal?'<span style="color:rgba(255,255,255,0.9);font-weight:700;">Total Paid Media</span>':'<span class="dot" style="background:'+col+'"></span><span style="color:'+col+'">'+c.channel+'</span>'}</td>
+      <td style="${tStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}</td>
+      <td style="${tStyle}">${c.adSales!=null?fDol(c.adSales):'—'}</td>
+      <td style="${tStyle}" class="${ac}">${acD!=null?acD+'%':'N/A'}</td>
+      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}</td>
+      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}</td>
+      <td style="${tStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}</td>
+      <td style="${tStyle}">${ordD!=null?fNum(ordD):'—'}</td>
+      <td style="${tStyle}">${c.aov!=null?fCpc(c.aov):'—'}</td>
+      <td style="${tStyle}">${c.cvr!=null?c.cvr+'%':'—'}</td>`;
+    tbody.appendChild(tr);
+  });
+  const noteRow=document.createElement('tr');
+  noteRow.innerHTML=`<td colspan="10" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">Meta, Walmart, Pinterest & other channels available in monthly view only</td>`;
+  tbody.appendChild(noteRow);
+
+  renderWLOS();
+  document.getElementById('footer').textContent='Skinuva Ads Tracking · Date Range: '+rangeStart+' → '+rangeEnd;
+  buildTicker();
+}
+
+// Also restore month-tabs opacity when leaving range mode (called by clearRange → render)
+const _origRenderSubtitle=null; // placeholder — logic is inline in render()
 
 // ── Inject historical month API data from skinuva_monthly.json ──
 // Runs before injectJuneApiData() so current month always wins.
