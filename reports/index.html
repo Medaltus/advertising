@@ -103,9 +103,9 @@ body {
 .section-header { margin-bottom:18px; }
 .chart-wrap { position:relative;width:100%; }
 /* Table */
-.table-wrap { overflow-x:auto; }
+.table-wrap { overflow-x:auto;overflow-y:auto;max-height:520px; }
 table { width:100%;border-collapse:collapse;font-size:13px; }
-thead th { text-align:right;padding:12px 12px;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;user-select:none; }
+thead th { text-align:right;padding:12px 12px;font-weight:700;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.35);border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer;user-select:none;position:sticky;top:0;z-index:2;background:#0d0d12;box-shadow:0 1px 0 rgba(255,255,255,0.08); }
 thead th:hover { color:rgba(255,255,255,0.6); }
 thead th:first-child { text-align:left; }
 tbody td { text-align:right;padding:11px 12px;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;font-size:13px;color:rgba(255,255,255,0.85);border-bottom:1px solid rgba(255,255,255,0.04); }
