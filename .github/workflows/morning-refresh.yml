@@ -51,6 +51,7 @@ jobs:
           git pull --rebase --autostash
           git add data/api_supplement.json \
                   skinuva/data/skinuva_supplement.json \
-                  skinuva/data/google_ads_data.json
+                  skinuva/data/google_ads_data.json \
+                  skinuva/data/skinuva_monthly.json
           git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
           git push

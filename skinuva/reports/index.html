@@ -853,7 +853,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 
 <script>
 const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
-let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={};
+let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={};
 
 const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48' };
 const VOLUME_KEYS = new Set(['adSpend','adSales','totalSales','impressions','clicks','orders']);
@@ -2103,7 +2103,9 @@ async function init(){
       fetch('/data/skinuva_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_AMAZON=d;}).catch(()=>{}),
       fetch('/data/google_ads_data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) GOOGLE_ADS_DATA=d;}).catch(()=>{}),
       fetch('/data/manual_totals.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
+      fetch('/data/skinuva_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_MONTHLY=d;}).catch(()=>{}),
     ]);
+    injectHistoricalApiData();
     injectJuneApiData();
     renderAmazonSection('month');
     renderGoogleSection('month');
@@ -2389,6 +2391,107 @@ function runQC() {
 
 
 init();
+
+// ── Inject historical month API data from skinuva_monthly.json ──
+// Runs before injectJuneApiData() so current month always wins.
+function injectHistoricalApiData(){
+  if(!DATA||!SKINUVA_MONTHLY||typeof SKINUVA_MONTHLY!=='object') return;
+  const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  const curMonth=_currentMonthLabel();
+  const MONTH_ORDER=['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  Object.entries(SKINUVA_MONTHLY).forEach(([mk,mData])=>{
+    if(mk===curMonth) return; // current month handled by injectJuneApiData()
+
+    const a=mData.amazon||{}, g=mData.google||{};
+    const combined=mData.combinedTotalSales||null;
+
+    // ── Amazon channel ──
+    const amzSpend=a.spend||0, amzSales=a.adSales||0, amzOrders=a.orders||0;
+    const amzClicks=a.clicks||0, amzImps=a.impressions||0, amzTotal=a.totalSales||0;
+    const amzCh={
+      channel:'Amazon',
+      adSpend:rd(amzSpend), adSales:rd(amzSales),
+      acos:amzSales>0?rd(amzSpend/amzSales*100):null,
+      totalSales:rd(amzTotal),
+      tacos:amzTotal>0?rd(amzSpend/amzTotal*100):null,
+      impressions:amzImps, clicks:amzClicks,
+      ctr:amzImps>0?rd(amzClicks/amzImps*100):null,
+      cpc:amzClicks>0?rd(amzSpend/amzClicks):null,
+      orders:amzOrders,
+      aov:amzOrders>0?rd(amzSales/amzOrders):null,
+      cvr:amzClicks>0?rd(amzOrders/amzClicks*100):null,
+    };
+
+    // ── Google channel ──
+    const gSpend=g.spend||0, gSales=g.adSales||0, gConv=g.conversions||0;
+    const gClicks=g.clicks||0, gImps=g.impressions||0;
+    const gCh={
+      channel:'Google',
+      adSpend:rd(gSpend), adSales:rd(gSales),
+      acos:gSales>0?rd(gSpend/gSales*100):null,
+      totalSales:null, tacos:null,
+      impressions:gImps, clicks:gClicks,
+      ctr:gImps>0?rd(gClicks/gImps*100):null,
+      cpc:gClicks>0?rd(gSpend/gClicks):null,
+      orders:Math.round(gConv), aov:null, cvr:null,
+    };
+
+    // Keep other channels already in DATA (Meta, Walmart, Pinterest, etc. from sheet)
+    const sheetChs=(DATA.channels[mk]||[]).filter(c=>
+      c.channel!=='Amazon'&&c.channel!=='Google'&&
+      c.channel!=='Total Paid Media'&&c.channel!=='Website Sales'
+    );
+
+    // ── Combined totals channel ──
+    const allChs=[amzCh,gCh,...sheetChs];
+    const totSpend=rd(allChs.reduce((s,c)=>s+(c.adSpend||0),0));
+    const totSales=rd(allChs.reduce((s,c)=>s+(c.adSales||0),0));
+    const totOrders=allChs.reduce((s,c)=>s+(c.orders||0),0);
+    const totImps=allChs.reduce((s,c)=>s+(c.impressions||0),0);
+    const totClicks=allChs.reduce((s,c)=>s+(c.clicks||0),0);
+    const totCh={
+      channel:'Total Paid Media',
+      adSpend:totSpend, adSales:totSales,
+      acos:totSales>0?rd(totSpend/totSales*100):null,
+      totalSales:combined,
+      tacos:combined>0?rd(totSpend/combined*100):null,
+      impressions:totImps, clicks:totClicks,
+      ctr:totImps>0?rd(totClicks/totImps*100):null,
+      cpc:totClicks>0?rd(totSpend/totClicks):null,
+      orders:totOrders,
+      aov:totOrders>0?rd(totSales/totOrders):null,
+      cvr:totClicks>0?rd(totOrders/totClicks*100):null,
+    };
+    DATA.channels[mk]=[amzCh,gCh,...sheetChs,totCh];
+
+    // ── Update / insert monthly summary row ──
+    const entry={
+      month:mk, adSpend:totSpend, adSales:totSales,
+      acos:totSales>0?rd(totSpend/totSales*100):null,
+      totalSales:combined,
+      tacos:combined>0?rd(totSpend/combined*100):null,
+      impressions:totImps, clicks:totClicks,
+      ctr:totImps>0?rd(totClicks/totImps*100):null,
+      cpc:totClicks>0?rd(totSpend/totClicks):null,
+      orders:totOrders,
+      aov:totOrders>0?rd(totSales/totOrders):null,
+      cvr:totClicks>0?rd(totOrders/totClicks*100):null,
+      pctFromAds:combined>0?rd(totSales/combined*100):null,
+      partial:false, daysElapsed:null, daysInMonth:null,
+    };
+    const idx=DATA.monthly.findIndex(m=>m.month===mk);
+    if(idx>=0) DATA.monthly[idx]=entry;
+    else DATA.monthly.push(entry);
+  });
+
+  // Re-sort monthly array chronologically
+  DATA.monthly.sort((a,b)=>{
+    const [am,ay]=a.month.split(' '), [bm,by]=b.month.split(' ');
+    if(ay!==by) return parseInt(ay)-parseInt(by);
+    return MONTH_ORDER.indexOf(am)-MONTH_ORDER.indexOf(bm);
+  });
+}
 
 // ── Inject current month API data (Amazon + Google) into monthly tab structure ──
 function injectJuneApiData(){
