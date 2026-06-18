@@ -2618,6 +2618,18 @@ function injectHistoricalApiData(){
   Object.entries(SKINUVA_MONTHLY).forEach(([mk,mData])=>{
     if(mk===curMonth) return; // current month handled by injectJuneApiData()
 
+    // Skip months whose last day is within the last 31 days.
+    // The 30-day API lookback means those months have only partial archive data
+    // (e.g. only May 19-31 if the script runs on June 18). The Google Sheet
+    // has the complete month — don't override it with partial numbers.
+    const [mName, mYearStr] = mk.split(' ');
+    const mYear = parseInt(mYearStr);
+    const mMonthIdx = MONTH_ORDER.indexOf(mName); // 0-based
+    const lastDayOfMonth = new Date(mYear, mMonthIdx + 1, 0); // day 0 of next month = last day
+    const thirtyOneDaysAgo = new Date();
+    thirtyOneDaysAgo.setDate(thirtyOneDaysAgo.getDate() - 31);
+    if (lastDayOfMonth >= thirtyOneDaysAgo) return; // too recent, sheet data is more complete
+
     const a=mData.amazon||{}, g=mData.google||{};
     const combined=mData.combinedTotalSales||null;
 
