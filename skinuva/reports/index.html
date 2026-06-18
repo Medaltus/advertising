@@ -1315,7 +1315,19 @@ function render(){
     const acosDisplay=(c.acos!=null && c.adSales>0)?c.acos:null;
     const ac=acosDisplay!=null?(acosDisplay>50?'acos-bad':acosDisplay<25?'acos-good':''):'';
     const ordersDisplay=c.orders!=null?Math.round(c.orders):null;
-    const p=findPrev(c.channel);
+    // For Total Paid Media row use DATA.monthly prev — same source as KPI cards —
+    // so the % arrows are consistent. Individual channel rows use their channel entry.
+    const p = isTotal && prev ? {
+      adSpend:    prev.adSpend,
+      adSales:    prev.adSales,
+      acos:       prev.acos,
+      impressions:prev.impressions,
+      clicks:     prev.clicks,
+      cpc:        prev.cpc,
+      orders:     prev.orders,
+      aov:        prev.aov,
+      cvr:        prev.cvr,
+    } : findPrev(c.channel);
     const pOrders=p&&p.orders!=null?Math.round(p.orders):null;
     const totalStyle=isTotal?'font-weight:700;color:#fff;':'';
     // Forecast volume metrics for %-comparison; rates (ACOS, CPC, AOV, CVR) use current value
