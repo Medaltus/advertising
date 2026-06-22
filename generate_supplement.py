@@ -278,6 +278,29 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
         entry['tacos']      = acos_pct(entry['spend'], entry['totalSales'])
 
 
+def fetch_daily_brand_sales(cfg: dict, dates: list) -> dict:
+    """
+    For each date in dates, fetch per-brand total sales via SP-API.
+    Returns {date: {brand_name: total_sales_float}}.
+    Only call for dates missing totalSales or within the last 3 days.
+    """
+    for p in [str(Path(__file__).parent.parent), str(Path(__file__).parent)]:
+        if p not in sys.path:
+            sys.path.insert(0, p)
+    from fetch_total_sales import fetch_brand_sales_for_period  # noqa
+
+    result = {}
+    total = len(dates)
+    for i, date_str in enumerate(sorted(dates), 1):
+        print(f"  [{i}/{total}] SP-API brand sales for {date_str}…")
+        try:
+            brand_sales = fetch_brand_sales_for_period(cfg, date_str, date_str)
+            result[date_str] = brand_sales
+        except Exception as exc:
+            print(f"  ⚠  SP-API failed for {date_str}: {exc}")
+    return result
+
+
 def main():
     script_dir = Path(__file__).parent.resolve()
     # ads_data.js lives next to fetch_ads_data.py, one level above deploy/
@@ -299,20 +322,27 @@ def main():
 
     supplement = build_supplement(data)
 
-    # Enrich with SP-API total sales per calendar month
+    # ── Load config once for all SP-API enrichment ──────────────────────────
     cfg_path = script_dir.parent / 'config.json'
     if not cfg_path.exists():
         cfg_path = script_dir / 'config.json'  # CI fallback: repo root = deploy/
+    cfg = None
     if cfg_path.exists():
         try:
             cfg = json.loads(cfg_path.read_text())
+        except Exception as exc:
+            print(f"\n⚠  Could not read config.json: {exc}")
+    else:
+        print(f"\n⚠  config.json not found at {cfg_path} — skipping all SP-API enrichment")
+
+    # Enrich supplement with SP-API total sales per calendar month
+    if cfg:
+        try:
             print("\nEnriching with SP-API total sales…")
             enrich_with_sp_sales(supplement, cfg)
         except Exception as exc:
             print(f"\n⚠  SP-API enrichment failed: {exc}")
             print("   totalSales will be None — check config.json and SP-API credentials")
-    else:
-        print(f"\n⚠  config.json not found at {cfg_path} — skipping SP-API enrichment")
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -359,6 +389,42 @@ def main():
         existing_daily[d]['brands'].update(entry['brands'])
 
     merged_daily = dict(sorted(existing_daily.items()))
+
+    # ── Fetch per-brand daily SP-API total sales ─────────────────────────────
+    # Fetch days that are missing totalSales OR within the last 3 days
+    # (recent days may not yet be finalized in the SP-API).
+    # After the first backfill run, only ~3 days are fetched per daily refresh.
+    if cfg:
+        try:
+            today = date.today()
+            lookback = cfg.get('lookback_days', 30)
+            cutoff       = (today - timedelta(days=lookback)).isoformat()
+            refresh_from = (today - timedelta(days=3)).isoformat()
+
+            dates_to_fetch = [
+                d for d in sorted(merged_daily.keys())
+                if d >= cutoff and (
+                    d >= refresh_from or
+                    any('totalSales' not in v
+                        for v in merged_daily[d]['brands'].values())
+                )
+            ]
+
+            if dates_to_fetch:
+                print(f"\nFetching SP-API daily brand sales for {len(dates_to_fetch)} days…")
+                daily_sp = fetch_daily_brand_sales(cfg, dates_to_fetch)
+                for d_str, brand_sales in daily_sp.items():
+                    if d_str in merged_daily:
+                        for brand, sales in brand_sales.items():
+                            if brand in merged_daily[d_str]['brands']:
+                                merged_daily[d_str]['brands'][brand]['totalSales'] = \
+                                    round(float(sales), 2)
+                print(f"✓ SP-API daily brand sales stored for {len(daily_sp)} days")
+            else:
+                print("\n✓ Daily archive SP-API data is up to date")
+        except Exception as exc:
+            print(f"\n⚠  Daily SP-API brand sales fetch failed: {exc}")
+
     daily_path.write_text(json.dumps(merged_daily, indent=2))
     print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
 

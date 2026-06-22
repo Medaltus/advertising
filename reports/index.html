@@ -1010,9 +1010,10 @@ function computeRangeMetrics(s,e){
     const dayBrands={};
     Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
       if(selectedBrand!=='All'&&bname!==selectedBrand) return;
-      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{}};
+      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{},totalSales:0,hasTotalSales:false};
       brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
       brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
+      if(brow.totalSales!=null){brands[bname].totalSales+=brow.totalSales;brands[bname].hasTotalSales=true;}
       if(brow.campaigns){
         Object.entries(brow.campaigns).forEach(([cname,cdata])=>{
           if(!brands[bname].campaigns[cname]) brands[bname].campaigns[cname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
@@ -1032,11 +1033,13 @@ function computeRangeMetrics(s,e){
       impressions:c.impressions,clicks:c.clicks,orders:c.orders,
       aov:c.orders>0?rd(c.adSales/c.orders):null
     })).filter(c=>c.spend>0).sort((a,b2)=>b2.spend-a.spend);
-    return{name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null,campaigns:campList};
+    const ts=b.hasTotalSales?rd(b.totalSales):null;
+    return{name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null,totalSales:ts,tacos:ts&&ts>0?rd(b.spend/ts*100):null,campaigns:campList};
   }).sort((a,b)=>b.spend-a.spend);
   const tS=rd(brandList.reduce((s,b)=>s+(b.spend||0),0)),tAs=rd(brandList.reduce((s,b)=>s+(b.adSales||0),0));
   const tO=brandList.reduce((s,b)=>s+(b.orders||0),0),tI=brandList.reduce((s,b)=>s+(b.impressions||0),0),tC=brandList.reduce((s,b)=>s+(b.clicks||0),0);
-  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:null,tacos:null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
+  const tTs=brandList.some(b=>b.totalSales!=null)?rd(brandList.reduce((s,b)=>s+(b.totalSales||0),0)):null;
+  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:tTs,tacos:tTs&&tTs>0?rd(tS/tTs*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
 }
 
 function renderRange(){
@@ -1057,7 +1060,7 @@ function renderRange(){
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:'—',sub:'Monthly only'},{l:'TACOS',v:'—',sub:'Monthly only'}]
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:m.totalSales==null?'Run morning refresh':null},{l:'TACOS',v:m.tacos!=null?m.tacos.toFixed(1)+'%':'—',sub:m.tacos==null&&m.totalSales==null?'Run morning refresh':null}]
     .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
 
   // KPI Row 2
@@ -1073,7 +1076,7 @@ function renderRange(){
     tableEl.innerHTML='';
     brandData.forEach(b=>{
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${b.name}</td><td>${b.spend!=null?'$'+b.spend.toLocaleString():'—'}</td><td>${b.adSales!=null?'$'+b.adSales.toLocaleString():'—'}</td><td>${b.acos!=null?b.acos.toFixed(1)+'%':'—'}</td><td>—</td><td>—</td><td>${b.impressions!=null?b.impressions.toLocaleString():'—'}</td><td>${b.clicks!=null?b.clicks.toLocaleString():'—'}</td><td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td><td>${b.orders!=null?b.orders.toLocaleString():'—'}</td>`;
+      tr.innerHTML=`<td>${b.name}</td><td>${b.spend!=null?'$'+b.spend.toLocaleString():'—'}</td><td>${b.adSales!=null?'$'+b.adSales.toLocaleString():'—'}</td><td>${b.acos!=null?b.acos.toFixed(1)+'%':'—'}</td><td>${b.totalSales!=null?'$'+b.totalSales.toLocaleString():'—'}</td><td>${b.tacos!=null?b.tacos.toFixed(1)+'%':'—'}</td><td>${b.impressions!=null?b.impressions.toLocaleString():'—'}</td><td>${b.clicks!=null?b.clicks.toLocaleString():'—'}</td><td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td><td>${b.orders!=null?b.orders.toLocaleString():'—'}</td>`;
       tableEl.appendChild(tr);
     });
     const noteRow=document.createElement('tr');
