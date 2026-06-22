@@ -1010,14 +1010,30 @@ function computeRangeMetrics(s,e){
     const dayBrands={};
     Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
       if(selectedBrand!=='All'&&bname!==selectedBrand) return;
-      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
+      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{}};
       brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
       brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
+      if(brow.campaigns){
+        Object.entries(brow.campaigns).forEach(([cname,cdata])=>{
+          if(!brands[bname].campaigns[cname]) brands[bname].campaigns[cname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
+          const cc=brands[bname].campaigns[cname];
+          cc.spend+=cdata.spend||0; cc.adSales+=cdata.adSales||0;
+          cc.orders+=cdata.orders||0; cc.clicks+=cdata.clicks||0; cc.impressions+=cdata.impressions||0;
+        });
+      }
       dayBrands[bname]=brow;
     });
     rows.push({date:d,brands:dayBrands});
   });
-  const brandList=Object.entries(brands).map(([name,b])=>({name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null})).sort((a,b)=>b.spend-a.spend);
+  const brandList=Object.entries(brands).map(([name,b])=>{
+    const campList=Object.entries(b.campaigns).map(([cname,c])=>({
+      name:cname,spend:rd(c.spend),adSales:rd(c.adSales),
+      acos:c.adSales>0?rd(c.spend/c.adSales*100):null,
+      impressions:c.impressions,clicks:c.clicks,orders:c.orders,
+      aov:c.orders>0?rd(c.adSales/c.orders):null
+    })).filter(c=>c.spend>0).sort((a,b2)=>b2.spend-a.spend);
+    return{name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null,campaigns:campList};
+  }).sort((a,b)=>b.spend-a.spend);
   const tS=rd(brandList.reduce((s,b)=>s+(b.spend||0),0)),tAs=rd(brandList.reduce((s,b)=>s+(b.adSales||0),0));
   const tO=brandList.reduce((s,b)=>s+(b.orders||0),0),tI=brandList.reduce((s,b)=>s+(b.impressions||0),0),tC=brandList.reduce((s,b)=>s+(b.clicks||0),0);
   return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:null,tacos:null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
@@ -1076,19 +1092,88 @@ function renderRange(){
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
       scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},maxTicksLimit:12},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
   }
-  // Campaigns — find the month most overlapping with the selected range, show its campaigns
-  const _MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const nearestMd=DATA.monthly.slice().reverse().find(m=>{
-    const[mn,my]=m.month.split(' '),mi=_MO.indexOf(mn),yr=parseInt(my);
-    const ms=`${yr}-${String(mi+1).padStart(2,'0')}-01`;
-    const me=new Date(yr,mi+1,0).toISOString().slice(0,10);
-    return rangeStart<=me&&rangeEnd>=ms;
-  })||DATA.monthly[DATA.monthly.length-1];
-  const campSec=document.getElementById('campaigns-section');
-  if(campSec) campSec.style.display='block';
-  renderCampaignsByBrand(selectedBrand==='All'?undefined:selectedBrand, nearestMd.month);
+  // Render campaign breakdown aggregated from the daily archive for this date range
+  renderRangeCampaigns(m);
 
   const footer=document.getElementById('footer'); if(footer) footer.textContent='Medaltus Portfolio · Date Range: '+rangeStart+' → '+rangeEnd;
+}
+
+function renderRangeCampaigns(m){
+  const campSec=document.getElementById('campaigns-section');
+  const container=document.getElementById('campaigns-container');
+  if(!campSec||!container) return;
+  campSec.style.display='block';
+  container.innerHTML='';
+
+  // Filter brands that have any campaign spend in this range
+  const activeBrands=(m.brands||[])
+    .filter(b=>b.campaigns&&b.campaigns.length>0)
+    .sort((a,b2)=>a.name.localeCompare(b2.name));
+
+  const hasCampData=activeBrands.length>0;
+  const label=(selectedBrand!=='All'?selectedBrand+' · ':'')+'Campaign detail · '+rangeStart+' → '+rangeEnd+(hasCampData?'':' · no campaign data in archive for this range');
+  document.getElementById('campaigns-sub').textContent=label;
+
+  if(!hasCampData){
+    container.innerHTML='<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.25);font-size:13px;">No campaign-level data in the archive for this date range. Campaign data is available from May 12, 2026 onwards.</div>';
+    return;
+  }
+
+  activeBrands.forEach(brand=>{
+    const color=BRAND_COLORS[brand.name]||'#666';
+    const isSelected=selectedBrand===brand.name;
+    const acosColor=brand.acos!=null?(brand.acos<25?'#4ade80':brand.acos<40?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.4)';
+    const hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;gap:10px;padding:13px 20px 10px;background:'+(isSelected?color+'18':'rgba(255,255,255,0.025)')+';border-top:1px solid rgba(255,255,255,0.07);';
+    hdr.innerHTML=
+      '<span style="width:10px;height:10px;border-radius:50%;background:'+color+';box-shadow:0 0 8px '+color+'44;display:inline-block;flex-shrink:0;"></span>'+
+      '<span style="font-weight:700;font-size:13px;color:'+color+';letter-spacing:.2px;">'+brand.name+'</span>'+
+      '<span style="font-size:11px;color:rgba(255,255,255,0.3);">'+brand.campaigns.length+' campaign'+(brand.campaigns.length!==1?'s':'')+'</span>'+
+      '<span style="margin-left:auto;display:flex;gap:24px;font-family:\'SF Mono\',\'Menlo\',monospace;font-size:12px;">'+
+        '<span style="color:rgba(255,255,255,0.4);">Spend <span style="color:rgba(255,255,255,0.8);">'+(brand.spend!=null?'$'+brand.spend.toLocaleString():'—')+'</span></span>'+
+        '<span style="color:rgba(255,255,255,0.4);">Sales <span style="color:rgba(255,255,255,0.8);">'+(brand.adSales!=null?'$'+brand.adSales.toLocaleString():'—')+'</span></span>'+
+        '<span style="color:'+acosColor+';">ACoS '+(brand.acos!=null?brand.acos.toFixed(1)+'%':'—')+'</span>'+
+      '</span>';
+    container.appendChild(hdr);
+
+    const colHdr=document.createElement('div');
+    colHdr.style.cssText='display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:6px 20px;border-bottom:1px solid rgba(255,255,255,0.05);';
+    colHdr.innerHTML=
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Campaign</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Spend</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Sales</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">ACoS</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Impr.</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Clicks</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CTR</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CPC</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">CR</span>'+
+      '<span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Orders</span>';
+    container.appendChild(colHdr);
+
+    brand.campaigns.forEach(c=>{
+      const ac=c.acos!=null?(c.acos<25?'#4ade80':c.acos<40?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.3)';
+      const row=document.createElement('div');
+      row.style.cssText='display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .15s;';
+      row.onmouseenter=()=>{row.style.background='rgba(129,140,248,0.04)';};
+      row.onmouseleave=()=>{row.style.background='';};
+      const cCtr=(c.clicks&&c.impressions)?(c.clicks/c.impressions*100):null;
+      const cCpc=(c.clicks&&c.spend)?(c.spend/c.clicks):null;
+      const cCr=(c.clicks&&c.orders)?(c.orders/c.clicks*100):null;
+      row.innerHTML=
+        '<span style="font-size:12px;color:rgba(255,255,255,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:12px;" title="'+c.name+'">'+c.name+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.85);text-align:right;">'+(c.spend!=null?'$'+c.spend.toLocaleString():'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.85);text-align:right;">'+(c.adSales!=null?'$'+c.adSales.toLocaleString():'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:'+ac+';text-align:right;">'+(c.acos!=null?c.acos.toFixed(1)+'%':'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(c.impressions!=null?c.impressions.toLocaleString():'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(c.clicks!=null?c.clicks.toLocaleString():'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(cCtr!=null?cCtr.toFixed(2)+'%':'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(cCpc!=null?'$'+cCpc.toFixed(2):'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(cCr!=null?cCr.toFixed(1)+'%':'—')+'</span>'+
+        '<span style="font-size:12px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.5);text-align:right;">'+(c.orders!=null?c.orders.toLocaleString():'—')+'</span>';
+      container.appendChild(row);
+    });
+  });
 }
 
 // ── Main render ──

@@ -57,29 +57,53 @@ def parse_ads_js(path: Path) -> dict:
 
 def build_daily_archive(data: dict) -> dict:
     """
-    Store per-brand per-day ad rows for arbitrary date-range queries.
-    Structure: {"YYYY-MM-DD": {"brands": {"BrandName": {spend, adSales, orders, clicks, impressions}}}}
+    Store per-brand per-day ad rows (+ per-campaign breakdown) for date-range queries.
+    Structure: {"YYYY-MM-DD": {"brands": {"BrandName": {spend, adSales, orders, clicks,
+                impressions, campaigns: {"CampaignName": {spend, adSales, orders, ...}}}}}}
     NOTE: totalSales is NOT included — it's a monthly SP-API metric, not a true daily value.
     Merged into medaltus_daily_archive.json — new data wins, old days preserved.
     """
     entries: dict = {}
 
     for brand in data.get('brands', []):
-        name     = brand.get('name', '')
-        timeline = brand.get('timeline', [])
+        name            = brand.get('name', '')
+        timeline        = brand.get('timeline', [])
+        camp_timeline   = brand.get('campaign_timeline', [])
+
+        # Build per-date campaign lookup from campaign_timeline
+        camp_by_date: dict = {}
+        for ct in camp_timeline:
+            d = ct.get('date')
+            if not d:
+                continue
+            camp_by_date[d] = {
+                c['name']: {
+                    'spend':       round(float(c.get('spend', 0) or 0), 2),
+                    'adSales':     round(float(c.get('sales', 0) or 0), 2),
+                    'orders':      int(c.get('purchases', 0) or 0),
+                    'clicks':      int(c.get('clicks', 0) or 0),
+                    'impressions': int(c.get('impressions', 0) or 0),
+                }
+                for c in ct.get('campaigns', [])
+                if c.get('name')
+            }
+
         for row in timeline:
             d = row.get('date')
             if not d:
                 continue
             if d not in entries:
                 entries[d] = {'brands': {}}
-            entries[d]['brands'][name] = {
+            brand_entry = {
                 'spend':       round(float(row.get('spend', 0) or 0), 2),
                 'adSales':     round(float(row.get('sales', 0) or 0), 2),
                 'orders':      int(row.get('purchases', 0) or 0),
                 'clicks':      int(row.get('clicks', 0) or 0),
                 'impressions': int(row.get('impressions', 0) or 0),
             }
+            if d in camp_by_date:
+                brand_entry['campaigns'] = camp_by_date[d]
+            entries[d]['brands'][name] = brand_entry
 
     return entries
 
