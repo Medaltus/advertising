@@ -1046,6 +1046,9 @@ function renderRange(){
     document.getElementById('kpi-row-2').innerHTML=''; return;
   }
   const m=computeRangeMetrics(rangeStart,rangeEnd);
+  // Rebuild brand selector so active pill updates correctly in range mode
+  const _selMd = DATA && DATA.monthly.length ? DATA.monthly[DATA.monthly.length-1] : null;
+  if(_selMd) renderBrandSelector(_selMd);
   const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
   const roas=m.adSpend>0?m.adSales/m.adSpend:null;
   document.getElementById('subtitle').textContent='Date Range View · Amazon Ad Metrics · '+rangeStart+' → '+rangeEnd;
