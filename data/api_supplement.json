@@ -255,9 +255,9 @@
         "acos": 22.7,
         "totalSales": 97174.09,
         "tacos": 10.9,
-        "impressions": 1129563,
+        "impressions": 1129984,
         "clicks": 4499,
-        "ctr": 0.3983,
+        "ctr": 0.3981,
         "cpc": 2.3573,
         "cr": null,
         "orders": 606,
@@ -273,7 +273,7 @@
             "spend": 3280.12,
             "adSales": 10219.66,
             "acos": 32.1,
-            "impressions": 313054,
+            "impressions": 312987,
             "clicks": 1164,
             "orders": 124
           },
@@ -283,7 +283,7 @@
             "spend": 3028.63,
             "adSales": 37695.86,
             "acos": 8.0,
-            "impressions": 42917,
+            "impressions": 43365,
             "clicks": 1615,
             "orders": 469
           },
@@ -293,7 +293,7 @@
             "spend": 967.44,
             "adSales": 2139.0,
             "acos": 45.2,
-            "impressions": 86654,
+            "impressions": 86647,
             "clicks": 377,
             "orders": 21
           },
@@ -303,7 +303,7 @@
             "spend": 919.71,
             "adSales": 2035.0,
             "acos": 45.2,
-            "impressions": 50288,
+            "impressions": 50320,
             "clicks": 387,
             "orders": 27
           },
@@ -313,7 +313,7 @@
             "spend": 890.07,
             "adSales": 2075.0,
             "acos": 42.9,
-            "impressions": 99600,
+            "impressions": 99598,
             "clicks": 261,
             "orders": 22
           },
@@ -323,7 +323,7 @@
             "spend": 733.82,
             "adSales": 1235.0,
             "acos": 59.4,
-            "impressions": 118936,
+            "impressions": 119001,
             "clicks": 155,
             "orders": 28
           },
@@ -333,7 +333,7 @@
             "spend": 683.84,
             "adSales": 1164.55,
             "acos": 58.7,
-            "impressions": 151887,
+            "impressions": 151875,
             "clicks": 173,
             "orders": 27
           },
@@ -343,7 +343,7 @@
             "spend": 676.97,
             "adSales": 1044.9,
             "acos": 64.8,
-            "impressions": 83688,
+            "impressions": 83687,
             "clicks": 363,
             "orders": 13
           },
@@ -353,7 +353,7 @@
             "spend": 557.11,
             "adSales": 3090.0,
             "acos": 18.0,
-            "impressions": 64806,
+            "impressions": 64801,
             "clicks": 217,
             "orders": 35
           },
@@ -363,7 +363,7 @@
             "spend": 514.75,
             "adSales": 1431.0,
             "acos": 36.0,
-            "impressions": 81452,
+            "impressions": 81439,
             "clicks": 264,
             "orders": 14
           },
@@ -383,7 +383,7 @@
             "spend": 381.06,
             "adSales": 990.0,
             "acos": 38.5,
-            "impressions": 66454,
+            "impressions": 66452,
             "clicks": 327,
             "orders": 13
           },
@@ -393,7 +393,7 @@
             "spend": 363.15,
             "adSales": 975.0,
             "acos": 37.2,
-            "impressions": 14024,
+            "impressions": 14023,
             "clicks": 149,
             "orders": 11
           },
@@ -403,7 +403,7 @@
             "spend": 353.76,
             "adSales": 559.93,
             "acos": 63.2,
-            "impressions": 16076,
+            "impressions": 16075,
             "clicks": 254,
             "orders": 7
           },
@@ -433,7 +433,7 @@
             "spend": 171.16,
             "adSales": 390.0,
             "acos": 43.9,
-            "impressions": 33202,
+            "impressions": 33199,
             "clicks": 97,
             "orders": 8
           },
@@ -443,7 +443,7 @@
             "spend": 170.69,
             "adSales": 515.0,
             "acos": 33.1,
-            "impressions": 200792,
+            "impressions": 200788,
             "clicks": 94,
             "orders": 6
           },
@@ -473,7 +473,7 @@
             "spend": 100.41,
             "adSales": 40.0,
             "acos": 251.0,
-            "impressions": 45990,
+            "impressions": 45984,
             "clicks": 30,
             "orders": 1
           },
@@ -529,9 +529,372 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "skinuva scar cream",
+              "spend": 2487.66,
+              "sales": 22246.58,
+              "acos": 11.18,
+              "impressions": 69759,
+              "clicks": 1367,
+              "ctr": 0.0196,
+              "cpc": 1.8198,
+              "purchases": 280,
+              "cvr": 0.2048
+            },
+            {
+              "query": "skinuva",
+              "spend": 658.98,
+              "sales": 9671.59,
+              "acos": 6.81,
+              "impressions": 9236,
+              "clicks": 346,
+              "ctr": 0.0375,
+              "cpc": 1.9046,
+              "purchases": 121,
+              "cvr": 0.3497
+            },
+            {
+              "query": "skinuva scar gel",
+              "spend": 877.37,
+              "sales": 4767.59,
+              "acos": 18.4,
+              "impressions": 23065,
+              "clicks": 407,
+              "ctr": 0.0176,
+              "cpc": 2.1557,
+              "purchases": 59,
+              "cvr": 0.145
+            },
+            {
+              "query": "skinuva scar",
+              "spend": 827.7,
+              "sales": 4263.99,
+              "acos": 19.41,
+              "impressions": 17872,
+              "clicks": 223,
+              "ctr": 0.0125,
+              "cpc": 3.7117,
+              "purchases": 54,
+              "cvr": 0.2422
+            },
+            {
+              "query": "scar cream",
+              "spend": 1233.16,
+              "sales": 3330.0,
+              "acos": 37.03,
+              "impressions": 184431,
+              "clicks": 623,
+              "ctr": 0.0034,
+              "cpc": 1.9794,
+              "purchases": 34,
+              "cvr": 0.0546
+            },
+            {
+              "query": "b07rcjdfn4",
+              "spend": 425.04,
+              "sales": 1405.0,
+              "acos": 30.25,
+              "impressions": 12937,
+              "clicks": 122,
+              "ctr": 0.0094,
+              "cpc": 3.4839,
+              "purchases": 17,
+              "cvr": 0.1393
+            },
+            {
+              "query": "skinuva bruise",
+              "spend": 246.83,
+              "sales": 1125.0,
+              "acos": 21.94,
+              "impressions": 2744,
+              "clicks": 76,
+              "ctr": 0.0277,
+              "cpc": 3.2478,
+              "purchases": 24,
+              "cvr": 0.3158
+            },
+            {
+              "query": "skinuva scar cream with spf 30",
+              "spend": 137.81,
+              "sales": 840.0,
+              "acos": 16.41,
+              "impressions": 6267,
+              "clicks": 55,
+              "ctr": 0.0088,
+              "cpc": 2.5056,
+              "purchases": 9,
+              "cvr": 0.1636
+            },
+            {
+              "query": "skin uva scar cream",
+              "spend": 44.09,
+              "sales": 784.4,
+              "acos": 5.62,
+              "impressions": 155,
+              "clicks": 19,
+              "ctr": 0.1226,
+              "cpc": 2.3205,
+              "purchases": 8,
+              "cvr": 0.4211
+            },
+            {
+              "query": "skin nuva scar cream",
+              "spend": 42.98,
+              "sales": 725.0,
+              "acos": 5.93,
+              "impressions": 438,
+              "clicks": 21,
+              "ctr": 0.0479,
+              "cpc": 2.0467,
+              "purchases": 8,
+              "cvr": 0.381
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "arnica",
+              "spend": 170.64,
+              "sales": 120.0,
+              "acos": 142.2,
+              "impressions": 25721,
+              "clicks": 35,
+              "ctr": 0.0014,
+              "cpc": 4.8754,
+              "purchases": 3,
+              "cvr": 0.0857
+            },
+            {
+              "query": "skinuva bruise pills",
+              "spend": 162.5,
+              "sales": 120.0,
+              "acos": 135.42,
+              "impressions": 2307,
+              "clicks": 16,
+              "ctr": 0.0069,
+              "cpc": 10.1562,
+              "purchases": 3,
+              "cvr": 0.1875
+            },
+            {
+              "query": "b0dxvvvvpr",
+              "spend": 105.35,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 2934,
+              "clicks": 27,
+              "ctr": 0.0092,
+              "cpc": 3.9019,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "arnica tablets",
+              "spend": 79.88,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 5302,
+              "clicks": 26,
+              "ctr": 0.0049,
+              "cpc": 3.0723,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b07ghl7nmp",
+              "spend": 69.0,
+              "sales": 40.0,
+              "acos": 172.5,
+              "impressions": 1367,
+              "clicks": 22,
+              "ctr": 0.0161,
+              "cpc": 3.1364,
+              "purchases": 1,
+              "cvr": 0.0455
+            },
+            {
+              "query": "arnica cream",
+              "spend": 49.44,
+              "sales": 44.55,
+              "acos": 110.98,
+              "impressions": 3912,
+              "clicks": 12,
+              "ctr": 0.0031,
+              "cpc": 4.12,
+              "purchases": 1,
+              "cvr": 0.0833
+            },
+            {
+              "query": "b00evao59m",
+              "spend": 40.93,
+              "sales": 40.0,
+              "acos": 102.33,
+              "impressions": 1329,
+              "clicks": 14,
+              "ctr": 0.0105,
+              "cpc": 2.9236,
+              "purchases": 1,
+              "cvr": 0.0714
+            },
+            {
+              "query": "b0861cgwlf",
+              "spend": 38.0,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 4822,
+              "clicks": 44,
+              "ctr": 0.0091,
+              "cpc": 0.8636,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "lightening cream",
+              "spend": 37.13,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 639,
+              "clicks": 12,
+              "ctr": 0.0188,
+              "cpc": 3.0942,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "bruise remedy",
+              "spend": 36.1,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 215,
+              "clicks": 6,
+              "ctr": 0.0279,
+              "cpc": 6.0167,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "sanuvia scar gel",
+              "spend": 8.64,
+              "sales": 224.0,
+              "acos": 3.86,
+              "impressions": 11,
+              "clicks": 2,
+              "ctr": 0.1818,
+              "cpc": 4.32,
+              "purchases": 3,
+              "cvr": 1.5
+            },
+            {
+              "query": "purple skinuva scar gel",
+              "spend": 7.7,
+              "sales": 90.0,
+              "acos": 8.56,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 7.7,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "skinuva scar gel day and night",
+              "spend": 6.9,
+              "sales": 80.0,
+              "acos": 8.62,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 6.9,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "spf scar",
+              "spend": 5.63,
+              "sales": 120.0,
+              "acos": 4.69,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 5.63,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "skinuva arnica",
+              "spend": 9.73,
+              "sales": 85.0,
+              "acos": 11.45,
+              "impressions": 8,
+              "clicks": 3,
+              "ctr": 0.375,
+              "cpc": 3.2433,
+              "purchases": 2,
+              "cvr": 0.6667
+            },
+            {
+              "query": "b0brnwsq8h",
+              "spend": 24.61,
+              "sales": 290.0,
+              "acos": 8.49,
+              "impressions": 430,
+              "clicks": 8,
+              "ctr": 0.0186,
+              "cpc": 3.0762,
+              "purchases": 4,
+              "cvr": 0.5
+            },
+            {
+              "query": "skinuva scar cream spf",
+              "spend": 7.97,
+              "sales": 90.0,
+              "acos": 8.86,
+              "impressions": 4,
+              "clicks": 2,
+              "ctr": 0.5,
+              "cpc": 3.985,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "cicatricure",
+              "spend": 7.56,
+              "sales": 80.0,
+              "acos": 9.45,
+              "impressions": 52,
+              "clicks": 2,
+              "ctr": 0.0385,
+              "cpc": 3.78,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "arnica montana",
+              "spend": 6.08,
+              "sales": 40.0,
+              "acos": 15.2,
+              "impressions": 176,
+              "clicks": 2,
+              "ctr": 0.0114,
+              "cpc": 3.04,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "biocorneum scar cream",
+              "spend": 6.08,
+              "sales": 105.0,
+              "acos": 5.79,
+              "impressions": 15,
+              "clicks": 2,
+              "ctr": 0.1333,
+              "cpc": 3.04,
+              "purchases": 1,
+              "cvr": 0.5
+            }
+          ]
         }
       },
       {
@@ -541,9 +904,9 @@
         "acos": 43.2,
         "totalSales": 7580.47,
         "tacos": 14.9,
-        "impressions": 437275,
+        "impressions": 437260,
         "clicks": 7240,
-        "ctr": 1.6557,
+        "ctr": 1.6558,
         "cpc": 0.1559,
         "cr": null,
         "orders": 217,
@@ -559,7 +922,7 @@
             "spend": 579.04,
             "adSales": 1697.95,
             "acos": 34.1,
-            "impressions": 252177,
+            "impressions": 252169,
             "clicks": 3837,
             "orders": 128
           },
@@ -579,7 +942,7 @@
             "spend": 339.57,
             "adSales": 716.99,
             "acos": 47.4,
-            "impressions": 171410,
+            "impressions": 171405,
             "clicks": 2943,
             "orders": 55
           },
@@ -599,7 +962,7 @@
             "spend": 149.59,
             "adSales": 291.0,
             "acos": 51.4,
-            "impressions": 88288,
+            "impressions": 88286,
             "clicks": 1378,
             "orders": 27
           },
@@ -635,9 +998,348 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "hello kitty sheet mask",
+              "spend": 9.31,
+              "sales": 81.0,
+              "acos": 11.49,
+              "impressions": 722,
+              "clicks": 44,
+              "ctr": 0.0609,
+              "cpc": 0.2116,
+              "purchases": 6,
+              "cvr": 0.1364
+            },
+            {
+              "query": "b0cb6z536h",
+              "spend": 5.8,
+              "sales": 60.0,
+              "acos": 9.67,
+              "impressions": 1109,
+              "clicks": 50,
+              "ctr": 0.0451,
+              "cpc": 0.116,
+              "purchases": 2,
+              "cvr": 0.04
+            },
+            {
+              "query": "hello kitty makeup",
+              "spend": 19.81,
+              "sales": 51.0,
+              "acos": 38.84,
+              "impressions": 4125,
+              "clicks": 139,
+              "ctr": 0.0337,
+              "cpc": 0.1425,
+              "purchases": 3,
+              "cvr": 0.0216
+            },
+            {
+              "query": "little twin stars",
+              "spend": 8.18,
+              "sales": 50.0,
+              "acos": 16.36,
+              "impressions": 1473,
+              "clicks": 35,
+              "ctr": 0.0238,
+              "cpc": 0.2337,
+              "purchases": 3,
+              "cvr": 0.0857
+            },
+            {
+              "query": "b0gp92j15k",
+              "spend": 5.9,
+              "sales": 36.0,
+              "acos": 16.39,
+              "impressions": 636,
+              "clicks": 39,
+              "ctr": 0.0613,
+              "cpc": 0.1513,
+              "purchases": 3,
+              "cvr": 0.0769
+            },
+            {
+              "query": "makeup brush set",
+              "spend": 6.81,
+              "sales": 34.0,
+              "acos": 20.03,
+              "impressions": 1269,
+              "clicks": 52,
+              "ctr": 0.041,
+              "cpc": 0.131,
+              "purchases": 2,
+              "cvr": 0.0385
+            },
+            {
+              "query": "b07jh6982h",
+              "spend": 5.91,
+              "sales": 24.0,
+              "acos": 24.62,
+              "impressions": 916,
+              "clicks": 25,
+              "ctr": 0.0273,
+              "cpc": 0.2364,
+              "purchases": 2,
+              "cvr": 0.08
+            },
+            {
+              "query": "kakao friends",
+              "spend": 5.13,
+              "sales": 24.0,
+              "acos": 21.38,
+              "impressions": 571,
+              "clicks": 19,
+              "ctr": 0.0333,
+              "cpc": 0.27,
+              "purchases": 2,
+              "cvr": 0.1053
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "macaron lip balm",
+              "spend": 16.26,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 6293,
+              "clicks": 111,
+              "ctr": 0.0176,
+              "cpc": 0.1465,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "skincare headband",
+              "spend": 8.77,
+              "sales": 8.0,
+              "acos": 109.62,
+              "impressions": 567,
+              "clicks": 38,
+              "ctr": 0.067,
+              "cpc": 0.2308,
+              "purchases": 1,
+              "cvr": 0.0263
+            },
+            {
+              "query": "b0gp2r8q9f",
+              "spend": 7.85,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1222,
+              "clicks": 47,
+              "ctr": 0.0385,
+              "cpc": 0.167,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "dermaplane razor",
+              "spend": 7.52,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1701,
+              "clicks": 40,
+              "ctr": 0.0235,
+              "cpc": 0.188,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b0fttq5qlj",
+              "spend": 7.43,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1268,
+              "clicks": 62,
+              "ctr": 0.0489,
+              "cpc": 0.1198,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "face mask hello kitty",
+              "spend": 7.3,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 301,
+              "clicks": 29,
+              "ctr": 0.0963,
+              "cpc": 0.2517,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b0cdhpg9v5",
+              "spend": 6.65,
+              "sales": 6.0,
+              "acos": 110.83,
+              "impressions": 1432,
+              "clicks": 53,
+              "ctr": 0.037,
+              "cpc": 0.1255,
+              "purchases": 1,
+              "cvr": 0.0189
+            },
+            {
+              "query": "b0c4m9t9x9",
+              "spend": 5.63,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1151,
+              "clicks": 28,
+              "ctr": 0.0243,
+              "cpc": 0.2011,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b0dy2w3wl6",
+              "spend": 5.3,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1353,
+              "clicks": 56,
+              "ctr": 0.0414,
+              "cpc": 0.0946,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "the creme shop",
+              "spend": 5.16,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 931,
+              "clicks": 23,
+              "ctr": 0.0247,
+              "cpc": 0.2243,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "b0d43gq2vb",
+              "spend": 1.84,
+              "sales": 27.0,
+              "acos": 6.81,
+              "impressions": 172,
+              "clicks": 9,
+              "ctr": 0.0523,
+              "cpc": 0.2044,
+              "purchases": 3,
+              "cvr": 0.3333
+            },
+            {
+              "query": "hello kitty macaron lip balm",
+              "spend": 1.94,
+              "sales": 36.0,
+              "acos": 5.39,
+              "impressions": 83,
+              "clicks": 7,
+              "ctr": 0.0843,
+              "cpc": 0.2771,
+              "purchases": 2,
+              "cvr": 0.2857
+            },
+            {
+              "query": "b0cct2q2vn",
+              "spend": 1.37,
+              "sales": 24.0,
+              "acos": 5.71,
+              "impressions": 163,
+              "clicks": 7,
+              "ctr": 0.0429,
+              "cpc": 0.1957,
+              "purchases": 2,
+              "cvr": 0.2857
+            },
+            {
+              "query": "kuromi sleep mask",
+              "spend": 3.18,
+              "sales": 42.0,
+              "acos": 7.57,
+              "impressions": 74,
+              "clicks": 12,
+              "ctr": 0.1622,
+              "cpc": 0.265,
+              "purchases": 3,
+              "cvr": 0.25
+            },
+            {
+              "query": "b0cd9wj1mf",
+              "spend": 1.61,
+              "sales": 16.0,
+              "acos": 10.06,
+              "impressions": 131,
+              "clicks": 8,
+              "ctr": 0.0611,
+              "cpc": 0.2013,
+              "purchases": 2,
+              "cvr": 0.25
+            },
+            {
+              "query": "the creme shop lip gloss",
+              "spend": 2.06,
+              "sales": 24.0,
+              "acos": 8.58,
+              "impressions": 19,
+              "clicks": 10,
+              "ctr": 0.5263,
+              "cpc": 0.206,
+              "purchases": 2,
+              "cvr": 0.2
+            },
+            {
+              "query": "makeup headband",
+              "spend": 3.8,
+              "sales": 24.0,
+              "acos": 15.83,
+              "impressions": 413,
+              "clicks": 16,
+              "ctr": 0.0387,
+              "cpc": 0.2375,
+              "purchases": 3,
+              "cvr": 0.1875
+            },
+            {
+              "query": "b0ck584sqk",
+              "spend": 3.1,
+              "sales": 24.0,
+              "acos": 12.92,
+              "impressions": 534,
+              "clicks": 17,
+              "ctr": 0.0318,
+              "cpc": 0.1824,
+              "purchases": 3,
+              "cvr": 0.1765
+            },
+            {
+              "query": "skin care headband",
+              "spend": 1.34,
+              "sales": 8.0,
+              "acos": 16.75,
+              "impressions": 88,
+              "clicks": 6,
+              "ctr": 0.0682,
+              "cpc": 0.2233,
+              "purchases": 1,
+              "cvr": 0.1667
+            },
+            {
+              "query": "b0d221bxg5",
+              "spend": 1.78,
+              "sales": 24.0,
+              "acos": 7.42,
+              "impressions": 428,
+              "clicks": 14,
+              "ctr": 0.0327,
+              "cpc": 0.1271,
+              "purchases": 2,
+              "cvr": 0.1429
+            }
+          ]
         }
       },
       {
@@ -647,9 +1349,9 @@
         "acos": 69.4,
         "totalSales": 4977.96,
         "tacos": 18.5,
-        "impressions": 129611,
+        "impressions": 129589,
         "clicks": 319,
-        "ctr": 0.2461,
+        "ctr": 0.2462,
         "cpc": 2.8814,
         "cr": null,
         "orders": 28,
@@ -675,7 +1377,7 @@
             "spend": 235.01,
             "adSales": 164.0,
             "acos": 143.3,
-            "impressions": 173322,
+            "impressions": 173300,
             "clicks": 147,
             "orders": 6
           },
@@ -781,9 +1483,288 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "just bjorn marine collagen",
+              "spend": 216.45,
+              "sales": 1024.6,
+              "acos": 21.13,
+              "impressions": 1676,
+              "clicks": 85,
+              "ctr": 0.0507,
+              "cpc": 2.5465,
+              "purchases": 18,
+              "cvr": 0.2118
+            },
+            {
+              "query": "b0ch43j2rr",
+              "spend": 7.21,
+              "sales": 99.0,
+              "acos": 7.28,
+              "impressions": 21,
+              "clicks": 3,
+              "ctr": 0.1429,
+              "cpc": 2.4033,
+              "purchases": 1,
+              "cvr": 0.3333
+            },
+            {
+              "query": "colageno marino just bjorn colageno amazon",
+              "spend": 8.49,
+              "sales": 55.0,
+              "acos": 15.44,
+              "impressions": 8,
+              "clicks": 1,
+              "ctr": 0.125,
+              "cpc": 8.49,
+              "purchases": 1,
+              "cvr": 1.0
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "collagen peptides",
+              "spend": 23.07,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 9567,
+              "clicks": 16,
+              "ctr": 0.0017,
+              "cpc": 1.4419,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "marine collagen stick packs",
+              "spend": 22.99,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 4,
+              "clicks": 2,
+              "ctr": 0.5,
+              "cpc": 11.495,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "unflavored marine collagen powder",
+              "spend": 17.8,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 12,
+              "clicks": 2,
+              "ctr": 0.1667,
+              "cpc": 8.9,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "collagen",
+              "spend": 17.15,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 9085,
+              "clicks": 11,
+              "ctr": 0.0012,
+              "cpc": 1.5591,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "collagen powder",
+              "spend": 16.79,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 4489,
+              "clicks": 10,
+              "ctr": 0.0022,
+              "cpc": 1.679,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "premium marine collagen powder",
+              "spend": 16.59,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 5,
+              "clicks": 1,
+              "ctr": 0.2,
+              "cpc": 16.59,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "collagen for women",
+              "spend": 13.5,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 2850,
+              "clicks": 9,
+              "ctr": 0.0032,
+              "cpc": 1.5,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "collagen on the go packets",
+              "spend": 10.57,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 10.57,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "bjorn collagen peptides",
+              "spend": 10.34,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 110,
+              "clicks": 3,
+              "ctr": 0.0273,
+              "cpc": 3.4467,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "nordic naturals marine collagen vanilla",
+              "spend": 9.27,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 9.27,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "just bjorn packets",
+              "spend": 1.74,
+              "sales": 80.0,
+              "acos": 2.17,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.74,
+              "purchases": 2,
+              "cvr": 2.0
+            },
+            {
+              "query": "colageno marino just bjorn colageno amazon",
+              "spend": 8.49,
+              "sales": 55.0,
+              "acos": 15.44,
+              "impressions": 8,
+              "clicks": 1,
+              "ctr": 0.125,
+              "cpc": 8.49,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "unflavored marine collagen",
+              "spend": 6.21,
+              "sales": 9.0,
+              "acos": 69.0,
+              "impressions": 16,
+              "clicks": 1,
+              "ctr": 0.0625,
+              "cpc": 6.21,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "marine collagen travel packs",
+              "spend": 3.87,
+              "sales": 50.0,
+              "acos": 7.74,
+              "impressions": 7,
+              "clicks": 1,
+              "ctr": 0.1429,
+              "cpc": 3.87,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "hydrolyzed nordic marine collagen peptides",
+              "spend": 3.6,
+              "sales": 79.0,
+              "acos": 4.56,
+              "impressions": 2,
+              "clicks": 1,
+              "ctr": 0.5,
+              "cpc": 3.6,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "marine collagen peptides bjorn",
+              "spend": 3.46,
+              "sales": 25.0,
+              "acos": 13.84,
+              "impressions": 7,
+              "clicks": 1,
+              "ctr": 0.1429,
+              "cpc": 3.46,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "marine protein packets",
+              "spend": 2.51,
+              "sales": 25.0,
+              "acos": 10.04,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 2.51,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "organic collagen",
+              "spend": 2.21,
+              "sales": 55.0,
+              "acos": 4.02,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 2.21,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "travel collagen packet",
+              "spend": 2.1,
+              "sales": 25.0,
+              "acos": 8.4,
+              "impressions": 4,
+              "clicks": 1,
+              "ctr": 0.25,
+              "cpc": 2.1,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "collagen protein single serve packets",
+              "spend": 2.04,
+              "sales": 25.0,
+              "acos": 8.16,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 2.04,
+              "purchases": 1,
+              "cvr": 1.0
+            }
+          ]
         }
       },
       {
@@ -793,7 +1774,7 @@
         "acos": 34.1,
         "totalSales": 4230.96,
         "tacos": 9.3,
-        "impressions": 57770,
+        "impressions": 57768,
         "clicks": 854,
         "ctr": 1.4783,
         "cpc": 0.4585,
@@ -821,7 +1802,7 @@
             "spend": 149.27,
             "adSales": 208.0,
             "acos": 71.8,
-            "impressions": 24388,
+            "impressions": 24387,
             "clicks": 350,
             "orders": 16
           },
@@ -831,7 +1812,7 @@
             "spend": 102.38,
             "adSales": 356.0,
             "acos": 28.8,
-            "impressions": 23282,
+            "impressions": 23281,
             "clicks": 244,
             "orders": 23
           },
@@ -847,9 +1828,288 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "cloud cafe",
+              "spend": 112.73,
+              "sales": 488.0,
+              "acos": 23.1,
+              "impressions": 4278,
+              "clicks": 279,
+              "ctr": 0.0652,
+              "cpc": 0.4041,
+              "purchases": 30,
+              "cvr": 0.1075
+            },
+            {
+              "query": "cloud cafe collagen",
+              "spend": 14.28,
+              "sales": 171.8,
+              "acos": 8.31,
+              "impressions": 125,
+              "clicks": 32,
+              "ctr": 0.256,
+              "cpc": 0.4462,
+              "purchases": 9,
+              "cvr": 0.2812
+            },
+            {
+              "query": "b0gdcrv934",
+              "spend": 15.82,
+              "sales": 80.0,
+              "acos": 19.78,
+              "impressions": 514,
+              "clicks": 30,
+              "ctr": 0.0584,
+              "cpc": 0.5273,
+              "purchases": 6,
+              "cvr": 0.2
+            },
+            {
+              "query": "instant coffee",
+              "spend": 13.13,
+              "sales": 44.0,
+              "acos": 29.84,
+              "impressions": 938,
+              "clicks": 24,
+              "ctr": 0.0256,
+              "cpc": 0.5471,
+              "purchases": 3,
+              "cvr": 0.125
+            },
+            {
+              "query": "cloud cafe collagen latte",
+              "spend": 7.79,
+              "sales": 40.0,
+              "acos": 19.48,
+              "impressions": 41,
+              "clicks": 17,
+              "ctr": 0.4146,
+              "cpc": 0.4582,
+              "purchases": 1,
+              "cvr": 0.0588
+            },
+            {
+              "query": "cloud coffee",
+              "spend": 6.66,
+              "sales": 40.0,
+              "acos": 16.65,
+              "impressions": 61,
+              "clicks": 8,
+              "ctr": 0.1311,
+              "cpc": 0.8325,
+              "purchases": 1,
+              "cvr": 0.125
+            },
+            {
+              "query": "cloud cafe matcha",
+              "spend": 8.78,
+              "sales": 32.0,
+              "acos": 27.44,
+              "impressions": 58,
+              "clicks": 13,
+              "ctr": 0.2241,
+              "cpc": 0.6754,
+              "purchases": 2,
+              "cvr": 0.1538
+            },
+            {
+              "query": "taro milk",
+              "spend": 6.32,
+              "sales": 24.0,
+              "acos": 26.33,
+              "impressions": 175,
+              "clicks": 13,
+              "ctr": 0.0743,
+              "cpc": 0.4862,
+              "purchases": 2,
+              "cvr": 0.1538
+            },
+            {
+              "query": "b0gdcyzpkj",
+              "spend": 6.04,
+              "sales": 24.0,
+              "acos": 25.17,
+              "impressions": 180,
+              "clicks": 12,
+              "ctr": 0.0667,
+              "cpc": 0.5033,
+              "purchases": 2,
+              "cvr": 0.1667
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "taro powder",
+              "spend": 8.85,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 774,
+              "clicks": 18,
+              "ctr": 0.0233,
+              "cpc": 0.4917,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "milk tea",
+              "spend": 8.23,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 68,
+              "clicks": 6,
+              "ctr": 0.0882,
+              "cpc": 1.3717,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "instant coffee packets",
+              "spend": 5.67,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 395,
+              "clicks": 11,
+              "ctr": 0.0278,
+              "cpc": 0.5155,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b0fk4723cw",
+              "spend": 5.61,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 306,
+              "clicks": 12,
+              "ctr": 0.0392,
+              "cpc": 0.4675,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "vanilla latte",
+              "spend": 0.6,
+              "sales": 60.0,
+              "acos": 1.0,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.6,
+              "purchases": 2,
+              "cvr": 2.0
+            },
+            {
+              "query": "royal milk tea",
+              "spend": 4.96,
+              "sales": 19.8,
+              "acos": 25.05,
+              "impressions": 5,
+              "clicks": 2,
+              "ctr": 0.4,
+              "cpc": 2.48,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "cloud cafe moomin",
+              "spend": 1.35,
+              "sales": 24.0,
+              "acos": 5.62,
+              "impressions": 4,
+              "clicks": 2,
+              "ctr": 0.5,
+              "cpc": 0.675,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "cloud cafe latte",
+              "spend": 1.19,
+              "sales": 20.0,
+              "acos": 5.95,
+              "impressions": 9,
+              "clicks": 2,
+              "ctr": 0.2222,
+              "cpc": 0.595,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "b0dntwwb9x",
+              "spend": 1.08,
+              "sales": 20.0,
+              "acos": 5.4,
+              "impressions": 5,
+              "clicks": 2,
+              "ctr": 0.4,
+              "cpc": 0.54,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "coffee packets",
+              "spend": 0.95,
+              "sales": 12.0,
+              "acos": 7.92,
+              "impressions": 5,
+              "clicks": 2,
+              "ctr": 0.4,
+              "cpc": 0.475,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "collagen latte",
+              "spend": 2.58,
+              "sales": 20.0,
+              "acos": 12.9,
+              "impressions": 3,
+              "clicks": 3,
+              "ctr": 1.0,
+              "cpc": 0.86,
+              "purchases": 1,
+              "cvr": 0.3333
+            },
+            {
+              "query": "b0gddnlp7t",
+              "spend": 1.69,
+              "sales": 20.0,
+              "acos": 8.45,
+              "impressions": 9,
+              "clicks": 3,
+              "ctr": 0.3333,
+              "cpc": 0.5633,
+              "purchases": 1,
+              "cvr": 0.3333
+            },
+            {
+              "query": "cloud cafe collagen",
+              "spend": 14.28,
+              "sales": 171.8,
+              "acos": 8.31,
+              "impressions": 125,
+              "clicks": 32,
+              "ctr": 0.256,
+              "cpc": 0.4462,
+              "purchases": 9,
+              "cvr": 0.2812
+            },
+            {
+              "query": "cloud cafe hot chocolate zero",
+              "spend": 4.58,
+              "sales": 44.0,
+              "acos": 10.41,
+              "impressions": 17,
+              "clicks": 8,
+              "ctr": 0.4706,
+              "cpc": 0.5725,
+              "purchases": 2,
+              "cvr": 0.25
+            }
+          ]
         }
       },
       {
@@ -943,9 +2203,276 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "pure passion perfume",
+              "spend": 8.47,
+              "sales": 110.0,
+              "acos": 7.7,
+              "impressions": 65,
+              "clicks": 10,
+              "ctr": 0.1538,
+              "cpc": 0.847,
+              "purchases": 2,
+              "cvr": 0.2
+            },
+            {
+              "query": "high on love pure passion body oil",
+              "spend": 5.96,
+              "sales": 45.0,
+              "acos": 13.24,
+              "impressions": 36,
+              "clicks": 2,
+              "ctr": 0.0556,
+              "cpc": 2.98,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "high on love pure passion perfume",
+              "spend": 10.1,
+              "sales": 38.0,
+              "acos": 26.58,
+              "impressions": 39,
+              "clicks": 6,
+              "ctr": 0.1538,
+              "cpc": 1.6833,
+              "purchases": 1,
+              "cvr": 0.1667
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "high on love oil",
+              "spend": 104.2,
+              "sales": 104.0,
+              "acos": 100.19,
+              "impressions": 1180,
+              "clicks": 30,
+              "ctr": 0.0254,
+              "cpc": 3.4733,
+              "purchases": 3,
+              "cvr": 0.1
+            },
+            {
+              "query": "edible body paint",
+              "spend": 33.6,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 3900,
+              "clicks": 36,
+              "ctr": 0.0092,
+              "cpc": 0.9333,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "chocolate body paint edible",
+              "spend": 17.05,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 772,
+              "clicks": 15,
+              "ctr": 0.0194,
+              "cpc": 1.1367,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "chocolate body paint for couples edible",
+              "spend": 17.01,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 542,
+              "clicks": 13,
+              "ctr": 0.024,
+              "cpc": 1.3085,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "womens intimate gel inserts",
+              "spend": 16.71,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 259,
+              "clicks": 11,
+              "ctr": 0.0425,
+              "cpc": 1.5191,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "perfume set",
+              "spend": 10.38,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1193,
+              "clicks": 10,
+              "ctr": 0.0084,
+              "cpc": 1.038,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "high on love dark chocolate body paint",
+              "spend": 8.39,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 240,
+              "clicks": 7,
+              "ctr": 0.0292,
+              "cpc": 1.1986,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "perfume gift sets for women",
+              "spend": 8.33,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 231,
+              "clicks": 7,
+              "ctr": 0.0303,
+              "cpc": 1.19,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "high on love o gel",
+              "spend": 8.31,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 23,
+              "clicks": 2,
+              "ctr": 0.087,
+              "cpc": 4.155,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "high on love cashmere and pear dry body oil",
+              "spend": 5.91,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 11,
+              "clicks": 4,
+              "ctr": 0.3636,
+              "cpc": 1.4775,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "high on love essential oil",
+              "spend": 0.45,
+              "sales": 25.0,
+              "acos": 1.8,
+              "impressions": 15,
+              "clicks": 1,
+              "ctr": 0.0667,
+              "cpc": 0.45,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "high on love pure passion body oil",
+              "spend": 5.96,
+              "sales": 45.0,
+              "acos": 13.24,
+              "impressions": 36,
+              "clicks": 2,
+              "ctr": 0.0556,
+              "cpc": 2.98,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "high on love stimulating o gel",
+              "spend": 3.8,
+              "sales": 35.0,
+              "acos": 10.86,
+              "impressions": 13,
+              "clicks": 2,
+              "ctr": 0.1538,
+              "cpc": 1.9,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "\ufffcpassion of love perfume",
+              "spend": 2.59,
+              "sales": 38.0,
+              "acos": 6.82,
+              "impressions": 3,
+              "clicks": 2,
+              "ctr": 0.6667,
+              "cpc": 1.295,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "dark chocolate body paint",
+              "spend": 1.8,
+              "sales": 70.0,
+              "acos": 2.57,
+              "impressions": 23,
+              "clicks": 4,
+              "ctr": 0.1739,
+              "cpc": 0.45,
+              "purchases": 2,
+              "cvr": 0.5
+            },
+            {
+              "query": "high on love",
+              "spend": 3.84,
+              "sales": 145.0,
+              "acos": 2.65,
+              "impressions": 137,
+              "clicks": 7,
+              "ctr": 0.0511,
+              "cpc": 0.5486,
+              "purchases": 3,
+              "cvr": 0.4286
+            },
+            {
+              "query": "pure passion perfume",
+              "spend": 8.47,
+              "sales": 110.0,
+              "acos": 7.7,
+              "impressions": 65,
+              "clicks": 10,
+              "ctr": 0.1538,
+              "cpc": 0.847,
+              "purchases": 2,
+              "cvr": 0.2
+            },
+            {
+              "query": "highonlove oil",
+              "spend": 4.59,
+              "sales": 55.0,
+              "acos": 8.35,
+              "impressions": 121,
+              "clicks": 5,
+              "ctr": 0.0413,
+              "cpc": 0.918,
+              "purchases": 1,
+              "cvr": 0.2
+            },
+            {
+              "query": "high on love pure passion perfume",
+              "spend": 10.1,
+              "sales": 38.0,
+              "acos": 26.58,
+              "impressions": 39,
+              "clicks": 6,
+              "ctr": 0.1538,
+              "cpc": 1.6833,
+              "purchases": 1,
+              "cvr": 0.1667
+            }
+          ]
         }
       },
       {
@@ -955,7 +2482,7 @@
         "acos": 12.6,
         "totalSales": 14820.88,
         "tacos": 2.1,
-        "impressions": 368346,
+        "impressions": 368344,
         "clicks": 4444,
         "ctr": 1.2065,
         "cpc": 0.0706,
@@ -983,7 +2510,7 @@
             "spend": 0.08,
             "adSales": 0.0,
             "acos": null,
-            "impressions": 324,
+            "impressions": 322,
             "clicks": 1,
             "orders": null
           },
@@ -1019,9 +2546,191 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
+          "top_performing": [
+            {
+              "query": "miffy",
+              "spend": 220.12,
+              "sales": 887.0,
+              "acos": 24.82,
+              "impressions": 253287,
+              "clicks": 2311,
+              "ctr": 0.0091,
+              "cpc": 0.0952,
+              "purchases": 42,
+              "cvr": 0.0182
+            },
+            {
+              "query": "moomin",
+              "spend": 20.39,
+              "sales": 212.0,
+              "acos": 9.62,
+              "impressions": 13826,
+              "clicks": 270,
+              "ctr": 0.0195,
+              "cpc": 0.0755,
+              "purchases": 12,
+              "cvr": 0.0444
+            },
+            {
+              "query": "paul frank",
+              "spend": 10.38,
+              "sales": 109.0,
+              "acos": 9.52,
+              "impressions": 13048,
+              "clicks": 102,
+              "ctr": 0.0078,
+              "cpc": 0.1018,
+              "purchases": 11,
+              "cvr": 0.1078
+            },
+            {
+              "query": "miffy compact mirror",
+              "spend": 8.27,
+              "sales": 30.0,
+              "acos": 27.57,
+              "impressions": 5948,
+              "clicks": 106,
+              "ctr": 0.0178,
+              "cpc": 0.078,
+              "purchases": 2,
+              "cvr": 0.0189
+            },
+            {
+              "query": "keith haring",
+              "spend": 5.07,
+              "sales": 26.0,
+              "acos": 19.5,
+              "impressions": 3499,
+              "clicks": 47,
+              "ctr": 0.0134,
+              "cpc": 0.1079,
+              "purchases": 3,
+              "cvr": 0.0638
+            }
+          ],
           "wasted_spend": [],
-          "opportunities": []
+          "opportunities": [
+            {
+              "query": "korean foot cream",
+              "spend": 0.22,
+              "sales": 27.0,
+              "acos": 0.81,
+              "impressions": 13,
+              "clicks": 2,
+              "ctr": 0.1538,
+              "cpc": 0.11,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "dear cloud pimple patches",
+              "spend": 0.36,
+              "sales": 35.0,
+              "acos": 1.03,
+              "impressions": 45,
+              "clicks": 6,
+              "ctr": 0.1333,
+              "cpc": 0.06,
+              "purchases": 2,
+              "cvr": 0.3333
+            },
+            {
+              "query": "b0f7s21ssp",
+              "spend": 0.24,
+              "sales": 44.0,
+              "acos": 0.55,
+              "impressions": 122,
+              "clicks": 6,
+              "ctr": 0.0492,
+              "cpc": 0.04,
+              "purchases": 2,
+              "cvr": 0.3333
+            },
+            {
+              "query": "pimple patches in case",
+              "spend": 0.24,
+              "sales": 20.0,
+              "acos": 1.2,
+              "impressions": 24,
+              "clicks": 3,
+              "ctr": 0.125,
+              "cpc": 0.08,
+              "purchases": 1,
+              "cvr": 0.3333
+            },
+            {
+              "query": "creme miffy",
+              "spend": 0.46,
+              "sales": 32.0,
+              "acos": 1.44,
+              "impressions": 68,
+              "clicks": 7,
+              "ctr": 0.1029,
+              "cpc": 0.0657,
+              "purchases": 2,
+              "cvr": 0.2857
+            },
+            {
+              "query": "creme shop headband",
+              "spend": 0.24,
+              "sales": 9.0,
+              "acos": 2.67,
+              "impressions": 21,
+              "clicks": 4,
+              "ctr": 0.1905,
+              "cpc": 0.06,
+              "purchases": 1,
+              "cvr": 0.25
+            },
+            {
+              "query": "dear cloud sunscreen",
+              "spend": 0.48,
+              "sales": 55.0,
+              "acos": 0.87,
+              "impressions": 282,
+              "clicks": 9,
+              "ctr": 0.0319,
+              "cpc": 0.0533,
+              "purchases": 2,
+              "cvr": 0.2222
+            },
+            {
+              "query": "b0fgg9rr49",
+              "spend": 0.36,
+              "sales": 27.0,
+              "acos": 1.33,
+              "impressions": 80,
+              "clicks": 9,
+              "ctr": 0.1125,
+              "cpc": 0.04,
+              "purchases": 2,
+              "cvr": 0.2222
+            },
+            {
+              "query": "b0f7scx3s7",
+              "spend": 0.68,
+              "sales": 58.0,
+              "acos": 1.17,
+              "impressions": 178,
+              "clicks": 17,
+              "ctr": 0.0955,
+              "cpc": 0.04,
+              "purchases": 3,
+              "cvr": 0.1765
+            },
+            {
+              "query": "b0dwg3x9jh",
+              "spend": 0.48,
+              "sales": 88.0,
+              "acos": 0.55,
+              "impressions": 181,
+              "clicks": 12,
+              "ctr": 0.0663,
+              "cpc": 0.04,
+              "purchases": 2,
+              "cvr": 0.1667
+            }
+          ]
         }
       },
       {
@@ -1031,7 +2740,7 @@
         "acos": 30.9,
         "totalSales": 1098.76,
         "tacos": 15.0,
-        "impressions": 38934,
+        "impressions": 38930,
         "clicks": 143,
         "ctr": 0.3673,
         "cpc": 1.1546,
@@ -1049,7 +2758,7 @@
             "spend": 178.1,
             "adSales": 238.37,
             "acos": 74.7,
-            "impressions": 46117,
+            "impressions": 46113,
             "clicks": 161,
             "orders": 7
           },
@@ -1135,9 +2844,216 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "eraclea",
+              "spend": 7.49,
+              "sales": 159.98,
+              "acos": 4.68,
+              "impressions": 139,
+              "clicks": 9,
+              "ctr": 0.0647,
+              "cpc": 0.8322,
+              "purchases": 2,
+              "cvr": 0.2222
+            },
+            {
+              "query": "b097vzgtzk",
+              "spend": 7.72,
+              "sales": 48.0,
+              "acos": 16.08,
+              "impressions": 900,
+              "clicks": 15,
+              "ctr": 0.0167,
+              "cpc": 0.5147,
+              "purchases": 2,
+              "cvr": 0.1333
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "oxygen face mask",
+              "spend": 21.94,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 451,
+              "clicks": 17,
+              "ctr": 0.0377,
+              "cpc": 1.2906,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "moisturizer",
+              "spend": 20.96,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 567,
+              "clicks": 16,
+              "ctr": 0.0282,
+              "cpc": 1.31,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "oxygen mask",
+              "spend": 20.46,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 376,
+              "clicks": 16,
+              "ctr": 0.0426,
+              "cpc": 1.2788,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "b075mmncl1",
+              "spend": 7.05,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 43,
+              "clicks": 5,
+              "ctr": 0.1163,
+              "cpc": 1.41,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "barrier cream",
+              "spend": 5.15,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 112,
+              "clicks": 4,
+              "ctr": 0.0357,
+              "cpc": 1.2875,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "eraclea bamboo",
+              "spend": 2.96,
+              "sales": 79.98,
+              "acos": 3.7,
+              "impressions": 2,
+              "clicks": 2,
+              "ctr": 1.0,
+              "cpc": 1.48,
+              "purchases": 2,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclea lip balm",
+              "spend": 2.24,
+              "sales": 70.4,
+              "acos": 3.18,
+              "impressions": 4,
+              "clicks": 2,
+              "ctr": 0.5,
+              "cpc": 1.12,
+              "purchases": 2,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclear bamboo",
+              "spend": 2.07,
+              "sales": 39.99,
+              "acos": 5.18,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 2.07,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclear",
+              "spend": 1.68,
+              "sales": 39.99,
+              "acos": 4.2,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.68,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclea daily bamboo exfoliant cleanser",
+              "spend": 1.52,
+              "sales": 39.99,
+              "acos": 3.8,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.52,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclea cleanser",
+              "spend": 0.9,
+              "sales": 39.99,
+              "acos": 2.25,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.9,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclea evermore lipbalm",
+              "spend": 0.6,
+              "sales": 16.0,
+              "acos": 3.75,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.6,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "eraclea pure hydration serum",
+              "spend": 4.89,
+              "sales": 95.0,
+              "acos": 5.15,
+              "impressions": 10,
+              "clicks": 2,
+              "ctr": 0.2,
+              "cpc": 2.445,
+              "purchases": 1,
+              "cvr": 0.5
+            },
+            {
+              "query": "b075mlb8zw",
+              "spend": 10.28,
+              "sales": 16.0,
+              "acos": 64.25,
+              "impressions": 37,
+              "clicks": 4,
+              "ctr": 0.1081,
+              "cpc": 2.57,
+              "purchases": 1,
+              "cvr": 0.25
+            },
+            {
+              "query": "eraclea",
+              "spend": 7.49,
+              "sales": 159.98,
+              "acos": 4.68,
+              "impressions": 139,
+              "clicks": 9,
+              "ctr": 0.0647,
+              "cpc": 0.8322,
+              "purchases": 2,
+              "cvr": 0.2222
+            }
+          ]
         }
       },
       {
@@ -1147,9 +3063,9 @@
         "acos": 82.6,
         "totalSales": 1757.4,
         "tacos": 9.4,
-        "impressions": 8306,
+        "impressions": 8302,
         "clicks": 68,
-        "ctr": 0.8187,
+        "ctr": 0.8191,
         "cpc": 2.426,
         "cr": null,
         "orders": 5,
@@ -1185,7 +3101,7 @@
             "spend": 27.27,
             "adSales": 0.0,
             "acos": null,
-            "impressions": 5115,
+            "impressions": 5111,
             "clicks": 30,
             "orders": null
           },
@@ -1212,24 +3128,62 @@
         ],
         "searchTermInsights": {
           "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "wasted_spend": [
+            {
+              "query": "migraine supplement",
+              "spend": 101.98,
+              "sales": 79.9,
+              "acos": 127.63,
+              "impressions": 3049,
+              "clicks": 34,
+              "ctr": 0.0112,
+              "cpc": 2.9994,
+              "purchases": 2,
+              "cvr": 0.0588
+            },
+            {
+              "query": "migraine supplements",
+              "spend": 10.13,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 40,
+              "clicks": 3,
+              "ctr": 0.075,
+              "cpc": 3.3767,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "miguard headache migraine relief",
+              "spend": 4.72,
+              "sales": 39.95,
+              "acos": 11.81,
+              "impressions": 10,
+              "clicks": 2,
+              "ctr": 0.2,
+              "cpc": 2.36,
+              "purchases": 1,
+              "cvr": 0.5
+            }
+          ]
         }
       },
       {
         "name": "evolis",
         "spend": 103.02,
-        "adSales": 700.76,
-        "acos": 14.7,
+        "adSales": 710.26,
+        "acos": 14.5,
         "totalSales": 3185.27,
         "tacos": 3.2,
-        "impressions": 46602,
+        "impressions": 46598,
         "clicks": 97,
-        "ctr": 0.2081,
+        "ctr": 0.2082,
         "cpc": 1.0621,
         "cr": null,
-        "orders": 24,
-        "aov": 29.2,
+        "orders": 25,
+        "aov": 28.41,
         "pctFromAds": null,
         "salesVolume": null,
         "momAcos": null,
@@ -1249,11 +3203,11 @@
             "name": "evolis - SP - Auto - v1",
             "source": "AMAZON",
             "spend": 41.16,
-            "adSales": 218.07,
-            "acos": 18.9,
-            "impressions": 45894,
+            "adSales": 227.57,
+            "acos": 18.1,
+            "impressions": 45891,
             "clicks": 97,
-            "orders": 10
+            "orders": 11
           },
           {
             "name": "Evolis - SP - M - Reverse v2",
@@ -1261,7 +3215,7 @@
             "spend": 35.0,
             "adSales": 454.01,
             "acos": 7.7,
-            "impressions": 8394,
+            "impressions": 8393,
             "clicks": 16,
             "orders": 15
           },
@@ -1277,9 +3231,228 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "evolis",
+              "spend": 10.52,
+              "sales": 159.96,
+              "acos": 6.58,
+              "impressions": 59,
+              "clicks": 5,
+              "ctr": 0.0847,
+              "cpc": 2.104,
+              "purchases": 4,
+              "cvr": 0.8
+            },
+            {
+              "query": "evolis shampoo",
+              "spend": 13.08,
+              "sales": 91.28,
+              "acos": 14.33,
+              "impressions": 66,
+              "clicks": 11,
+              "ctr": 0.1667,
+              "cpc": 1.1891,
+              "purchases": 8,
+              "cvr": 0.7273
+            },
+            {
+              "query": "evolis shampoo and conditioner",
+              "spend": 9.81,
+              "sales": 29.49,
+              "acos": 33.27,
+              "impressions": 20,
+              "clicks": 6,
+              "ctr": 0.3,
+              "cpc": 1.635,
+              "purchases": 2,
+              "cvr": 0.3333
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "b07sg6s4vv",
+              "spend": 10.64,
+              "sales": 9.5,
+              "acos": 112.0,
+              "impressions": 1159,
+              "clicks": 28,
+              "ctr": 0.0242,
+              "cpc": 0.38,
+              "purchases": 1,
+              "cvr": 0.0357
+            },
+            {
+              "query": "routine shampoo for women hair loss",
+              "spend": 8.66,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 847,
+              "clicks": 3,
+              "ctr": 0.0035,
+              "cpc": 2.8867,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "hair regrowth treatment for women",
+              "spend": 7.42,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 1146,
+              "clicks": 34,
+              "ctr": 0.0297,
+              "cpc": 0.2182,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "hair loss treatments for women",
+              "spend": 5.84,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 419,
+              "clicks": 2,
+              "ctr": 0.0048,
+              "cpc": 2.92,
+              "purchases": 0,
+              "cvr": 0.0
+            },
+            {
+              "query": "evolis reverse thickening shampoo for fuller-looking hair",
+              "spend": 5.42,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 5.42,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "evolis hair",
+              "spend": 1.04,
+              "sales": 92.78,
+              "acos": 1.12,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 1.04,
+              "purchases": 5,
+              "cvr": 5.0
+            },
+            {
+              "query": "b08bjbm77v",
+              "spend": 1.12,
+              "sales": 68.99,
+              "acos": 1.62,
+              "impressions": 12,
+              "clicks": 1,
+              "ctr": 0.0833,
+              "cpc": 1.12,
+              "purchases": 3,
+              "cvr": 3.0
+            },
+            {
+              "query": "evolis reverse",
+              "spend": 3.81,
+              "sales": 91.79,
+              "acos": 4.15,
+              "impressions": 28,
+              "clicks": 2,
+              "ctr": 0.0714,
+              "cpc": 1.905,
+              "purchases": 5,
+              "cvr": 2.5
+            },
+            {
+              "query": "evolis hair mask",
+              "spend": 0.9,
+              "sales": 79.98,
+              "acos": 1.13,
+              "impressions": 4,
+              "clicks": 1,
+              "ctr": 0.25,
+              "cpc": 0.9,
+              "purchases": 2,
+              "cvr": 2.0
+            },
+            {
+              "query": "b0gf4gs4cv",
+              "spend": 0.84,
+              "sales": 57.79,
+              "acos": 1.45,
+              "impressions": 3,
+              "clicks": 1,
+              "ctr": 0.3333,
+              "cpc": 0.84,
+              "purchases": 2,
+              "cvr": 2.0
+            },
+            {
+              "query": "evolis reverse activator",
+              "spend": 3.96,
+              "sales": 149.97,
+              "acos": 2.64,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 3.96,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "b07sj8k9hs",
+              "spend": 1.33,
+              "sales": 49.99,
+              "acos": 2.66,
+              "impressions": 7,
+              "clicks": 1,
+              "ctr": 0.1429,
+              "cpc": 1.33,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "evolis style and treat dry shampoo",
+              "spend": 1.04,
+              "sales": 20.0,
+              "acos": 5.2,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.04,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "b0d3wrdbqq",
+              "spend": 0.84,
+              "sales": 38.0,
+              "acos": 2.21,
+              "impressions": 10,
+              "clicks": 1,
+              "ctr": 0.1,
+              "cpc": 0.84,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "evolis",
+              "spend": 10.52,
+              "sales": 159.96,
+              "acos": 6.58,
+              "impressions": 59,
+              "clicks": 5,
+              "ctr": 0.0847,
+              "cpc": 2.104,
+              "purchases": 4,
+              "cvr": 0.8
+            }
+          ]
         }
       },
       {
@@ -1323,9 +3496,156 @@
           }
         ],
         "searchTermInsights": {
-          "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "top_performing": [
+            {
+              "query": "charcoal face wipes",
+              "spend": 8.05,
+              "sales": 35.0,
+              "acos": 23.0,
+              "impressions": 33,
+              "clicks": 7,
+              "ctr": 0.2121,
+              "cpc": 1.15,
+              "purchases": 5,
+              "cvr": 0.7143
+            }
+          ],
+          "wasted_spend": [
+            {
+              "query": "cucumber face wipes",
+              "spend": 5.15,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 22,
+              "clicks": 5,
+              "ctr": 0.2273,
+              "cpc": 1.03,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "charcoal face wipe",
+              "spend": 0.69,
+              "sales": 28.0,
+              "acos": 2.46,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.69,
+              "purchases": 2,
+              "cvr": 2.0
+            },
+            {
+              "query": "cucumber sheet mask",
+              "spend": 1.51,
+              "sales": 6.0,
+              "acos": 25.17,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.51,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "green tea face wipes",
+              "spend": 1.51,
+              "sales": 7.0,
+              "acos": 21.57,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.51,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "organic make up remover wipes",
+              "spend": 1.51,
+              "sales": 7.0,
+              "acos": 21.57,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.51,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "charcoal wipes for your face",
+              "spend": 1.5,
+              "sales": 7.0,
+              "acos": 21.43,
+              "impressions": 2,
+              "clicks": 1,
+              "ctr": 0.5,
+              "cpc": 1.5,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "wipes pomegranate",
+              "spend": 1.32,
+              "sales": 7.0,
+              "acos": 18.86,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.32,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "face wipes charcoal",
+              "spend": 1.24,
+              "sales": 7.0,
+              "acos": 17.71,
+              "impressions": 2,
+              "clicks": 1,
+              "ctr": 0.5,
+              "cpc": 1.24,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "charcoal wipes for women",
+              "spend": 0.79,
+              "sales": 7.0,
+              "acos": 11.29,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.79,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "collagen face wipes for women",
+              "spend": 0.77,
+              "sales": 7.0,
+              "acos": 11.0,
+              "impressions": 4,
+              "clicks": 1,
+              "ctr": 0.25,
+              "cpc": 0.77,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "cleansing wipes with aloe vera for face",
+              "spend": 0.63,
+              "sales": 7.0,
+              "acos": 9.0,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 0.63,
+              "purchases": 1,
+              "cvr": 1.0
+            }
+          ]
         }
       },
       {
@@ -1370,22 +3690,60 @@
         ],
         "searchTermInsights": {
           "top_performing": [],
-          "wasted_spend": [],
-          "opportunities": []
+          "wasted_spend": [
+            {
+              "query": "cosmetic bag",
+              "spend": 19.32,
+              "sales": 0.0,
+              "acos": null,
+              "impressions": 7138,
+              "clicks": 22,
+              "ctr": 0.0031,
+              "cpc": 0.8782,
+              "purchases": 0,
+              "cvr": 0.0
+            }
+          ],
+          "opportunities": [
+            {
+              "query": "amala youth renewing eye cream",
+              "spend": 1.36,
+              "sales": 138.0,
+              "acos": 0.99,
+              "impressions": 1,
+              "clicks": 1,
+              "ctr": 1.0,
+              "cpc": 1.36,
+              "purchases": 1,
+              "cvr": 1.0
+            },
+            {
+              "query": "make up bag",
+              "spend": 3.56,
+              "sales": 35.64,
+              "acos": 9.99,
+              "impressions": 22,
+              "clicks": 4,
+              "ctr": 0.1818,
+              "cpc": 0.89,
+              "purchases": 1,
+              "cvr": 0.25
+            }
+          ]
         }
       }
     ],
     "spend": 14277.81,
-    "adSales": 56416.63,
+    "adSales": 56426.13,
     "acos": 25.3,
     "totalSales": 137646.43,
     "tacos": 10.4,
-    "impressions": 2301342,
+    "impressions": 2301710,
     "clicks": 18095,
-    "ctr": 0.7863,
+    "ctr": 0.7862,
     "cpc": 0.789,
     "cr": null,
-    "orders": 1129,
+    "orders": 1130,
     "aov": null
   }
 }
