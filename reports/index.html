@@ -1009,6 +1009,7 @@ function computeRangeMetrics(s,e){
     if(d<s||d>e) return;
     const dayBrands={};
     Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
+      if(selectedBrand!=='All'&&bname!==selectedBrand) return;
       if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
       brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
       brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
@@ -1075,6 +1076,18 @@ function renderRange(){
       options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},tooltip:{callbacks:{label:c=>'$'+c.raw.toLocaleString()},backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
       scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:11},maxTicksLimit:12},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11},callback:v=>'$'+Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}}});
   }
+  // Campaigns — find the month most overlapping with the selected range, show its campaigns
+  const _MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const nearestMd=DATA.monthly.slice().reverse().find(m=>{
+    const[mn,my]=m.month.split(' '),mi=_MO.indexOf(mn),yr=parseInt(my);
+    const ms=`${yr}-${String(mi+1).padStart(2,'0')}-01`;
+    const me=new Date(yr,mi+1,0).toISOString().slice(0,10);
+    return rangeStart<=me&&rangeEnd>=ms;
+  })||DATA.monthly[DATA.monthly.length-1];
+  const campSec=document.getElementById('campaigns-section');
+  if(campSec) campSec.style.display='block';
+  renderCampaignsByBrand(selectedBrand==='All'?undefined:selectedBrand, nearestMd.month);
+
   const footer=document.getElementById('footer'); if(footer) footer.textContent='Medaltus Portfolio · Date Range: '+rangeStart+' → '+rangeEnd;
 }
 
@@ -1523,16 +1536,17 @@ function renderTable(md, prev) {
 }
 
 // ── Campaigns by Brand ──
-function renderCampaignsByBrand() {
+function renderCampaignsByBrand(filterBrand, monthOverride) {
   const container = document.getElementById('campaigns-container');
   if (!container) return;
   container.innerHTML = '';
   if (!DATA || !DATA.monthly.length) return;
-  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  const effectiveMonth = monthOverride || selectedMonth;
+  const md = DATA.monthly.find(m => m.month === effectiveMonth);
   if (!md) return;
 
   // For API supplement months, ensure campaigns are attached directly from supplement
-  const suppEntry = API_SUPPLEMENT[selectedMonth];
+  const suppEntry = API_SUPPLEMENT[effectiveMonth];
   if (suppEntry) {
     md.brands.forEach(b => {
       if (!b.campaigns || !b.campaigns.length) {
@@ -1542,11 +1556,15 @@ function renderCampaignsByBrand() {
     });
   }
 
-  document.getElementById('campaigns-sub').textContent =
-    'Campaign detail · ' + selectedMonth + (selectedBrand !== 'All' ? ' · ' + selectedBrand : '');
+  const subLabel = filterBrand
+    ? `Campaign detail · ${effectiveMonth} · ${filterBrand}${monthOverride?' (nearest month)':''}`
+    : `Campaign detail · ${effectiveMonth}${selectedBrand!=='All'?' · '+selectedBrand:''}${monthOverride?' (nearest month)':''}`;
+  document.getElementById('campaigns-sub').textContent = subLabel;
 
-  // Campaigns section always shows all brands regardless of the brand pill filter
-  const brandsToShow = md.brands.filter(b => b.spend > 0);
+  // In normal monthly view show all brands; when called from range mode filter to selected brand
+  const brandsToShow = filterBrand
+    ? md.brands.filter(b => b.spend > 0 && b.name === filterBrand)
+    : md.brands.filter(b => b.spend > 0);
 
   const activeBrands = brandsToShow
     .filter(b => b.campaigns && b.campaigns.filter(c => c.spend > 0).length > 0)
