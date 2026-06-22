@@ -188,10 +188,9 @@ SEARCH_TERM_CONFIG = {
     "adProduct":    "SPONSORED_PRODUCTS",
     "reportTypeId": "spSearchTerm",
     "columns": [
-        "searchTermKeywordText", "query", "campaignName",
-        "impressions", "clicks", "spend", "cost",
-        "purchases7d", "sales7d", "unitsSoldClicks7d",
-        "purchasesSameSku7d", "salesOtherSku7d",
+        "searchTerm", "campaignName", "matchType",
+        "impressions", "clicks", "cost",
+        "purchases7d", "sales7d",
     ],
     "normalize": None,
 }
@@ -245,16 +244,12 @@ def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
     for r in st_rows:
         if not matches(r):
             continue
-        # Amazon API returns search term under different column names across versions
-        term = (r.get("searchTermKeywordText")
-                or r.get("query")
-                or r.get("searchTerm")
-                or r.get("targeting") or "").strip()
+        term = (r.get("searchTerm") or "").strip()
         if not term:
             continue
         imp = int(r.get("impressions", 0) or 0)
         clk = int(r.get("clicks", 0) or 0)
-        spd = float(r.get("spend") or r.get("cost") or 0)
+        spd = float(r.get("cost") or r.get("spend") or 0)
         sls = float(r.get("sales7d", 0) or 0)
         pur = int(r.get("purchases7d", 0) or 0)
         if term not in by_term:
@@ -422,7 +417,7 @@ def build_brand_data(records: list, brand_name: str, brands: list,
         cn  = r.get("campaignName", "")
         imp = int(r.get("impressions", 0) or 0)
         clk = int(r.get("clicks", 0) or 0)
-        spd = float(r.get("spend") or r.get("cost") or 0)
+        spd = float(r.get("cost") or r.get("spend") or 0)
         sls = float(r.get("sales7d", 0) or 0)
         pur = int(r.get("purchases7d", 0) or 0)
 
