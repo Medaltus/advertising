@@ -108,13 +108,54 @@ def build_daily_archive(data: dict) -> dict:
     return entries
 
 
+def build_search_term_insights(search_terms: list) -> dict:
+    """
+    Categorize a brand's search terms into 3 buckets, top 10 each.
+    - top_performing:  ACOS < 40%, spend >= $5, sales > 0  → sorted by sales desc
+    - wasted_spend:    spend >= $5, sales == 0 or ACOS > 100% → sorted by spend desc
+    - opportunities:   CVR > 3%, spend < $30, sales > 0    → sorted by cvr desc
+    """
+    top, wasted, opps = [], [], []
+
+    for t in search_terms:
+        spend = t.get('spend', 0) or 0
+        sales = t.get('sales', 0) or 0
+        acos  = t.get('acos')
+        cvr   = t.get('cvr') or 0
+
+        if spend >= 5 and sales > 0 and acos is not None and acos <= 40:
+            top.append(t)
+        if spend >= 5 and (sales == 0 or (acos is not None and acos > 100)):
+            wasted.append(t)
+        if cvr > 0.03 and spend < 30 and sales > 0:
+            opps.append(t)
+
+    top.sort(key=lambda x: x.get('sales', 0) or 0, reverse=True)
+    wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
+    opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
+
+    def trim(terms):
+        return [
+            {k: t[k] for k in ('query', 'spend', 'sales', 'acos', 'impressions',
+                                'clicks', 'ctr', 'cpc', 'purchases', 'cvr')}
+            for t in terms[:10]
+        ]
+
+    return {
+        'top_performing': trim(top),
+        'wasted_spend':   trim(wasted),
+        'opportunities':  trim(opps),
+    }
+
+
 def build_supplement(data: dict) -> dict:
     supplement = {}
 
     for brand in data.get('brands', []):
-        name      = brand['name']
-        timeline  = brand.get('timeline', [])
-        campaigns = brand.get('campaigns', [])
+        name         = brand['name']
+        timeline     = brand.get('timeline', [])
+        campaigns    = brand.get('campaigns', [])
+        search_terms = brand.get('search_terms', [])
 
         # ── Aggregate timeline into monthly buckets ─────────────────────────
         # NOTE: We do NOT aggregate the Amazon Ads 'totalSales' field.
@@ -172,24 +213,25 @@ def build_supplement(data: dict) -> dict:
                 supplement[mk] = {'brands': []}
 
             supplement[mk]['brands'].append({
-                'name':        name,
-                'spend':       spend,
-                'adSales':     sales,
-                'acos':        acos_pct(spend, sales),
-                'totalSales':  None,
-                'tacos':       None,
-                'impressions': impr,
-                'clicks':      clicks,
-                'ctr':         safe_div(clicks * 100, impr),
-                'cpc':         safe_div(spend, clicks),
-                'cr':          None,
-                'orders':      purchases if purchases else None,
-                'aov':         round(sales / purchases, 2) if purchases and sales else None,
-                'pctFromAds':  None,
-                'salesVolume': None,
-                'momAcos':     None,
-                'momTacos':    None,
-                'campaigns':   brand_campaigns,
+                'name':              name,
+                'spend':             spend,
+                'adSales':           sales,
+                'acos':              acos_pct(spend, sales),
+                'totalSales':        None,
+                'tacos':             None,
+                'impressions':       impr,
+                'clicks':            clicks,
+                'ctr':               safe_div(clicks * 100, impr),
+                'cpc':               safe_div(spend, clicks),
+                'cr':                None,
+                'orders':            purchases if purchases else None,
+                'aov':               round(sales / purchases, 2) if purchases and sales else None,
+                'pctFromAds':        None,
+                'salesVolume':       None,
+                'momAcos':           None,
+                'momTacos':          None,
+                'campaigns':         brand_campaigns,
+                'searchTermInsights': build_search_term_insights(search_terms) if mk == latest_month else None,
             })
 
     # ── Compute month-level portfolio totals ────────────────────────────────

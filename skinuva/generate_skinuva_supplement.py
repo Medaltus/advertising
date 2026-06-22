@@ -47,14 +47,38 @@ def extract_brand(data: dict, brand_name: str) -> dict:
                              f"Available: {[b.get('name') for b in brands]}")
 
     return {
-        'fetched_at': data.get('fetched_at', ''),
+        'fetched_at':   data.get('fetched_at', ''),
         'lookback_days': data.get('lookback_days', 31),
-        'currency': data.get('currency', 'USD'),
-        'summary': brand.get('summary', {}),
-        'timeline': brand.get('timeline', []),
-        'campaigns': brand.get('campaigns', []),
-        'pacing': brand.get('pacing', []),
+        'currency':     data.get('currency', 'USD'),
+        'summary':      brand.get('summary', {}),
+        'timeline':     brand.get('timeline', []),
+        'campaigns':    brand.get('campaigns', []),
+        'pacing':       brand.get('pacing', []),
+        'search_terms': brand.get('search_terms', []),
     }
+
+
+def build_search_term_insights(search_terms: list) -> dict:
+    """Categorize search terms into top 10 per bucket."""
+    top, wasted, opps = [], [], []
+    for t in search_terms:
+        spend = t.get('spend', 0) or 0
+        sales = t.get('sales', 0) or 0
+        acos  = t.get('acos')
+        cvr   = t.get('cvr') or 0
+        if spend >= 5 and sales > 0 and acos is not None and acos <= 40:
+            top.append(t)
+        if spend >= 5 and (sales == 0 or (acos is not None and acos > 100)):
+            wasted.append(t)
+        if cvr > 0.03 and spend < 30 and sales > 0:
+            opps.append(t)
+    top.sort(key=lambda x: x.get('sales', 0) or 0, reverse=True)
+    wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
+    opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
+    def trim(terms):
+        return [{k: t[k] for k in ('query','spend','sales','acos','impressions',
+                                    'clicks','ctr','cpc','purchases','cvr')} for t in terms[:10]]
+    return {'top_performing': trim(top), 'wasted_spend': trim(wasted), 'opportunities': trim(opps)}
 
 
 def month_key_from_date(date_str: str) -> str:
@@ -224,6 +248,10 @@ def main():
 
     out_dir = script_dir / 'data'
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # ── Add search term insights ──────────────────────────────────────────────
+    supplement['searchTermInsights'] = build_search_term_insights(
+        supplement.get('search_terms', []))
 
     # ── Write flat supplement (used for current-month injection) ─────────────
     out_path = out_dir / 'skinuva_supplement.json'

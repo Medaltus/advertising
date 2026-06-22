@@ -184,6 +184,94 @@ AD_PRODUCT_CONFIGS = [
 ]
 
 
+SEARCH_TERM_CONFIG = {
+    "adProduct":    "SPONSORED_PRODUCTS",
+    "reportTypeId": "spSearchTerm",
+    "columns": [
+        "searchTermKeywordText", "campaignName",
+        "impressions", "clicks", "spend", "purchases7d", "sales7d",
+    ],
+    "normalize": None,
+}
+
+
+def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
+    """Submit a 30-day search term summary report. Returns reportId."""
+    payload = {
+        "name":      "SP Search Terms Summary",
+        "startDate": start,
+        "endDate":   end,
+        "configuration": {
+            "adProduct":    "SPONSORED_PRODUCTS",
+            "groupBy":      ["searchTerm"],
+            "columns":      SEARCH_TERM_CONFIG["columns"],
+            "reportTypeId": "spSearchTerm",
+            "timeUnit":     "SUMMARY",
+            "format":       "GZIP_JSON",
+        },
+    }
+    resp = requests.post(
+        f"{api_base}/reporting/reports",
+        headers={**hdrs, "Content-Type": "application/vnd.createasyncreportrequest.v3+json"},
+        json=payload,
+        timeout=30,
+    )
+    if resp.status_code == 425:
+        import re as _re
+        m = _re.search(r'duplicate of\s*[:\s]+([a-f0-9-]{36})', resp.text, _re.IGNORECASE)
+        if m:
+            report_id = m.group(1)
+            print(f"  ↩  Duplicate — reusing existing spSearchTerm (reportId={report_id})")
+            return report_id
+    if not resp.ok:
+        print(f"    spSearchTerm submission error {resp.status_code}: {resp.text[:300]}")
+        resp.raise_for_status()
+    report_id = resp.json()["reportId"]
+    print(f"  ✓ Submitted spSearchTerm (reportId={report_id})")
+    return report_id
+
+
+def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
+                                  single_brand: bool) -> list:
+    """Aggregate search term rows for one brand. Returns list sorted by spend (top 200)."""
+    def matches(r):
+        if single_brand:
+            return True
+        return identify_brand(r.get("campaignName", ""), brands) == brand_name
+
+    by_term = {}
+    for r in st_rows:
+        if not matches(r):
+            continue
+        term = (r.get("searchTermKeywordText") or "").strip()
+        if not term:
+            continue
+        imp = int(r.get("impressions", 0) or 0)
+        clk = int(r.get("clicks", 0) or 0)
+        spd = float(r.get("spend", 0) or 0)
+        sls = float(r.get("sales7d", 0) or 0)
+        pur = int(r.get("purchases7d", 0) or 0)
+        if term not in by_term:
+            by_term[term] = {"query": term, "impressions": 0, "clicks": 0,
+                             "spend": 0.0, "sales": 0.0, "purchases": 0}
+        t = by_term[term]
+        t["impressions"] += imp; t["clicks"] += clk
+        t["spend"] += spd;       t["sales"]  += sls; t["purchases"] += pur
+
+    result = []
+    for t in by_term.values():
+        t["spend"] = round(t["spend"], 2)
+        t["sales"] = round(t["sales"], 2)
+        t["acos"]  = acos_pct(t["spend"], t["sales"])
+        t["cvr"]   = safe_div(t["purchases"], t["clicks"])
+        t["ctr"]   = safe_div(t["clicks"], t["impressions"])
+        t["cpc"]   = safe_div(t["spend"], t["clicks"])
+        result.append(t)
+
+    result.sort(key=lambda x: x["spend"], reverse=True)
+    return result[:200]  # cap at 200 per brand to keep ads_data.js manageable
+
+
 def submit_campaign_report(api_base: str, hdrs: dict, start: str, end: str,
                             ad_product: str = "SPONSORED_PRODUCTS") -> str:
     """Submit a daily campaigns report for the given ad product. Returns reportId."""
@@ -523,6 +611,8 @@ def main():
 
     # pending: list of (profile, ap_cfg, report_id, hdrs, single_brand, currency)
     pending = []
+    # pending_st: list of (profile, report_id, hdrs, single_brand, currency)
+    pending_st = []
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -554,9 +644,17 @@ def main():
             if report_id:
                 pending.append((profile, ap_cfg, report_id, hdrs, single_brand, currency))
 
+        # Also submit search term report for this profile
+        time.sleep(5)
+        try:
+            st_id = submit_search_term_report(urls["api"], hdrs, start, end)
+            pending_st.append((profile, st_id, hdrs, single_brand, currency))
+        except Exception as e:
+            print(f"  ✗ spSearchTerm submission failed: {e}")
+
         time.sleep(5)   # small gap between profiles
 
-    print(f"\n✓ {len(pending)} reports submitted — polling all simultaneously…\n")
+    print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term reports submitted — polling all simultaneously…\n")
 
     # ── Phase 2: Poll + download all reports in parallel via threads ───────────
     downloaded = {}   # report_id → rows
@@ -588,17 +686,25 @@ def main():
     threads = [threading.Thread(target=fetch_report, args=(ap_cfg, report_id, hdrs),
                                 daemon=True)
                for _, ap_cfg, report_id, hdrs, _, _ in pending]
-    for t in threads: t.start()
-    for t in threads: t.join()
+    st_threads = [threading.Thread(target=fetch_report, args=(SEARCH_TERM_CONFIG, report_id, hdrs),
+                                    daemon=True)
+                  for _, report_id, hdrs, _, _ in pending_st]
+    for t in threads + st_threads: t.start()
+    for t in threads + st_threads: t.join()
 
     print(f"\n✓ All reports ready — processing brand data…\n")
 
     # ── Phase 3: Build brand data per profile ──────────────────────────────────
     # Group downloaded rows by profile
-    profile_records = {}   # profile_id → [rows]
+    profile_records = {}   # profile_id → [campaign rows]
     for profile, ap_cfg, report_id, _, _, _ in pending:
         pid = profile.get("profileId")
         profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
+
+    st_profile_records = {}  # profile_id → [search term rows]
+    for profile, report_id, _, _, _ in pending_st:
+        pid = profile.get("profileId")
+        st_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -606,13 +712,14 @@ def main():
         currency     = profile.get("currencyCode") or "USD"
         single_brand = single_brand_profiles.get(profile_name)
 
-        records = profile_records.get(profile_id, [])
+        records    = profile_records.get(profile_id, [])
+        st_records = st_profile_records.get(profile_id, [])
 
         print(f"━━ {profile_name} ━━")
         if not records:
             print(f"  → Skipping (no data)\n")
             continue
-        print(f"  ✓ Combined: {len(records)} total campaign-day rows")
+        print(f"  ✓ Combined: {len(records)} campaign-day rows, {len(st_records)} search-term rows")
 
         # Split into brands
         target_brands = [single_brand] if single_brand else brands
@@ -620,12 +727,15 @@ def main():
         for brand in target_brands:
             bdata = build_brand_data(records, brand, brands, bool(single_brand))
             if bdata:
-                bdata["profile"]  = profile_name
-                bdata["currency"] = currency
+                bdata["profile"]      = profile_name
+                bdata["currency"]     = currency
+                bdata["search_terms"] = build_search_terms_for_brand(
+                    st_records, brand, brands, bool(single_brand))
                 brand_outputs[brand] = bdata
                 s = bdata["summary"]
                 print(f"  ✓ {brand}: spend=${s['spend']:,.0f}, "
-                      f"sales=${s['sales']:,.0f}, acos={s['acos']}%")
+                      f"sales=${s['sales']:,.0f}, acos={s['acos']}%"
+                      f"  ({len(bdata['search_terms'])} search terms)")
             else:
                 print(f"  → {brand}: no data (no matching campaigns)")
 
