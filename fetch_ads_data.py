@@ -187,8 +187,9 @@ AD_PRODUCT_CONFIGS = [
 SEARCH_TERM_CONFIG = {
     "adProduct":    "SPONSORED_PRODUCTS",
     "reportTypeId": "spSearchTerm",
+    "timeUnit":     "DAILY",
     "columns": [
-        "searchTerm", "campaignName", "matchType",
+        "date", "searchTerm", "campaignName", "matchType",
         "impressions", "clicks", "cost",
         "purchases7d", "sales7d",
     ],
@@ -197,9 +198,9 @@ SEARCH_TERM_CONFIG = {
 
 
 def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
-    """Submit a 30-day search term summary report. Returns reportId."""
+    """Submit a 30-day daily search term report. Returns reportId."""
     payload = {
-        "name":      "SP Search Terms Summary",
+        "name":      "SP Search Terms Daily",
         "startDate": start,
         "endDate":   end,
         "configuration": {
@@ -207,7 +208,7 @@ def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -
             "groupBy":      ["searchTerm"],
             "columns":      SEARCH_TERM_CONFIG["columns"],
             "reportTypeId": "spSearchTerm",
-            "timeUnit":     "SUMMARY",
+            "timeUnit":     SEARCH_TERM_CONFIG["timeUnit"],
             "format":       "GZIP_JSON",
         },
     }
@@ -240,13 +241,14 @@ def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
             return True
         return identify_brand(r.get("campaignName", ""), brands) == brand_name
 
-    by_term = {}
+    by_term: dict = {}
     for r in st_rows:
         if not matches(r):
             continue
         term = (r.get("searchTerm") or "").strip()
         if not term:
             continue
+        d   = r.get("date", "")
         imp = int(r.get("impressions", 0) or 0)
         clk = int(r.get("clicks", 0) or 0)
         spd = float(r.get("cost") or r.get("spend") or 0)
@@ -254,10 +256,20 @@ def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
         pur = int(r.get("purchases7d", 0) or 0)
         if term not in by_term:
             by_term[term] = {"query": term, "impressions": 0, "clicks": 0,
-                             "spend": 0.0, "sales": 0.0, "purchases": 0}
+                             "spend": 0.0, "sales": 0.0, "purchases": 0,
+                             "daily": {}}
         t = by_term[term]
         t["impressions"] += imp; t["clicks"] += clk
         t["spend"] += spd;       t["sales"]  += sls; t["purchases"] += pur
+        # Per-day breakdown for CPC trend tracking
+        if d:
+            if d not in t["daily"]:
+                t["daily"][d] = {"date": d, "impressions": 0, "clicks": 0,
+                                  "spend": 0.0, "sales": 0.0}
+            t["daily"][d]["impressions"] += imp
+            t["daily"][d]["clicks"]      += clk
+            t["daily"][d]["spend"]       += spd
+            t["daily"][d]["sales"]       += sls
 
     result = []
     for t in by_term.values():
@@ -267,10 +279,18 @@ def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
         t["cvr"]   = safe_div(t["purchases"], t["clicks"])
         t["ctr"]   = safe_div(t["clicks"], t["impressions"])
         t["cpc"]   = safe_div(t["spend"], t["clicks"])
+        # Finalize daily list: compute CPC per day, sort chronologically
+        daily_list = []
+        for dd in t["daily"].values():
+            dd["spend"] = round(dd["spend"], 2)
+            dd["sales"] = round(dd["sales"], 2)
+            dd["cpc"]   = safe_div(dd["spend"], dd["clicks"])
+            daily_list.append(dd)
+        t["daily"] = sorted(daily_list, key=lambda x: x["date"])
         result.append(t)
 
     result.sort(key=lambda x: x["spend"], reverse=True)
-    return result[:200]  # cap at 200 per brand to keep ads_data.js manageable
+    return result[:200]
 
 
 def submit_campaign_report(api_base: str, hdrs: dict, start: str, end: str,

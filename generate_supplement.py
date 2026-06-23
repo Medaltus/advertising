@@ -135,9 +135,10 @@ def build_search_term_insights(search_terms: list) -> dict:
     opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
 
     def trim(terms):
+        keys = ('query', 'spend', 'sales', 'acos', 'impressions',
+                'clicks', 'ctr', 'cpc', 'purchases', 'cvr')
         return [
-            {k: t[k] for k in ('query', 'spend', 'sales', 'acos', 'impressions',
-                                'clicks', 'ctr', 'cpc', 'purchases', 'cvr')}
+            {**{k: t.get(k) for k in keys}, 'daily': t.get('daily', [])}
             for t in terms[:10]
         ]
 
