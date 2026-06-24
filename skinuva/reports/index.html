@@ -874,6 +874,15 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
     <div id="search-terms-container"></div>
   </div>
 
+  <!-- Day-of-Week Heatmap Section -->
+  <div class="chart-card glass" style="margin-bottom:24px;" id="dow-section">
+    <div class="section-header">
+      <div class="section-title">Day-of-Week Performance</div>
+      <div class="section-sub" id="dow-sub">ACOS &amp; CVR by day of week</div>
+    </div>
+    <div id="dow-container"></div>
+  </div>
+
   <div class="chart-card glass" style="margin-bottom:24px;" id="wlos-section">
     <div class="section-header"><div class="section-title">Wins, Losses, Opportunities & Strategies</div><div class="section-sub" id="wlos-sub">Strategic findings from latest analysis</div></div>
     <div id="wlos-container"></div>
@@ -1356,6 +1365,7 @@ function render(){
   });
   // Search Term Insights
   renderSearchTermInsights();
+  renderDayOfWeekHeatmap();
   // WLOS
   renderWLOS();
   document.getElementById('footer').textContent='Skinuva Ads Tracking · Live from Google Sheets · '+new Date().toLocaleDateString();
@@ -1666,6 +1676,73 @@ Return ONLY the JSON array starting with [`;
 }
 
 // ── WLOS: main render (AI-first, with cache and fallback) ──
+function renderDayOfWeekHeatmap() {
+  const section   = document.getElementById('dow-section');
+  const container = document.getElementById('dow-container');
+  if (!section || !container) return;
+
+  const timeline = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON) ? (SKINUVA_AMAZON.timeline || []) : [];
+  if (!timeline.length) { section.style.display='none'; return; }
+
+  const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const buckets   = DAY_NAMES.map(() => ({spend:0, sales:0, orders:0, clicks:0, count:0}));
+
+  timeline.forEach(row => {
+    const d   = new Date(row.date + 'T12:00:00');
+    const dow = (d.getDay() + 6) % 7; // Mon=0 … Sun=6
+    buckets[dow].spend  += row.spend      || 0;
+    buckets[dow].sales  += row.sales      || 0;
+    buckets[dow].orders += row.purchases  || 0;
+    buckets[dow].clicks += row.clicks     || 0;
+    buckets[dow].count  += 1;
+  });
+
+  const total = buckets.reduce((s,b) => s + b.count, 0);
+  if (!total) { section.style.display='none'; return; }
+  section.style.display = 'block';
+
+  const acosVals  = buckets.map(b => b.sales > 0 ? b.spend / b.sales * 100 : null);
+  const validAcos = acosVals.filter(v => v !== null);
+  const minAcos   = Math.min(...validAcos);
+  const maxAcos   = Math.max(...validAcos);
+  const range     = maxAcos - minAcos;
+
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.style.cssText = 'display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:rgba(255,255,255,0.05);';
+
+  DAY_NAMES.forEach((day, i) => {
+    const b     = buckets[i];
+    const acos  = acosVals[i];
+    const cvr   = b.clicks > 0 ? b.orders / b.clicks * 100 : null;
+    const spend = b.count  > 0 ? b.spend  / b.count        : null;
+
+    let color='rgba(255,255,255,0.3)', bg='#0d0d12';
+    if (acos !== null && range > 0) {
+      const t = (acos - minAcos) / range;
+      if (t < 0.33)      { color='#4ade80'; bg='rgba(74,222,128,0.06)'; }
+      else if (t < 0.67) { color='#f59e0b'; bg='rgba(245,158,11,0.06)'; }
+      else               { color='#ff6b6b'; bg='rgba(255,107,107,0.06)'; }
+    }
+
+    const cell = document.createElement('div');
+    cell.style.cssText = 'background:'+bg+';padding:18px 10px;text-align:center;';
+    cell.innerHTML =
+      '<div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;">'+day+'</div>'+
+      '<div style="font-size:20px;font-weight:700;color:'+color+';margin-bottom:2px;">'+(acos!==null?acos.toFixed(1)+'%':'—')+'</div>'+
+      '<div style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:10px;">ACOS</div>'+
+      '<div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.55);margin-bottom:2px;">'+(cvr!==null?cvr.toFixed(1)+'%':'—')+'</div>'+
+      '<div style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:10px;">CVR</div>'+
+      '<div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:2px;">'+(spend!==null?'$'+spend.toFixed(0):'—')+'</div>'+
+      '<div style="font-size:9px;color:rgba(255,255,255,0.2);">avg/day</div>'+
+      '<div style="font-size:9px;color:rgba(255,255,255,0.15);margin-top:8px;">'+(b.count?'n='+b.count:'')+'</div>';
+    grid.appendChild(cell);
+  });
+
+  container.appendChild(grid);
+  document.getElementById('dow-sub').textContent = 'Skinuva · ACOS & CVR by day of week · last 30 days';
+}
+
 function renderWLOS() {
   const section=document.getElementById('wlos-section');
   const el=document.getElementById('wlos-container');
