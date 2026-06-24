@@ -1431,7 +1431,7 @@ function renderSearchTermInsights(){
   const _sti_src=typeof SKINUVA_AMAZON!=='undefined'&&SKINUVA_AMAZON?SKINUVA_AMAZON.searchTermInsights:null;
   if(!_sti_src){sec.style.display='none';return;}
   const sti=_sti_src;
-  const hasData=sti.top_performing.length||sti.wasted_spend.length||sti.opportunities.length;
+  const hasData=sti.top_performing.length||sti.wasted_spend.length||sti.opportunities.length||(sti.cpc_changes||[]).length;
   if(!hasData){
     sec.style.display='block';
     container.innerHTML='<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.25);font-size:13px;">No search term data yet — run the morning refresh to populate.</div>';
@@ -1439,17 +1439,77 @@ function renderSearchTermInsights(){
   }
   sec.style.display='block';
   container.innerHTML='';
-  document.getElementById('search-terms-sub').textContent='Top performing · wasted spend · new opportunities · 30-day rolling';
+  document.getElementById('search-terms-sub').textContent='Top performing · wasted spend · new opportunities · CPC rising · 30-day rolling';
+
+  // ── CPC Trend Modal ──────────────────────────────────────────────────────
+  if(!document.getElementById('cpc-modal')){
+    const modal=document.createElement('div');
+    modal.id='cpc-modal';
+    modal.style.cssText='display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;';
+    modal.innerHTML='<div style="background:#13131a;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:28px;width:560px;max-width:90vw;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.6);">'+
+      '<button onclick="document.getElementById(\'cpc-modal\').style.display=\'none\'" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:rgba(255,255,255,0.5);width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;">✕</button>'+
+      '<div id="cpc-modal-body"></div></div>';
+    modal.onclick=e=>{if(e.target===modal)modal.style.display='none';};
+    document.body.appendChild(modal);
+  }
+
+  function showCpcTrend(t){
+    const modal=document.getElementById('cpc-modal');
+    const body=document.getElementById('cpc-modal-body');
+    const daily=t.daily||[];
+    const avg30=t.cpc||0;
+    const lastDay=daily.length?daily[daily.length-1]:null;
+    const latestCpc=lastDay?(lastDay.cpc||0):avg30;
+    const isSpike=avg30>0&&latestCpc>avg30*2;
+    const W=504,H=120,PL=40,PR=10,PT=10,PB=24;
+    const cpcVals=daily.map(d=>d.cpc||0);
+    const maxCpc=Math.max(...cpcVals,avg30*1.1,0.01);
+    const xS=i=>PL+(i/Math.max(daily.length-1,1))*(W-PL-PR);
+    const yS=v=>H-PB-(v/maxCpc)*(H-PT-PB);
+    const pts=daily.map((d,i)=>`${xS(i).toFixed(1)},${yS(d.cpc||0).toFixed(1)}`).join(' ');
+    const area=pts+` ${xS(daily.length-1).toFixed(1)},${yS(0).toFixed(1)} ${xS(0).toFixed(1)},${yS(0).toFixed(1)}`;
+    const avgY=yS(avg30).toFixed(1);
+    const lineColor=isSpike?'#ff6b6b':'#818cf8';
+    body.innerHTML=
+      '<div style="margin-bottom:4px;font-size:11px;color:rgba(255,255,255,0.35);">Skinuva</div>'+
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'+
+        '<div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.9);">'+t.query+'</div>'+
+        (isSpike?'<span style="background:#ff6b6b22;color:#ff6b6b;border:1px solid #ff6b6b44;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⚠ CPC SPIKE</span>':'')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">'+
+        '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:4px;">30-Day Avg CPC</div><div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.85);">$'+avg30.toFixed(2)+'</div></div>'+
+        '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:4px;">Latest Day CPC</div><div style="font-size:18px;font-weight:700;color:'+(isSpike?'#ff6b6b':'#4ade80')+';">$'+latestCpc.toFixed(2)+'</div></div>'+
+        '<div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:12px;"><div style="font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:4px;">Total Spend</div><div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.85);">$'+(t.spend||0).toLocaleString()+'</div></div>'+
+      '</div>'+
+      (daily.length>1?
+        '<div style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Daily CPC — last '+daily.length+' days</div>'+
+        '<svg width="'+W+'" height="'+H+'" style="width:100%;height:auto;display:block;" viewBox="0 0 '+W+' '+H+'">'+
+          '<defs><linearGradient id="cpcGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+lineColor+'" stop-opacity="0.25"/><stop offset="100%" stop-color="'+lineColor+'" stop-opacity="0"/></linearGradient></defs>'+
+          '<line x1="'+PL+'" y1="'+avgY+'" x2="'+(W-PR)+'" y2="'+avgY+'" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4,4"/>'+
+          '<polygon points="'+area+'" fill="url(#cpcGrad)"/>'+
+          '<polyline points="'+pts+'" fill="none" stroke="'+lineColor+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>'+
+          daily.map((d,i)=>'<circle cx="'+xS(i).toFixed(1)+'" cy="'+yS(d.cpc||0).toFixed(1)+'" r="3" fill="'+(isSpike&&i===daily.length-1?'#ff6b6b':lineColor)+'"/>').join('')+
+          '<text x="'+(PL-4)+'" y="'+(PT+8)+'" text-anchor="end" fill="rgba(255,255,255,0.3)" font-size="9">$'+maxCpc.toFixed(2)+'</text>'+
+          '<text x="'+(PL-4)+'" y="'+avgY+'" text-anchor="end" fill="rgba(255,255,255,0.3)" font-size="9">avg</text>'+
+          '<text x="'+xS(0).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="9">'+daily[0].date.slice(5)+'</text>'+
+          '<text x="'+xS(daily.length-1).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="9">'+daily[daily.length-1].date.slice(5)+'</text>'+
+        '</svg>'
+      :'<div style="padding:16px;text-align:center;color:rgba(255,255,255,0.25);font-size:12px;">Run the morning refresh to populate daily CPC trend data.</div>');
+    modal.style.display='flex';
+  }
+
   const BUCKETS=[
     {key:'top_performing',label:'🏆 Top Performing',color:'#4ade80',desc:'ACOS < 40% · sorted by sales'},
     {key:'wasted_spend',label:'🔥 Wasted Spend',color:'#ff6b6b',desc:'No sales · sorted by spend'},
     {key:'opportunities',label:'💡 Opportunities',color:'#f59e0b',desc:'High CVR, underinvested · sorted by CVR'},
+    {key:'cpc_changes',label:'⚡ CPC Rising',color:'#f472b6',desc:'Biggest CPC jumps vs 30-day avg · all terms · click for trend'},
   ];
   const grid=document.createElement('div');
-  grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.05);';
+  grid.style.cssText='display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.05);';
   container.appendChild(grid);
   BUCKETS.forEach(bucket=>{
     const terms=sti[bucket.key]||[];
+    const isCpc=bucket.key==='cpc_changes';
     const col=document.createElement('div');
     col.style.cssText='background:#0d0d12;padding:0;';
     const bHdr=document.createElement('div');
@@ -1462,6 +1522,30 @@ function renderSearchTermInsights(){
       empty.style.cssText='padding:14px 16px;font-size:12px;color:rgba(255,255,255,0.2);font-style:italic;';
       empty.textContent='No terms in this category';
       col.appendChild(empty);
+    } else if(isCpc){
+      const ch=document.createElement('div');
+      ch.style.cssText='display:grid;grid-template-columns:1fr 52px 52px 52px;padding:5px 16px;border-bottom:1px solid rgba(255,255,255,0.04);';
+      ch.innerHTML='<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Query</span>'+
+        '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Avg</span>'+
+        '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Today</span>'+
+        '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Chg</span>';
+      col.appendChild(ch);
+      terms.forEach((t,i)=>{
+        const chg=t.cpc_change_pct||0;
+        const chgColor=chg>100?'#ff6b6b':chg>50?'#f59e0b':'#f472b6';
+        const row=document.createElement('div');
+        row.style.cssText='display:grid;grid-template-columns:1fr 52px 52px 52px;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.025);transition:background .15s;cursor:pointer;';
+        row.onmouseenter=()=>row.style.background='rgba(255,255,255,0.04)';
+        row.onmouseleave=()=>row.style.background='';
+        row.onclick=()=>showCpcTrend(t);
+        row.innerHTML=
+          '<span style="font-size:11px;color:rgba(255,255,255,0.75);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;" title="'+t.query+'">'+
+            '<span style="font-size:9px;color:rgba(255,255,255,0.25);margin-right:5px;">'+(i+1)+'.</span>'+t.query+'</span>'+
+          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.45);text-align:right;">'+(t.cpc!=null?'$'+t.cpc.toFixed(2):'—')+'</span>'+
+          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:#ff6b6b;text-align:right;">'+(t.latest_cpc!=null?'$'+t.latest_cpc.toFixed(2):'—')+'</span>'+
+          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:'+chgColor+';font-weight:700;text-align:right;">'+(t.cpc_change_pct!=null?'+'+t.cpc_change_pct.toFixed(0)+'%':'—')+'</span>';
+        col.appendChild(row);
+      });
     } else {
       const ch=document.createElement('div');
       ch.style.cssText='display:grid;grid-template-columns:1fr 58px 58px 52px;padding:5px 16px;border-bottom:1px solid rgba(255,255,255,0.04);';
@@ -1479,8 +1563,8 @@ function renderSearchTermInsights(){
         row.innerHTML=
           '<span style="font-size:11px;color:rgba(255,255,255,0.75);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;" title="'+t.query+'">'+
             '<span style="font-size:9px;color:rgba(255,255,255,0.25);margin-right:5px;">'+(i+1)+'.</span>'+t.query+'</span>'+
-          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.6);text-align:right;">$'+t.spend.toLocaleString()+'</span>'+
-          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.6);text-align:right;">'+(t.sales>0?'$'+t.sales.toLocaleString():'—')+'</span>'+
+          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.6);text-align:right;">$'+(t.spend||0).toLocaleString()+'</span>'+
+          '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.6);text-align:right;">'+((t.sales||0)>0?'$'+(t.sales||0).toLocaleString():'—')+'</span>'+
           '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:'+ac+';text-align:right;">'+(t.acos!=null?t.acos.toFixed(1)+'%':'—')+'</span>';
         col.appendChild(row);
       });
@@ -1654,7 +1738,7 @@ function renderWLOS() {
       el.innerHTML='';
       renderWlosEntries(el, monthData.entries);
     } else {
-      section.style.display='none';
+      el.innerHTML='<div style="grid-column:1/-1;padding:24px;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;">AI analysis unavailable — click ✨ Regenerate to try again.</div>';
     }
   });
 }
