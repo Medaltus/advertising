@@ -2622,12 +2622,12 @@ async function initAgents() {
 // ── Audio Briefing ──
 let audioBriefingCache = (function() {
   try {
-    const saved = JSON.parse(localStorage.getItem('medaltus_briefing_cache'));
+    const saved = JSON.parse(localStorage.getItem('medaltus_briefing_cache_v2'));
     if (saved && saved.text && saved.dataHash) return saved;
   } catch(e) {}
   return {text: null, dataHash: null};
 })();
-function saveBriefingCache() { try { localStorage.setItem('medaltus_briefing_cache', JSON.stringify(audioBriefingCache)); } catch(e) {} }
+function saveBriefingCache() { try { localStorage.setItem('medaltus_briefing_cache_v2', JSON.stringify(audioBriefingCache)); } catch(e) {} }
 let currentUtterance = null;
 let isSpeaking = false;
 
