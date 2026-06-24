@@ -187,6 +187,24 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 .agent-run-btn { padding:11px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(129,140,248,0.12));border:1px solid rgba(129,140,248,0.25);color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap; }
 .agent-run-btn:hover { background:linear-gradient(135deg,rgba(129,140,248,0.45),rgba(129,140,248,0.2));color:#c7d2fe; }
 .agent-run-btn:disabled { opacity:0.35;cursor:not-allowed; }
+/* ── Audio Briefing Button ── */
+.audio-btn { width:38px;height:38px;border-radius:10px;border:1px solid rgba(129,140,248,0.3);background:linear-gradient(160deg,rgba(129,140,248,0.15) 0%,rgba(129,140,248,0.05) 100%);cursor:pointer;display:none;align-items:center;justify-content:center;transition:all 0.3s ease;position:relative;flex-shrink:0; }
+.audio-btn:hover { border-color:rgba(129,140,248,0.5);box-shadow:0 0 16px rgba(129,140,248,0.2);background:linear-gradient(160deg,rgba(129,140,248,0.25) 0%,rgba(129,140,248,0.1) 100%); }
+.audio-btn svg { width:18px;height:18px;fill:rgba(129,140,248,0.8);transition:fill 0.3s; }
+.audio-btn:hover svg { fill:rgba(129,140,248,1); }
+.audio-btn.speaking { border-color:rgba(129,140,248,0.6);animation:speakPulse 2s ease-in-out infinite; }
+.audio-btn.speaking svg { fill:#818cf8; }
+.audio-btn.loading { pointer-events:none;opacity:0.6; }
+.audio-btn .audio-spinner { display:none;width:18px;height:18px;border:2px solid rgba(129,140,248,0.2);border-top-color:#818cf8;border-radius:50%;animation:spin 0.7s linear infinite; }
+.audio-btn.loading .audio-spinner { display:block; }
+.audio-btn.loading svg { display:none; }
+@keyframes speakPulse { 0%,100%{box-shadow:0 0 8px rgba(129,140,248,0.15);} 50%{box-shadow:0 0 24px rgba(129,140,248,0.4),0 0 48px rgba(129,140,248,0.15);} }
+.audio-bars { display:none;gap:2px;align-items:center;height:18px; }
+.audio-btn.speaking .audio-bars { display:flex; }
+.audio-btn.speaking svg.speaker-icon { display:none; }
+.audio-bar { width:3px;border-radius:2px;background:#818cf8;animation:audioBar 1s ease-in-out infinite; }
+.audio-bar:nth-child(1){height:6px;animation-delay:0s;} .audio-bar:nth-child(2){height:12px;animation-delay:0.15s;} .audio-bar:nth-child(3){height:8px;animation-delay:0.3s;} .audio-bar:nth-child(4){height:14px;animation-delay:0.1s;} .audio-bar:nth-child(5){height:6px;animation-delay:0.25s;}
+@keyframes audioBar { 0%,100%{transform:scaleY(0.4);} 50%{transform:scaleY(1);} }
 .agent-sop-row { display:flex;justify-content:flex-end;margin-top:10px;gap:8px;flex-wrap:wrap; }
 .agent-sop-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.08));border:1px solid rgba(212,175,55,0.25);color:rgba(212,175,55,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center;text-decoration:none; }
 .agent-sop-btn:hover { background:linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.15));color:rgba(212,175,55,1);border-color:rgba(212,175,55,0.4);box-shadow:0 4px 16px rgba(212,175,55,0.15); }
@@ -275,6 +293,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
   .market-ticker,
   #pdf-export-btn,
   #qc-btn,
+  .audio-btn,
   .refresh-timer,
   .tab-bar,
   #loading,
@@ -351,6 +370,12 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
           <span class="timer-text" id="refresh-time">0:00</span>
           <span class="timer-label">ago</span>
         </div>
+        <button class="audio-btn" id="audio-btn" title="Executive Summary" onclick="toggleAudioBriefing()" style="display:none;width:auto;padding:6px 14px 6px 10px;gap:8px;">
+          <svg class="speaker-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px;flex-shrink:0;"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <div class="audio-bars"><div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div><div class="audio-bar"></div></div>
+          <div class="audio-spinner"></div>
+          <span style="font-size:11px;font-weight:600;color:rgba(129,140,248,0.8);letter-spacing:0.5px;">Executive Summary</span>
+        </button>
         <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08));border:1px solid rgba(251,191,36,0.3);color:rgba(251,191,36,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.35),rgba(251,191,36,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.08))'">&#9741; QC Check</button>
         <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
       </div>
@@ -2594,6 +2619,92 @@ async function initAgents() {
   }
 }
 
+// ── Audio Briefing ──
+let audioBriefingCache = (function() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('medaltus_briefing_cache'));
+    if (saved && saved.text && saved.dataHash) return saved;
+  } catch(e) {}
+  return {text: null, dataHash: null};
+})();
+function saveBriefingCache() { try { localStorage.setItem('medaltus_briefing_cache', JSON.stringify(audioBriefingCache)); } catch(e) {} }
+let currentUtterance = null;
+let isSpeaking = false;
+
+function getDataHash() {
+  if (!DATA || !DATA.monthly.length) return '';
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  if (!md) return '';
+  return selectedMonth + '|' + md.adSpend + '|' + md.adSales + '|' + md.totalSales + '|' + md.acos + '|' + md.orders;
+}
+
+function pickVoice() {
+  const voices = speechSynthesis.getVoices();
+  const prefs = ['Karen','Samantha','Google US English','Microsoft Jenny','Microsoft Aria','Moira','Tessa','Alex','Daniel'];
+  for (const name of prefs) {
+    const v = voices.find(v => v.name.includes(name) && v.lang.startsWith('en'));
+    if (v) return v;
+  }
+  const english = voices.filter(v => v.lang.startsWith('en'));
+  return english[0] || voices[0];
+}
+
+async function generateBriefing() {
+  const summary = buildDataSummary();
+  const prompt = `Give a quick verbal summary of the Medaltus portfolio's ad performance this month across all brands. Talk like a real person giving a casual update to their manager — plain language, no jargon, no fancy words. Imagine you're on a quick call saying "here's where we're at."
+
+Rules:
+- Keep it under 300 words, around 90 seconds spoken
+- Use short sentences. The way people actually talk.
+- Say dollar amounts and percentages naturally, like "about thirteen thousand" not "thirteen thousand two hundred twenty-eight dollars and fifty cents"
+- Start with the bottom line: is the portfolio doing well or not?
+- Hit the key numbers: total spend, sales, ACOS vs the 30% goal, which brands are standouts (good or bad)
+- If it's a partial month, mention how far in we are and where we're trending
+- End with one thing to keep an eye on
+- Do NOT use bullet points, headers, or any formatting — this is spoken out loud
+- Do NOT use words like "robust", "leverage", "optimize", "trajectory", "endeavor", "formidable", "commendable", or any word you wouldn't say to a friend
+- No dramatic flair. Just the facts, said simply.`;
+
+  try {
+    const response = await callClaude(prompt);
+    return typeof response === 'string' ? response : extractText(response);
+  } catch(err) {
+    console.error('Briefing generation failed:', err);
+    return null;
+  }
+}
+
+async function toggleAudioBriefing() {
+  const btn = document.getElementById('audio-btn');
+  if (btn.disabled) return;
+  if (isSpeaking) {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    btn.classList.remove('speaking');
+    return;
+  }
+  const hash = getDataHash();
+  if (!audioBriefingCache.text || audioBriefingCache.dataHash !== hash) {
+    btn.classList.add('loading');
+    const text = await generateBriefing();
+    btn.classList.remove('loading');
+    if (!text) { alert('Could not generate briefing. Please try again.'); return; }
+    audioBriefingCache = {text, dataHash: hash};
+    saveBriefingCache();
+  }
+  const utterance = new SpeechSynthesisUtterance(audioBriefingCache.text);
+  const voice = pickVoice();
+  if (voice) utterance.voice = voice;
+  utterance.rate = 1.0; utterance.pitch = 1.0; utterance.volume = 1.0;
+  utterance.onstart = () => { isSpeaking = true; btn.classList.add('speaking'); };
+  utterance.onend   = () => { isSpeaking = false; btn.classList.remove('speaking'); };
+  utterance.onerror = () => { isSpeaking = false; btn.classList.remove('speaking'); };
+  currentUtterance = utterance;
+  speechSynthesis.speak(utterance);
+}
+
+speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+
 // ── Init ──
 async function init() {
   try {
@@ -2613,6 +2724,7 @@ async function init() {
     document.getElementById('dashboard').style.display = 'block';
     render();
     startRefreshTimer();
+    document.getElementById('audio-btn').style.display = 'flex';
     loadMarketTicker();
     initAgents();
   } catch(err) {
