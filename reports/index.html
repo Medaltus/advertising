@@ -395,14 +395,14 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
       <div class="agent-panel expanded" id="panel-analytics">
         <div class="agent-panel-header" onclick="togglePanel('analytics')">
           <div class="agent-icon analytics">&#9679;</div>
-          <div><div class="agent-name">Portfolio Analysis</div><div class="agent-desc">Brand performance, anomalies & QC</div></div>
+          <div><div class="agent-name">Analytics | Reporting | QC</div><div class="agent-desc">Performance analysis, reporting & data integrity</div></div>
           <span class="chevron">&#9660;</span>
         </div>
         <div class="agent-panel-body">
           <div id="analytics-status" class="agent-status"><div class="pulse"></div> Analyzing brands...</div>
           <div id="analytics-output" class="agent-output" style="display:none;"></div>
           <div class="agent-input-row">
-            <input class="agent-input" id="analytics-input" placeholder="Ask about any brand's performance..." />
+            <input class="agent-input" id="analytics-input" placeholder="Ask a follow-up question..." />
             <button class="agent-run-btn" onclick="runAgent('analytics')">Ask</button>
           </div>
           <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-analytics" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a><button class="qc-btn" id="qc-dashboard-btn" onclick="runDashboardQC()"><span class="qc-spin"></span>&#9745; QC Dashboard</button></div>
@@ -411,14 +411,14 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
       <div class="agent-panel expanded" id="panel-strategy">
         <div class="agent-panel-header" onclick="togglePanel('strategy')">
           <div class="agent-icon strategy">&#9670;</div>
-          <div><div class="agent-name">Budget Strategy</div><div class="agent-desc">Cross-brand budget allocation</div></div>
+          <div><div class="agent-name">Strategy</div><div class="agent-desc">Channel & budget recommendations</div></div>
           <span class="chevron">&#9660;</span>
         </div>
         <div class="agent-panel-body">
           <div id="strategy-status" class="agent-status"><div class="pulse"></div> Building strategy...</div>
           <div id="strategy-output" class="agent-output" style="display:none;"></div>
           <div class="agent-input-row">
-            <input class="agent-input" id="strategy-input" placeholder="e.g. Which brands should get more budget?" />
+            <input class="agent-input" id="strategy-input" placeholder="e.g. Should we scale Amazon spend?" />
             <button class="agent-run-btn" onclick="runAgent('strategy')">Run</button>
           </div>
           <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-strategy" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
@@ -427,14 +427,14 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
       <div class="agent-panel expanded" id="panel-forecast">
         <div class="agent-panel-header" onclick="togglePanel('forecast')">
           <div class="agent-icon forecast">&#9650;</div>
-          <div><div class="agent-name">Forecasting</div><div class="agent-desc">Brand projections & trends</div></div>
+          <div><div class="agent-name">Forecasting | Trends | Goals</div><div class="agent-desc">Projections, trend analysis & goal tracking</div></div>
           <span class="chevron">&#9660;</span>
         </div>
         <div class="agent-panel-body">
           <div id="forecast-status" class="agent-status"><div class="pulse"></div> Building forecasts...</div>
           <div id="forecast-output" class="agent-output" style="display:none;"></div>
           <div class="agent-input-row">
-            <input class="agent-input" id="forecast-input" placeholder="e.g. Which brands are trending up?" />
+            <input class="agent-input" id="forecast-input" placeholder="e.g. Will we hit $180K total sales?" />
             <button class="agent-run-btn" onclick="runAgent('forecast')">Run</button>
           </div>
           <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-forecast" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
@@ -443,14 +443,14 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
       <div class="agent-panel expanded" id="panel-market">
         <div class="agent-panel-header" onclick="togglePanel('market')">
           <div class="agent-icon market">&#9673;</div>
-          <div><div class="agent-name">Market Conditions</div><div class="agent-desc">Platform & seasonal intel</div></div>
+          <div><div class="agent-name">Market Conditions</div><div class="agent-desc">Live market intel & policy changes</div></div>
           <span class="chevron">&#9660;</span>
         </div>
         <div class="agent-panel-body">
           <div id="market-status" class="agent-status"><div class="pulse"></div> Scanning market...</div>
           <div id="market-output" class="agent-output" style="display:none;"></div>
           <div class="agent-input-row">
-            <input class="agent-input" id="market-input" placeholder="e.g. Any Amazon policy changes?" />
+            <input class="agent-input" id="market-input" placeholder="e.g. Any new Amazon ad policy changes?" />
             <button class="agent-run-btn" onclick="runAgent('market')">Run</button>
           </div>
           <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-market" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
