@@ -2649,21 +2649,51 @@ function pickVoice() {
   return english[0] || voices[0];
 }
 
+function buildBriefingSummary() {
+  if (!DATA) return '';
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  if (!md) return '';
+  const today = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+  let s = `TODAY: ${today}\n`;
+  s += `REPORTING MONTH: ${selectedMonth}\n`;
+  if (md.partial) {
+    s += `DAYS IN: ${md.daysElapsed} of ${md.daysInMonth} days elapsed (data through day ${md.daysElapsed})\n`;
+  } else {
+    s += `STATUS: Full month (complete data)\n`;
+  }
+  s += `\nPORTFOLIO TOTALS (MTD):\n`;
+  s += `  Ad Spend: $${(md.spend||0).toLocaleString()}\n`;
+  s += `  Ad Sales: $${(md.adSales||0).toLocaleString()}\n`;
+  s += `  ACOS: ${md.acos != null ? md.acos.toFixed(1) + '%' : 'N/A'} (goal: 30%)\n`;
+  s += `  Total Sales: $${(md.totalSales||0).toLocaleString()}\n`;
+  s += `  TACOS: ${md.tacos != null ? md.tacos.toFixed(1) + '%' : 'N/A'}\n`;
+  s += `  Orders: ${md.orders||0}\n`;
+  s += `\nBRAND BREAKDOWN (current month only, sorted by spend):\n`;
+  (md.brands||[]).filter(b => (b.spend||0) > 0).sort((a,b2) => (b2.spend||0) - (a.spend||0)).forEach(b => {
+    s += `  ${b.name}: Spend=$${(b.spend||0).toLocaleString()}, AdSales=$${(b.adSales||0).toLocaleString()}, ACOS=${b.acos != null ? b.acos.toFixed(1)+'%' : 'N/A'}, Orders=${b.orders||0}\n`;
+  });
+  return s;
+}
+
 async function generateBriefing() {
-  const summary = buildDataSummary();
-  const prompt = `Give a quick verbal summary of the Medaltus portfolio's ad performance this month across all brands. Talk like a real person giving a casual update to their manager — plain language, no jargon, no fancy words. Imagine you're on a quick call saying "here's where we're at."
+  const summary = buildBriefingSummary();
+  const prompt = `Give a quick verbal summary of the Medaltus portfolio's ad performance. Talk like a real person giving a casual update to their manager — plain language, no jargon, no fancy words. Imagine you're on a quick call saying "here's where we're at."
 
 Rules:
 - Keep it under 300 words, around 90 seconds spoken
 - Use short sentences. The way people actually talk.
 - Say dollar amounts and percentages naturally, like "about thirteen thousand" not "thirteen thousand two hundred twenty-eight dollars and fifty cents"
+- ONLY reference the data provided below — do not reference or summarize any other months
 - Start with the bottom line: is the portfolio doing well or not?
 - Hit the key numbers: total spend, sales, ACOS vs the 30% goal, which brands are standouts (good or bad)
-- If it's a partial month, mention how far in we are and where we're trending
+- If it's a partial month, state how many days in we are using the exact daysElapsed number from the data
 - End with one thing to keep an eye on
 - Do NOT use bullet points, headers, or any formatting — this is spoken out loud
 - Do NOT use words like "robust", "leverage", "optimize", "trajectory", "endeavor", "formidable", "commendable", or any word you wouldn't say to a friend
-- No dramatic flair. Just the facts, said simply.`;
+- No dramatic flair. Just the facts, said simply.
+
+Here is the current data:
+${summary}`;
 
   try {
     const response = await callClaude(prompt);
