@@ -187,6 +187,14 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 .agent-run-btn { padding:11px 18px;border-radius:12px;background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(129,140,248,0.12));border:1px solid rgba(129,140,248,0.25);color:#a5b4fc;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap; }
 .agent-run-btn:hover { background:linear-gradient(135deg,rgba(129,140,248,0.45),rgba(129,140,248,0.2));color:#c7d2fe; }
 .agent-run-btn:disabled { opacity:0.35;cursor:not-allowed; }
+.agent-sop-row { display:flex;justify-content:flex-end;margin-top:10px;gap:8px;flex-wrap:wrap; }
+.agent-sop-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.08));border:1px solid rgba(212,175,55,0.25);color:rgba(212,175,55,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center;text-decoration:none; }
+.agent-sop-btn:hover { background:linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.15));color:rgba(212,175,55,1);border-color:rgba(212,175,55,0.4);box-shadow:0 4px 16px rgba(212,175,55,0.15); }
+.qc-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08));border:1px solid rgba(56,189,248,0.25);color:rgba(56,189,248,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center;text-decoration:none; }
+.qc-btn:hover { background:linear-gradient(135deg,rgba(56,189,248,0.35),rgba(56,189,248,0.15));color:rgba(56,189,248,1);border-color:rgba(56,189,248,0.4);box-shadow:0 4px 16px rgba(56,189,248,0.15); }
+.qc-btn.running { opacity:0.5;pointer-events:none; }
+.qc-btn .qc-spin { display:none;width:10px;height:10px;border:2px solid rgba(56,189,248,0.3);border-top-color:rgba(56,189,248,0.9);border-radius:50%;animation:spin 0.8s linear infinite; }
+.qc-btn.running .qc-spin { display:inline-block; }
 .footer { margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.04);text-align:center;font-size:11px;color:rgba(255,255,255,0.15);letter-spacing:0.5px; }
 /* Spacer below sticky header */
 .header-spacer { height:24px; }
@@ -397,6 +405,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <input class="agent-input" id="analytics-input" placeholder="Ask about any brand's performance..." />
             <button class="agent-run-btn" onclick="runAgent('analytics')">Ask</button>
           </div>
+          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-analytics" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a><button class="qc-btn" id="qc-dashboard-btn" onclick="runDashboardQC()"><span class="qc-spin"></span>&#9745; QC Dashboard</button></div>
         </div>
       </div>
       <div class="agent-panel expanded" id="panel-strategy">
@@ -412,6 +421,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <input class="agent-input" id="strategy-input" placeholder="e.g. Which brands should get more budget?" />
             <button class="agent-run-btn" onclick="runAgent('strategy')">Run</button>
           </div>
+          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-strategy" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
         </div>
       </div>
       <div class="agent-panel expanded" id="panel-forecast">
@@ -427,6 +437,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <input class="agent-input" id="forecast-input" placeholder="e.g. Which brands are trending up?" />
             <button class="agent-run-btn" onclick="runAgent('forecast')">Run</button>
           </div>
+          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-forecast" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
         </div>
       </div>
       <div class="agent-panel expanded" id="panel-market">
@@ -442,6 +453,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <input class="agent-input" id="market-input" placeholder="e.g. Any Amazon policy changes?" />
             <button class="agent-run-btn" onclick="runAgent('market')">Run</button>
           </div>
+          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-market" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
         </div>
       </div>
     </div>
@@ -1959,47 +1971,100 @@ function buildDataSummary() {
 }
 
 const AGENT_PROMPTS = {
-  analytics: `You are an analytics agent for Medaltus, a multi-brand advertising agency. Analyze performance across ALL brands in the portfolio.
+  analytics: `You are an analytics and quality control agent for Medaltus's multi-brand advertising portfolio. You do two jobs: check data integrity AND analyze what the numbers mean.
 
-FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with the most critical portfolio-level findings. Then cover:
-1. PORTFOLIO OVERVIEW: Top-line totals, ACOS vs 30% goal, MoM change
-2. TOP PERFORMERS: Which brands have the best ACOS/ROAS this month? Call out specific numbers.
-3. UNDERPERFORMERS: Which brands are dragging down the portfolio? Why?
-4. ANOMALIES: Any unusual MoM spikes, drops, or outliers?
-5. PACING: If partial month, how is the portfolio tracking vs last month?
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) summarizing the most critical findings. Each bullet should be one short line with a specific number or fact. Then leave a blank line and continue with detailed sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
 
-Be specific with numbers. Plain text only, no HTML or markdown bold. Under 400 words.`,
+After the takeaways, cover:
+1. DATA QUALITY: Flag any missing values, suspicious numbers, mismatches between brand sums and portfolio totals, or inconsistencies across months
+2. PERFORMANCE ANALYSIS: Which brands are performing well and which are underperforming? Compare ACOS, ROAS, CVR, CPC across brands. Call out the best and worst performers with specific numbers.
+3. ANOMALIES: Unusual MoM spikes, drops, or outliers in any brand or metric — explain what likely caused them
+4. PACING: For any partial month, compare the portfolio run rate to prior full months. Are spend and sales on track?
 
-  strategy: `You are a paid media strategist for Medaltus managing a portfolio of CPG and wellness brands.
+Be specific with numbers. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
 
-FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with your top budget recommendations. Then cover:
-1. BUDGET REALLOCATION: Which brands deserve more budget vs less? Give specific rationale.
-2. SCALING OPPORTUNITIES: Brands with strong ACOS (<25%) that could absorb more spend
-3. EFFICIENCY FIXES: Brands with poor ACOS (>40%) — what's the likely fix?
-4. BRAND MIX: Is the portfolio too concentrated in one brand (Skinuva)? What's the risk?
+  strategy: `You are a paid media strategy advisor for Medaltus, managing a portfolio of CPG and wellness brands.
 
-Be specific, cite numbers. Plain text only. Under 400 words.`,
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) summarizing your top recommendations. Each bullet should be one short actionable line. Then leave a blank line and continue with detailed analysis. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
 
-  forecast: `You are a forecasting analyst for Medaltus's advertising portfolio.
+After the takeaways, cover budget reallocation opportunities across brands, scaling opportunities (brands with strong ACOS <25% that could absorb more spend), efficiency fixes for brands with poor ACOS (>40%), and portfolio concentration risk. If the user asks a specific question, focus on that instead.
 
-FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •) with projected performance. Then cover:
-1. MONTH-END FORECAST: Project portfolio totals for spend, ad sales, total sales, ACOS, TACOS
-2. BRAND FORECASTS: For the top 5 brands by spend, project their month-end performance
-3. TRENDS: Which brands are on improving ACOS trends? Worsening?
+Be specific with numbers and cite the data. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
+
+  market: `You are a market intelligence analyst covering digital advertising and CPG/wellness ecommerce. Today's date is ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}. The Medaltus portfolio advertises on Amazon, Google, Meta, TikTok, Pinterest, Walmart Connect, and Reddit.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) with the most important things the team needs to know right now. Each bullet should be one short specific line. Then leave a blank line and continue with detailed sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
+
+After the takeaways, cover:
+1. SEASONAL & MARKET FACTORS: Seasonal trends, shopping events, CPM/CPC trends for this time of year
+2. PLATFORM UPDATES: Recent known policy changes, algorithm updates, targeting restrictions, new ad formats — especially healthcare/skincare/CPG ad policies
+3. RISKS & WATCH LIST: What to monitor in the coming weeks
+
+Be specific and actionable. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
+
+  forecast: `You are a forecasting, trends, and goals analyst for Medaltus's advertising portfolio.
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) summarizing projected performance vs last month and key trend directions. Each bullet should be one short line with a specific number. Then leave a blank line and continue with detailed sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
+
+After the takeaways, cover:
+1. MONTH-END FORECAST: Project portfolio-level month-end totals for spend, ad sales, total sales, ACOS, and TACOS using the current run rate. Compare projected numbers vs last month's actuals.
+2. BRAND FORECASTS: For the top 5 brands by spend, project their month-end performance and whether they're tracking above or below last month.
+3. TRENDS: Are key metrics (ACOS, ROAS, CPC, CVR, orders) trending up or down across the portfolio? Identify 2-3 trends and whether they are accelerating or leveling off.
 4. ALERTS: Any brands that look like they'll significantly miss or beat last month?
 
-Cite specific numbers. Plain text only. Under 400 words.`,
+If the user asks a specific question, focus on that instead.
 
-  market: `You are a market intelligence analyst covering digital advertising for CPG/wellness brands on Amazon, Google, and Walmart. Today: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}.
-
-FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 bullet points (use •). Then cover:
-1. SEASONAL FACTORS: What shopping events or seasonal trends affect these brand categories right now?
-2. PLATFORM UPDATES: Recent changes to Amazon Ads, Google Shopping, Walmart Connect that impact this portfolio
-3. CPM/CPC TRENDS: Are costs rising or falling seasonally?
-4. RISKS: What to watch in the next 2-4 weeks
-
-Plain text only. Under 400 words.`
+Be specific with numbers. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`
 };
+
+const AGENT_RAW_TEXT = {};
+const AGENT_LABELS = {
+  analytics: 'Portfolio Analysis | QC',
+  strategy: 'Strategy',
+  forecast: 'Forecasting, Trends & Goals',
+  market: 'Market Conditions'
+};
+
+// ── SOP content loaded from Google Sheet tabs ──
+const AGENT_SOP = {analytics:'',strategy:'',forecast:'',market:''};
+const SOP_TAB_MAP = {
+  'SOP_Analytics':'analytics','sop_analytics':'analytics',
+  'SOP_Strategy':'strategy','sop_strategy':'strategy',
+  'SOP_Forecast':'forecast','sop_forecast':'forecast',
+  'SOP_Market':'market','sop_market':'market'
+};
+const SOP_TAB_NAMES = {analytics:'Analytics',strategy:'Strategy',forecast:'Forecast',market:'Market'};
+const SOP_TAB_GIDS  = {analytics:'',strategy:'',forecast:'',market:''};
+
+function parseSopTabs(rawText) {
+  const sections = rawText.split(/^##\s+/m);
+  for (const sec of sections) {
+    const nlIdx = sec.indexOf('\n');
+    if (nlIdx < 0) continue;
+    const heading  = sec.substring(0, nlIdx).trim();
+    const agentKey = SOP_TAB_MAP[heading];
+    if (!agentKey) continue;
+    const body = sec.substring(nlIdx + 1).split('\n')
+      .filter(l => !l.trim().startsWith('|') && !l.trim().match(/^:-/))
+      .join('\n').trim();
+    if (body.length > 0) AGENT_SOP[agentKey] = body;
+  }
+  ['analytics','strategy','forecast','market'].forEach(key => {
+    const link = document.getElementById('sop-link-' + key);
+    if (link) {
+      const gid = SOP_TAB_GIDS[key];
+      link.href = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + (gid ? '/edit#gid=' + gid : '');
+      link.textContent = 'Edit ' + SOP_TAB_NAMES[key] + ' SOP';
+    }
+  });
+}
+
+// ── callClaude wrapper ──
+async function callClaude(prompt) {
+  const r = await fetch('/api/claude', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt})});
+  if (!r.ok) throw new Error('Claude API error: ' + r.status);
+  return r.json();
+}
 
 async function runAllAgents() {
   const btn = document.getElementById('run-all-btn'); btn.classList.add('running'); btn.textContent = 'Running...';
@@ -2031,13 +2096,16 @@ async function runAgent(name, autoPrompt) {
   if (statusEl) { statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="pulse"></div> Thinking...'; }
   outputEl.style.display = 'none';
   const dataSummary = buildDataSummary();
-  let prompt = AGENT_PROMPTS[name] + '\n\nData:\n' + dataSummary;
+  let prompt = AGENT_PROMPTS[name];
+  const sop = AGENT_SOP[name];
+  if (sop) prompt += '\n\nCUSTOM OPERATING RULES (follow these closely — they are set by the user and override defaults where they conflict):\n' + sop;
+  prompt += '\n\nHere is the current data:\n' + dataSummary;
   if (userQ) prompt += '\n\nUser question: ' + userQ;
   if (autoPrompt) prompt += '\n\n' + autoPrompt;
   try {
-    const _agentResp = await fetch('/api/claude', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
-    if (!_agentResp.ok) throw new Error('Claude API error: ' + _agentResp.status);
-    const text = (await _agentResp.json()).text || '';
+    const response = await callClaude(prompt);
+    const text = (typeof response === 'string' ? response : response.text) || '';
+    AGENT_RAW_TEXT[name] = text;
     if (!userQ) saveAgentCache(name, text);
     const formatted = formatAgentOutput(text);
     if (statusEl) statusEl.style.display = 'none';
@@ -2049,6 +2117,75 @@ async function runAgent(name, autoPrompt) {
     outputEl.style.display = 'block';
     if (statusEl) statusEl.style.display = 'none';
   }
+}
+
+async function runDashboardQC() {
+  const btn = document.getElementById('qc-dashboard-btn');
+  if (btn) btn.classList.add('running');
+  const md = DATA.monthly.find(m => m.month === selectedMonth);
+  const ch = DATA.channels[selectedMonth] || [];
+  let qcData = 'DASHBOARD QC AUDIT REQUEST\n';
+  qcData += 'Selected month: ' + selectedMonth + '\n';
+  if (md) {
+    qcData += 'Partial: ' + (md.partial ? 'Yes (' + md.daysElapsed + '/' + md.daysInMonth + ' days)' : 'No (full month)') + '\n';
+    qcData += 'KPIs shown: Ad Spend=$' + (md.adSpend||0).toLocaleString() + ', Ad Sales=$' + (md.adSales||0).toLocaleString() + ', ACOS=' + (md.acos||0) + '%, Total Sales=$' + (md.totalSales||0).toLocaleString() + ', TACOS=' + (md.tacos||0) + '%, Orders=' + (md.orders||0) + ', CPC=$' + (md.cpc||0).toFixed(2) + ', CVR=' + (md.cvr||0) + '%, AOV=$' + (md.aov||0).toFixed(2) + '\n';
+    if (md.partial) {
+      const VOLUME_KEYS = new Set(['adSpend','adSales','totalSales','impressions','clicks','orders']);
+      const fKeys = ['adSpend','adSales','totalSales','orders'];
+      qcData += 'Forecasts shown: ';
+      fKeys.forEach(k => {
+        const v = md[k];
+        if (v != null && md.daysElapsed > 0) {
+          const proj = VOLUME_KEYS.has(k) ? (v / md.daysElapsed) * md.daysInMonth : v;
+          qcData += k + '=$' + Math.round(proj).toLocaleString() + ' ';
+        }
+      });
+      qcData += '\n';
+    }
+  }
+  if (ch.length) {
+    qcData += 'Channel Breakdown rows:\n';
+    ch.forEach(c => {
+      qcData += '  ' + c.channel + ': Spend=$' + (c.adSpend||0).toLocaleString() + ', Sales=$' + (c.adSales||0).toLocaleString() + ', ACOS=' + (c.acos||'N/A') + '%, Orders=' + (c.orders||0) + ', CPC=$' + (c.cpc||0).toFixed(2) + ', CVR=' + (c.cvr||0) + '%\n';
+    });
+    const sumSpend = ch.filter(c => c.channel !== 'Total Paid Media' && c.channel !== 'Website Sales').reduce((s,c) => s + (c.adSpend||0), 0);
+    const totalRow = ch.find(c => c.channel === 'Total Paid Media');
+    qcData += 'Sum of channel spends (excl Total/Website): $' + sumSpend.toLocaleString() + '\n';
+    if (totalRow) qcData += 'Total Paid Media row spend: $' + (totalRow.adSpend||0).toLocaleString() + '\n';
+  }
+  qcData += 'Updated date used for daysElapsed: ' + (md && md.daysElapsed ? md.daysElapsed + ' days' : 'unknown') + '\n';
+
+  const qcPrompt = `You are a dashboard QC auditor. Your job is to verify every number displayed on this dashboard is correct and consistent. Check ALL of the following:
+
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character). Mark each as PASS or FAIL. Then continue with details. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
+
+QC CHECKS:
+1. MATH VERIFICATION: Do the channel ad spends sum to the Total Paid Media row? Do channel ad sales sum correctly? Flag any discrepancies with exact numbers.
+2. FORECAST ACCURACY: For the partial month, verify forecasts use the correct daysElapsed (from the sheet Updated date, NOT today's date). Check: forecast = (MTD value / daysElapsed) * daysInMonth. Show the math for at least 2 KPIs.
+3. KPI CONSISTENCY: Do the top-level KPIs match the Total Paid Media row in the channel breakdown? Flag any mismatches.
+4. MoM CHANGES: Spot-check 2-3 MoM percentage changes. Verify the math is correct: ((current - previous) / |previous|) * 100.
+5. DATA COMPLETENESS: Are any channels missing data that should be there? Any suspicious zeros or N/A values?
+6. ANOMALIES: Any numbers that seem obviously wrong, impossible, or inconsistent with each other?
+
+Be ruthlessly precise. If everything checks out, say so. If something is wrong, show the exact math that proves it.
+
+Here is what the dashboard is currently displaying:\n` + qcData;
+
+  try {
+    const response = await callClaude(qcPrompt);
+    const text = (typeof response === 'string' ? response : response.text) || '';
+    AGENT_RAW_TEXT['analytics'] = text;
+    const formatted = formatAgentOutput(text);
+    const outputEl = document.getElementById('analytics-output');
+    const statusEl = document.getElementById('analytics-status');
+    if (statusEl) statusEl.style.display = 'none';
+    await typeAgentOutput(outputEl, formatted, 8);
+    outputEl.scrollTop = 0;
+  } catch(err) {
+    const outputEl = document.getElementById('analytics-output');
+    if (outputEl) { outputEl.textContent = 'QC error: ' + (err.message || err); outputEl.style.display = 'block'; }
+  }
+  if (btn) btn.classList.remove('running');
 }
 
 function formatAgentOutput(rawText) {
@@ -2426,10 +2563,10 @@ function showAgentFromCache(name, rawText, generatedAt) {
 }
 
 const AGENT_AUTO_PROMPTS = {
-  analytics: 'Run your automatic portfolio analysis.',
-  strategy: 'Which brands should get more or less budget this month? Focus on concrete reallocation recommendations.',
-  forecast: 'Project month-end performance for the portfolio and the top 5 brands by spend.',
-  market: 'Give your current market conditions briefing for this brand portfolio.'
+  analytics: 'Run your automatic analysis on the latest data.',
+  strategy: 'Focus on opportunities to scale up. Which brands have strong ROAS and room to increase spend? Where are there untapped growth opportunities? Prioritize by potential impact and ease of execution.',
+  forecast: "Give a rundown on how we are looking to perform this month versus last month. Compare projected month-end totals for spend, sales, ACOS, orders, and ROAS against last month's actuals. Call out which metrics are trending better or worse.",
+  market: 'Give your current market conditions briefing for the Medaltus portfolio. Cover seasonal factors, recent platform policy changes, and industry trends.'
 };
 
 async function initAgents() {
@@ -2467,6 +2604,7 @@ async function init() {
     ]);
     if (_daily) MEDALTUS_DAILY = _daily;
     API_SUPPLEMENT = _supplement;
+    parseSopTabs(text);
     DATA = parseSheet(text);
     mergeApiSupplement(DATA);
     if (!DATA.monthly.length) throw new Error('No brand data found. The sheet format may have changed.');
