@@ -134,6 +134,24 @@ def build_search_term_insights(search_terms: list) -> dict:
     wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
     opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
 
+    # CPC changes: scan ALL search terms for biggest CPC increases vs 30-day avg
+    cpc_changes = []
+    for t in search_terms:
+        daily = t.get('daily', [])
+        if len(daily) < 2:
+            continue
+        avg_cpc = t.get('cpc') or 0
+        if avg_cpc <= 0:
+            continue
+        latest_cpc = daily[-1].get('cpc', 0) or 0
+        if latest_cpc <= 0:
+            continue
+        pct_change = (latest_cpc - avg_cpc) / avg_cpc * 100
+        if pct_change > 0:
+            cpc_changes.append({**t, '_latest_cpc': latest_cpc, '_cpc_change_pct': pct_change})
+
+    cpc_changes.sort(key=lambda x: x.get('_cpc_change_pct', 0), reverse=True)
+
     def trim(terms):
         keys = ('query', 'spend', 'sales', 'acos', 'impressions',
                 'clicks', 'ctr', 'cpc', 'purchases', 'cvr')
@@ -142,10 +160,22 @@ def build_search_term_insights(search_terms: list) -> dict:
             for t in terms[:10]
         ]
 
+    def trim_cpc(terms):
+        keys = ('query', 'spend', 'sales', 'acos', 'impressions',
+                'clicks', 'ctr', 'cpc', 'purchases', 'cvr')
+        return [
+            {**{k: t.get(k) for k in keys},
+             'daily':          t.get('daily', []),
+             'latest_cpc':     round(t.get('_latest_cpc', 0), 4),
+             'cpc_change_pct': round(t.get('_cpc_change_pct', 0), 1)}
+            for t in terms[:10]
+        ]
+
     return {
         'top_performing': trim(top),
         'wasted_spend':   trim(wasted),
         'opportunities':  trim(opps),
+        'cpc_changes':    trim_cpc(cpc_changes),
     }
 
 

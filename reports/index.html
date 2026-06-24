@@ -1801,14 +1801,15 @@ function renderSearchTermInsights() {
     b.searchTermInsights && (
       b.searchTermInsights.top_performing.length ||
       b.searchTermInsights.wasted_spend.length ||
-      b.searchTermInsights.opportunities.length
+      b.searchTermInsights.opportunities.length ||
+      (b.searchTermInsights.cpc_changes || []).length
     ) && (selectedBrand === 'All' || selectedBrand === b.name)
   ).sort((a, b2) => a.name.localeCompare(b2.name));
 
   sec.style.display = 'block';
   container.innerHTML = '';
   document.getElementById('search-terms-sub').textContent =
-    'Top performing · wasted spend · new opportunities · 30-day rolling · ' + md.month;
+    'Top performing · wasted spend · new opportunities · CPC rising · 30-day rolling · ' + md.month;
 
   if (!brandsWithData.length) {
     container.innerHTML = '<div style="padding:28px;text-align:center;color:rgba(255,255,255,0.25);font-size:13px;">No search term data yet — run the morning refresh to populate.</div>';
@@ -1894,6 +1895,7 @@ function renderSearchTermInsights() {
     { key: 'top_performing', label: '🏆 Top Performing', color: '#4ade80', desc: 'ACOS < 40% · sorted by sales' },
     { key: 'wasted_spend',   label: '🔥 Wasted Spend',   color: '#ff6b6b', desc: 'No sales · sorted by spend' },
     { key: 'opportunities',  label: '💡 Opportunities',  color: '#f59e0b', desc: 'High CVR, underinvested · sorted by CVR' },
+    { key: 'cpc_changes',    label: '⚡ CPC Rising',     color: '#f472b6', desc: 'Biggest CPC jumps vs 30-day avg · all terms · click for trend' },
   ];
 
   brandsWithData.forEach(brand => {
@@ -1908,11 +1910,12 @@ function renderSearchTermInsights() {
     container.appendChild(brandHdr);
 
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.05);';
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:1px;background:rgba(255,255,255,0.05);';
     container.appendChild(grid);
 
     BUCKETS.forEach(bucket => {
       const terms = sti[bucket.key] || [];
+      const isCpc = bucket.key === 'cpc_changes';
       const col = document.createElement('div');
       col.style.cssText = 'background:#0d0d12;padding:0;';
 
@@ -1928,6 +1931,33 @@ function renderSearchTermInsights() {
         empty.style.cssText = 'padding:14px 16px;font-size:12px;color:rgba(255,255,255,0.2);font-style:italic;';
         empty.textContent = 'No terms in this category';
         col.appendChild(empty);
+      } else if (isCpc) {
+        const ch = document.createElement('div');
+        ch.style.cssText = 'display:grid;grid-template-columns:1fr 52px 52px 52px;padding:5px 16px;border-bottom:1px solid rgba(255,255,255,0.04);';
+        ch.innerHTML =
+          '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Query</span>'+
+          '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Avg</span>'+
+          '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Today</span>'+
+          '<span style="font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:right;">Chg</span>';
+        col.appendChild(ch);
+
+        terms.forEach((t, i) => {
+          const chg = t.cpc_change_pct || 0;
+          const chgColor = chg > 100 ? '#ff6b6b' : chg > 50 ? '#f59e0b' : '#f472b6';
+          const row = document.createElement('div');
+          row.style.cssText = 'display:grid;grid-template-columns:1fr 52px 52px 52px;padding:7px 16px;border-bottom:1px solid rgba(255,255,255,0.025);transition:background .15s;cursor:pointer;';
+          row.onmouseenter = () => row.style.background = 'rgba(255,255,255,0.04)';
+          row.onmouseleave = () => row.style.background = '';
+          row.onclick = () => showCpcTrend(t, brand.name);
+          row.innerHTML =
+            '<span style="font-size:11px;color:rgba(255,255,255,0.75);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:8px;" title="'+t.query+'">'+
+              '<span style="font-size:9px;color:rgba(255,255,255,0.25);margin-right:5px;">'+(i+1)+'.</span>'+t.query+
+            '</span>'+
+            '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:rgba(255,255,255,0.45);text-align:right;">'+(t.cpc!=null?'$'+t.cpc.toFixed(2):'—')+'</span>'+
+            '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:#ff6b6b;text-align:right;">'+(t.latest_cpc!=null?'$'+t.latest_cpc.toFixed(2):'—')+'</span>'+
+            '<span style="font-size:11px;font-family:\'SF Mono\',\'Menlo\',monospace;color:'+chgColor+';font-weight:700;text-align:right;">'+(t.cpc_change_pct!=null?'+'+t.cpc_change_pct.toFixed(0)+'%':'—')+'</span>';
+          col.appendChild(row);
+        });
       } else {
         const ch = document.createElement('div');
         ch.style.cssText = 'display:grid;grid-template-columns:1fr 50px 50px 46px 46px;padding:5px 16px;border-bottom:1px solid rgba(255,255,255,0.04);';
