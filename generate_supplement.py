@@ -179,6 +179,40 @@ def build_search_term_insights(search_terms: list) -> dict:
     }
 
 
+def build_asin_insights(asins: list) -> dict:
+    """Categorize ASIN data into performance buckets, top 10 each."""
+    top, wasted, opps = [], [], []
+
+    for a in asins:
+        spend = a.get('spend', 0) or 0
+        sales = a.get('sales', 0) or 0
+        acos  = a.get('acos')
+        cvr   = a.get('cvr') or 0
+
+        if spend >= 5 and sales > 0 and acos is not None and acos <= 35:
+            top.append(a)
+        if spend >= 5 and (sales == 0 or (acos is not None and acos > 100)):
+            wasted.append(a)
+        if cvr > 0.05 and spend < 50 and sales > 0:
+            opps.append(a)
+
+    top.sort(key=lambda x: x.get('sales', 0) or 0, reverse=True)
+    wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
+    opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
+
+    def trim(items):
+        keys = ('asin', 'sku', 'impressions', 'clicks', 'spend',
+                'sales', 'purchases', 'acos', 'ctr', 'cpc', 'cvr')
+        return [{k: a.get(k) for k in keys} for a in items[:10]]
+
+    return {
+        'top_performers': trim(top),
+        'wasted_spend':   trim(wasted),
+        'opportunities':  trim(opps),
+        'all':            trim(asins[:50]),
+    }
+
+
 def build_supplement(data: dict) -> dict:
     supplement = {}
 
@@ -187,6 +221,7 @@ def build_supplement(data: dict) -> dict:
         timeline     = brand.get('timeline', [])
         campaigns    = brand.get('campaigns', [])
         search_terms = brand.get('search_terms', [])
+        asins        = brand.get('asins', [])
 
         # ── Aggregate timeline into monthly buckets ─────────────────────────
         # NOTE: We do NOT aggregate the Amazon Ads 'totalSales' field.
@@ -263,6 +298,7 @@ def build_supplement(data: dict) -> dict:
                 'momTacos':          None,
                 'campaigns':         brand_campaigns,
                 'searchTermInsights': build_search_term_insights(search_terms) if mk == latest_month else None,
+                'productInsights':    build_asin_insights(asins) if mk == latest_month else None,
             })
 
     # ── Compute month-level portfolio totals ────────────────────────────────

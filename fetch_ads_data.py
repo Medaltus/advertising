@@ -196,6 +196,13 @@ SEARCH_TERM_CONFIG = {
     "normalize": None,
 }
 
+ASIN_REPORT_CONFIG = {
+    "adProduct":    "SPONSORED_PRODUCTS",
+    "reportTypeId": "spAdvertisedProduct",
+    "timeUnit":     "SUMMARY",
+    "normalize":    None,
+}
+
 
 def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
     """Submit a 30-day daily search term report. Returns reportId."""
@@ -231,6 +238,90 @@ def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -
     report_id = resp.json()["reportId"]
     print(f"  ✓ Submitted spSearchTerm (reportId={report_id})")
     return report_id
+
+
+def submit_asin_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
+    """Submit an ASIN performance summary report. Returns reportId."""
+    payload = {
+        "name":      "SP Advertised Products Summary",
+        "startDate": start,
+        "endDate":   end,
+        "configuration": {
+            "adProduct":    "SPONSORED_PRODUCTS",
+            "groupBy":      ["advertiserAndASIN"],
+            "columns":      [
+                "advertisedAsin", "advertisedSku", "campaignName",
+                "impressions", "clicks", "spend", "purchases7d", "sales7d",
+            ],
+            "reportTypeId": "spAdvertisedProduct",
+            "timeUnit":     "SUMMARY",
+            "format":       "GZIP_JSON",
+        },
+    }
+    resp = requests.post(
+        f"{api_base}/reporting/reports",
+        headers={**hdrs, "Content-Type": "application/vnd.createasyncreportrequest.v3+json"},
+        json=payload,
+        timeout=30,
+    )
+    if resp.status_code == 425:
+        import re as _re
+        m = _re.search(r'duplicate of\s*[:\s]+([a-f0-9-]{36})', resp.text, _re.IGNORECASE)
+        if m:
+            report_id = m.group(1)
+            print(f"  ↩  Duplicate — reusing existing spAdvertisedProduct (reportId={report_id})")
+            return report_id
+    if not resp.ok:
+        print(f"    spAdvertisedProduct submission error {resp.status_code}: {resp.text[:300]}")
+        resp.raise_for_status()
+    report_id = resp.json()["reportId"]
+    print(f"  ✓ Submitted spAdvertisedProduct (reportId={report_id})")
+    return report_id
+
+
+def build_asin_data_for_brand(asin_rows: list, brand_name: str, brands: list,
+                               single_brand: bool) -> list:
+    """Aggregate ASIN rows for one brand. Returns list sorted by spend (top 100)."""
+    def matches(r):
+        if single_brand:
+            return True
+        return identify_brand(r.get("campaignName", ""), brands) == brand_name
+
+    by_asin: dict = {}
+    for r in asin_rows:
+        if not matches(r):
+            continue
+        asin = (r.get("advertisedAsin") or "").strip()
+        sku  = (r.get("advertisedSku")  or "").strip()
+        if not asin:
+            continue
+        imp = int(r.get("impressions", 0) or 0)
+        clk = int(r.get("clicks", 0) or 0)
+        spd = float(r.get("spend", 0) or 0)
+        sls = float(r.get("sales7d", 0) or 0)
+        pur = int(r.get("purchases7d", 0) or 0)
+        if asin not in by_asin:
+            by_asin[asin] = {"asin": asin, "sku": sku, "impressions": 0,
+                             "clicks": 0, "spend": 0.0, "sales": 0.0, "purchases": 0}
+        a = by_asin[asin]
+        a["impressions"] += imp
+        a["clicks"]      += clk
+        a["spend"]       += spd
+        a["sales"]       += sls
+        a["purchases"]   += pur
+
+    result = []
+    for a in by_asin.values():
+        a["spend"]  = round(a["spend"], 2)
+        a["sales"]  = round(a["sales"], 2)
+        a["acos"]   = acos_pct(a["spend"], a["sales"])
+        a["ctr"]    = safe_div(a["clicks"], a["impressions"])
+        a["cpc"]    = safe_div(a["spend"], a["clicks"])
+        a["cvr"]    = safe_div(a["purchases"], a["clicks"])
+        result.append(a)
+
+    result.sort(key=lambda x: x["spend"], reverse=True)
+    return result[:100]
 
 
 def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
@@ -634,6 +725,8 @@ def main():
     pending = []
     # pending_st: list of (profile, report_id, hdrs, single_brand, currency)
     pending_st = []
+    # pending_asin: list of (profile, report_id, hdrs, single_brand, currency)
+    pending_asin = []
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -673,9 +766,17 @@ def main():
         except Exception as e:
             print(f"  ✗ spSearchTerm submission failed: {e}")
 
+        # Also submit ASIN report for this profile
+        time.sleep(5)
+        try:
+            asin_id = submit_asin_report(urls["api"], hdrs, start, end)
+            pending_asin.append((profile, asin_id, hdrs, single_brand, currency))
+        except Exception as e:
+            print(f"  ✗ spAdvertisedProduct submission failed: {e}")
+
         time.sleep(5)   # small gap between profiles
 
-    print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term reports submitted — polling all simultaneously…\n")
+    print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term + {len(pending_asin)} ASIN reports submitted — polling all simultaneously…\n")
 
     # ── Phase 2: Poll + download all reports in parallel via threads ───────────
     downloaded = {}   # report_id → rows
@@ -710,8 +811,11 @@ def main():
     st_threads = [threading.Thread(target=fetch_report, args=(SEARCH_TERM_CONFIG, report_id, hdrs),
                                     daemon=True)
                   for _, report_id, hdrs, _, _ in pending_st]
-    for t in threads + st_threads: t.start()
-    for t in threads + st_threads: t.join()
+    asin_threads = [threading.Thread(target=fetch_report, args=(ASIN_REPORT_CONFIG, report_id, hdrs),
+                                     daemon=True)
+                    for _, report_id, hdrs, _, _ in pending_asin]
+    for t in threads + st_threads + asin_threads: t.start()
+    for t in threads + st_threads + asin_threads: t.join()
 
     print(f"\n✓ All reports ready — processing brand data…\n")
 
@@ -726,6 +830,11 @@ def main():
     for profile, report_id, _, _, _ in pending_st:
         pid = profile.get("profileId")
         st_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
+
+    asin_profile_records = {}  # profile_id → [ASIN rows]
+    for profile, report_id, _, _, _ in pending_asin:
+        pid = profile.get("profileId")
+        asin_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -752,6 +861,8 @@ def main():
                 bdata["currency"]     = currency
                 bdata["search_terms"] = build_search_terms_for_brand(
                     st_records, brand, brands, bool(single_brand))
+                bdata["asins"] = build_asin_data_for_brand(
+                    asin_profile_records.get(profile_id, []), brand, brands, bool(single_brand))
                 brand_outputs[brand] = bdata
                 s = bdata["summary"]
                 print(f"  ✓ {brand}: spend=${s['spend']:,.0f}, "

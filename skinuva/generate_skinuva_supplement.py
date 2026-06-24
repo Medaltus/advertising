@@ -55,6 +55,41 @@ def extract_brand(data: dict, brand_name: str) -> dict:
         'campaigns':    brand.get('campaigns', []),
         'pacing':       brand.get('pacing', []),
         'search_terms': brand.get('search_terms', []),
+        'asins':        brand.get('asins', []),
+    }
+
+
+def build_asin_insights(asins: list) -> dict:
+    """Categorize ASIN data into performance buckets, top 10 each."""
+    top, wasted, opps = [], [], []
+
+    for a in asins:
+        spend = a.get('spend', 0) or 0
+        sales = a.get('sales', 0) or 0
+        acos  = a.get('acos')
+        cvr   = a.get('cvr') or 0
+
+        if spend >= 5 and sales > 0 and acos is not None and acos <= 35:
+            top.append(a)
+        if spend >= 5 and (sales == 0 or (acos is not None and acos > 100)):
+            wasted.append(a)
+        if cvr > 0.05 and spend < 50 and sales > 0:
+            opps.append(a)
+
+    top.sort(key=lambda x: x.get('sales', 0) or 0, reverse=True)
+    wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
+    opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
+
+    def trim(items):
+        keys = ('asin', 'sku', 'impressions', 'clicks', 'spend',
+                'sales', 'purchases', 'acos', 'ctr', 'cpc', 'cvr')
+        return [{k: a.get(k) for k in keys} for a in items[:10]]
+
+    return {
+        'top_performers': trim(top),
+        'wasted_spend':   trim(wasted),
+        'opportunities':  trim(opps),
+        'all':            trim(asins[:50]),
     }
 
 
@@ -286,6 +321,8 @@ def main():
     # ── Add search term insights ──────────────────────────────────────────────
     supplement['searchTermInsights'] = build_search_term_insights(
         supplement.get('search_terms', []))
+    supplement['productInsights'] = build_asin_insights(
+        supplement.get('asins', []))
 
     # ── Write flat supplement (used for current-month injection) ─────────────
     out_path = out_dir / 'skinuva_supplement.json'

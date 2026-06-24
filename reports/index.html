@@ -574,6 +574,15 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
     <div id="dow-container"></div>
   </div>
 
+  <!-- Product / ASIN Performance Section -->
+  <div class="chart-card glass" style="margin-bottom:24px;display:none;" id="asin-section">
+    <div class="section-header">
+      <div class="section-title">Product / ASIN Performance</div>
+      <div class="section-sub" id="asin-sub">Top performers · wasted spend · opportunities · 30-day rolling</div>
+    </div>
+    <div id="asin-container"></div>
+  </div>
+
   <!-- WLOS Section -->
   <div class="chart-card glass" style="margin-bottom:24px;" id="wlos-section">
     <div class="section-header">
@@ -1360,6 +1369,7 @@ function render() {
   renderCampaignsByBrand();
   renderSearchTermInsights();
   renderDayOfWeekHeatmap();
+  renderProductPerformance();
   renderWLOS();
   buildTicker(md);
   document.getElementById('footer').textContent = 'Medaltus Ad Reports · All Brands · Google Sheets + Amazon Ads API · ' + new Date().toLocaleDateString();
@@ -2601,6 +2611,118 @@ function renderDayOfWeekHeatmap() {
   container.appendChild(grid);
   document.getElementById('dow-sub').textContent =
     (selectedBrand!=='All'?selectedBrand+' · ':'All brands · ')+'ACOS & CVR by day of week · '+selectedMonth;
+}
+
+function renderProductPerformance() {
+  const sec = document.getElementById('asin-section');
+  const container = document.getElementById('asin-container');
+  if (!sec || !container) return;
+
+  if (!DATA || !DATA.monthly.length) { sec.style.display='none'; return; }
+  const md = DATA.monthly[DATA.monthly.length - 1];
+  if (!md) { sec.style.display='none'; return; }
+
+  // Merge supplement productInsights into md.brands if not already there
+  const suppEntry = API_SUPPLEMENT[md.month];
+  if (suppEntry) {
+    md.brands.forEach(b => {
+      if (!b.productInsights) {
+        const sb = (suppEntry.brands || []).find(s => s.name === b.name);
+        if (sb && sb.productInsights) b.productInsights = sb.productInsights;
+      }
+    });
+  }
+
+  const brandsWithData = md.brands.filter(b =>
+    b.productInsights && (
+      b.productInsights.top_performers.length ||
+      b.productInsights.wasted_spend.length ||
+      b.productInsights.opportunities.length
+    ) && (selectedBrand === 'All' || selectedBrand === b.name)
+  ).sort((a, b2) => a.name.localeCompare(b2.name));
+
+  if (!brandsWithData.length) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  container.innerHTML = '';
+  document.getElementById('asin-sub').textContent =
+    'Top performers · wasted spend · opportunities · 30-day rolling · ' + md.month;
+
+  const BUCKETS_ASIN = [
+    { key: 'top_performers', label: '🏆 Top Performers', color: '#4ade80',
+      desc: 'ACOS ≤ 35% · spend ≥ $5 · sorted by sales' },
+    { key: 'wasted_spend',   label: '🔥 Wasted Spend',   color: '#ff6b6b',
+      desc: 'Spend ≥ $5 · no sales or ACOS > 100%' },
+    { key: 'opportunities',  label: '💡 Opportunities',  color: '#fbbf24',
+      desc: 'CVR > 5% · spend < $50 · room to scale' },
+  ];
+
+  function fmtAsin(asin) {
+    if (!asin) return '—';
+    return `<a href="https://www.amazon.com/dp/${asin}" target="_blank"
+      style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2);"
+      title="View on Amazon">${asin}</a>`;
+  }
+
+  brandsWithData.forEach(brand => {
+    const pi = brand.productInsights;
+
+    const brandHdr = document.createElement('div');
+    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:12px;';
+    brandHdr.textContent = brand.name;
+    container.appendChild(brandHdr);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;';
+
+    BUCKETS_ASIN.forEach(bucket => {
+      const items = pi[bucket.key] || [];
+      const cell  = document.createElement('div');
+      cell.style.cssText = `background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;`;
+
+      const hdr = document.createElement('div');
+      hdr.style.cssText = `padding:12px 14px 10px;border-bottom:1px solid rgba(255,255,255,0.06);`;
+      hdr.innerHTML =
+        `<div style="font-size:12px;font-weight:700;color:${bucket.color};margin-bottom:3px;">${bucket.label}</div>`+
+        `<div style="font-size:10px;color:rgba(255,255,255,0.3);">${bucket.desc}</div>`;
+      cell.appendChild(hdr);
+
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.style.cssText = 'padding:20px 14px;font-size:11px;color:rgba(255,255,255,0.2);text-align:center;';
+        empty.textContent = 'No data';
+        cell.appendChild(empty);
+      } else {
+        const tbl = document.createElement('table');
+        tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:11px;';
+        tbl.innerHTML =
+          `<thead><tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+            <th style="padding:7px 14px 7px;text-align:left;color:rgba(255,255,255,0.3);font-weight:600;font-size:10px;">ASIN</th>
+            <th style="padding:7px 6px;text-align:right;color:rgba(255,255,255,0.3);font-weight:600;font-size:10px;">Spend</th>
+            <th style="padding:7px 6px;text-align:right;color:rgba(255,255,255,0.3);font-weight:600;font-size:10px;">Sales</th>
+            <th style="padding:7px 14px 7px 6px;text-align:right;color:rgba(255,255,255,0.3);font-weight:600;font-size:10px;">ACOS</th>
+          </tr></thead>`;
+        const tbody = document.createElement('tbody');
+        items.forEach((a, idx) => {
+          const acos = a.acos != null ? a.acos.toFixed(1)+'%' : '—';
+          const acosColor = a.acos == null ? 'rgba(255,255,255,0.35)'
+            : a.acos < 25 ? '#4ade80' : a.acos < 50 ? '#f59e0b' : '#ff6b6b';
+          const row = document.createElement('tr');
+          row.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);' +
+            (idx%2===1?'background:rgba(255,255,255,0.015);':'');
+          row.innerHTML =
+            `<td style="padding:6px 14px;color:rgba(255,255,255,0.7);">${fmtAsin(a.asin)}</td>`+
+            `<td style="padding:6px;text-align:right;color:rgba(255,255,255,0.6);">$${(a.spend||0).toFixed(0)}</td>`+
+            `<td style="padding:6px;text-align:right;color:rgba(255,255,255,0.6);">$${(a.sales||0).toFixed(0)}</td>`+
+            `<td style="padding:6px 14px 6px 6px;text-align:right;color:${acosColor};font-weight:700;">${acos}</td>`;
+          tbody.appendChild(row);
+        });
+        tbl.appendChild(tbody);
+        cell.appendChild(tbl);
+      }
+      grid.appendChild(cell);
+    });
+    container.appendChild(grid);
+  });
 }
 
 function renderWLOS() {
