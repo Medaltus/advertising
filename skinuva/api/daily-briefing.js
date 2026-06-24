@@ -1,6 +1,6 @@
 // skinuva/api/daily-briefing.js — Vercel Cron Job
 // Runs daily at 9am ET. Reads local supplement JSON, formats a KPI briefing,
-// and posts it to the #claude-advertising-updates Slack channel.
+// and posts it to Slack.
 //
 // Env vars required:
 //   SLACK_WEBHOOK_URL   — Slack Incoming Webhook URL
@@ -75,7 +75,7 @@ module.exports = async function handler(req, res) {
     const today       = new Date();
     const dayOfMonth  = today.getDate();
     const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const dateStr     = today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    const dateStr     = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
     const summary = supp.summary || {};
     const sti     = supp.searchTermInsights || {};
@@ -86,33 +86,72 @@ module.exports = async function handler(req, res) {
     lines.push(`*📊 Skinuva — ${dateStr} (Day ${dayOfMonth} of ${daysInMonth})*`);
     lines.push('');
 
-    // ── Totals ────────────────────────────────────────────────────────────────
+    // ── Totals + Pacing ───────────────────────────────────────────────────────
     const acos = summary.acos;
     lines.push(
       `*MTD:* Spend ${fmt(summary.spend)} · Sales ${fmt(summary.sales)} · ACOS ${fmtPct(acos)}${acosFlag(acos)} · Orders ${summary.purchases ?? '—'} · Total Sales ${fmt(summary.totalSales)}`
     );
+
+    const daysElapsed = Math.max(dayOfMonth - 1, 1);
+    const projected   = (summary.spend / daysElapsed) * daysInMonth;
+    lines.push(`*Pacing:* ~${fmt(projected)} projected EOM at current rate`);
     lines.push('');
 
-    // ── Top search terms ──────────────────────────────────────────────────────
+    // ── What's Working ────────────────────────────────────────────────────────
+    const working  = [];
+    const concerns = [];
+
+    if (acos != null && acos <= 25) {
+      working.push(`Overall ACOS ${fmtPct(acos)} — well under 30% goal`);
+    }
+
+    // Top wasted spend terms for concerns
+    const wasted = (sti.wasted_spend || []).slice(0, 3);
+
+    // Top performing terms for what's working
     const top = (sti.top_performing || []).slice(0, 3);
-    if (top.length) {
-      lines.push('*Top Search Terms:*');
-      for (const t of top) {
-        lines.push(
-          `"${t.query}": ${fmt(t.spend)} spend · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS · ${t.purchases ?? 0} orders`
-        );
+    for (const t of top) {
+      if (t.acos != null && t.acos <= 20) {
+        working.push(`"${t.query}": ${fmtPct(t.acos)} ACOS · ${t.purchases ?? 0} orders · ${fmt(t.sales)} sales`);
+      }
+    }
+
+    if (acos != null && acos > 30 && acos <= 40) {
+      concerns.push(`Overall ACOS ${fmtPct(acos)} — slightly over 30% goal`);
+    } else if (acos != null && acos > 40) {
+      concerns.push(`Overall ACOS ${fmtPct(acos)} — significantly over 30% goal`);
+    }
+
+    if (working.length) {
+      lines.push('*✅ What\'s Working:*');
+      for (const w of working) lines.push(w);
+      lines.push('');
+    }
+
+    // ── Concerns ──────────────────────────────────────────────────────────────
+    if (concerns.length || wasted.length) {
+      lines.push('*⚠️ Concerns:*');
+      for (const c of concerns) lines.push(c);
+      if (wasted.length) {
+        lines.push('Wasted spend (no-sale terms):');
+        for (const t of wasted) {
+          lines.push(`  "${t.query}": ${fmt(t.spend)} spend · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS`);
+        }
       }
       lines.push('');
     }
 
-    // ── Wasted spend ──────────────────────────────────────────────────────────
-    const wasted = (sti.wasted_spend || []).slice(0, 3);
-    if (wasted.length) {
-      lines.push('*Wasted Spend (no-sale terms):*');
-      for (const t of wasted) {
-        lines.push(
-          `"${t.query}": ${fmt(t.spend)} spend · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS`
-        );
+    // ── Scaling Opportunities ─────────────────────────────────────────────────
+    const opps = (sti.opportunities || [])
+      .filter(o => (o.acos || 0) < 30 && (o.cvr || 0) > 0)
+      .sort((a, b) => (b.cvr || 0) - (a.cvr || 0))
+      .slice(0, 4);
+
+    if (opps.length) {
+      lines.push('*🚀 Scaling Opportunities (high CVR, low spend):*');
+      for (const o of opps) {
+        const cvrPct = ((o.cvr || 0) * 100).toFixed(0);
+        lines.push(`"${o.query}": ${cvrPct}% CVR · ${fmtPct(o.acos)} ACOS · only ${fmt(o.spend)} spent`);
       }
     }
 

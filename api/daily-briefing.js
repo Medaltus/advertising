@@ -1,6 +1,6 @@
 // api/daily-briefing.js — Vercel Cron Job
 // Runs daily at 9am ET. Reads local supplement JSON, formats a KPI briefing,
-// and posts it to the #claude-advertising-updates Slack channel.
+// and posts it to Slack.
 //
 // Env vars required:
 //   SLACK_WEBHOOK_URL   — Slack Incoming Webhook URL
@@ -28,6 +28,13 @@ function acosFlag(acos) {
   if (acos <= 30) return ' ✅';
   if (acos <= 40) return ' ⚠️';
   return ' 🔴';
+}
+
+function delta(curr, prev) {
+  if (curr == null || prev == null) return '';
+  const d = curr - prev;
+  const sign = d > 0 ? '+' : '';
+  return ` (${sign}${d.toFixed(1)}pp vs last mo)`;
 }
 
 // ── Slack ─────────────────────────────────────────────────────────────────────
@@ -76,13 +83,23 @@ module.exports = async function handler(req, res) {
     const currentMonth = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
     const dayOfMonth   = today.getDate();
     const daysInMonth  = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-    const dateStr      = today.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    const dateStr      = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
 
-    const md = supp[currentMonth];
+    // Prior month for MoM comparisons
+    const priorDate  = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const priorMonth = priorDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    const md   = supp[currentMonth];
+    const prMd = supp[priorMonth] || {};
+
     if (!md) {
       await postToSlack(slackUrl, `⚠️ Medaltus briefing: no data for ${currentMonth}`);
       return res.status(200).json({ ok: true, warning: 'no data for current month' });
     }
+
+    // Prior month brand lookup
+    const priorBrands = {};
+    for (const b of prMd.brands || []) priorBrands[b.name] = b;
 
     const lines = [];
 
@@ -94,6 +111,12 @@ module.exports = async function handler(req, res) {
     lines.push(
       `*MTD:* Spend ${fmt(md.spend)} · Sales ${fmt(md.adSales)} · ACOS ${fmtPct(md.acos)}${acosFlag(md.acos)} · Orders ${md.orders ?? '—'} · TACOS ${fmtPct(md.tacos)}`
     );
+
+    // Spend pacing
+    const daysElapsed = Math.max(dayOfMonth - 1, 1);
+    const dailyRate   = md.spend / daysElapsed;
+    const projected   = dailyRate * daysInMonth;
+    lines.push(`*Pacing:* ~${fmt(projected)} projected EOM at current rate`);
     lines.push('');
 
     // ── Brand breakdown ───────────────────────────────────────────────────────
@@ -104,33 +127,46 @@ module.exports = async function handler(req, res) {
     if (brands.length) {
       lines.push('*Brands:*');
       for (const b of brands) {
+        const pr   = priorBrands[b.name];
+        const mom  = pr ? delta(b.acos, pr.acos) : '';
         lines.push(
-          `${b.name}: ${fmt(b.spend)} spend · ${fmt(b.adSales)} sales · ${fmtPct(b.acos)}${acosFlag(b.acos)} ACOS · ${b.orders ?? 0} orders`
+          `${b.name}: ${fmt(b.spend)} · ${fmtPct(b.acos)}${acosFlag(b.acos)} ACOS${mom} · ${b.orders ?? 0} orders`
         );
       }
       lines.push('');
     }
 
-    // ── Search term insights ──────────────────────────────────────────────────
-    const allTop    = [];
-    const allWasted = {};
+    // ── What's Working / Concerns ─────────────────────────────────────────────
+    const working  = [];
+    const concerns = [];
     const cpcAlerts = [];
+    const allWasted = {};
 
-    for (const b of md.brands || []) {
-      const sti = b.searchTermInsights || {};
+    for (const b of brands) {
+      const pr = priorBrands[b.name];
 
-      // Aggregate top performers across brands
-      for (const t of sti.top_performing || []) {
-        allTop.push({ ...t, brand: b.name });
+      // What's Working: ACOS ≤ 25%
+      if (b.acos != null && b.acos <= 25) {
+        const note = pr && pr.acos != null
+          ? (b.acos < pr.acos ? `, improving from ${fmtPct(pr.acos)} last mo` : '')
+          : '';
+        working.push(`${b.name} at ${fmtPct(b.acos)} ACOS${note}`);
       }
 
-      // Aggregate wasted spend by brand
-      const brandWasted = (sti.wasted_spend || []).reduce((s, t) => s + (t.spend || 0), 0);
-      if (brandWasted > 5) allWasted[b.name] = brandWasted;
+      // Concerns: ACOS > 40%
+      if (b.acos != null && b.acos > 40) {
+        const note = pr && pr.acos != null ? ` (was ${fmtPct(pr.acos)} last mo)` : '';
+        concerns.push(`${b.name} at ${fmtPct(b.acos)} ACOS${note}`);
+      }
 
-      // CPC spike detection: latest day CPC > 2× 30-day avg
-      for (const category of ['top_performing', 'wasted_spend', 'opportunities']) {
-        for (const t of sti[category] || []) {
+      // Wasted spend totals
+      const sti = b.searchTermInsights || {};
+      const wastedAmt = (sti.wasted_spend || []).reduce((s, t) => s + (t.spend || 0), 0);
+      if (wastedAmt > 10) allWasted[b.name] = wastedAmt;
+
+      // CPC spikes
+      for (const cat of ['top_performing', 'wasted_spend', 'opportunities']) {
+        for (const t of sti[cat] || []) {
           const daily = t.daily || [];
           if (daily.length < 2) continue;
           const avgCpc    = t.cpc || 0;
@@ -143,33 +179,57 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Top 3 search terms by sales
-    allTop.sort((a, b) => (b.sales || 0) - (a.sales || 0));
-    if (allTop.length) {
-      lines.push('*Top Search Terms:*');
-      for (const t of allTop.slice(0, 3)) {
+    if (working.length) {
+      lines.push('*✅ What\'s Working:*');
+      for (const w of working) lines.push(w);
+      lines.push('');
+    }
+
+    // Concerns: high ACOS brands + wasted spend
+    const wastedEntries = Object.entries(allWasted).sort((a, b) => b[1] - a[1]);
+    if (concerns.length || wastedEntries.length || cpcAlerts.length) {
+      lines.push('*⚠️ Concerns:*');
+      for (const c of concerns) lines.push(c);
+      if (wastedEntries.length) {
         lines.push(
-          `"${t.query}": ${fmt(t.spend)} spend · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS · ${t.purchases ?? 0} orders`
+          `Wasted spend: ` + wastedEntries.map(([n, amt]) => `${n} ${fmt(amt)}`).join(' · ')
         );
       }
-      lines.push('');
-    }
-
-    // Wasted spend summary by brand
-    const wastedEntries = Object.entries(allWasted).sort((a, b) => b[1] - a[1]);
-    if (wastedEntries.length) {
-      lines.push('*Wasted Spend (no-sale terms):* ' +
-        wastedEntries.map(([name, amt]) => `${name} ${fmt(amt)}`).join(' · ')
-      );
-      lines.push('');
-    }
-
-    // CPC alerts
-    if (cpcAlerts.length) {
-      lines.push('*⚠️ CPC Rising (2× avg):*');
-      for (const alert of cpcAlerts.slice(0, 5)) {
-        lines.push(alert);
+      for (const alert of cpcAlerts.slice(0, 3)) {
+        lines.push(`CPC rising — ${alert}`);
       }
+      lines.push('');
+    }
+
+    // ── Scaling Opportunities ─────────────────────────────────────────────────
+    // High-CVR, low-spend terms worth increasing bids on (ACOS < 30%)
+    const allOpps = [];
+    for (const b of brands) {
+      const opps = (b.searchTermInsights || {}).opportunities || [];
+      for (const o of opps) {
+        if ((o.acos || 0) < 30 && (o.cvr || 0) > 0) {
+          allOpps.push({ ...o, brand: b.name });
+        }
+      }
+    }
+    allOpps.sort((a, b) => (b.cvr || 0) - (a.cvr || 0));
+    if (allOpps.length) {
+      lines.push('*🚀 Scaling Opportunities (high CVR, low spend):*');
+      for (const o of allOpps.slice(0, 4)) {
+        const cvrPct = ((o.cvr || 0) * 100).toFixed(0);
+        lines.push(`"${o.query}" (${o.brand}): ${cvrPct}% CVR · ${fmtPct(o.acos)} ACOS · only ${fmt(o.spend)} spent`);
+      }
+      lines.push('');
+    }
+
+    // ── Budget Concentration ──────────────────────────────────────────────────
+    const totalSpend = md.spend || 1;
+    const topBrand   = brands[0];
+    if (topBrand) {
+      const topPct = ((topBrand.spend || 0) / totalSpend * 100).toFixed(1);
+      const top3   = brands.slice(0, 3).map(b => `${b.name} ${((b.spend||0)/totalSpend*100).toFixed(0)}%`).join(' · ');
+      const flag   = parseFloat(topPct) > 60 ? ' ⚠️' : '';
+      lines.push(`*Budget Concentration:* ${top3}${flag}`);
     }
 
     await postToSlack(slackUrl, lines.join('\n'));
