@@ -2,8 +2,12 @@
   "version": 2,
   "functions": {
     "api/sheets.js": { "memory": 512, "maxDuration": 30 },
-    "api/claude.js": { "memory": 256, "maxDuration": 30 }
+    "api/claude.js": { "memory": 256, "maxDuration": 30 },
+    "api/daily-briefing.js": { "memory": 512, "maxDuration": 60 }
   },
+  "crons": [
+    { "path": "/api/daily-briefing", "schedule": "0 14 * * *" }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/reports/index.html" }
   ],
