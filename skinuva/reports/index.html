@@ -2298,10 +2298,13 @@ Rules:
 - End with one thing to keep an eye on
 - Do NOT use bullet points, headers, or any formatting — this is spoken out loud
 - Do NOT use words like "robust", "leverage", "optimize", "trajectory", "endeavor", "formidable", "commendable", or any word you wouldn't say to a friend
-- No dramatic flair. Just the facts, said simply.`;
+- No dramatic flair. Just the facts, said simply.
+
+Here is the current dashboard data:
+${summary}`;
 
   try{
-    const response=await callClaude(prompt,[summary]);
+    const response=await callClaude(prompt);
     return typeof response==='string'?response:extractText(response);
   }catch(err){
     console.error('Briefing generation failed:',err);
