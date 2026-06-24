@@ -1,6 +1,6 @@
 // skinuva/api/daily-briefing.js — Vercel Cron Job
 // Runs daily at 9am ET. Reads local supplement JSON, formats a KPI briefing,
-// and posts it to Slack.
+// and posts it to Slack using colored attachment blocks.
 //
 // Env vars required:
 //   SLACK_WEBHOOK_URL   — Slack Incoming Webhook URL
@@ -23,18 +23,11 @@ function fmtPct(n) {
   return n.toFixed(1) + '%';
 }
 
-function acosFlag(acos) {
-  if (acos == null) return '';
-  if (acos <= 30) return ' ✅';
-  if (acos <= 40) return ' ⚠️';
-  return ' 🔴';
-}
-
 // ── Slack ─────────────────────────────────────────────────────────────────────
 
-function postToSlack(webhookUrl, text) {
+function postToSlack(webhookUrl, payload) {
   return new Promise((resolve, reject) => {
-    const body = JSON.stringify({ text });
+    const body = JSON.stringify(payload);
     const url  = new URL(webhookUrl);
     const req  = https.request(
       {
@@ -49,6 +42,10 @@ function postToSlack(webhookUrl, text) {
     req.write(body);
     req.end();
   });
+}
+
+function attachment(color, lines) {
+  return { color, mrkdwn_in: ['text'], text: lines.join('\n') };
 }
 
 // ── Handler ───────────────────────────────────────────────────────────────────
@@ -79,66 +76,45 @@ module.exports = async function handler(req, res) {
 
     const summary = supp.summary || {};
     const sti     = supp.searchTermInsights || {};
+    const acos    = summary.acos;
 
-    const lines = [];
-
-    // ── Header ────────────────────────────────────────────────────────────────
-    lines.push(`*📊 Skinuva — ${dateStr} (Day ${dayOfMonth} of ${daysInMonth})*`);
-    lines.push('');
-
-    // ── Totals + Pacing ───────────────────────────────────────────────────────
-    const acos = summary.acos;
-    lines.push(
-      `*MTD:* Spend ${fmt(summary.spend)} · Sales ${fmt(summary.sales)} · ACOS ${fmtPct(acos)}${acosFlag(acos)} · Orders ${summary.purchases ?? '—'} · Total Sales ${fmt(summary.totalSales)}`
-    );
-
+    // ── Header + totals ───────────────────────────────────────────────────────
     const daysElapsed = Math.max(dayOfMonth - 1, 1);
-    const projected   = (summary.spend / daysElapsed) * daysInMonth;
-    lines.push(`*Pacing:* ~${fmt(projected)} projected EOM at current rate`);
-    lines.push('');
+    const projSpend   = (summary.spend / daysElapsed) * daysInMonth;
+    const projSales   = ((summary.sales || 0) / daysElapsed) * daysInMonth;
+    const projAcos    = projSales > 0 ? (projSpend / projSales) * 100 : null;
+
+    const headerText = [
+      `*📊 Skinuva — ${dateStr} (Day ${dayOfMonth} of ${daysInMonth})*`,
+      '',
+      `*MTD:* Spend ${fmt(summary.spend)} · Sales ${fmt(summary.sales)} · ACOS ${fmtPct(acos)} · Orders ${summary.purchases ?? '—'} · Total Sales ${fmt(summary.totalSales)}`,
+      `*Pacing:* ~${fmt(projSpend)} spend · ~${fmt(projSales)} sales · ~${fmtPct(projAcos)} ACOS projected EOM`,
+    ].join('\n');
 
     // ── What's Working ────────────────────────────────────────────────────────
-    const working  = [];
-    const concerns = [];
-
+    const working = [];
     if (acos != null && acos <= 25) {
       working.push(`Overall ACOS ${fmtPct(acos)} — well under 30% goal`);
     }
-
-    // Top wasted spend terms for concerns
-    const wasted = (sti.wasted_spend || []).slice(0, 3);
-
-    // Top performing terms for what's working
-    const top = (sti.top_performing || []).slice(0, 3);
-    for (const t of top) {
+    for (const t of (sti.top_performing || []).slice(0, 3)) {
       if (t.acos != null && t.acos <= 20) {
         working.push(`"${t.query}": ${fmtPct(t.acos)} ACOS · ${t.purchases ?? 0} orders · ${fmt(t.sales)} sales`);
       }
     }
 
-    if (acos != null && acos > 30 && acos <= 40) {
-      concerns.push(`Overall ACOS ${fmtPct(acos)} — slightly over 30% goal`);
-    } else if (acos != null && acos > 40) {
-      concerns.push(`Overall ACOS ${fmtPct(acos)} — significantly over 30% goal`);
-    }
+    // ── Concerns ─────────────────────────────────────────────────────────────
+    const concernLines = [];
+    if (acos != null && acos > 30 && acos <= 40)
+      concernLines.push(`Overall ACOS ${fmtPct(acos)} — slightly over 30% goal`);
+    else if (acos != null && acos > 40)
+      concernLines.push(`Overall ACOS ${fmtPct(acos)} — significantly over 30% goal`);
 
-    if (working.length) {
-      lines.push('*✅ What\'s Working:*');
-      for (const w of working) lines.push(w);
-      lines.push('');
-    }
-
-    // ── Concerns ──────────────────────────────────────────────────────────────
-    if (concerns.length || wasted.length) {
-      lines.push('*⚠️ Concerns:*');
-      for (const c of concerns) lines.push(c);
-      if (wasted.length) {
-        lines.push('Wasted spend (no-sale terms):');
-        for (const t of wasted) {
-          lines.push(`  "${t.query}": ${fmt(t.spend)} spend · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS`);
-        }
+    const wasted = (sti.wasted_spend || []).slice(0, 3);
+    if (wasted.length) {
+      concernLines.push('Wasted spend:');
+      for (const t of wasted) {
+        concernLines.push(`  "${t.query}": ${fmt(t.spend)} · ${fmt(t.sales)} sales · ${fmtPct(t.acos)} ACOS`);
       }
-      lines.push('');
     }
 
     // ── Scaling Opportunities ─────────────────────────────────────────────────
@@ -147,20 +123,33 @@ module.exports = async function handler(req, res) {
       .sort((a, b) => (b.cvr || 0) - (a.cvr || 0))
       .slice(0, 4);
 
+    // ── Build attachments ─────────────────────────────────────────────────────
+    const attachments = [];
+
+    if (working.length)
+      attachments.push(attachment('#2eb886', ['*What\'s Working*', ...working]));
+
+    if (concernLines.length)
+      attachments.push(attachment('#e01e5a', ['*Concerns*', ...concernLines]));
+
     if (opps.length) {
-      lines.push('*🚀 Scaling Opportunities (high CVR, low spend):*');
-      for (const o of opps) {
+      const oppLines = opps.map(o => {
         const cvrPct = ((o.cvr || 0) * 100).toFixed(0);
-        lines.push(`"${o.query}": ${cvrPct}% CVR · ${fmtPct(o.acos)} ACOS · only ${fmt(o.spend)} spent`);
-      }
+        return `"${o.query}": ${cvrPct}% CVR · ${fmtPct(o.acos)} ACOS · only ${fmt(o.spend)} spent`;
+      });
+      attachments.push(attachment('#4a90d9', ['*Scaling Opportunities*', ...oppLines]));
     }
 
-    await postToSlack(slackUrl, lines.join('\n'));
+    await postToSlack(slackUrl, {
+      text: `Skinuva — ${dateStr}`,
+      blocks: [{ type: 'section', text: { type: 'mrkdwn', text: headerText } }],
+      attachments,
+    });
     return res.status(200).json({ ok: true });
 
   } catch (err) {
     console.error('[skinuva/daily-briefing.js]', err.message);
-    try { await postToSlack(process.env.SLACK_WEBHOOK_URL, `⚠️ Skinuva briefing failed: ${err.message}`); } catch (_) {}
+    try { await postToSlack(process.env.SLACK_WEBHOOK_URL, { text: `Skinuva briefing failed: ${err.message}` }); } catch (_) {}
     return res.status(500).json({ error: err.message });
   }
 };
