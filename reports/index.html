@@ -2079,13 +2079,13 @@ async function runAllAgents() {
   const delay = ms => new Promise(r => setTimeout(r, ms));
   let done = 0;
   const onDone = () => { done++; if (done >= 4) { btn.classList.remove('running'); btn.textContent = '▶ Run All Agents'; } };
-  try { await runAgent('analytics', 'Run your automatic portfolio analysis.'); } catch(e){} onDone();
+  try { await runAgent('analytics', AGENT_AUTO_PROMPTS.analytics); } catch(e){ console.warn('Analytics agent error:',e); } onDone();
   await delay(3000);
-  try { await runAgent('strategy', 'Which brands should get more or less budget this month? Focus on concrete reallocation recommendations.'); } catch(e){} onDone();
+  try { await runAgent('strategy', AGENT_AUTO_PROMPTS.strategy); } catch(e){ console.warn('Strategy agent error:',e); } onDone();
   await delay(3000);
-  try { await runAgent('forecast', 'Project month-end performance for the portfolio and the top 5 brands by spend.'); } catch(e){} onDone();
+  try { await runAgent('forecast', AGENT_AUTO_PROMPTS.forecast); } catch(e){ console.warn('Forecast agent error:',e); } onDone();
   await delay(3000);
-  try { await runAgent('market', 'Give your current market conditions briefing for this brand portfolio.'); } catch(e){} onDone();
+  try { await runAgent('market', AGENT_AUTO_PROMPTS.market); } catch(e){ console.warn('Market agent error:',e); } onDone();
 }
 
 async function runAgent(name, autoPrompt) {
@@ -2191,7 +2191,7 @@ Here is what the dashboard is currently displaying:\n` + qcData;
 function formatAgentOutput(rawText) {
   let t = rawText;
   let prev = '';
-  while (t !== prev) { prev = t; t = t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'); }
+  while (t !== prev) { prev = t; t = t.replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&#39;/g,"'"); }
   t = t.replace(/<[^>]*>/g,'');
   t = t.replace(/\*\*([^*]+)\*\*/g,'$1').replace(/\*([^*]+)\*/g,'$1');
   t = t.replace(/^KEY TAKEAWAYS:\s*/m,'');
