@@ -574,6 +574,15 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
     <div id="dow-container"></div>
   </div>
 
+  <!-- Placement Performance Section -->
+  <div class="chart-card glass" style="margin-bottom:24px;display:none;" id="placement-section">
+    <div class="section-header">
+      <div class="section-title">Placement Performance</div>
+      <div class="section-sub" id="placement-sub">Top of Search · Rest of Search · Product Pages · 30-day rolling</div>
+    </div>
+    <div id="placement-container"></div>
+  </div>
+
   <!-- Product / ASIN Performance Section -->
   <div class="chart-card glass" style="margin-bottom:24px;display:none;" id="asin-section">
     <div class="section-header">
@@ -1369,6 +1378,7 @@ function render() {
   renderCampaignsByBrand();
   renderSearchTermInsights();
   renderDayOfWeekHeatmap();
+  renderPlacementPerformance();
   renderProductPerformance();
   renderWLOS();
   buildTicker(md);
@@ -2611,6 +2621,107 @@ function renderDayOfWeekHeatmap() {
   container.appendChild(grid);
   document.getElementById('dow-sub').textContent =
     (selectedBrand!=='All'?selectedBrand+' · ':'All brands · ')+'ACOS & CVR by day of week · '+selectedMonth;
+}
+
+function renderPlacementPerformance() {
+  const sec = document.getElementById('placement-section');
+  const container = document.getElementById('placement-container');
+  if (!sec || !container) return;
+
+  if (!DATA || !DATA.monthly.length) { sec.style.display='none'; return; }
+  const md = DATA.monthly[DATA.monthly.length - 1];
+  if (!md) { sec.style.display='none'; return; }
+
+  const suppEntry = API_SUPPLEMENT[md.month];
+  if (suppEntry) {
+    md.brands.forEach(b => {
+      if (!b.placementInsights) {
+        const sb = (suppEntry.brands || []).find(s => s.name === b.name);
+        if (sb && sb.placementInsights) b.placementInsights = sb.placementInsights;
+      }
+    });
+  }
+
+  const brandsWithData = md.brands.filter(b =>
+    b.placementInsights && b.placementInsights.length &&
+    (selectedBrand === 'All' || selectedBrand === b.name)
+  ).sort((a, b2) => a.name.localeCompare(b2.name));
+
+  if (!brandsWithData.length) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  container.innerHTML = '';
+  document.getElementById('placement-sub').textContent =
+    'Top of Search · Rest of Search · Product Pages · 30-day rolling · ' + md.month;
+
+  const PLACEMENT_ICONS = { 'Top of Search': '🔝', 'Rest of Search': '🔍', 'Product Pages': '📦' };
+  const PLACEMENT_COLORS = { 'Top of Search': '#818cf8', 'Rest of Search': '#4ade80', 'Product Pages': '#fbbf24' };
+
+  brandsWithData.forEach(brand => {
+    const placements = brand.placementInsights;
+    const totalSpend = placements.reduce((s, p) => s + (p.spend || 0), 0);
+
+    const brandHdr = document.createElement('div');
+    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px;';
+    brandHdr.textContent = brand.name;
+    container.appendChild(brandHdr);
+
+    const grid = document.createElement('div');
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;';
+
+    placements.forEach(p => {
+      const icon  = PLACEMENT_ICONS[p.placement]  || '📍';
+      const color = PLACEMENT_COLORS[p.placement] || '#a5b4fc';
+      const acos  = p.acos  != null ? p.acos.toFixed(1)+'%'  : '—';
+      const cvr   = p.cvr   != null ? (p.cvr*100).toFixed(1)+'%' : '—';
+      const cpc   = p.cpc   != null ? '$'+p.cpc.toFixed(2)   : '—';
+      const acosColor = p.acos == null ? 'rgba(255,255,255,0.5)'
+        : p.acos < 25 ? '#4ade80' : p.acos < 50 ? '#f59e0b' : '#ff6b6b';
+
+      const barW = totalSpend > 0 ? Math.round(p.spendShare) : 0;
+
+      const card = document.createElement('div');
+      card.style.cssText = `background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:20px;`;
+      card.innerHTML =
+        `<div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+           <span style="font-size:18px;">${icon}</span>
+           <div style="font-size:13px;font-weight:700;color:${color};">${p.placement}</div>
+         </div>
+         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;">
+           <div>
+             <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px;">Spend</div>
+             <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.85);">$${(p.spend||0).toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+           </div>
+           <div>
+             <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px;">Sales</div>
+             <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.85);">$${(p.sales||0).toLocaleString('en-US',{maximumFractionDigits:0})}</div>
+           </div>
+           <div>
+             <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px;">ACOS</div>
+             <div style="font-size:16px;font-weight:700;color:${acosColor};">${acos}</div>
+           </div>
+           <div>
+             <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:3px;">CVR</div>
+             <div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.7);">${cvr}</div>
+           </div>
+         </div>
+         <div style="margin-bottom:6px;">
+           <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+             <span style="font-size:10px;color:rgba(255,255,255,0.3);">Spend share</span>
+             <span style="font-size:10px;font-weight:700;color:${color};">${p.spendShare}%</span>
+           </div>
+           <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px;">
+             <div style="height:4px;width:${barW}%;background:${color};border-radius:2px;transition:width 0.4s;"></div>
+           </div>
+         </div>
+         <div style="display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.05);">
+           <div style="font-size:10px;color:rgba(255,255,255,0.3);">CPC <span style="color:rgba(255,255,255,0.5);font-weight:600;">${cpc}</span></div>
+           <div style="font-size:10px;color:rgba(255,255,255,0.3);">Clicks <span style="color:rgba(255,255,255,0.5);font-weight:600;">${(p.clicks||0).toLocaleString()}</span></div>
+           <div style="font-size:10px;color:rgba(255,255,255,0.3);">Impr <span style="color:rgba(255,255,255,0.5);font-weight:600;">${(p.impressions||0).toLocaleString()}</span></div>
+         </div>`;
+      grid.appendChild(card);
+    });
+    container.appendChild(grid);
+  });
 }
 
 function renderProductPerformance() {

@@ -56,6 +56,7 @@ def extract_brand(data: dict, brand_name: str) -> dict:
         'pacing':       brand.get('pacing', []),
         'search_terms': brand.get('search_terms', []),
         'asins':        brand.get('asins', []),
+        'placements':   brand.get('placements', []),
     }
 
 
@@ -81,7 +82,7 @@ def build_asin_insights(asins: list) -> dict:
     opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
 
     def trim(items):
-        keys = ('asin', 'sku', 'impressions', 'clicks', 'spend',
+        keys = ('asin', 'sku', 'title', 'impressions', 'clicks', 'spend',
                 'sales', 'purchases', 'acos', 'ctr', 'cpc', 'cvr')
         return [{k: a.get(k) for k in keys} for a in items[:10]]
 
@@ -323,6 +324,7 @@ def main():
         supplement.get('search_terms', []))
     supplement['productInsights'] = build_asin_insights(
         supplement.get('asins', []))
+    supplement['placementInsights'] = supplement.get('placements', [])
 
     # ── Write flat supplement (used for current-month injection) ─────────────
     out_path = out_dir / 'skinuva_supplement.json'

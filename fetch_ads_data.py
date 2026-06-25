@@ -203,6 +203,13 @@ ASIN_REPORT_CONFIG = {
     "normalize":    None,
 }
 
+PLACEMENT_REPORT_CONFIG = {
+    "adProduct":    "SPONSORED_PRODUCTS",
+    "reportTypeId": "spCampaigns",
+    "timeUnit":     "SUMMARY",
+    "normalize":    None,
+}
+
 
 def submit_search_term_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
     """Submit a 30-day daily search term report. Returns reportId."""
@@ -277,6 +284,105 @@ def submit_asin_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
     report_id = resp.json()["reportId"]
     print(f"  ✓ Submitted spAdvertisedProduct (reportId={report_id})")
     return report_id
+
+
+def submit_placement_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
+    """Submit a placement performance summary report. Returns reportId."""
+    payload = {
+        "name":      "SP Campaign Placement Summary",
+        "startDate": start,
+        "endDate":   end,
+        "configuration": {
+            "adProduct":    "SPONSORED_PRODUCTS",
+            "groupBy":      ["campaign", "placement"],
+            "columns":      [
+                "campaignName", "campaignId", "placement",
+                "impressions", "clicks", "spend", "purchases7d", "sales7d",
+            ],
+            "reportTypeId": "spCampaigns",
+            "timeUnit":     "SUMMARY",
+            "format":       "GZIP_JSON",
+        },
+    }
+    resp = requests.post(
+        f"{api_base}/reporting/reports",
+        headers={**hdrs, "Content-Type": "application/vnd.createasyncreportrequest.v3+json"},
+        json=payload,
+        timeout=30,
+    )
+    if resp.status_code == 425:
+        import re as _re
+        m = _re.search(r'duplicate of\s*[:\s]+([a-f0-9-]{36})', resp.text, _re.IGNORECASE)
+        if m:
+            report_id = m.group(1)
+            print(f"  ↩  Duplicate — reusing existing placement report (reportId={report_id})")
+            return report_id
+    if not resp.ok:
+        print(f"    Placement report submission error {resp.status_code}: {resp.text[:300]}")
+        resp.raise_for_status()
+    report_id = resp.json()["reportId"]
+    print(f"  ✓ Submitted placement report (reportId={report_id})")
+    return report_id
+
+
+PLACEMENT_LABELS = {
+    # Long-form values (confirmed in some API versions)
+    "PLACEMENT_TOP":             "Top of Search",
+    "PLACEMENT_REST_OF_SEARCH":  "Rest of Search",
+    "PLACEMENT_PRODUCT_PAGE":    "Product Pages",
+    # Short-form values (seen in other API versions)
+    "TOP":                       "Top of Search",
+    "OTHER":                     "Rest of Search",
+    "DETAIL_PAGE":               "Product Pages",
+}
+
+
+def build_placement_data_for_brand(placement_rows: list, brand_name: str, brands: list,
+                                    single_brand: bool) -> dict:
+    """Aggregate placement rows for one brand. Returns dict keyed by placement type."""
+    def matches(r):
+        if single_brand:
+            return True
+        return identify_brand(r.get("campaignName", ""), brands) == brand_name
+
+    by_placement: dict = {}
+    for r in placement_rows:
+        if not matches(r):
+            continue
+        # API may return "placement" or "placementClassification" depending on version
+        raw  = (r.get("placement") or r.get("placementClassification") or "").strip()
+        label = PLACEMENT_LABELS.get(raw, raw or "Other")
+        imp  = int(r.get("impressions", 0) or 0)
+        clk  = int(r.get("clicks", 0) or 0)
+        spd  = float(r.get("spend", 0) or 0)
+        sls  = float(r.get("sales7d", 0) or 0)
+        pur  = int(r.get("purchases7d", 0) or 0)
+        if label not in by_placement:
+            by_placement[label] = {"placement": label, "impressions": 0,
+                                   "clicks": 0, "spend": 0.0, "sales": 0.0, "purchases": 0}
+        p = by_placement[label]
+        p["impressions"] += imp
+        p["clicks"]      += clk
+        p["spend"]       += spd
+        p["sales"]       += sls
+        p["purchases"]   += pur
+
+    result = []
+    total_spend = sum(p["spend"] for p in by_placement.values())
+    for p in by_placement.values():
+        p["spend"]     = round(p["spend"], 2)
+        p["sales"]     = round(p["sales"], 2)
+        p["acos"]      = acos_pct(p["spend"], p["sales"])
+        p["ctr"]       = safe_div(p["clicks"], p["impressions"])
+        p["cpc"]       = safe_div(p["spend"], p["clicks"])
+        p["cvr"]       = safe_div(p["purchases"], p["clicks"])
+        p["spendShare"] = round(p["spend"] / total_spend * 100, 1) if total_spend else 0
+        result.append(p)
+
+    # Sort by canonical order: TOS, ROS, PP
+    order = list(PLACEMENT_LABELS.values())
+    result.sort(key=lambda x: order.index(x["placement"]) if x["placement"] in order else 99)
+    return result
 
 
 def build_asin_data_for_brand(asin_rows: list, brand_name: str, brands: list,
@@ -727,6 +833,8 @@ def main():
     pending_st = []
     # pending_asin: list of (profile, report_id, hdrs, single_brand, currency)
     pending_asin = []
+    # pending_placement: list of (profile, report_id, hdrs, single_brand, currency)
+    pending_placement = []
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -774,9 +882,17 @@ def main():
         except Exception as e:
             print(f"  ✗ spAdvertisedProduct submission failed: {e}")
 
+        # Also submit placement report for this profile
+        time.sleep(5)
+        try:
+            placement_id = submit_placement_report(urls["api"], hdrs, start, end)
+            pending_placement.append((profile, placement_id, hdrs, single_brand, currency))
+        except Exception as e:
+            print(f"  ✗ Placement report submission failed: {e}")
+
         time.sleep(5)   # small gap between profiles
 
-    print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term + {len(pending_asin)} ASIN reports submitted — polling all simultaneously…\n")
+    print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term + {len(pending_asin)} ASIN + {len(pending_placement)} placement reports submitted — polling all simultaneously…\n")
 
     # ── Phase 2: Poll + download all reports in parallel via threads ───────────
     downloaded = {}   # report_id → rows
@@ -814,8 +930,11 @@ def main():
     asin_threads = [threading.Thread(target=fetch_report, args=(ASIN_REPORT_CONFIG, report_id, hdrs),
                                      daemon=True)
                     for _, report_id, hdrs, _, _ in pending_asin]
-    for t in threads + st_threads + asin_threads: t.start()
-    for t in threads + st_threads + asin_threads: t.join()
+    placement_threads = [threading.Thread(target=fetch_report, args=(PLACEMENT_REPORT_CONFIG, report_id, hdrs),
+                                          daemon=True)
+                         for _, report_id, hdrs, _, _ in pending_placement]
+    for t in threads + st_threads + asin_threads + placement_threads: t.start()
+    for t in threads + st_threads + asin_threads + placement_threads: t.join()
 
     print(f"\n✓ All reports ready — processing brand data…\n")
 
@@ -835,6 +954,11 @@ def main():
     for profile, report_id, _, _, _ in pending_asin:
         pid = profile.get("profileId")
         asin_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
+
+    placement_profile_records = {}  # profile_id → [placement rows]
+    for profile, report_id, _, _, _ in pending_placement:
+        pid = profile.get("profileId")
+        placement_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
 
     for profile in profiles:
         profile_id   = profile.get("profileId")
@@ -863,6 +987,8 @@ def main():
                     st_records, brand, brands, bool(single_brand))
                 bdata["asins"] = build_asin_data_for_brand(
                     asin_profile_records.get(profile_id, []), brand, brands, bool(single_brand))
+                bdata["placements"] = build_placement_data_for_brand(
+                    placement_profile_records.get(profile_id, []), brand, brands, bool(single_brand))
                 brand_outputs[brand] = bdata
                 s = bdata["summary"]
                 print(f"  ✓ {brand}: spend=${s['spend']:,.0f}, "

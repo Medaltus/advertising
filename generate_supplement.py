@@ -201,7 +201,7 @@ def build_asin_insights(asins: list) -> dict:
     opps.sort(key=lambda x: x.get('cvr', 0) or 0, reverse=True)
 
     def trim(items):
-        keys = ('asin', 'sku', 'impressions', 'clicks', 'spend',
+        keys = ('asin', 'sku', 'title', 'impressions', 'clicks', 'spend',
                 'sales', 'purchases', 'acos', 'ctr', 'cpc', 'cvr')
         return [{k: a.get(k) for k in keys} for a in items[:10]]
 
@@ -213,6 +213,11 @@ def build_asin_insights(asins: list) -> dict:
     }
 
 
+def build_placement_insights(placements: list) -> list:
+    """Pass placement data through — already aggregated by fetch_ads_data.py."""
+    return placements
+
+
 def build_supplement(data: dict) -> dict:
     supplement = {}
 
@@ -222,6 +227,7 @@ def build_supplement(data: dict) -> dict:
         campaigns    = brand.get('campaigns', [])
         search_terms = brand.get('search_terms', [])
         asins        = brand.get('asins', [])
+        placements   = brand.get('placements', [])
 
         # ── Aggregate timeline into monthly buckets ─────────────────────────
         # NOTE: We do NOT aggregate the Amazon Ads 'totalSales' field.
@@ -299,6 +305,7 @@ def build_supplement(data: dict) -> dict:
                 'campaigns':         brand_campaigns,
                 'searchTermInsights': build_search_term_insights(search_terms) if mk == latest_month else None,
                 'productInsights':    build_asin_insights(asins) if mk == latest_month else None,
+                'placementInsights': build_placement_insights(placements) if mk == latest_month else None,
             })
 
     # ── Compute month-level portfolio totals ────────────────────────────────
