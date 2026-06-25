@@ -2656,8 +2656,11 @@ function renderPlacementPerformance() {
   const PLACEMENT_ICONS = { 'Top of Search': '🔝', 'Rest of Search': '🔍', 'Product Pages': '📦' };
   const PLACEMENT_COLORS = { 'Top of Search': '#818cf8', 'Rest of Search': '#4ade80', 'Product Pages': '#fbbf24' };
 
+  const CANONICAL = ['Top of Search', 'Rest of Search', 'Product Pages'];
+
   brandsWithData.forEach(brand => {
-    const placements = brand.placementInsights;
+    const placements = brand.placementInsights.filter(p => CANONICAL.includes(p.placement));
+    if (!placements.length) return;
     const totalSpend = placements.reduce((s, p) => s + (p.spend || 0), 0);
 
     const brandHdr = document.createElement('div');

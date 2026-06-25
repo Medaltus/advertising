@@ -330,6 +330,8 @@ PLACEMENT_LABELS = {
     "Top of Search on-Amazon":   "Top of Search",
     "Detail Page on-Amazon":     "Product Pages",
     "Other on-Amazon":           "Rest of Search",
+    "Off Amazon":                "Rest of Search",
+    "Off-Amazon":                "Rest of Search",
     # Enum variants seen in other API versions
     "TOP_OF_SEARCH":             "Top of Search",
     "DETAIL_PAGE_ON_AMAZON":     "Product Pages",

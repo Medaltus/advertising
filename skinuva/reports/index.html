@@ -1768,8 +1768,10 @@ function renderPlacementPerformance() {
   const container = document.getElementById('placement-container');
   if (!sec || !container) return;
 
-  const placements = (typeof SKINUVA_SUPPLEMENT !== 'undefined' && SKINUVA_SUPPLEMENT)
+  const CANONICAL = ['Top of Search', 'Rest of Search', 'Product Pages'];
+  const allPlacements = (typeof SKINUVA_SUPPLEMENT !== 'undefined' && SKINUVA_SUPPLEMENT)
     ? (SKINUVA_SUPPLEMENT.placementInsights || []) : [];
+  const placements = allPlacements.filter(p => CANONICAL.includes(p.placement));
 
   if (!placements.length) { sec.style.display='none'; return; }
   sec.style.display = 'block';
