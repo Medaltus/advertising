@@ -2664,7 +2664,8 @@ function renderPlacementPerformance() {
     const totalSpend = placements.reduce((s, p) => s + (p.spend || 0), 0);
 
     const brandHdr = document.createElement('div');
-    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:6px 0 6px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:10px;';
+    const bc = BRAND_COLORS[brand.name] || 'rgba(255,255,255,0.6)';
+    brandHdr.style.cssText = `font-size:11px;font-weight:700;color:${bc};letter-spacing:1.5px;text-transform:uppercase;padding:6px 0 6px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:10px;`;
     brandHdr.textContent = brand.name;
     container.appendChild(brandHdr);
 
@@ -2795,7 +2796,8 @@ function renderProductPerformance() {
     const pi = brand.productInsights;
 
     const brandHdr = document.createElement('div');
-    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:12px;';
+    const bc2 = BRAND_COLORS[brand.name] || 'rgba(255,255,255,0.6)';
+    brandHdr.style.cssText = `font-size:11px;font-weight:700;color:${bc2};letter-spacing:1.5px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:12px;`;
     brandHdr.textContent = brand.name;
     container.appendChild(brandHdr);
 
