@@ -296,7 +296,7 @@ def submit_placement_report(api_base: str, hdrs: dict, start: str, end: str) -> 
             "adProduct":    "SPONSORED_PRODUCTS",
             "groupBy":      ["campaign", "placement"],
             "columns":      [
-                "campaignName", "campaignId", "placement",
+                "campaignName", "campaignId",
                 "impressions", "clicks", "spend", "purchases7d", "sales7d",
             ],
             "reportTypeId": "spCampaigns",
