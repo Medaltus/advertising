@@ -2664,12 +2664,12 @@ function renderPlacementPerformance() {
     const totalSpend = placements.reduce((s, p) => s + (p.spend || 0), 0);
 
     const brandHdr = document.createElement('div');
-    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:12px 0 8px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px;';
+    brandHdr.style.cssText = 'font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1.5px;text-transform:uppercase;padding:6px 0 6px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:10px;';
     brandHdr.textContent = brand.name;
     container.appendChild(brandHdr);
 
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px;';
+    grid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px;';
 
     placements.forEach(p => {
       const icon  = PLACEMENT_ICONS[p.placement]  || '📍';

@@ -1769,8 +1769,8 @@ function renderPlacementPerformance() {
   if (!sec || !container) return;
 
   const CANONICAL = ['Top of Search', 'Rest of Search', 'Product Pages'];
-  const allPlacements = (typeof SKINUVA_SUPPLEMENT !== 'undefined' && SKINUVA_SUPPLEMENT)
-    ? (SKINUVA_SUPPLEMENT.placementInsights || []) : [];
+  const allPlacements = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON)
+    ? (SKINUVA_AMAZON.placementInsights || []) : [];
   const placements = allPlacements.filter(p => CANONICAL.includes(p.placement));
 
   if (!placements.length) { sec.style.display='none'; return; }
@@ -1843,8 +1843,8 @@ function renderProductPerformance() {
   const container = document.getElementById('asin-container');
   if (!sec || !container) return;
 
-  const pi = (typeof SKINUVA_SUPPLEMENT !== 'undefined' && SKINUVA_SUPPLEMENT)
-    ? (SKINUVA_SUPPLEMENT.productInsights || null) : null;
+  const pi = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON)
+    ? (SKINUVA_AMAZON.productInsights || null) : null;
 
   if (!pi || (!pi.top_performers.length && !pi.wasted_spend.length && !pi.opportunities.length)) {
     sec.style.display = 'none'; return;
