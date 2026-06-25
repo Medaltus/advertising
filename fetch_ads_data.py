@@ -915,6 +915,23 @@ def main():
     else:
         print("\n  (SP-API credentials not configured — skipping total sales)")
 
+    # ── Attach ASIN product titles (written by fetch_total_sales.py) ──────────
+    asin_titles = {}
+    try:
+        titles_path = Path(args.config).parent / "asin_titles.json"
+        if titles_path.exists():
+            asin_titles = json.loads(titles_path.read_text())
+            print(f"  ✓ Loaded {len(asin_titles)} ASIN titles")
+    except Exception as e:
+        print(f"  ⚠ Could not load asin_titles.json: {e}")
+
+    if asin_titles:
+        for b in brands_out:
+            for a in b.get("asins", []):
+                asin = a.get("asin", "")
+                if asin and asin in asin_titles:
+                    a["title"] = asin_titles[asin]
+
     output = {
         "fetched_at":          time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "lookback_days":       lookback,

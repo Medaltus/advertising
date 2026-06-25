@@ -298,6 +298,7 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
             # SKU column for abbreviation-based brand lookup
             sku_col = next((i for i, h in enumerate(headers_row) if h.lower() in ("seller-sku", "sku")), None)
 
+            asin_title = {}
             if asin_col is not None and title_col is not None:
                 for line in lines[1:]:
                     cols = line.split("\t")
@@ -307,6 +308,9 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
                     title = cols[title_col].strip()
                     if not asin:
                         continue
+
+                    if title:
+                        asin_title[asin] = title
 
                     # 1. Try SKU prefix first (most reliable)
                     brand = None
@@ -320,6 +324,14 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
 
                     if brand:
                         asin_brand[asin] = brand
+
+            # Write ASIN→title map for use by fetch_ads_data.py
+            if asin_title:
+                try:
+                    titles_path = Path(__file__).parent / "asin_titles.json"
+                    titles_path.write_text(json.dumps(asin_title))
+                except Exception:
+                    pass
 
         print(f"  ✓ Listings report: {len(asin_brand)} ASINs mapped from {len(lines)-1} listings")
 

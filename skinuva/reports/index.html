@@ -1776,11 +1776,16 @@ function renderProductPerformance() {
       desc: 'CVR > 5% · spend < $50 · room to scale' },
   ];
 
-  function fmtAsin(asin) {
+  function fmtAsin(a) {
+    const asin = a.asin || '';
+    const title = a.title || '';
     if (!asin) return '—';
-    return `<a href="https://www.amazon.com/dp/${asin}" target="_blank"
-      style="color:inherit;text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.2);"
-      title="View on Amazon">${asin}</a>`;
+    const display = title ? `<div style="font-size:11px;color:rgba(255,255,255,0.75);margin-bottom:2px;line-height:1.3;">${title.length>50?title.slice(0,48)+'…':title}</div><div style="font-size:9px;color:rgba(255,255,255,0.3);">` : '';
+    const suffix  = title ? '</div>' : '';
+    return display +
+      `<a href="https://www.amazon.com/dp/${asin}" target="_blank"
+        style="color:rgba(255,255,255,0.35);text-decoration:none;border-bottom:1px dashed rgba(255,255,255,0.15);"
+        title="View on Amazon">${asin}</a>` + suffix;
   }
 
   const grid = document.createElement('div');
@@ -1822,7 +1827,7 @@ function renderProductPerformance() {
         row.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);' +
           (idx%2===1?'background:rgba(255,255,255,0.015);':'');
         row.innerHTML =
-          `<td style="padding:6px 14px;color:rgba(255,255,255,0.7);">${fmtAsin(a.asin)}</td>`+
+          `<td style="padding:6px 14px;">${fmtAsin(a)}</td>`+
           `<td style="padding:6px;text-align:right;color:rgba(255,255,255,0.6);">$${(a.spend||0).toFixed(0)}</td>`+
           `<td style="padding:6px;text-align:right;color:rgba(255,255,255,0.6);">$${(a.sales||0).toFixed(0)}</td>`+
           `<td style="padding:6px 14px 6px 6px;text-align:right;color:${acosColor};font-weight:700;">${acos}</td>`;
