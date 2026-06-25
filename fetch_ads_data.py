@@ -294,9 +294,9 @@ def submit_placement_report(api_base: str, hdrs: dict, start: str, end: str) -> 
         "endDate":   end,
         "configuration": {
             "adProduct":    "SPONSORED_PRODUCTS",
-            "groupBy":      ["campaign", "placement"],
+            "groupBy":      ["campaignPlacement"],
             "columns":      [
-                "campaignName", "campaignId",
+                "campaignName", "campaignId", "placementClassification",
                 "impressions", "clicks", "spend", "purchases7d", "sales7d",
             ],
             "reportTypeId": "spCampaigns",
