@@ -326,11 +326,17 @@ def submit_placement_report(api_base: str, hdrs: dict, start: str, end: str) -> 
 
 
 PLACEMENT_LABELS = {
-    # Long-form values (confirmed in some API versions)
+    # Human-readable strings confirmed from live SP v3 reports
+    "Top of Search on-Amazon":   "Top of Search",
+    "Detail Page on-Amazon":     "Product Pages",
+    "Other on-Amazon":           "Rest of Search",
+    # Enum variants seen in other API versions
+    "TOP_OF_SEARCH":             "Top of Search",
+    "DETAIL_PAGE_ON_AMAZON":     "Product Pages",
+    "OTHER_ON_AMAZON":           "Rest of Search",
     "PLACEMENT_TOP":             "Top of Search",
     "PLACEMENT_REST_OF_SEARCH":  "Rest of Search",
     "PLACEMENT_PRODUCT_PAGE":    "Product Pages",
-    # Short-form values (seen in other API versions)
     "TOP":                       "Top of Search",
     "OTHER":                     "Rest of Search",
     "DETAIL_PAGE":               "Product Pages",
@@ -380,7 +386,7 @@ def build_placement_data_for_brand(placement_rows: list, brand_name: str, brands
         result.append(p)
 
     # Sort by canonical order: TOS, ROS, PP
-    order = list(PLACEMENT_LABELS.values())
+    order = ["Top of Search", "Rest of Search", "Product Pages"]
     result.sort(key=lambda x: order.index(x["placement"]) if x["placement"] in order else 99)
     return result
 
