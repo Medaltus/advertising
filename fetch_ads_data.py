@@ -248,7 +248,7 @@ def submit_asin_report(api_base: str, hdrs: dict, start: str, end: str) -> str:
         "endDate":   end,
         "configuration": {
             "adProduct":    "SPONSORED_PRODUCTS",
-            "groupBy":      ["advertiserAndASIN"],
+            "groupBy":      ["advertiser"],
             "columns":      [
                 "advertisedAsin", "advertisedSku", "campaignName",
                 "impressions", "clicks", "spend", "purchases7d", "sales7d",
