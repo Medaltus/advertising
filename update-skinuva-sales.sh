@@ -36,4 +36,7 @@ with open('$JSON_FILE', 'w') as f:
 print('Updated $MONTH: shopify=\$$shopify, walmart=\$$walmart')
 "
 
-cd "$SCRIPT_DIR" && git add skinuva/data/manual_totals.json && git commit -m "chore: update Skinuva sales for $MONTH (shopify=$shopify, walmart=$walmart)" && git pull --rebase && git push
+cd "$SCRIPT_DIR"
+# Clear any stale git lock files before proceeding
+find .git -name "*.lock" -delete 2>/dev/null
+git add skinuva/data/manual_totals.json && git commit -m "chore: update Skinuva sales for $MONTH (shopify=$shopify, walmart=$walmart)" && git pull --rebase && git push
