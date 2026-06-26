@@ -2,8 +2,8 @@ name: Morning Ad Data Refresh
 
 on:
   schedule:
-    # Scheduled at 6:00 UTC (2:00 AM ET); GitHub typically delays ~5h, landing ~7 AM ET
-    - cron: '0 6 * * *'
+    - cron: '0 6 * * *'   # targets ~5am ET (GitHub adds ~3h delay)
+    - cron: '0 13 * * *'  # targets ~noon ET (GitHub adds ~3h delay)
   workflow_dispatch:  # Lets you trigger it manually from GitHub
 
 jobs:
