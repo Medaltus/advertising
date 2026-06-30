@@ -1148,12 +1148,29 @@ function renderRange(){
     document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
     tableEl.innerHTML='';
     brandData.forEach(b=>{
+      const color = BRAND_COLORS[b.name] || '#666';
+      const bCpm = b.impressions > 0 ? (b.spend / b.impressions * 1000) : null;
+      const bCr  = b.orders > 0 && b.clicks > 0 ? (b.orders / b.clicks * 100) : null;
+      const bSv  = b.adSales > 0 && m.adSales > 0 ? (b.adSales / m.adSales * 100) : null;
+      const ac   = b.acos != null ? (b.acos < 25 ? 'acos-good' : b.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
       const tr=document.createElement('tr');
-      tr.innerHTML=`<td>${b.name}</td><td>${b.spend!=null?'$'+b.spend.toLocaleString():'—'}</td><td>${b.adSales!=null?'$'+b.adSales.toLocaleString():'—'}</td><td>${b.acos!=null?b.acos.toFixed(1)+'%':'—'}</td><td>${b.totalSales!=null?'$'+b.totalSales.toLocaleString():'—'}</td><td>${b.tacos!=null?b.tacos.toFixed(1)+'%':'—'}</td><td>${b.impressions!=null?b.impressions.toLocaleString():'—'}</td><td>${b.clicks!=null?b.clicks.toLocaleString():'—'}</td><td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td><td>${b.orders!=null?b.orders.toLocaleString():'—'}</td>`;
+      tr.innerHTML=`
+        <td><span class="dot" style="background:${color}"></span><span style="color:${color}">${b.name}</span></td>
+        <td>${b.spend!=null?'$'+b.spend.toLocaleString():'—'}</td>
+        <td>${b.adSales!=null?'$'+b.adSales.toLocaleString():'—'}</td>
+        <td class="${ac}">${b.acos!=null?b.acos.toFixed(1)+'%':'—'}</td>
+        <td>${b.totalSales!=null?'$'+b.totalSales.toLocaleString():'—'}</td>
+        <td>${b.tacos!=null?b.tacos.toFixed(1)+'%':'—'}</td>
+        <td>${b.orders!=null?Math.round(b.orders).toLocaleString():'—'}</td>
+        <td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td>
+        <td>${bCpm!=null?'$'+bCpm.toFixed(2):'—'}</td>
+        <td>${bCr!=null?bCr.toFixed(1)+'%':'—'}</td>
+        <td>${bSv!=null?bSv.toFixed(1)+'%':'—'}</td>`;
+      tr.onclick = () => { selectedBrand = selectedBrand === b.name ? 'All' : b.name; render(); };
       tableEl.appendChild(tr);
     });
     const noteRow=document.createElement('tr');
-    noteRow.innerHTML=`<td colspan="10" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
+    noteRow.innerHTML=`<td colspan="11" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
     tableEl.appendChild(noteRow);
   }
 
