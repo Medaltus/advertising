@@ -536,6 +536,8 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <th onclick="sortTable('totalSales')">Total Sales &#8597;</th>
             <th onclick="sortTable('tacos')">TACOS &#8597;</th>
             <th onclick="sortTable('orders')">Orders &#8597;</th>
+            <th onclick="sortTable('clicks')">Clicks &#8597;</th>
+            <th onclick="sortTable('ctr')">CTR &#8597;</th>
             <th onclick="sortTable('cpc')">CPC &#8597;</th>
             <th onclick="sortTable('cpm')">CPM &#8597;</th>
             <th onclick="sortTable('cr')">CVR &#8597;</th>
@@ -1162,6 +1164,8 @@ function renderRange(){
         <td>${b.totalSales!=null?'$'+b.totalSales.toLocaleString():'—'}</td>
         <td>${b.tacos!=null?b.tacos.toFixed(1)+'%':'—'}</td>
         <td>${b.orders!=null?Math.round(b.orders).toLocaleString():'—'}</td>
+        <td>${b.clicks!=null?b.clicks.toLocaleString():'—'}</td>
+        <td>${b.ctr!=null?b.ctr.toFixed(1)+'%':'—'}</td>
         <td>${b.cpc!=null?'$'+b.cpc.toFixed(2):'—'}</td>
         <td>${bCpm!=null?'$'+bCpm.toFixed(2):'—'}</td>
         <td>${bCr!=null?bCr.toFixed(1)+'%':'—'}</td>
@@ -1170,7 +1174,7 @@ function renderRange(){
       tableEl.appendChild(tr);
     });
     const noteRow=document.createElement('tr');
-    noteRow.innerHTML=`<td colspan="11" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
+    noteRow.innerHTML=`<td colspan="13" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
     tableEl.appendChild(noteRow);
   }
 
@@ -1666,6 +1670,9 @@ function renderTable(md, prev) {
     const pbCpm = pb && pb.impressions > 0 ? pb.spend / pb.impressions * 1000 : null;
     const pbCr  = pb ? (pb.cr != null ? pb.cr : (pb.orders > 0 && pb.clicks > 0 ? pb.orders / pb.clicks * 100 : null)) : null;
     const pbSv  = pb ? (pb.salesVolume != null ? pb.salesVolume : (pb.adSales > 0 && prev && prev.adSales > 0 ? pb.adSales / prev.adSales * 100 : null)) : null;
+    const bCtr  = b.ctr != null ? b.ctr : (b.impressions > 0 && b.clicks > 0 ? (b.clicks / b.impressions * 100) : null);
+    const pbCtr = pb ? (pb.ctr != null ? pb.ctr : (pb.impressions > 0 && pb.clicks > 0 ? pb.clicks / pb.impressions * 100 : null)) : null;
+    const fCtr  = fClicks != null && fImpr != null ? fClicks / fImpr * 100 : null;
 
     const acosVal   = (b.acos != null && b.adSales > 0) ? b.acos : null;
     const pbAcosVal = pb ? ((pb.acos != null && pb.adSales > 0) ? pb.acos : null) : null;
@@ -1679,6 +1686,8 @@ function renderTable(md, prev) {
       <td>${cell(b.totalSales, fTotalSales, pb ? pb.totalSales : null, fDol, false)}</td>
       <td>${cell(b.tacos, fTacos, pb ? pb.tacos : null, fPct, true)}</td>
       <td>${cell(b.orders != null ? Math.round(b.orders) : null, fOrders != null ? Math.round(fOrders) : null, pb && pb.orders != null ? Math.round(pb.orders) : null, v => v.toLocaleString(), false)}</td>
+      <td>${cell(b.clicks != null ? Math.round(b.clicks) : null, fClicks != null ? Math.round(fClicks) : null, pb && pb.clicks != null ? Math.round(pb.clicks) : null, v => v.toLocaleString(), false)}</td>
+      <td>${cell(bCtr, fCtr, pbCtr, fPct, false)}</td>
       <td>${cell(b.cpc, fCpc, pb ? pb.cpc : null, fDol2, true)}</td>
       <td>${cell(bCpm, fCpm, pbCpm, fDol2, true)}</td>
       <td>${cell(bCr, fCr, pbCr, fPct, false)}</td>
@@ -1702,8 +1711,11 @@ function renderTable(md, prev) {
   const pfTacos      = pfSpend != null && pfTotalSales ? Math.round(pfSpend / pfTotalSales * 1000) / 10 : null;
   const pfCpc        = pfSpend != null && pfClicks     ? pfSpend / pfClicks : null;
   const pfCpm        = pfSpend != null && pfImpr       ? pfSpend / pfImpr * 1000 : null;
+  const pfCtr        = pfClicks != null && pfImpr      ? pfClicks / pfImpr * 100 : null;
   const mdCpm        = md.impressions > 0              ? md.spend / md.impressions * 1000 : null;
+  const mdCtr        = md.impressions > 0              ? md.clicks / md.impressions * 100 : null;
   const prevCpm      = prev && prev.impressions > 0    ? prev.spend / prev.impressions * 1000 : null;
+  const prevCtr      = prev && prev.impressions > 0    ? prev.clicks / prev.impressions * 100 : null;
 
   totalRow.innerHTML =
     '<td style="font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.55);font-size:11px;text-transform:uppercase;">PORTFOLIO</td>' +
@@ -1713,6 +1725,8 @@ function renderTable(md, prev) {
     '<td>' + cell(md.totalSales, pfTotalSales, prev ? prev.totalSales : null, fDol, false) + '</td>' +
     '<td>' + cell(md.tacos, pfTacos, prev ? prev.tacos : null, fPct, true) + '</td>' +
     '<td>' + cell(md.orders != null ? Math.round(md.orders) : null, pfOrders != null ? Math.round(pfOrders) : null, prev && prev.orders != null ? Math.round(prev.orders) : null, v => v.toLocaleString(), false) + '</td>' +
+    '<td>' + cell(md.clicks != null ? Math.round(md.clicks) : null, pfClicks != null ? Math.round(pfClicks) : null, prev && prev.clicks != null ? Math.round(prev.clicks) : null, v => v.toLocaleString(), false) + '</td>' +
+    '<td>' + cell(mdCtr, pfCtr, prevCtr, fPct, false) + '</td>' +
     '<td>' + cell(md.cpc, pfCpc, prev ? prev.cpc : null, fDol2, true) + '</td>' +
     '<td>' + cell(mdCpm, pfCpm, prevCpm, fDol2, true) + '</td>' +
     '<td>—</td>' +
