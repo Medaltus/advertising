@@ -477,15 +477,8 @@ def main():
         except Exception as exc:
             print(f"\n⚠  Could not merge with existing data: {exc} — writing fresh supplement")
 
-    out_json.write_text(json.dumps(supplement, indent=2))
-
-    print(f"\n✓ Wrote {out_json}")
-    for mk, entry in supplement.items():
-        partial = ' (partial)' if len(entry.get('brands', [])) else ''
-        print(f"  {mk}: {len(entry['brands'])} brands | "
-              f"spend=${entry['spend']:,.0f} | "
-              f"adSales=${entry['adSales']:,.0f} | "
-              f"acos={entry['acos']}%{partial}")
+    # NOTE: supplement is written after the daily archive is built and
+    # archive-corrected below — do not write it here.
 
     # ── Build and merge medaltus_daily_archive.json ──────────────────────────
     daily_path = out_dir / 'medaltus_daily_archive.json'
@@ -543,6 +536,80 @@ def main():
 
     daily_path.write_text(json.dumps(merged_daily, indent=2))
     print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
+
+    # ── Correct supplement totals for completed months from the complete archive ─
+    # The fresh ads_data.js covers only the last N days (lookback_days window).
+    # When running in a new month (e.g. July), the early days of the prior month
+    # (e.g. June 1-5) fall outside the window, causing the supplement to under-
+    # count completed months. We re-derive brand and portfolio totals from the
+    # complete daily archive, which accumulates every day permanently.
+    print("\nCorrecting supplement month totals from complete daily archive…")
+    today_month_str = date.today().strftime('%B %Y')
+
+    # Aggregate archive into monthly brand totals
+    archive_monthly: dict = defaultdict(lambda: defaultdict(lambda: {
+        'spend': 0.0, 'adSales': 0.0, 'orders': 0, 'clicks': 0, 'impressions': 0,
+    }))
+    for d_str, day_entry in merged_daily.items():
+        mk = month_key(d_str)
+        for brand_name, brand_day in day_entry.get('brands', {}).items():
+            b = archive_monthly[mk][brand_name]
+            b['spend']       += float(brand_day.get('spend', 0) or 0)
+            b['adSales']     += float(brand_day.get('adSales', 0) or 0)
+            b['orders']      += int(brand_day.get('orders', 0) or 0)
+            b['clicks']      += int(brand_day.get('clicks', 0) or 0)
+            b['impressions'] += int(brand_day.get('impressions', 0) or 0)
+
+    # Apply archive-derived totals to supplement for all completed months
+    for mk, entry in supplement.items():
+        if mk == today_month_str:
+            continue  # Current partial month: fresh data is the best available
+        if mk not in archive_monthly:
+            continue  # No archive data for this month — leave as-is
+        arch_brands = archive_monthly[mk]
+        for b in entry.get('brands', []):
+            ab = arch_brands.get(b['name'])
+            if not ab:
+                continue
+            b['spend']       = round(ab['spend'], 2)
+            b['adSales']     = round(ab['adSales'], 2)
+            b['orders']      = ab['orders'] if ab['orders'] else None
+            b['clicks']      = ab['clicks']
+            b['impressions'] = ab['impressions']
+            b['acos']        = acos_pct(b['spend'], b['adSales'])
+            b['ctr']         = safe_div(b['clicks'] * 100, b['impressions'])
+            b['cpc']         = safe_div(b['spend'], b['clicks'])
+            b['aov']         = (round(b['adSales'] / b['orders'], 2)
+                                if b['orders'] and b['adSales'] else None)
+            b['tacos']       = acos_pct(b['spend'], b.get('totalSales'))
+        # Recompute portfolio totals from corrected brand data
+        brands = entry.get('brands', [])
+        t_spend  = round(sum(b['spend'] or 0 for b in brands), 2)
+        t_sales  = round(sum(b['adSales'] or 0 for b in brands), 2)
+        t_impr   = sum(b['impressions'] or 0 for b in brands)
+        t_clicks = sum(b['clicks'] or 0 for b in brands)
+        t_orders = sum(b['orders'] or 0 for b in brands)
+        entry.update({
+            'spend':       t_spend,
+            'adSales':     t_sales,
+            'acos':        acos_pct(t_spend, t_sales),
+            'impressions': t_impr,
+            'clicks':      t_clicks,
+            'ctr':         safe_div(t_clicks * 100, t_impr),
+            'cpc':         safe_div(t_spend, t_clicks),
+            'orders':      t_orders if t_orders else None,
+            'tacos':       acos_pct(t_spend, entry.get('totalSales')),
+        })
+        print(f"  [{mk}] Archive-corrected: spend=${t_spend:,.2f}, "
+              f"sales=${t_sales:,.2f}, orders={t_orders}")
+
+    out_json.write_text(json.dumps(supplement, indent=2))
+    print(f"\n✓ Wrote {out_json}")
+    for mk, entry in supplement.items():
+        print(f"  {mk}: {len(entry.get('brands', []))} brands | "
+              f"spend=${entry['spend']:,.0f} | "
+              f"adSales=${entry['adSales']:,.0f} | "
+              f"acos={entry['acos']}%")
 
     print("\nNext steps:")
     print("  git add deploy/data/api_supplement.json deploy/data/medaltus_daily_archive.json")
