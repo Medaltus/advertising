@@ -3102,11 +3102,12 @@ function injectHistoricalApiData(){
   Object.entries(SKINUVA_MONTHLY).forEach(([mk,mData])=>{
     if(mk===curMonth) return; // current month handled by injectJuneApiData()
 
-    // skinuva_monthly.json is built from the daily archive, which accumulates
-    // permanently regardless of lookback window. All completed months are safe
-    // to inject — the current month is already handled by injectJuneApiData().
-
+    // Only inject if we have real Amazon data for this month. skinuva_monthly.json
+    // is built from the supplement timeline (lookback window), so months outside
+    // the window have amazon.spend=0 — injecting those would wipe correct sheet data.
     const a=mData.amazon||{}, g=mData.google||{};
+    if (!a.spend || a.spend <= 0) return; // no Amazon data — let the sheet handle this month
+
     const combined=mData.combinedTotalSales||null;
 
     // ── Amazon channel ──
