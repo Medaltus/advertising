@@ -1,42 +1,84 @@
 #!/bin/bash
+# update-skinuva-sales.sh
 # Usage:
-#   ./update-skinuva-sales.sh shopify 23256.03
-#   ./update-skinuva-sales.sh walmart 485.00
-#   ./update-skinuva-sales.sh shopify 23256.03 walmart 610.00
+#   ./update-skinuva-sales.sh shopify 9701.43            # current month
+#   ./update-skinuva-sales.sh walmart 635.00             # current month
+#   ./update-skinuva-sales.sh shopify 40856.74 "June 2026"  # specific month
+
+set -e
+
+CHANNEL="$1"
+AMOUNT="$2"
+MONTH_ARG="$3"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-JSON_FILE="$SCRIPT_DIR/skinuva/data/manual_totals.json"
-MONTH=$(date +"%B %Y")
+MANUAL="$SCRIPT_DIR/skinuva/data/manual_totals.json"
+MONTHLY="$SCRIPT_DIR/skinuva/data/skinuva_monthly.json"
 
-# Read current values
-current=$(cat "$JSON_FILE")
-shopify=$(echo "$current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('$MONTH',{}).get('shopify',0))")
-walmart=$(echo "$current" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('$MONTH',{}).get('walmart',0))")
+if [[ -z "$CHANNEL" || -z "$AMOUNT" ]]; then
+  echo "Usage: $0 <shopify|walmart> <amount> [\"Month YYYY\"]"
+  echo "  e.g. $0 shopify 9701.43"
+  echo "  e.g. $0 shopify 40856.74 \"June 2026\""
+  exit 1
+fi
 
-# Apply updates from arguments
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    shopify) shopify="$2"; shift 2 ;;
-    walmart) walmart="$2"; shift 2 ;;
-    *) echo "Unknown argument: $1. Use: shopify <amount> and/or walmart <amount>"; exit 1 ;;
-  esac
-done
+if [[ "$CHANNEL" != "shopify" && "$CHANNEL" != "walmart" ]]; then
+  echo "Error: channel must be 'shopify' or 'walmart'"
+  exit 1
+fi
 
-# Write updated JSON
-python3 -c "
+MONTH_LABEL=$(python3 - "$MONTH_ARG" <<'PYEOF'
+import sys
+from datetime import datetime
+arg = sys.argv[1] if len(sys.argv) > 1 else ""
+if arg:
+    print(arg)
+else:
+    months = ['January','February','March','April','May','June',
+              'July','August','September','October','November','December']
+    now = datetime.now()
+    print(f"{months[now.month-1]} {now.year}")
+PYEOF
+)
+
+echo "Month: $MONTH_LABEL"
+
+python3 - "$CHANNEL" "$AMOUNT" "$MONTH_LABEL" "$MANUAL" "$MONTHLY" <<'PYEOF'
 import json, sys
-try:
-    with open('$JSON_FILE') as f:
-        data = json.load(f)
-except:
-    data = {}
-data['$MONTH'] = {'walmart': float('$walmart'), 'shopify': float('$shopify')}
-with open('$JSON_FILE', 'w') as f:
-    json.dump(data, f, indent=2)
-print('Updated $MONTH: shopify=\$$shopify, walmart=\$$walmart')
-"
+
+channel, amount, month, manual_path, monthly_path = sys.argv[1], float(sys.argv[2]), sys.argv[3], sys.argv[4], sys.argv[5]
+print(f"Updating {channel} for {month} → ${amount:,.2f}")
+
+with open(manual_path) as f:
+    mt = json.load(f)
+if month not in mt:
+    mt[month] = {}
+mt[month][channel] = amount
+with open(manual_path, "w") as f:
+    json.dump(mt, f, indent=2)
+print(f"  ✓ manual_totals.json updated")
+
+with open(monthly_path) as f:
+    sm = json.load(f)
+if month not in sm:
+    print(f"  ⚠  '{month}' not found in skinuva_monthly.json — skipping recalc")
+    sys.exit(0)
+entry = sm[month]
+entry[channel] = amount
+amz_total = (entry.get("amazon") or {}).get("totalSales") or 0
+shopify   = entry.get("shopify") or 0
+walmart   = entry.get("walmart") or 0
+combined  = round(amz_total + shopify + walmart, 2)
+entry["combinedTotalSales"] = combined
+with open(monthly_path, "w") as f:
+    json.dump(sm, f, indent=2)
+print(f"  ✓ skinuva_monthly.json updated  (combinedTotalSales = ${combined:,.2f})")
+PYEOF
 
 cd "$SCRIPT_DIR"
-# Clear any stale git lock files before proceeding
-find .git -name "*.lock" -delete 2>/dev/null
-git add skinuva/data/manual_totals.json && git commit -m "chore: update Skinuva sales for $MONTH (shopify=$shopify, walmart=$walmart)" && git pull --rebase && git push
+git add skinuva/data/manual_totals.json skinuva/data/skinuva_monthly.json
+git commit -m "data: Skinuva ${CHANNEL} for ${MONTH_LABEL} = \$${AMOUNT}"
+git pull --rebase && git push
+
+echo ""
+echo "✓ Pushed. Vercel will redeploy automatically."
