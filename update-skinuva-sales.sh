@@ -76,6 +76,8 @@ print(f"  ✓ skinuva_monthly.json updated  (combinedTotalSales = ${combined:,.2
 PYEOF
 
 cd "$SCRIPT_DIR"
+# Clear any stale lock files left by background processes
+rm -f .git/index.lock .git/HEAD.lock .git/packed-refs.lock .git/REBASE_HEAD.lock 2>/dev/null || true
 git add skinuva/data/manual_totals.json skinuva/data/skinuva_monthly.json
 git commit -m "data: Skinuva ${CHANNEL} for ${MONTH_LABEL} = \$${AMOUNT}"
 git pull --rebase && git push
