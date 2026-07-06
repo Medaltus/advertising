@@ -3102,17 +3102,9 @@ function injectHistoricalApiData(){
   Object.entries(SKINUVA_MONTHLY).forEach(([mk,mData])=>{
     if(mk===curMonth) return; // current month handled by injectJuneApiData()
 
-    // Skip months whose last day is within the last 31 days.
-    // The 30-day API lookback means those months have only partial archive data
-    // (e.g. only May 19-31 if the script runs on June 18). The Google Sheet
-    // has the complete month — don't override it with partial numbers.
-    const [mName, mYearStr] = mk.split(' ');
-    const mYear = parseInt(mYearStr);
-    const mMonthIdx = MONTH_ORDER.indexOf(mName); // 0-based
-    const lastDayOfMonth = new Date(mYear, mMonthIdx + 1, 0); // day 0 of next month = last day
-    const thirtyOneDaysAgo = new Date();
-    thirtyOneDaysAgo.setDate(thirtyOneDaysAgo.getDate() - 31);
-    if (lastDayOfMonth >= thirtyOneDaysAgo) return; // too recent, sheet data is more complete
+    // skinuva_monthly.json is built from the daily archive, which accumulates
+    // permanently regardless of lookback window. All completed months are safe
+    // to inject — the current month is already handled by injectJuneApiData().
 
     const a=mData.amazon||{}, g=mData.google||{};
     const combined=mData.combinedTotalSales||null;
@@ -3226,7 +3218,11 @@ function injectJuneApiData(){
   const amzImps=sumK(amzTL,'impressions'), amzClicks=sumK(amzTL,'clicks');
   // Use manual Amazon actual total sales if provided; fall back to API attribution field
   const _mt=(typeof MANUAL_TOTALS!=='undefined')?(MANUAL_TOTALS[_currentMonthLabel()]||{}):{};
-  const amzTotalSales=_mt.amazonTotal!=null?_mt.amazonTotal:sumK(amzTL.filter(r=>r.totalSales>0),'totalSales');
+  // SP-API totalSales lags ~1-2 days; recent timeline entries may have totalSales=0.
+  // Fall back to skinuva_monthly.json which aggregates totalSales from the SP-API fetch.
+  const _smCur=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?(SKINUVA_MONTHLY[_currentMonthLabel()]||{}):{};
+  const _amzTotalFromTL=sumK(amzTL.filter(r=>r.totalSales>0),'totalSales');
+  const amzTotalSales=_mt.amazonTotal!=null?_mt.amazonTotal:(_amzTotalFromTL||(_smCur.amazon&&_smCur.amazon.totalSales)||0);
   const walmartSales=_mt.walmart||0;
   const shopifySales=_mt.shopify||0;
   const combinedTotalSales=rd(amzTotalSales+walmartSales+shopifySales);
