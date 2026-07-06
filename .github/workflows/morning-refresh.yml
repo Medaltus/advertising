@@ -29,6 +29,8 @@ jobs:
 
       # ── Amazon Ads (shared account — fetches all brands including Skinuva) ──
       - name: Fetch Amazon Ads data
+        env:
+          LOOKBACK_DAYS: 45
         run: python3 fetch_ads_data.py
 
       # ── Medaltus ─────────────────────────────────────────────────────────────

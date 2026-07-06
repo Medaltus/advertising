@@ -15,6 +15,7 @@ import gzip
 import argparse
 import sys
 import io
+import os
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -819,7 +820,7 @@ def main():
 
     region   = cfg.get("region", "NA").upper()
     urls     = REGION_URLS[region]
-    lookback = int(cfg.get("lookback_days", 30))
+    lookback = int(os.environ.get("LOOKBACK_DAYS") or cfg.get("lookback_days", 30))
     brands   = cfg.get("brands", [])
     single_brand_profiles = cfg.get("single_brand_profiles", {})
 
