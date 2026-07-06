@@ -181,6 +181,21 @@ AD_PRODUCT_CONFIGS = [
             "purchases7d": r.pop("purchases", 0) or 0,
         }) or r,
     },
+    {
+        "adProduct":    "SPONSORED_DISPLAY",
+        "reportTypeId": "sdCampaigns",
+        "columns": [
+            "date", "campaignId", "campaignName", "campaignStatus",
+            "campaignBudgetAmount", "campaignBudgetType",
+            "impressions", "clicks", "cost", "purchases", "sales",
+        ],
+        # Rename SD columns to the names build_brand_data expects (same as SB).
+        "normalize": lambda r: r.update({
+            "spend":       r.pop("cost",      0) or 0,
+            "sales7d":     r.pop("sales",     0) or 0,
+            "purchases7d": r.pop("purchases", 0) or 0,
+        }) or r,
+    },
 ]
 
 
@@ -1004,6 +1019,24 @@ def main():
                       f"  ({len(bdata['search_terms'])} search terms)")
             else:
                 print(f"  → {brand}: no data (no matching campaigns)")
+
+        # ── Detect unmatched campaigns (spend not attributed to any brand) ────
+        if not single_brand:
+            unmatched_spend = 0.0
+            unmatched_names = {}
+            for r in records:
+                b = identify_brand(r.get("campaignName", ""), brands)
+                if b == "Other":
+                    spd = float(r.get("cost") or r.get("spend") or 0)
+                    unmatched_spend += spd
+                    cn = r.get("campaignName", "UNKNOWN")
+                    unmatched_names[cn] = unmatched_names.get(cn, 0) + spd
+            if unmatched_spend > 0:
+                print(f"  ⚠ UNMATCHED campaigns: ${unmatched_spend:,.2f} spend NOT attributed to any brand!")
+                for cn, spd in sorted(unmatched_names.items(), key=lambda x: -x[1])[:10]:
+                    print(f"      ${spd:,.2f}  {cn}")
+            else:
+                print(f"  ✓ All campaign spend matched to a brand")
 
         print()
 
