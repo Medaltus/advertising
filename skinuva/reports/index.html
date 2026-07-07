@@ -3365,9 +3365,10 @@ function renderAmazonSection(period){
 
   // Campaign table — use full campaign list (aggregated over fetch period); filter by spend
   const tbody=document.getElementById('amazon-campaign-tbody'); tbody.innerHTML='';
-  // For month view, approximate by scaling down proportionally from known period ratio
-  const periodDays=tl.length; const totalDays=d.timeline.length||31;
-  const scale=period==='month'?(periodDays/totalDays):1;
+  // For month view, scale campaigns by actual spend ratio (period spend / total 31-day spend)
+  // so campaign totals match header KPIs which sum real timeline data.
+  const totalSpend31=d.timeline.reduce((s,r)=>s+(r.spend||0),0);
+  const scale=period==='month'?(totalSpend31>0?spend/totalSpend31:0):1;
   const campaigns=d.campaigns.filter(c=>c.spend>0).map(c=>({
     ...c,
     spend:period==='month'?Math.round(c.spend*scale*100)/100:c.spend,
