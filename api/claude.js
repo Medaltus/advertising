@@ -1,11 +1,9 @@
 // api/claude.js — Vercel serverless function
-// Proxies requests to the Anthropic Claude API.
-// Used by the dashboard for AI agents, WLOS generation, and market ticker fallback.
+// Proxies requests to the Anthropic Claude API via native fetch (Node 18+).
+// No SDK dependency — avoids version skew issues.
 //
 // Env vars required:
 //   ANTHROPIC_API_KEY — your Anthropic API key
-
-const Anthropic = require('@anthropic-ai/sdk');
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -23,15 +21,28 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const client = new Anthropic({ apiKey });
-
-    const message = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',   // fast & cheap for dashboard AI features
-      max_tokens: 3000,
-      messages: [{ role: 'user', content: prompt }],
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 3000,
+        messages: [{ role: 'user', content: prompt }],
+      }),
     });
 
-    const text = message.content?.[0]?.text || '';
+    const data = await response.json();
+    if (!response.ok) {
+      const msg = data?.error?.message || `HTTP ${response.status}`;
+      console.error('[claude.js]', response.status, msg);
+      return res.status(500).json({ error: msg });
+    }
+
+    const text = data.content?.[0]?.text || '';
     res.status(200).json({ text });
 
   } catch (err) {
