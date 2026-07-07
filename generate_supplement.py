@@ -264,21 +264,40 @@ def build_supplement(data: dict) -> dict:
             clicks    = m['clicks']
             purchases = m['purchases']
 
-            # Campaign data is 30-day rolling — attach to latest month only
+            # Campaign data: aggregate from campaign_timeline for this month only.
+            # Using the full 'campaigns' list (31-day window aggregate) would inflate
+            # the latest-month campaign totals to include prior-month dates.
             brand_campaigns = []
             if mk == latest_month:
-                for c in campaigns:
-                    cspend = round(float(c.get('spend', 0) or 0), 2)
-                    csales = round(float(c.get('sales', 0) or 0), 2)
+                camp_timeline = brand.get('campaign_timeline', [])
+                camp_by_id: dict = {}
+                for ct_entry in camp_timeline:
+                    if month_key(ct_entry.get('date', '')) != latest_month:
+                        continue
+                    for c in ct_entry.get('campaigns', []):
+                        cid = c.get('id') or c.get('name', '')
+                        if cid not in camp_by_id:
+                            camp_by_id[cid] = {
+                                'name': c.get('name', ''), 'spend': 0.0, 'sales': 0.0,
+                                'impressions': 0, 'clicks': 0, 'purchases': 0,
+                            }
+                        camp_by_id[cid]['spend']       += float(c.get('spend', 0) or 0)
+                        camp_by_id[cid]['sales']       += float(c.get('sales', 0) or 0)
+                        camp_by_id[cid]['impressions'] += int(c.get('impressions', 0) or 0)
+                        camp_by_id[cid]['clicks']      += int(c.get('clicks', 0) or 0)
+                        camp_by_id[cid]['purchases']   += int(c.get('purchases', 0) or 0)
+                for c in sorted(camp_by_id.values(), key=lambda x: x['spend'], reverse=True):
+                    cspend = round(c['spend'], 2)
+                    csales = round(c['sales'], 2)
                     brand_campaigns.append({
-                        'name':        c.get('name', ''),
+                        'name':        c['name'],
                         'source':      'AMAZON',
                         'spend':       cspend,
                         'adSales':     csales,
                         'acos':        acos_pct(cspend, csales),
-                        'impressions': int(c.get('impressions', 0) or 0),
-                        'clicks':      int(c.get('clicks', 0) or 0),
-                        'orders':      int(c.get('purchases', 0)) if c.get('purchases') else None,
+                        'impressions': c['impressions'],
+                        'clicks':      c['clicks'],
+                        'orders':      c['purchases'] if c['purchases'] else None,
                     })
 
             if mk not in supplement:
