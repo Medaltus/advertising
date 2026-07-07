@@ -3434,14 +3434,21 @@ function renderGoogleSection(period){
   _renderApiChart('chart-google-trend', tl, 'rgb(66,133,244)');
 
   const tbody=document.getElementById('google-campaign-tbody'); tbody.innerHTML='';
-  const periodDays=tl.length; const totalDays=d.timeline.length||31;
-  const scale=period==='month'?(periodDays/totalDays):1;
+  const gtl31=d.timeline;
+  const gtot31Spend=gtl31.reduce((s,r)=>s+(r.spend||0),0);
+  const gtot31Sales=gtl31.reduce((s,r)=>s+(r.sales||0),0);
+  const gtot31Conv=gtl31.reduce((s,r)=>s+(r.conversions||0),0);
+  const gtot31Clicks=gtl31.reduce((s,r)=>s+(r.clicks||0),0);
+  const gScaleSpend=period==='month'?(gtot31Spend>0?spend/gtot31Spend:0):1;
+  const gScaleSales=period==='month'?(gtot31Sales>0?sales/gtot31Sales:0):1;
+  const gScaleConv=period==='month'?(gtot31Conv>0?conv/gtot31Conv:0):1;
+  const gScaleClicks=period==='month'?(gtot31Clicks>0?clicks/gtot31Clicks:0):1;
   const campaigns=d.campaigns.filter(c=>c.spend>0).map(c=>({
     ...c,
-    spend:period==='month'?Math.round(c.spend*scale*100)/100:c.spend,
-    sales:period==='month'?Math.round(c.sales*scale*100)/100:c.sales,
-    conversions:period==='month'?Math.round((c.conversions||0)*scale*10)/10:c.conversions||0,
-    clicks:period==='month'?Math.round((c.clicks||0)*scale):c.clicks||0,
+    spend:period==='month'?Math.round(c.spend*gScaleSpend*100)/100:c.spend,
+    sales:period==='month'?Math.round(c.sales*gScaleSales*100)/100:c.sales,
+    conversions:period==='month'?Math.round((c.conversions||0)*gScaleConv*10)/10:c.conversions||0,
+    clicks:period==='month'?Math.round((c.clicks||0)*gScaleClicks):c.clicks||0,
   })).sort((a,b)=>b.spend-a.spend);
   campaigns.forEach(c=>{
     const ac=c.acos==null?'':c.acos<20?'acos-good':c.acos<35?'':'acos-bad';
