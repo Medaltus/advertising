@@ -546,10 +546,16 @@ def main():
     print("\nCorrecting supplement month totals from complete daily archive…")
     today_month_str = date.today().strftime('%B %Y')
 
-    # Aggregate archive into monthly brand totals
+    # Aggregate archive into monthly brand totals (metrics + campaigns)
     archive_monthly: dict = defaultdict(lambda: defaultdict(lambda: {
         'spend': 0.0, 'adSales': 0.0, 'orders': 0, 'clicks': 0, 'impressions': 0,
     }))
+    # { month: { brand: { campaign_name: {spend, adSales, orders, clicks, impressions} } } }
+    archive_monthly_camps: dict = defaultdict(
+        lambda: defaultdict(lambda: defaultdict(lambda: {
+            'spend': 0.0, 'adSales': 0.0, 'orders': 0, 'clicks': 0, 'impressions': 0,
+        }))
+    )
     for d_str, day_entry in merged_daily.items():
         mk = month_key(d_str)
         for brand_name, brand_day in day_entry.get('brands', {}).items():
@@ -559,6 +565,13 @@ def main():
             b['orders']      += int(brand_day.get('orders', 0) or 0)
             b['clicks']      += int(brand_day.get('clicks', 0) or 0)
             b['impressions'] += int(brand_day.get('impressions', 0) or 0)
+            for camp_name, camp_data in brand_day.get('campaigns', {}).items():
+                c = archive_monthly_camps[mk][brand_name][camp_name]
+                c['spend']       += float(camp_data.get('spend', 0) or 0)
+                c['adSales']     += float(camp_data.get('adSales', 0) or 0)
+                c['orders']      += int(camp_data.get('orders', 0) or 0)
+                c['clicks']      += int(camp_data.get('clicks', 0) or 0)
+                c['impressions'] += int(camp_data.get('impressions', 0) or 0)
 
     # Apply archive-derived totals to supplement for all completed months
     for mk, entry in supplement.items():
@@ -582,6 +595,23 @@ def main():
             b['aov']         = (round(b['adSales'] / b['orders'], 2)
                                 if b['orders'] and b['adSales'] else None)
             b['tacos']       = acos_pct(b['spend'], b.get('totalSales'))
+            # Populate campaigns from daily archive
+            arch_camps = archive_monthly_camps.get(mk, {}).get(b['name'], {})
+            if arch_camps:
+                b['campaigns'] = sorted([
+                    {
+                        'name':        cname,
+                        'source':      'AMAZON',
+                        'spend':       round(cd['spend'], 2),
+                        'adSales':     round(cd['adSales'], 2),
+                        'orders':      cd['orders'] or None,
+                        'acos':        acos_pct(cd['spend'], cd['adSales']),
+                        'clicks':      cd['clicks'],
+                        'impressions': cd['impressions'],
+                    }
+                    for cname, cd in arch_camps.items()
+                    if cd['spend'] > 0
+                ], key=lambda c: c['spend'], reverse=True)
         # Recompute portfolio totals from corrected brand data
         brands = entry.get('brands', [])
         t_spend  = round(sum(b['spend'] or 0 for b in brands), 2)
