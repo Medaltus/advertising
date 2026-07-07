@@ -3365,16 +3365,23 @@ function renderAmazonSection(period){
 
   // Campaign table — use full campaign list (aggregated over fetch period); filter by spend
   const tbody=document.getElementById('amazon-campaign-tbody'); tbody.innerHTML='';
-  // For month view, scale campaigns by actual spend ratio (period spend / total 31-day spend)
-  // so campaign totals match header KPIs which sum real timeline data.
-  const totalSpend31=d.timeline.reduce((s,r)=>s+(r.spend||0),0);
-  const scale=period==='month'?(totalSpend31>0?spend/totalSpend31:0):1;
+  // For month view, scale each metric by its own ratio (period/total) from actual timeline data
+  // so campaign totals match header KPIs exactly.
+  const tl31=d.timeline;
+  const tot31Spend=tl31.reduce((s,r)=>s+(r.spend||0),0);
+  const tot31Sales=tl31.reduce((s,r)=>s+(r.sales||0),0);
+  const tot31Orders=tl31.reduce((s,r)=>s+(r.purchases||0),0);
+  const tot31Clicks=tl31.reduce((s,r)=>s+(r.clicks||0),0);
+  const scaleSpend=period==='month'?(tot31Spend>0?spend/tot31Spend:0):1;
+  const scaleSales=period==='month'?(tot31Sales>0?sales/tot31Sales:0):1;
+  const scaleOrders=period==='month'?(tot31Orders>0?orders/tot31Orders:0):1;
+  const scaleClicks=period==='month'?(tot31Clicks>0?clicks/tot31Clicks:0):1;
   const campaigns=d.campaigns.filter(c=>c.spend>0).map(c=>({
     ...c,
-    spend:period==='month'?Math.round(c.spend*scale*100)/100:c.spend,
-    sales:period==='month'?Math.round(c.sales*scale*100)/100:c.sales,
-    purchases:period==='month'?Math.round((c.purchases||0)*scale):c.purchases||0,
-    clicks:period==='month'?Math.round((c.clicks||0)*scale):c.clicks||0,
+    spend:period==='month'?Math.round(c.spend*scaleSpend*100)/100:c.spend,
+    sales:period==='month'?Math.round(c.sales*scaleSales*100)/100:c.sales,
+    purchases:period==='month'?Math.round((c.purchases||0)*scaleOrders):c.purchases||0,
+    clicks:period==='month'?Math.round((c.clicks||0)*scaleClicks):c.clicks||0,
   })).sort((a,b)=>b.spend-a.spend);
   campaigns.forEach(c=>{
     const ac=c.acos==null?'':c.acos<20?'acos-good':c.acos<35?'':'acos-bad';
