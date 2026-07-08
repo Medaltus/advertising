@@ -2132,9 +2132,15 @@ const AGENT_LABELS={
   market: 'Market Conditions'
 };
 
-// ── Agent cache helpers (keyed to same data fingerprint as WLOS) ──
+// ── Agent cache helpers (keyed to calendar day, not data fingerprint —
+//    agents should only re-run once per day, on the first load of that day) ──
+function todayCacheKey() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
 function agentCacheKey(name) {
-  return 'skinuva_agent_v1_' + name + '_' + wlosHashKey(getWlosDataHash());
+  return 'skinuva_agent_v2_' + name + '_' + todayCacheKey();
 }
 
 function saveAgentCache(name, rawText) {
