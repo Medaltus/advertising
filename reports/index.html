@@ -2178,7 +2178,11 @@ function parseSopTabs(rawText) {
 // ── callClaude wrapper ──
 async function callClaude(prompt) {
   const r = await fetch('/api/claude', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt})});
-  if (!r.ok) throw new Error('Claude API error: ' + r.status);
+  if (!r.ok) {
+    let msg = r.status;
+    try { const j = await r.json(); msg = j.error || r.status; } catch(e) {}
+    throw new Error('Claude API error: ' + msg);
+  }
   return r.json();
 }
 
