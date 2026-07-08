@@ -920,7 +920,7 @@ const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
 let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={}, SKINUVA_DAILY={};
 let rangeMode=false, rangeStart=null, rangeEnd=null;
 
-const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48' };
+const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48', OpenAI:'#10a37f' };
 const VOLUME_KEYS = new Set(['adSpend','adSales','totalSales','impressions','clicks','orders']);
 
 // ── Helpers ──
@@ -946,7 +946,7 @@ function extractText(r) {
 }
 
 // ── Parser ──
-const AD_CHANNELS = new Set(['Amazon','Google','Walmart','Meta','Pinterest','TikTok','Reddit','Shopify Shop']);
+const AD_CHANNELS = new Set(['Amazon','Google','Walmart','Meta','Pinterest','TikTok','Reddit','Shopify Shop','OpenAI']);
 
 // Extract the S1 cell date from the "Ad Performance by Channel" tab.
 // S1 = date data was downloaded. Data only covers through S1 - 1 day.
@@ -1673,7 +1673,7 @@ Requirements:
 - Exactly 16 total entries: 4 Wins, 4 Losses, 4 Opportunities, 4 Strategies
 - type: exactly Win, Loss, Opportunity, or Strategy
 - priority: exactly High, Medium, or Low
-- channel: one of Amazon, Google, Walmart, Meta, TikTok, Pinterest, Reddit, All Channels
+- channel: one of Amazon, Google, Walmart, Meta, TikTok, Pinterest, Reddit, OpenAI, All Channels
 - finding: cite specific numbers (ACOS %, spend $, sales $, MoM change %)
 - action: specific and actionable, time-bound where possible
 - You MUST return exactly 4 entries for each type — no more, no fewer
@@ -2098,7 +2098,7 @@ After the takeaways, cover channel mix optimization, ACOS targets (goal under 30
 
 Be specific with numbers and cite the data. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
 
-  market: `You are a market intelligence analyst covering digital advertising and skincare ecommerce. Today's date is ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}. Skinuva advertises on Amazon, Google, Meta, TikTok, Pinterest, Walmart Connect, and Reddit.
+  market: `You are a market intelligence analyst covering digital advertising and skincare ecommerce. Today's date is ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}. Skinuva advertises on Amazon, Google, Meta, TikTok, Pinterest, Walmart Connect, Reddit, and OpenAI (ChatGPT) ads.
 
 FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) with the most important things the team needs to know right now. Each bullet should be one short specific line. Then leave a blank line and continue with detailed sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
 
