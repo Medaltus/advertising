@@ -80,7 +80,12 @@ cd "$SCRIPT_DIR"
 rm -f .git/index.lock .git/HEAD.lock .git/packed-refs.lock .git/REBASE_HEAD.lock 2>/dev/null || true
 git add skinuva/data/manual_totals.json skinuva/data/skinuva_monthly.json
 git commit -m "data: Skinuva ${CHANNEL} for ${MONTH_LABEL} = \$${AMOUNT}"
-git pull --rebase && git push
 
 echo ""
-echo "✓ Pushed. Vercel will redeploy automatically."
+if git pull --rebase && git push; then
+  echo "✓ Pushed. Vercel will redeploy automatically."
+else
+  echo "✗ Push did NOT go through — likely a rebase conflict (e.g. daily cron ran at the same time)."
+  echo "  Run 'git status' in this folder to see the conflict, resolve it, then 'git rebase --continue' and 'git push'."
+  exit 1
+fi
