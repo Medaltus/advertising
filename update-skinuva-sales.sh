@@ -82,10 +82,50 @@ git add skinuva/data/manual_totals.json skinuva/data/skinuva_monthly.json
 git commit -m "data: Skinuva ${CHANNEL} for ${MONTH_LABEL} = \$${AMOUNT}"
 
 echo ""
-if git pull --rebase && git push; then
-  echo "✓ Pushed. Vercel will redeploy automatically."
+if git pull --rebase; then
+  git push && echo "✓ Pushed. Vercel will redeploy automatically."
 else
-  echo "✗ Push did NOT go through — likely a rebase conflict (e.g. daily cron ran at the same time)."
-  echo "  Run 'git status' in this folder to see the conflict, resolve it, then 'git rebase --continue' and 'git push'."
-  exit 1
+  # Auto-recover from conflict on skinuva_monthly.json (cron ran at same time)
+  CONFLICTS=$(git diff --name-only --diff-filter=U 2>/dev/null)
+  if echo "$CONFLICTS" | grep -q "skinuva_monthly.json"; then
+    echo "  → Conflict detected — auto-resolving (taking cron data, re-applying our value)..."
+
+    # Take cron's version of skinuva_monthly.json (has fresh Amazon data)
+    git checkout --theirs skinuva/data/skinuva_monthly.json
+
+    # Re-apply our channel value on top of cron's version
+    python3 - "$CHANNEL" "$AMOUNT" "$MONTH_LABEL" "$MONTHLY" <<'RESOLVE_PYEOF'
+import json, sys
+channel, amount, month, monthly_path = sys.argv[1], float(sys.argv[2]), sys.argv[3], sys.argv[4]
+with open(monthly_path) as f:
+    sm = json.load(f)
+if month in sm:
+    entry = sm[month]
+    entry[channel] = amount
+    amz_total = (entry.get("amazon") or {}).get("totalSales") or 0
+    shopify   = entry.get("shopify") or 0
+    walmart   = entry.get("walmart") or 0
+    combined  = round(amz_total + shopify + walmart, 2)
+    entry["combinedTotalSales"] = combined
+    with open(monthly_path, "w") as f:
+        json.dump(sm, f, indent=2)
+    print(f"  ✓ Re-applied {channel}=${amount:,.2f} → combinedTotalSales=${combined:,.2f}")
+else:
+    print(f"  ⚠  Month '{month}' not found after conflict resolution")
+RESOLVE_PYEOF
+
+    git add skinuva/data/skinuva_monthly.json
+    # Also keep ours for manual_totals.json if it conflicted
+    if echo "$CONFLICTS" | grep -q "manual_totals.json"; then
+      git checkout --ours skinuva/data/manual_totals.json
+      git add skinuva/data/manual_totals.json
+    fi
+
+    GIT_EDITOR=true git rebase --continue
+    git push && echo "✓ Pushed (auto-resolved conflict). Vercel will redeploy automatically."
+  else
+    echo "✗ Unexpected conflict — run 'git status' to investigate."
+    git rebase --abort 2>/dev/null || true
+    exit 1
+  fi
 fi
