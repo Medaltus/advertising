@@ -74,6 +74,21 @@ body {
 .kpi-value { font-size:28px;font-weight:700;color:#fff;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;line-height:1.1; }
 .kpi-sub { font-size:12px;color:rgba(255,255,255,0.3);margin-top:6px; }
 .kpi-sub.warn { color:#f59e0b; }
+/* Strategy action buttons */
+.action-btn { background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.22);color:rgba(129,140,248,0.75);font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;cursor:pointer;margin-left:8px;font-family:inherit;transition:all 0.18s;vertical-align:middle;white-space:nowrap; }
+.action-btn:hover:not(.actioned) { background:rgba(129,140,248,0.25);color:#fff;border-color:rgba(129,140,248,0.5); }
+.action-btn.actioned { background:rgba(74,222,128,0.1);border-color:rgba(74,222,128,0.3);color:#4ade80;cursor:default; }
+.strategy-log-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(129,140,248,0.18),rgba(129,140,248,0.06));border:1px solid rgba(129,140,248,0.22);color:rgba(129,140,248,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center; }
+.strategy-log-btn:hover { background:linear-gradient(135deg,rgba(129,140,248,0.32),rgba(129,140,248,0.12));color:#fff;border-color:rgba(129,140,248,0.4);box-shadow:0 4px 16px rgba(129,140,248,0.12); }
+.strategy-action-log { margin-top:14px;padding:14px 16px;background:rgba(129,140,248,0.05);border:1px solid rgba(129,140,248,0.15);border-radius:12px;font-size:11.5px;color:rgba(255,255,255,0.5);display:none; }
+.strategy-action-log h5 { font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(129,140,248,0.7);margin-bottom:10px; }
+.strategy-action-log .sal-item { padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;gap:3px; }
+.strategy-action-log .sal-item:last-child { border-bottom:none; }
+.strategy-action-log .sal-date { font-size:10px;color:rgba(255,255,255,0.3); }
+.strategy-action-log .sal-text { color:rgba(255,255,255,0.75);font-size:12px; }
+.strategy-action-log .sal-kpi { font-size:10px;color:rgba(129,140,248,0.6); }
+.strategy-action-log .sal-clear { margin-top:10px;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.2);color:rgba(255,107,107,0.7);font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit;transition:all 0.2s; }
+.strategy-action-log .sal-clear:hover { background:rgba(255,107,107,0.15);color:#ff6b6b; }
 .kpi-forecast { margin-top:10px;padding:8px 10px;border-radius:10px;background:linear-gradient(135deg,rgba(129,140,248,0.14) 0%,rgba(129,140,248,0.04) 100%);border:1px solid rgba(129,140,248,0.22); }
 .kpi-forecast-label { font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(129,140,248,0.7);margin-bottom:3px; }
 .kpi-forecast-value { font-size:16px;font-weight:700;color:rgba(255,255,255,0.9);font-family:'SF Mono','Menlo','Monaco','Courier New',monospace; }
@@ -446,7 +461,8 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
             <input class="agent-input" id="strategy-input" placeholder="e.g. Should we scale Amazon spend?" />
             <button class="agent-run-btn" onclick="runAgent('strategy')">Run</button>
           </div>
-          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-strategy" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a></div>
+          <div class="agent-sop-row"><a class="agent-sop-btn" id="sop-link-strategy" href="#" target="_blank" rel="noopener">&#9998; Edit SOP</a><button class="strategy-log-btn" onclick="toggleStrategyLog()">&#128203; Action Log</button></div>
+          <div class="strategy-action-log" id="strategy-action-log"></div>
         </div>
       </div>
       <div class="agent-panel expanded" id="panel-forecast">
@@ -2186,6 +2202,116 @@ async function callClaude(prompt) {
   return r.json();
 }
 
+// ── Strategy self-learning: action log ──
+const STRATEGY_ACTIONS_KEY = 'medaltus_strategy_actions_v1';
+
+function loadStrategyActions() {
+  try { const r = localStorage.getItem(STRATEGY_ACTIONS_KEY); return r ? JSON.parse(r) : []; }
+  catch(e) { return []; }
+}
+
+function getCurrentKPIsSnapshot() {
+  const md = DATA && DATA.monthly.find(m => m.month === selectedMonth);
+  if (!md) return {};
+  return { month: selectedMonth, adSpend: md.adSpend||0, adSales: md.adSales||0, acos: md.acos, tacos: md.tacos, orders: md.orders||0 };
+}
+
+function saveStrategyAction(text) {
+  const actions = loadStrategyActions();
+  const already = actions.some(a => a.text === text);
+  if (already) return;
+  actions.push({ id: 'sa_' + Date.now(), text, date: new Date().toISOString(), kpis: getCurrentKPIsSnapshot() });
+  try { localStorage.setItem(STRATEGY_ACTIONS_KEY, JSON.stringify(actions.slice(-40))); } catch(e) {}
+  renderStrategyActionLog();
+}
+
+function buildStrategyActionContext() {
+  const actions = loadStrategyActions();
+  if (!actions.length) return '';
+  const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
+  const recent = actions.filter(a => new Date(a.date).getTime() > cutoff);
+  if (!recent.length) return '';
+  const cur = getCurrentKPIsSnapshot();
+  let ctx = '\n\nPREVIOUS ACTIONS MARKED (what has already been tried — use this to calibrate and avoid repeating yourself):\n';
+  recent.forEach(a => {
+    const d = new Date(a.date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    ctx += `[${d}] "${a.text}"`;
+    if (a.kpis && a.kpis.acos != null && cur.acos != null) {
+      const dAcos = (cur.acos - a.kpis.acos).toFixed(1);
+      const dSpend = a.kpis.adSpend > 0 ? ((cur.adSpend - a.kpis.adSpend) / a.kpis.adSpend * 100).toFixed(1) : null;
+      ctx += ` | KPIs when actioned: ACOS ${a.kpis.acos}%, Spend $${(a.kpis.adSpend||0).toLocaleString()}, Orders ${a.kpis.orders||0}`;
+      ctx += ` | KPIs now: ACOS ${cur.acos}% (${dAcos>0?'+':''}${dAcos}pp)`;
+      if (dSpend !== null) ctx += `, Spend ${dSpend>0?'+':''}${dSpend}%`;
+    }
+    ctx += '\n';
+  });
+  ctx += 'For each past action, assess whether KPIs improved or worsened since it was marked. Acknowledge what was tried, give a brief verdict on whether it appears to have worked, then build on it. Do not re-recommend something already actioned unless KPIs have clearly worsened since.\n';
+  return ctx;
+}
+
+function addStrategyActionButtons(outputEl) {
+  const existing = loadStrategyActions().map(a => a.text);
+  const bullets = outputEl.querySelectorAll('div[style*="border-left"]');
+  bullets.forEach(div => {
+    const text = div.textContent.trim();
+    if (!text || text.length < 15 || div.querySelector('.action-btn')) return;
+    const alreadyDone = existing.includes(text);
+    const btn = document.createElement('button');
+    btn.className = 'action-btn' + (alreadyDone ? ' actioned' : '');
+    btn.textContent = alreadyDone ? '✓ Actioned' : '+ Action';
+    btn.onclick = function() {
+      if (btn.classList.contains('actioned')) return;
+      saveStrategyAction(text);
+      btn.classList.add('actioned');
+      btn.textContent = '✓ Actioned';
+    };
+    div.appendChild(btn);
+  });
+}
+
+function renderStrategyActionLog() {
+  const el = document.getElementById('strategy-action-log');
+  if (!el) return;
+  const actions = loadStrategyActions();
+  if (!actions.length) {
+    el.innerHTML = '<h5>Action Log</h5><p style="font-size:11px;color:rgba(255,255,255,0.3);">No actions logged yet. Mark a recommendation above to track it.</p>';
+    return;
+  }
+  const cur = getCurrentKPIsSnapshot();
+  let html = '<h5>Action Log (' + actions.length + ')</h5>';
+  [...actions].reverse().forEach(a => {
+    const d = new Date(a.date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
+    let kpiLine = '';
+    if (a.kpis && a.kpis.acos != null && cur.acos != null) {
+      const dAcos = (cur.acos - a.kpis.acos).toFixed(1);
+      const dSpend = a.kpis.adSpend > 0 ? ((cur.adSpend - a.kpis.adSpend) / a.kpis.adSpend * 100).toFixed(1) : null;
+      kpiLine = `ACOS then: ${a.kpis.acos}% → now: ${cur.acos}% (${dAcos>0?'+':''}${dAcos}pp)`;
+      if (dSpend !== null) kpiLine += ` · Spend: ${dSpend>0?'+':''}${dSpend}%`;
+    }
+    html += `<div class="sal-item"><div class="sal-date">${d}</div><div class="sal-text">${a.text}</div>${kpiLine ? '<div class="sal-kpi">'+kpiLine+'</div>' : ''}</div>`;
+  });
+  html += '<button class="sal-clear" onclick="clearStrategyActions()">Clear Log</button>';
+  el.innerHTML = html;
+}
+
+function toggleStrategyLog() {
+  const el = document.getElementById('strategy-action-log');
+  if (!el) return;
+  if (el.style.display === 'block') { el.style.display = 'none'; return; }
+  renderStrategyActionLog();
+  el.style.display = 'block';
+}
+
+function clearStrategyActions() {
+  if (!confirm('Clear all actioned items from the log?')) return;
+  try { localStorage.removeItem(STRATEGY_ACTIONS_KEY); } catch(e) {}
+  renderStrategyActionLog();
+  // Remove actioned state from any visible buttons
+  document.querySelectorAll('.action-btn.actioned').forEach(b => {
+    b.classList.remove('actioned'); b.textContent = '+ Action';
+  });
+}
+
 async function runAllAgents() {
   const btn = document.getElementById('run-all-btn'); btn.classList.add('running'); btn.textContent = 'Running...';
   ['analytics','strategy','forecast','market'].forEach(name => {
@@ -2220,6 +2346,7 @@ async function runAgent(name, autoPrompt) {
   const sop = AGENT_SOP[name];
   if (sop) prompt += '\n\nCUSTOM OPERATING RULES (follow these closely — they are set by the user and override defaults where they conflict):\n' + sop;
   prompt += '\n\nHere is the current data:\n' + dataSummary;
+  if (name === 'strategy') { const actionCtx = buildStrategyActionContext(); if (actionCtx) prompt += actionCtx; }
   if (userQ) prompt += '\n\nUser question: ' + userQ;
   if (autoPrompt) prompt += '\n\n' + autoPrompt;
   try {
@@ -2231,6 +2358,7 @@ async function runAgent(name, autoPrompt) {
     if (statusEl) statusEl.style.display = 'none';
     await typeAgentOutput(outputEl, formatted, 8);
     outputEl.scrollTop = 0;
+    if (name === 'strategy') addStrategyActionButtons(outputEl);
     if (inputEl) inputEl.value = '';
   } catch(err) {
     outputEl.textContent = 'Agent error: ' + (err.message || err);
@@ -2993,6 +3121,7 @@ function showAgentFromCache(name, rawText, generatedAt) {
   stamp.style.cssText = 'margin-top:10px;font-size:10px;color:rgba(255,255,255,0.18);text-align:right;';
   stamp.textContent = 'Last updated ' + dt.toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'});
   outputEl.appendChild(stamp);
+  if (name === 'strategy') addStrategyActionButtons(outputEl);
 }
 
 const AGENT_AUTO_PROMPTS = {
