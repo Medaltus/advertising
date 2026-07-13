@@ -499,7 +499,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
     <div class="chart-card">
       <div class="section-header">
         <div class="section-title">ACOS by Brand</div>
-        <div class="section-sub" id="acos-bar-sub">Green &lt;25% · Amber 25–40% · Red &gt;40%</div>
+        <div class="section-sub" id="acos-bar-sub">Green &lt;30% · Amber 30–45% · Red &gt;45%</div>
       </div>
       <div class="chart-wrap" style="height:320px;"><canvas id="chart-acos-bar"></canvas></div>
     </div>
@@ -1154,7 +1154,7 @@ function renderRange(){
       const bCpm = b.impressions > 0 ? (b.spend / b.impressions * 1000) : null;
       const bCr  = b.orders > 0 && b.clicks > 0 ? (b.orders / b.clicks * 100) : null;
       const bSv  = b.adSales > 0 && m.adSales > 0 ? (b.adSales / m.adSales * 100) : null;
-      const ac   = b.acos != null ? (b.acos < 25 ? 'acos-good' : b.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
+      const ac   = b.acos != null ? (b.acos < 30 ? 'acos-good' : b.acos < 46 ? 'acos-mid' : 'acos-bad') : '';
       const tr=document.createElement('tr');
       tr.innerHTML=`
         <td><span class="dot" style="background:${color}"></span><span style="color:${color}">${b.name}</span></td>
@@ -1222,7 +1222,7 @@ function renderRangeCampaigns(m){
   activeBrands.forEach(brand=>{
     const color=BRAND_COLORS[brand.name]||'#666';
     const isSelected=selectedBrand===brand.name;
-    const acosColor=brand.acos!=null?(brand.acos<25?'#4ade80':brand.acos<40?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.4)';
+    const acosColor=brand.acos!=null?(brand.acos<30?'#4ade80':brand.acos<46?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.4)';
     const hdr=document.createElement('div');
     hdr.style.cssText='display:flex;align-items:center;gap:10px;padding:13px 20px 10px;background:'+(isSelected?color+'18':'rgba(255,255,255,0.025)')+';border-top:1px solid rgba(255,255,255,0.07);';
     hdr.innerHTML=
@@ -1252,7 +1252,7 @@ function renderRangeCampaigns(m){
     container.appendChild(colHdr);
 
     brand.campaigns.forEach(c=>{
-      const ac=c.acos!=null?(c.acos<25?'#4ade80':c.acos<40?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.3)';
+      const ac=c.acos!=null?(c.acos<30?'#4ade80':c.acos<46?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.3)';
       const row=document.createElement('div');
       row.style.cssText='display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .15s;';
       row.onmouseenter=()=>{row.style.background='rgba(129,140,248,0.04)';};
@@ -1482,11 +1482,11 @@ function renderBrandBar(md) {
 }
 
 function renderAcosBar(md) {
-  document.getElementById('acos-bar-sub').textContent = selectedMonth + ' · Green <25% · Amber 25–40% · Red >40%';
+  document.getElementById('acos-bar-sub').textContent = selectedMonth + ' · Green <30% · Amber 30–45% · Red >45%';
   const brands = md.brands.filter(b => b.acos != null && b.adSales > 0 && b.spend > 0).sort((a, b) => (a.acos || 999) - (b.acos || 999));
   const colors = brands.map(b => {
     const a = b.acos || 0;
-    const base = a < 25 ? '#4ade80' : a < 40 ? '#f59e0b' : '#ff6b6b';
+    const base = a < 30 ? '#4ade80' : a < 46 ? '#f59e0b' : '#ff6b6b';
     return selectedBrand === 'All' || selectedBrand === b.name ? base + 'EE' : base + '44';
   });
 
@@ -1637,7 +1637,7 @@ function renderTable(md, prev) {
   sorted.forEach(b => {
     const color = BRAND_COLORS[b.name] || '#666';
     const isSelected = selectedBrand === b.name;
-    const ac = b.acos != null ? (b.acos < 25 ? 'acos-good' : b.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
+    const ac = b.acos != null ? (b.acos < 30 ? 'acos-good' : b.acos < 46 ? 'acos-mid' : 'acos-bad') : '';
     const tr = document.createElement('tr');
     if (isSelected) tr.className = 'highlighted';
 
@@ -1699,7 +1699,7 @@ function renderTable(md, prev) {
   // ── Totals row ──
   const totalRow = document.createElement('tr');
   totalRow.style.cssText = 'border-top:2px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);cursor:default;';
-  const acTot = md.acos != null ? (md.acos < 25 ? 'acos-good' : md.acos < 40 ? 'acos-mid' : 'acos-bad') : '';
+  const acTot = md.acos != null ? (md.acos < 30 ? 'acos-good' : md.acos < 46 ? 'acos-mid' : 'acos-bad') : '';
 
   const pfSpend      = bFv(md.spend);
   const pfAdSales    = bFv(md.adSales);
@@ -1780,7 +1780,7 @@ function renderCampaignsByBrand(filterBrand, monthOverride) {
     const campaigns = brand.campaigns;
     const color = BRAND_COLORS[brand.name] || '#666';
     const isSelected = selectedBrand === brand.name;
-    const acosColor = brand.acos != null ? (brand.acos < 25 ? '#4ade80' : brand.acos < 40 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.4)';
+    const acosColor = brand.acos != null ? (brand.acos < 30 ? '#4ade80' : brand.acos < 46 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.4)';
 
     const hdr = document.createElement('div');
     hdr.style.cssText = 'display:flex;align-items:center;gap:10px;padding:13px 20px 10px;background:' + (isSelected ? color + '18' : 'rgba(255,255,255,0.025)') + ';border-top:1px solid rgba(255,255,255,0.07);';
@@ -1811,7 +1811,7 @@ function renderCampaignsByBrand(filterBrand, monthOverride) {
     container.appendChild(colHdr);
 
     campaigns.filter(c => c.spend > 0).forEach(c => {
-      const ac = c.acos != null ? (c.acos < 25 ? '#4ade80' : c.acos < 40 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.3)';
+      const ac = c.acos != null ? (c.acos < 30 ? '#4ade80' : c.acos < 46 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.3)';
       const srcBadge = c.source !== 'AMAZON' ? '<span style="font-size:9px;color:rgba(255,255,255,0.2);background:rgba(255,255,255,0.05);padding:1px 6px;border-radius:4px;margin-left:6px;">' + c.source + '</span>' : '';
       const row = document.createElement('div');
       row.style.cssText = 'display:grid;grid-template-columns:1fr 80px 80px 68px 80px 65px 58px 65px 55px 62px;gap:0;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background .15s;';
@@ -2031,7 +2031,7 @@ function renderSearchTermInsights() {
         col.appendChild(ch);
 
         terms.forEach((t, i) => {
-          const ac = t.acos != null ? (t.acos < 25 ? '#4ade80' : t.acos < 40 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.3)';
+          const ac = t.acos != null ? (t.acos < 30 ? '#4ade80' : t.acos < 46 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.3)';
           const daily = t.daily || [];
           const latestCpc = daily.length ? (daily[daily.length-1].cpc || 0) : (t.cpc || 0);
           const isSpike   = (t.cpc || 0) > 0 && latestCpc > (t.cpc || 0) * 2;
@@ -2714,7 +2714,7 @@ function renderPlacementPerformance() {
       const cvr   = p.cvr   != null ? (p.cvr*100).toFixed(1)+'%' : '—';
       const cpc   = p.cpc   != null ? '$'+p.cpc.toFixed(2)   : '—';
       const acosColor = p.acos == null ? 'rgba(255,255,255,0.5)'
-        : p.acos < 25 ? '#4ade80' : p.acos < 50 ? '#f59e0b' : '#ff6b6b';
+        : p.acos < 30 ? '#4ade80' : p.acos < 46 ? '#f59e0b' : '#ff6b6b';
 
       const barW = totalSpend > 0 ? Math.round(p.spendShare) : 0;
 
@@ -2870,7 +2870,7 @@ function renderProductPerformance() {
         items.forEach((a, idx) => {
           const acos = a.acos != null ? a.acos.toFixed(1)+'%' : '—';
           const acosColor = a.acos == null ? 'rgba(255,255,255,0.35)'
-            : a.acos < 25 ? '#4ade80' : a.acos < 50 ? '#f59e0b' : '#ff6b6b';
+            : a.acos < 30 ? '#4ade80' : a.acos < 46 ? '#f59e0b' : '#ff6b6b';
           const row = document.createElement('tr');
           row.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.04);' +
             (idx%2===1?'background:rgba(255,255,255,0.015);':'');
