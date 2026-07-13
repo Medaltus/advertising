@@ -2358,6 +2358,17 @@ function buildStrategyActionContext() {
   return ctx;
 }
 
+// Wrap any substantial plain-text line in the strategy output in a border-left div
+// so addStrategyActionButtons can attach buttons to ALL recommendations, not just • bullets
+function addStrategyActionDivs(html) {
+  return html.split('\n').map(line => {
+    const t = line.trim();
+    // Skip empty, already-HTML, or too short
+    if (!t || t.startsWith('<') || t.endsWith('>') || t.length < 20) return line;
+    return '<div style="padding:4px 0 4px 12px;border-left:2px solid rgba(255,255,255,0.08);margin:2px 0;color:rgba(255,255,255,0.8);font-size:12.5px;">' + t + '</div>';
+  }).join('\n');
+}
+
 function addStrategyActionButtons(outputEl) {
   const existing = loadStrategyActions().map(a => a.text);
   const bullets = outputEl.querySelectorAll('div[style*="border-left"]');
@@ -2463,7 +2474,8 @@ async function runAgent(name, autoPrompt) {
     const text = (typeof response === 'string' ? response : response.text) || '';
     AGENT_RAW_TEXT[name] = text;
     if (!userQ) saveAgentCache(name, text);
-    const formatted = formatAgentOutput(text);
+    let formatted = formatAgentOutput(text);
+    if (name === 'strategy') formatted = addStrategyActionDivs(formatted);
     if (statusEl) statusEl.style.display = 'none';
     await typeAgentOutput(outputEl, formatted, 8);
     outputEl.scrollTop = 0;
@@ -3221,7 +3233,8 @@ function showAgentFromCache(name, rawText, generatedAt) {
   const outputEl = document.getElementById(name+'-output');
   const statusEl = document.getElementById(name+'-status');
   if (!outputEl) return;
-  const formatted = formatAgentOutput(rawText);
+  let formatted = formatAgentOutput(rawText);
+  if (name === 'strategy') formatted = addStrategyActionDivs(formatted);
   if (statusEl) statusEl.style.display = 'none';
   outputEl.innerHTML = formatted;
   outputEl.style.display = 'block';
