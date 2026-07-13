@@ -74,6 +74,23 @@ body {
 .kpi-value { font-size:28px;font-weight:700;color:#fff;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;line-height:1.1; }
 .kpi-sub { font-size:12px;color:rgba(255,255,255,0.3);margin-top:6px; }
 .kpi-sub.warn { color:#f59e0b; }
+/* ── Budget Pacing ── */
+#pacing-section { margin-bottom:24px; }
+.pacing-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:14px; }
+.pacing-title { font-size:14px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:0.3px; }
+.pacing-set-btn { display:inline-flex;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s; }
+.pacing-set-btn:hover { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7); }
+.pacing-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px; }
+.pacing-card { background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 18px;position:relative; }
+.pacing-card::before { content:'';position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.15) 50%,transparent 95%); }
+.pacing-card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:12px; }
+.pacing-brand-name { font-size:13px;font-weight:700;letter-spacing:0.2px; }
+.pacing-status { font-size:10px;font-weight:700;letter-spacing:1px;padding:3px 8px;border-radius:6px; }
+.pacing-bar-track { position:relative;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:visible;margin-bottom:10px; }
+.pacing-bar-fill { position:absolute;top:0;left:0;height:100%;border-radius:4px;transition:width 0.6s ease; }
+.pacing-bar-marker { position:absolute;top:-4px;bottom:-4px;width:2px;background:rgba(255,255,255,0.7);border-radius:2px;transform:translateX(-50%);box-shadow:0 0 4px rgba(255,255,255,0.4); }
+.pacing-numbers { display:flex;justify-content:space-between;align-items:center;font-size:11px;flex-wrap:wrap;gap:4px; }
+.pacing-budget-input:focus { border-color:rgba(129,140,248,0.4)!important;box-shadow:0 0 0 2px rgba(129,140,248,0.08); }
 /* Strategy action buttons */
 .action-btn { background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.22);color:rgba(129,140,248,0.75);font-size:10px;font-weight:600;padding:2px 8px;border-radius:6px;cursor:pointer;margin-left:8px;font-family:inherit;transition:all 0.18s;vertical-align:middle;white-space:nowrap; }
 .action-btn:hover:not(.actioned) { background:rgba(129,140,248,0.25);color:#fff;border-color:rgba(129,140,248,0.5); }
@@ -433,7 +450,10 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 
   <!-- KPI Row -->
   <div class="kpi-row" id="kpi-row-1"></div>
-  <div class="kpi-row" id="kpi-row-2" style="margin-bottom:32px;"></div>
+  <div class="kpi-row" id="kpi-row-2" style="margin-bottom:20px;"></div>
+
+  <!-- Budget Pacing -->
+  <div id="pacing-section" style="display:none;"></div>
 
   <!-- AI Agents -->
   <div class="agents-section" id="agents-section" style="display:none;">
@@ -1303,6 +1323,117 @@ function renderRangeCampaigns(m){
   });
 }
 
+// ── Budget Pacing ──
+const BUDGETS_KEY = 'medaltus_budgets_v1';
+function loadBudgets() { try { return JSON.parse(localStorage.getItem(BUDGETS_KEY)) || {}; } catch(e) { return {}; } }
+function saveBudget(brand, val) {
+  const b = loadBudgets();
+  if (val === null || val === '' || isNaN(val)) delete b[brand]; else b[brand] = parseFloat(val);
+  try { localStorage.setItem(BUDGETS_KEY, JSON.stringify(b)); } catch(e) {}
+}
+function togglePacingEdit() {
+  const row = document.getElementById('pacing-edit-row');
+  if (row) row.style.display = row.style.display === 'none' ? 'block' : 'none';
+}
+
+function renderPacing(md, prev) {
+  const el = document.getElementById('pacing-section');
+  if (!el) return;
+  if (!md || !md.partial || !md.daysElapsed || !md.daysInMonth) { el.style.display = 'none'; return; }
+
+  const brands = (md.brands || []).filter(b => (b.spend || 0) > 0).sort((a, b2) => (b2.spend || 0) - (a.spend || 0));
+  if (!brands.length) { el.style.display = 'none'; return; }
+
+  const budgets = loadBudgets();
+  const { daysElapsed, daysInMonth } = md;
+  const dayFrac = daysElapsed / daysInMonth;
+
+  // Budget edit inputs
+  let editInputs = '';
+  brands.forEach(b => {
+    const prevSpend = prev ? (prev.brands || []).find(pb => pb.name === b.name)?.spend : null;
+    const placeholder = prevSpend ? Math.round(prevSpend).toLocaleString() : '';
+    editInputs += `<div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;color:rgba(255,255,255,0.55);min-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${b.name}">${b.name}</span>
+      <span style="color:rgba(255,255,255,0.25);font-size:12px;">$</span>
+      <input type="number" class="pacing-budget-input" value="${budgets[b.name] != null ? budgets[b.name] : ''}" placeholder="${placeholder||'e.g. 5000'}" min="0" step="100"
+        style="flex:1;min-width:80px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#fff;font-size:12px;padding:5px 8px;font-family:inherit;outline:none;"
+        oninput="saveBudget('${b.name.replace(/'/g,"\\'")}', this.value)" onchange="renderPacing(DATA.monthly.find(m=>m.month===selectedMonth), DATA.monthly[DATA.monthly.indexOf(DATA.monthly.find(m=>m.month===selectedMonth))-1]||null)" />
+    </div>`;
+  });
+
+  // Pacing cards
+  let cards = '';
+  brands.forEach(b => {
+    const target = budgets[b.name] != null ? budgets[b.name] : (prev ? (prev.brands || []).find(pb => pb.name === b.name)?.spend : null);
+    const color = (typeof BRAND_COLORS !== 'undefined' && BRAND_COLORS[b.name]) || 'rgba(129,140,248,0.9)';
+    const dailyRate = b.spend / daysElapsed;
+    const projected = Math.round(dailyRate * daysInMonth);
+
+    if (!target) {
+      cards += `<div class="pacing-card">
+        <div class="pacing-card-header">
+          <span class="pacing-brand-name" style="color:${color}">${b.name}</span>
+          <span class="pacing-status" style="color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.05);">NO TARGET</span>
+        </div>
+        <div class="pacing-bar-track"><div class="pacing-bar-fill" style="width:${Math.min(dayFrac*100,100)}%;background:rgba(255,255,255,0.15);"></div></div>
+        <div class="pacing-numbers">
+          <span style="color:rgba(255,255,255,0.5);">$${(b.spend||0).toLocaleString()} spent</span>
+          <span style="color:rgba(255,255,255,0.3);">Proj. $${projected.toLocaleString()}</span>
+        </div>
+      </div>`;
+      return;
+    }
+
+    const expectedNow = target * dayFrac;
+    const pace = expectedNow > 0 ? (b.spend - expectedNow) / expectedNow * 100 : 0;
+    const spendPct = Math.min(b.spend / target * 100, 110); // allow slight overflow
+    const markerPct = Math.min(dayFrac * 100, 99);
+    const projDiff = projected - target;
+    const projDiffPct = target > 0 ? (projDiff / target * 100) : 0;
+
+    let statusLabel, statusColor, barColor;
+    if (Math.abs(pace) <= 8)         { statusLabel='ON TRACK';                         statusColor='#4ade80'; barColor='rgba(74,222,128,0.7)'; }
+    else if (pace < -8 && pace >=-20){ statusLabel=`UNDER ${Math.abs(pace).toFixed(0)}%`; statusColor='#f59e0b'; barColor='rgba(245,158,11,0.7)'; }
+    else if (pace < -20)             { statusLabel=`UNDER ${Math.abs(pace).toFixed(0)}%`; statusColor='#ff6b6b'; barColor='rgba(255,107,107,0.7)'; }
+    else if (pace > 8 && pace <= 20) { statusLabel=`OVER ${pace.toFixed(0)}%`;          statusColor='#f59e0b'; barColor='rgba(245,158,11,0.7)'; }
+    else                             { statusLabel=`OVER ${pace.toFixed(0)}%`;          statusColor='#ff6b6b'; barColor='rgba(255,107,107,0.7)'; }
+
+    const projStr = projDiff > 0
+      ? `<span style="color:${statusColor};">+$${projDiff.toLocaleString()} over</span>`
+      : projDiff < 0
+      ? `<span style="color:${statusColor};">$${Math.abs(projDiff).toLocaleString()} under</span>`
+      : `<span style="color:#4ade80;">on budget</span>`;
+
+    cards += `<div class="pacing-card">
+      <div class="pacing-card-header">
+        <span class="pacing-brand-name" style="color:${color}">${b.name}</span>
+        <span class="pacing-status" style="color:${statusColor};background:${statusColor}18;">${statusLabel}</span>
+      </div>
+      <div class="pacing-bar-track">
+        <div class="pacing-bar-fill" style="width:${Math.min(spendPct,100)}%;background:${barColor};"></div>
+        <div class="pacing-bar-marker" style="left:${markerPct}%;"></div>
+      </div>
+      <div class="pacing-numbers">
+        <span style="color:rgba(255,255,255,0.6);">$${(b.spend||0).toLocaleString()} <span style="opacity:0.4;">/ $${target.toLocaleString()} budget</span></span>
+        <span>Proj. $${projected.toLocaleString()} — ${projStr}</span>
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = `
+    <div class="pacing-header">
+      <div class="pacing-title">&#9646;&#9646; Budget Pacing <span style="font-size:10px;font-weight:400;color:rgba(255,255,255,0.3);margin-left:8px;">Day ${daysElapsed} of ${daysInMonth} · white line = expected today</span></div>
+      <button class="pacing-set-btn" onclick="togglePacingEdit()">&#9998; Set Budgets</button>
+    </div>
+    <div id="pacing-edit-row" style="display:none;margin-bottom:14px;padding:14px 16px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;">Monthly Budget Targets — leave blank to use last month as reference</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;">${editInputs}</div>
+    </div>
+    <div class="pacing-grid">${cards}</div>`;
+  el.style.display = 'block';
+}
+
 // ── Main render ──
 function render() {
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
@@ -1419,6 +1550,7 @@ function render() {
     r2.appendChild(kpi(x.l, x.v, o));
   });
 
+  renderPacing(md, prev);
   renderBrandBar(md);
   renderAcosBar(md);
   renderTrend();
