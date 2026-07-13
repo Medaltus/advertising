@@ -65,7 +65,10 @@ module.exports = async function handler(req, res) {
 
     let output = '';
 
-    for (const sheetName of sheetNames) {
+    for (const sheetMeta of meta.data.sheets) {
+      const sheetName = sheetMeta.properties.title;
+      const gid = sheetMeta.properties.sheetId || '';
+
       const response = await sheetsApi.spreadsheets.values.get({
         spreadsheetId: SHEET_ID,
         range: sheetName,
@@ -74,6 +77,9 @@ module.exports = async function handler(req, res) {
 
       let rows = response.data.values || [];
       if (rows.length === 0) continue;
+
+      // Emit a tab-name marker so the dashboard can route content by tab
+      output += `## SHEET:${sheetName}:GID:${gid}\n`;
 
       // Normalise away the extra MONTH/YEAR prefix column if present
       rows = normalizeRows(rows);

@@ -223,6 +223,17 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 .agent-sop-row { display:flex;justify-content:flex-end;margin-top:10px;gap:8px;flex-wrap:wrap; }
 .agent-sop-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(212,175,55,0.08));border:1px solid rgba(212,175,55,0.25);color:rgba(212,175,55,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center;text-decoration:none; }
 .agent-sop-btn:hover { background:linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.15));color:rgba(212,175,55,1);border-color:rgba(212,175,55,0.4);box-shadow:0 4px 16px rgba(212,175,55,0.15); }
+.sop-editor { display:none;margin-top:12px;background:rgba(212,175,55,0.04);border:1px solid rgba(212,175,55,0.18);border-radius:12px;padding:14px 16px; }
+.sop-editor-label { font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:rgba(212,175,55,0.6);margin-bottom:8px; }
+.sop-editor-hint { font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:10px;line-height:1.5; }
+.sop-editor textarea { width:100%;min-height:140px;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:rgba(255,255,255,0.85);font-size:12px;font-family:inherit;padding:10px 12px;resize:vertical;outline:none;line-height:1.6; }
+.sop-editor textarea:focus { border-color:rgba(212,175,55,0.35);box-shadow:0 0 0 2px rgba(212,175,55,0.08); }
+.sop-editor-actions { display:flex;gap:8px;margin-top:8px;justify-content:flex-end; }
+.sop-save-btn { padding:6px 16px;border-radius:8px;border:none;background:linear-gradient(135deg,rgba(212,175,55,0.35),rgba(212,175,55,0.15));color:rgba(212,175,55,1);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s; }
+.sop-save-btn:hover { background:linear-gradient(135deg,rgba(212,175,55,0.5),rgba(212,175,55,0.25)); }
+.sop-cancel-btn { padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.35);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s; }
+.sop-cancel-btn:hover { color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2); }
+.sop-saved-badge { font-size:10px;color:#4ade80;display:none;align-items:center;gap:4px; }
 .qc-btn { display:inline-flex;padding:6px 14px;border-radius:10px;background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08));border:1px solid rgba(56,189,248,0.25);color:rgba(56,189,248,0.8);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;gap:6px;align-items:center;text-decoration:none; }
 .qc-btn:hover { background:linear-gradient(135deg,rgba(56,189,248,0.35),rgba(56,189,248,0.15));color:rgba(56,189,248,1);border-color:rgba(56,189,248,0.4);box-shadow:0 4px 16px rgba(56,189,248,0.15); }
 .qc-btn.running { opacity:0.5;pointer-events:none; }
@@ -2221,25 +2232,62 @@ const SOP_TAB_MAP = {
 const SOP_TAB_NAMES = {analytics:'Analytics',strategy:'Strategy',forecast:'Forecast',market:'Market'};
 const SOP_TAB_GIDS  = {analytics:'',strategy:'',forecast:'',market:''};
 
+// Maps sheet tab names (lowercase) to agent keys
+const SOP_TAB_NAME_MAP = {
+  'strategy sop': 'strategy',
+  'analytics sop': 'analytics',
+  'forecast sop': 'forecast',
+  'market sop': 'market',
+  'sop_strategy': 'strategy',
+  'sop_analytics': 'analytics',
+  'sop_forecast': 'forecast',
+  'sop_market': 'market',
+};
+
 function parseSopTabs(rawText) {
+  // Route by ## SHEET:tabname:GID:xxx markers (emitted by sheets.js)
+  const sheetSections = rawText.split(/^## SHEET:/m);
+  sheetSections.forEach(sec => {
+    const nlIdx = sec.indexOf('\n');
+    if (nlIdx < 0) return;
+    const header = sec.substring(0, nlIdx); // "strategy sop:GID:1234"
+    const parts  = header.split(':GID:');
+    const tabName = parts[0].trim().toLowerCase();
+    const gid    = parts[1] ? parts[1].trim() : '';
+    const agentKey = SOP_TAB_NAME_MAP[tabName];
+    if (!agentKey) return;
+    // Strip pipe delimiters — content is pipe-formatted by sheets.js; only column A matters
+    const body = sec.substring(nlIdx + 1).split('\n')
+      .map(l => l.replace(/^\|\s*/, '').replace(/\s*\|[\s|]*$/, '').trim())
+      .filter(l => l && !l.match(/^-{2,}/) && !l.match(/^:-/))
+      .join('\n').trim();
+    if (body.length > 0) {
+      AGENT_SOP[agentKey] = body;
+      SOP_TAB_GIDS[agentKey] = gid;
+    }
+  });
+
+  // Fallback: also support legacy ## SOP_Strategy headings embedded in any tab
   const sections = rawText.split(/^##\s+/m);
   for (const sec of sections) {
     const nlIdx = sec.indexOf('\n');
     if (nlIdx < 0) continue;
     const heading  = sec.substring(0, nlIdx).trim();
     const agentKey = SOP_TAB_MAP[heading];
-    if (!agentKey) continue;
+    if (!agentKey || AGENT_SOP[agentKey]) continue; // skip if already set by tab name
     const body = sec.substring(nlIdx + 1).split('\n')
       .filter(l => !l.trim().startsWith('|') && !l.trim().match(/^:-/))
       .join('\n').trim();
     if (body.length > 0) AGENT_SOP[agentKey] = body;
   }
+
+  // Update Edit SOP button links
   ['analytics','strategy','forecast','market'].forEach(key => {
     const link = document.getElementById('sop-link-' + key);
     if (link) {
       const gid = SOP_TAB_GIDS[key];
-      link.href = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + (gid ? '/edit#gid=' + gid : '');
-      link.textContent = 'Edit ' + SOP_TAB_NAMES[key] + ' SOP';
+      link.href = 'https://docs.google.com/spreadsheets/d/' + SHEET_ID + (gid ? '/edit#gid=' + gid : '/edit');
+      link.textContent = '✎ Edit ' + SOP_TAB_NAMES[key] + ' SOP';
     }
   });
 }
