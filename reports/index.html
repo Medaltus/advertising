@@ -1080,9 +1080,10 @@ function kpi(label, value, opts) {
       const c = (opts.inv ? opts.fMom <= 0 : opts.fMom >= 0) ? 'positive' : 'negative';
       h += `<div class="mom ${c}" style="font-size:11px;margin-top:3px;"><span class="mom-badge" style="width:15px;height:15px;">${opts.fMom>=0?'▲':'▼'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% MoM</div>`;
     }
+    if (opts.prev) h += `<div class="prev-row" style="margin-top:3px;">prev mo: <span>${opts.prev}</span></div>`;
     h += `</div>`;
   }
-  if (opts.prev) h += `<div class="prev-row">prev: <span>${opts.prev}</span></div>`;
+  if (opts.prev && opts.fFmt == null) h += `<div class="prev-row">prev: <span>${opts.prev}</span></div>`;
   if (opts.mom != null && isFinite(opts.mom)) {
     const c = (opts.inv ? opts.mom <= 0 : opts.mom >= 0) ? 'positive' : 'negative';
     h += `<div class="mom ${c}"><span class="mom-badge">${opts.mom>=0?'▲':'▼'}</span>${opts.mom>0?'+':''}${opts.mom.toFixed(1)}% MoM</div>`;
@@ -1090,6 +1091,7 @@ function kpi(label, value, opts) {
   if (opts.wow != null && isFinite(opts.wow)) {
     const c = (opts.inv ? opts.wow <= 0 : opts.wow >= 0) ? 'positive' : 'negative';
     h += `<div class="mom ${c}" style="font-size:10.5px;opacity:0.78;"><span class="mom-badge" style="width:13px;height:13px;font-size:9px;">${opts.wow>=0?'▲':'▼'}</span>${opts.wow>0?'+':''}${opts.wow.toFixed(1)}% WoW</div>`;
+    if (opts.wowPrev) h += `<div class="prev-row" style="font-size:10px;">prev wk: <span>${opts.wowPrev}</span></div>`;
   }
   if (opts.accent) el.style.borderColor = opts.accent + '40';
   el.innerHTML = h; return el;
@@ -1493,6 +1495,7 @@ function computeWoW(brand) {
     impressions: pct(cur.impressions, prev.impressions), clicks: pct(cur.clicks, prev.clicks),
     ctr: pct(cur.ctr, prev.ctr), cpc: pct(cur.cpc, prev.cpc), orders: pct(cur.orders, prev.orders),
     daysLabel: `${daysSinceMonday}d`,
+    prevRaw: prev,
   };
 }
 
@@ -1580,7 +1583,17 @@ function render() {
       o.prev = x.pf; o.mom = ip ? null : x.mm;
       if (x.ff != null) { o.fFmt = x.ffm; o.fMom = x.fmm; }
     }
-    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) o.wow = wow[x.wk];
+    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) {
+      o.wow = wow[x.wk];
+      if (wow.prevRaw) {
+        const pv = wow.prevRaw[x.wk];
+        if (pv != null) {
+          if (x.wk === 'roas') o.wowPrev = pv.toFixed(1) + 'x';
+          else if (x.wk === 'acos' || x.wk === 'tacos') o.wowPrev = pct(pv);
+          else o.wowPrev = fmt(pv);
+        }
+      }
+    }
     r1.appendChild(kpi(x.l, x.v, o));
   });
 
@@ -1610,7 +1623,18 @@ function render() {
       else o.fFmt = fmt(fval, x.px != null ? x.px : '$', x.dc || 0);
       o.fMom = prevBdata ? momPct(fval, prevBdata[x.k]) : null;
     }
-    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) o.wow = wow[x.wk];
+    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) {
+      o.wow = wow[x.wk];
+      if (wow.prevRaw) {
+        const pv = wow.prevRaw[x.wk];
+        if (pv != null) {
+          if (x.wk === 'ctr') o.wowPrev = pct(pv);
+          else if (x.wk === 'cpc') o.wowPrev = '$' + pv.toFixed(2);
+          else if (x.wk === 'orders') o.wowPrev = Math.round(pv).toLocaleString();
+          else o.wowPrev = fmt(pv, '', 0);
+        }
+      }
+    }
     r2.appendChild(kpi(x.l, x.v, o));
   });
 
