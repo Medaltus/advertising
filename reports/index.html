@@ -1078,7 +1078,7 @@ function kpi(label, value, opts) {
     h += `<div class="kpi-forecast"><div class="kpi-forecast-label">Forecast${opts.days?' · '+opts.days:''}</div><div class="kpi-forecast-value">${opts.fFmt}</div>`;
     if (opts.fMom != null && isFinite(opts.fMom)) {
       const c = (opts.inv ? opts.fMom <= 0 : opts.fMom >= 0) ? 'positive' : 'negative';
-      h += `<div class="mom ${c}" style="font-size:11px;margin-top:3px;"><span class="mom-badge" style="width:15px;height:15px;">${opts.fMom>=0?'▲':'▼'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% vs prev</div>`;
+      h += `<div class="mom ${c}" style="font-size:11px;margin-top:3px;"><span class="mom-badge" style="width:15px;height:15px;">${opts.fMom>=0?'▲':'▼'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% MoM</div>`;
     }
     h += `</div>`;
   }
