@@ -2102,6 +2102,51 @@ function buildDataSummary() {
   return s;
 }
 
+function buildStrategyDataSummary() {
+  // Base brand-level summary
+  let s = buildDataSummary();
+  // Enrich with campaign + STI detail from supplement
+  const suppEntry = API_SUPPLEMENT && API_SUPPLEMENT[selectedMonth];
+  if (!suppEntry || !suppEntry.brands) return s;
+  const today = new Date().toISOString().slice(0,10);
+  s += '\n\nCAMPAIGN-LEVEL DETAIL BY BRAND:\n';
+  suppEntry.brands.forEach(b => {
+    const campaigns = (b.campaigns || []).filter(c => (c.spend||0) > 0);
+    const stis = Array.isArray(b.searchTermInsights) ? b.searchTermInsights : Object.values(b.searchTermInsights||{});
+    if (!campaigns.length && !stis.length) return;
+    s += `\n[${b.name}]\n`;
+    // Campaigns sorted by spend desc, top 10
+    if (campaigns.length) {
+      s += '  Campaigns (sorted by spend):\n';
+      campaigns.sort((a,b2)=>(b2.spend||0)-(a.spend||0)).slice(0,10).forEach(c => {
+        const cpc = c.clicks > 0 ? (c.spend/c.clicks).toFixed(2) : 'N/A';
+        const cvr = c.clicks > 0 && c.orders > 0 ? ((c.orders/c.clicks)*100).toFixed(1) : 'N/A';
+        const roas = c.spend > 0 && c.adSales > 0 ? (c.adSales/c.spend).toFixed(2) : 'N/A';
+        s += `    "${c.name}" [${c.source||''}]: Spend=$${(c.spend||0).toFixed(2)}, Sales=$${(c.adSales||0).toFixed(2)}, ACOS=${c.acos||'N/A'}%, CPC=$${cpc}, CVR=${cvr}%, ROAS=${roas}, Orders=${c.orders||0}\n`;
+      });
+    }
+    // STIs — show all, with 7-day CPC trend
+    if (stis.length) {
+      s += '  Search Term Insights:\n';
+      stis.sort((a,b2)=>(b2.spend||0)-(a.spend||0)).forEach(st => {
+        const daily = st.daily || [];
+        // Recent 7 days vs prior 7 days CPC trend
+        const recent7 = daily.filter(d=>d.date<=today).slice(-7);
+        const prior7  = daily.filter(d=>d.date<=today).slice(-14,-7);
+        let trendStr = '';
+        if (recent7.length >= 3 && prior7.length >= 3) {
+          const avgR = recent7.reduce((a,d)=>a+(d.cpc||0),0)/recent7.length;
+          const avgP = prior7.reduce((a,d)=>a+(d.cpc||0),0)/prior7.length;
+          const pct = avgP > 0 ? ((avgR-avgP)/avgP*100).toFixed(0) : 0;
+          trendStr = ` | CPC 7d trend: ${pct>0?'+':''}${pct}% (now avg $${avgR.toFixed(2)})`;
+        }
+        s += `    "${st.query}": Spend=$${(st.spend||0).toFixed(2)}, Sales=$${(st.sales||0).toFixed(2)}, ACOS=${(st.acos||0).toFixed(1)}%, CPC=$${(st.cpc||0).toFixed(2)}, CVR=${((st.cvr||0)*100).toFixed(1)}%, Orders=${st.purchases||0}${trendStr}\n`;
+      });
+    }
+  });
+  return s;
+}
+
 const AGENT_PROMPTS = {
   analytics: `You are an analytics and quality control agent for Medaltus's multi-brand advertising portfolio. You do two jobs: check data integrity AND analyze what the numbers mean.
 
@@ -2115,13 +2160,21 @@ After the takeaways, cover:
 
 Be specific with numbers. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
 
-  strategy: `You are a paid media strategy advisor for Medaltus, managing a portfolio of CPG and wellness brands.
+  strategy: `You are a hands-on paid media campaign manager for Medaltus, a CPG/wellness portfolio on Amazon, Google, Meta, and TikTok. Your job is to give specific, campaign-level action items — not brand-level summaries. The user already knows the brand rollups. They want to know exactly which campaigns to touch and how.
 
-FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) summarizing your top recommendations. Each bullet should be one short actionable line. Then leave a blank line and continue with detailed analysis. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
+FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character). Each bullet must name a specific campaign or search term and a concrete action (e.g. "Raise daily budget on [campaign] by 20% — ACOS 11%, CPC trending down"). Then leave a blank line and continue with sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
 
-After the takeaways, cover budget reallocation opportunities across brands, scaling opportunities (brands with strong ACOS <25% that could absorb more spend), efficiency fixes for brands with poor ACOS (>40%), and portfolio concentration risk. If the user asks a specific question, focus on that instead.
+After the takeaways, cover these sections:
 
-Be specific with numbers and cite the data. Use plain text, no markdown. Keep it under 400 words. Start each section with the section name in caps followed by a colon.`,
+SCALE UP: Campaigns or search terms with strong ACOS (<25%) and good CVR that have room to absorb more spend. Name the campaign/term, current CPC, current ACOS, and recommend a specific budget increase (e.g. "+$30/day" or "+25% bid").
+
+CUT OR PAUSE: Campaigns or terms with poor ACOS (>45%) or high CPC with low CVR. Name them, show the numbers, and say whether to reduce budget, lower bids, or pause.
+
+BID ADJUSTMENTS: Search terms where CPC is trending significantly up or down vs the prior 7 days. If CPC is dropping on a converting term, raise bids to capture volume. If CPC is spiking on a low-converting term, cut bids now.
+
+BUDGET PACING: Based on current daily run rate vs days remaining in the month, flag any brand that is on track to significantly over- or underspend. Recommend specific daily budget adjustments.
+
+Be specific: use campaign names, dollar amounts, and percentages from the data. Keep it under 500 words. If the user asks a specific question, focus on that instead of the standard sections.`,
 
   market: `You are a market intelligence analyst covering digital advertising and CPG/wellness ecommerce. Today's date is ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}. The Medaltus portfolio advertises on Amazon, Google, Meta, TikTok, Pinterest, Walmart Connect, and Reddit.
 
@@ -2341,7 +2394,7 @@ async function runAgent(name, autoPrompt) {
   const userQ = inputEl ? inputEl.value.trim() : '';
   if (statusEl) { statusEl.style.display = 'flex'; statusEl.innerHTML = '<div class="pulse"></div> Thinking...'; }
   outputEl.style.display = 'none';
-  const dataSummary = buildDataSummary();
+  const dataSummary = name === 'strategy' ? buildStrategyDataSummary() : buildDataSummary();
   let prompt = AGENT_PROMPTS[name];
   const sop = AGENT_SOP[name];
   if (sop) prompt += '\n\nCUSTOM OPERATING RULES (follow these closely — they are set by the user and override defaults where they conflict):\n' + sop;
@@ -3126,7 +3179,7 @@ function showAgentFromCache(name, rawText, generatedAt) {
 
 const AGENT_AUTO_PROMPTS = {
   analytics: 'Run your automatic analysis on the latest data.',
-  strategy: 'Focus on opportunities to scale up. Which brands have strong ROAS and room to increase spend? Where are there untapped growth opportunities? Prioritize by potential impact and ease of execution.',
+  strategy: 'Review all campaign and search term data. Identify the top 3 campaigns to scale (low ACOS, good CVR, room to spend more), top 3 to cut or reduce bids (poor ACOS or high CPC/low CVR), any search terms where CPC is trending meaningfully up or down this week, and whether any brand is pacing to over/underspend this month. Give specific campaign names, dollar amounts, and bid recommendations.',
   forecast: "Give a rundown on how we are looking to perform this month versus last month. Compare projected month-end totals for spend, sales, ACOS, orders, and ROAS against last month's actuals. Call out which metrics are trending better or worse.",
   market: 'Give your current market conditions briefing for the Medaltus portfolio. Cover seasonal factors, recent platform policy changes, and industry trends.'
 };
