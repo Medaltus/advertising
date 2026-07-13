@@ -1087,6 +1087,10 @@ function kpi(label, value, opts) {
     const c = (opts.inv ? opts.mom <= 0 : opts.mom >= 0) ? 'positive' : 'negative';
     h += `<div class="mom ${c}"><span class="mom-badge">${opts.mom>=0?'▲':'▼'}</span>${opts.mom>0?'+':''}${opts.mom.toFixed(1)}% MoM</div>`;
   }
+  if (opts.wow != null && isFinite(opts.wow)) {
+    const c = (opts.inv ? opts.wow <= 0 : opts.wow >= 0) ? 'positive' : 'negative';
+    h += `<div class="mom ${c}" style="font-size:10.5px;opacity:0.78;"><span class="mom-badge" style="width:13px;height:13px;font-size:9px;">${opts.wow>=0?'▲':'▼'}</span>${opts.wow>0?'+':''}${opts.wow.toFixed(1)}% WoW</div>`;
+  }
   if (opts.accent) el.style.borderColor = opts.accent + '40';
   el.innerHTML = h; return el;
 }
@@ -1435,6 +1439,54 @@ function renderPacing(md, prev) {
 }
 
 // ── Main render ──
+// ── Week-over-Week delta helper ────────────────────────────────────────────
+function computeWoW(brand) {
+  if (!MEDALTUS_DAILY || !Object.keys(MEDALTUS_DAILY).length) return null;
+  const today = new Date();
+  const dow = today.getDay(); // 0=Sun, 1=Mon … 6=Sat
+  const daysSinceMonday = (dow + 6) % 7; // Mon=0, Tue=1 … Sun=6
+  if (daysSinceMonday === 0) return null; // Today is Monday — no current-week data yet
+  const toISO = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  // Current week: this Monday → yesterday
+  const thisMonday = new Date(today); thisMonday.setDate(today.getDate() - daysSinceMonday);
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  const curStart = toISO(thisMonday), curEnd = toISO(yesterday);
+  // Prior week: same Mon + same number of elapsed days (apples-to-apples)
+  const prevMonday = new Date(thisMonday); prevMonday.setDate(thisMonday.getDate() - 7);
+  const prevSameDay = new Date(prevMonday); prevSameDay.setDate(prevMonday.getDate() + daysSinceMonday - 1);
+  const priorStart = toISO(prevMonday), priorEnd = toISO(prevSameDay);
+  const sum = (s, e) => {
+    const acc = { spend:0, adSales:0, orders:0, clicks:0, impressions:0, totalSales:0, hasTotalSales:false };
+    Object.entries(MEDALTUS_DAILY).forEach(([d, entry]) => {
+      if (d < s || d > e) return;
+      const bs = entry.brands || {};
+      const bnames = brand === 'All' ? Object.keys(bs) : (bs[brand] ? [brand] : []);
+      bnames.forEach(bn => {
+        const b = bs[bn]; if (!b) return;
+        acc.spend += b.spend||0; acc.adSales += b.adSales||0;
+        acc.orders += b.orders||0; acc.clicks += b.clicks||0; acc.impressions += b.impressions||0;
+        if (b.totalSales != null) { acc.totalSales += b.totalSales; acc.hasTotalSales = true; }
+      });
+    });
+    acc.acos = acc.adSales > 0 ? acc.spend / acc.adSales * 100 : null;
+    acc.roas = acc.spend > 0 ? acc.adSales / acc.spend : null;
+    acc.cpc  = acc.clicks > 0 ? acc.spend / acc.clicks : null;
+    acc.ctr  = acc.impressions > 0 ? acc.clicks / acc.impressions * 100 : null;
+    acc.tacos = acc.hasTotalSales && acc.totalSales > 0 ? acc.spend / acc.totalSales * 100 : null;
+    return acc;
+  };
+  const cur = sum(curStart, curEnd), prev = sum(priorStart, priorEnd);
+  const pct = (c, p) => (p != null && p !== 0) ? ((c - p) / Math.abs(p)) * 100 : null;
+  return {
+    spend: pct(cur.spend, prev.spend), adSales: pct(cur.adSales, prev.adSales),
+    roas: pct(cur.roas, prev.roas), acos: pct(cur.acos, prev.acos),
+    totalSales: pct(cur.totalSales, prev.totalSales), tacos: pct(cur.tacos, prev.tacos),
+    impressions: pct(cur.impressions, prev.impressions), clicks: pct(cur.clicks, prev.clicks),
+    ctr: pct(cur.ctr, prev.ctr), cpc: pct(cur.cpc, prev.cpc), orders: pct(cur.orders, prev.orders),
+    daysLabel: `${daysSinceMonday}d`,
+  };
+}
+
 function render() {
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if (!DATA || !DATA.monthly.length) return;
@@ -1489,6 +1541,7 @@ function render() {
   // Get display data (brand or aggregate)
   const bdata = getBrandData(md, selectedBrand);
   const prevBdata = prev ? getBrandData(prev, selectedBrand) : null;
+  const wow = computeWoW(selectedBrand);
 
   // KPI Row 1
   const r1 = document.getElementById('kpi-row-1'); r1.innerHTML = '';
@@ -1498,12 +1551,12 @@ function render() {
   const accent = selectedBrand !== 'All' ? BRAND_COLORS[selectedBrand] : null;
 
   const k1 = [
-    { l: 'Ad Spend', v: fmt(bdata.spend), k: 'spend', sub: ip ? 'Month in progress' : null, warn: ip },
-    { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales' },
-    { l: 'ROAS', v: roas ? roas.toFixed(1) + 'x' : '—', pf: prevRoas ? prevRoas.toFixed(1) + 'x' : null, mm: momPct(roas, prevRoas), ff: fRoas, ffm: fRoas ? fRoas.toFixed(1) + 'x' : null, fmm: fRoas && prevRoas ? momPct(fRoas, prevRoas) : null },
-    { l: 'ACOS', v: pct(bdata.acos), k: 'acos', inv: true },
-    { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales' },
-    { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', inv: true },
+    { l: 'Ad Spend', v: fmt(bdata.spend), k: 'spend', wk: 'spend', sub: ip ? 'Month in progress' : null, warn: ip },
+    { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales', wk: 'adSales' },
+    { l: 'ROAS', v: roas ? roas.toFixed(1) + 'x' : '—', pf: prevRoas ? prevRoas.toFixed(1) + 'x' : null, mm: momPct(roas, prevRoas), ff: fRoas, ffm: fRoas ? fRoas.toFixed(1) + 'x' : null, fmm: fRoas && prevRoas ? momPct(fRoas, prevRoas) : null, wk: 'roas' },
+    { l: 'ACOS', v: pct(bdata.acos), k: 'acos', wk: 'acos', inv: true },
+    { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales', wk: 'totalSales' },
+    { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', wk: 'tacos', inv: true },
   ];
   k1.forEach(x => {
     const o = { sub: x.sub, warn: x.warn, inv: x.inv, days, accent };
@@ -1518,17 +1571,18 @@ function render() {
       o.prev = x.pf; o.mom = ip ? null : x.mm;
       if (x.ff != null) { o.fFmt = x.ffm; o.fMom = x.fmm; }
     }
+    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) o.wow = wow[x.wk];
     r1.appendChild(kpi(x.l, x.v, o));
   });
 
   // KPI Row 2
   const r2 = document.getElementById('kpi-row-2'); r2.innerHTML = '';
   const k2 = [
-    { l: 'Impressions', v: fmt(bdata.impressions, '', 0), k: 'impressions', px: '', dc: 0 },
-    { l: 'Clicks', v: fmt(bdata.clicks, '', 0), k: 'clicks', px: '', dc: 0 },
-    { l: 'CTR', v: pct(bdata.ctr), k: 'ctr', ip2: true },
-    { l: 'CPC', v: bdata.cpc != null ? '$' + bdata.cpc.toFixed(2) : '—', k: 'cpc', inv: true, dl: true },
-    { l: 'Ad Orders', v: bdata.orders != null ? Math.round(bdata.orders).toLocaleString() : '—', k: 'orders', ord: true },
+    { l: 'Impressions', v: fmt(bdata.impressions, '', 0), k: 'impressions', wk: 'impressions', px: '', dc: 0 },
+    { l: 'Clicks', v: fmt(bdata.clicks, '', 0), k: 'clicks', wk: 'clicks', px: '', dc: 0 },
+    { l: 'CTR', v: pct(bdata.ctr), k: 'ctr', wk: 'ctr', ip2: true },
+    { l: 'CPC', v: bdata.cpc != null ? '$' + bdata.cpc.toFixed(2) : '—', k: 'cpc', wk: 'cpc', inv: true, dl: true },
+    { l: 'Ad Orders', v: bdata.orders != null ? Math.round(bdata.orders).toLocaleString() : '—', k: 'orders', wk: 'orders', ord: true },
     { l: 'AOV', v: bdata.aov != null ? '$' + bdata.aov.toFixed(2) : '—', k: 'aov', dl: true },
   ];
   k2.forEach(x => {
@@ -1547,6 +1601,7 @@ function render() {
       else o.fFmt = fmt(fval, x.px != null ? x.px : '$', x.dc || 0);
       o.fMom = prevBdata ? momPct(fval, prevBdata[x.k]) : null;
     }
+    if (wow && x.wk && wow[x.wk] != null && isFinite(wow[x.wk])) o.wow = wow[x.wk];
     r2.appendChild(kpi(x.l, x.v, o));
   });
 
