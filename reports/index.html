@@ -1445,16 +1445,25 @@ function computeWoW(brand) {
   const today = new Date();
   const dow = today.getDay(); // 0=Sun, 1=Mon … 6=Sat
   const daysSinceMonday = (dow + 6) % 7; // Mon=0, Tue=1 … Sun=6
-  if (daysSinceMonday === 0) return null; // Today is Monday — no current-week data yet
   const toISO = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-  // Current week: this Monday → yesterday
-  const thisMonday = new Date(today); thisMonday.setDate(today.getDate() - daysSinceMonday);
-  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
-  const curStart = toISO(thisMonday), curEnd = toISO(yesterday);
-  // Prior week: same Mon + same number of elapsed days (apples-to-apples)
-  const prevMonday = new Date(thisMonday); prevMonday.setDate(thisMonday.getDate() - 7);
-  const prevSameDay = new Date(prevMonday); prevSameDay.setDate(prevMonday.getDate() + daysSinceMonday - 1);
-  const priorStart = toISO(prevMonday), priorEnd = toISO(prevSameDay);
+  let curStart, curEnd, priorStart, priorEnd;
+  if (daysSinceMonday === 0) {
+    // Today is Monday — show last complete week (Mon-Sun) vs week before
+    const lastMon = new Date(today); lastMon.setDate(today.getDate() - 7);
+    const lastSun = new Date(today); lastSun.setDate(today.getDate() - 1);
+    const prevMon = new Date(today); prevMon.setDate(today.getDate() - 14);
+    const prevSun = new Date(today); prevSun.setDate(today.getDate() - 8);
+    curStart = toISO(lastMon); curEnd = toISO(lastSun);
+    priorStart = toISO(prevMon); priorEnd = toISO(prevSun);
+  } else {
+    // Normal: this Mon → yesterday vs same elapsed days from prior week
+    const thisMonday = new Date(today); thisMonday.setDate(today.getDate() - daysSinceMonday);
+    const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+    const prevMonday = new Date(thisMonday); prevMonday.setDate(thisMonday.getDate() - 7);
+    const prevSameDay = new Date(prevMonday); prevSameDay.setDate(prevMonday.getDate() + daysSinceMonday - 1);
+    curStart = toISO(thisMonday); curEnd = toISO(yesterday);
+    priorStart = toISO(prevMonday); priorEnd = toISO(prevSameDay);
+  }
   const sum = (s, e) => {
     const acc = { spend:0, adSales:0, orders:0, clicks:0, impressions:0, totalSales:0, hasTotalSales:false };
     Object.entries(MEDALTUS_DAILY).forEach(([d, entry]) => {
