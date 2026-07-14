@@ -250,14 +250,7 @@
     }
   },
   "2026-06-12": {
-    "amazon": {
-      "spend": 550.79,
-      "adSales": 3313.98,
-      "totalSales": 6011.42,
-      "orders": 39,
-      "clicks": 216,
-      "impressions": 54186
-    },
+    "amazon": {},
     "google": {
       "spend": 463.84,
       "adSales": 1208.86,
@@ -375,7 +368,7 @@
       "totalSales": 5869.16,
       "orders": 29,
       "clicks": 220,
-      "impressions": 60297
+      "impressions": 60296
     },
     "google": {
       "spend": 287.2,
@@ -610,7 +603,7 @@
     "amazon": {
       "spend": 420.89,
       "adSales": 1984.19,
-      "totalSales": 5589.66,
+      "totalSales": 5539.67,
       "orders": 24,
       "clicks": 231,
       "impressions": 59999
@@ -694,9 +687,9 @@
   "2026-07-08": {
     "amazon": {
       "spend": 488.57,
-      "adSales": 2004.0,
+      "adSales": 2084.0,
       "totalSales": 6503.64,
-      "orders": 27,
+      "orders": 28,
       "clicks": 258,
       "impressions": 48444
     },
@@ -729,7 +722,7 @@
     "amazon": {
       "spend": 448.12,
       "adSales": 1654.19,
-      "totalSales": 6717.88,
+      "totalSales": 6657.88,
       "orders": 22,
       "clicks": 199,
       "impressions": 45421
@@ -745,11 +738,11 @@
   "2026-07-11": {
     "amazon": {
       "spend": 410.96,
-      "adSales": 1563.2,
+      "adSales": 1643.2,
       "totalSales": 7133.41,
-      "orders": 19,
+      "orders": 20,
       "clicks": 199,
-      "impressions": 40717
+      "impressions": 40720
     },
     "google": {
       "spend": 287.51,
@@ -763,17 +756,28 @@
     "amazon": {
       "spend": 444.37,
       "adSales": 1235.0,
-      "totalSales": 0.0,
+      "totalSales": 6111.1,
       "orders": 17,
       "clicks": 175,
-      "impressions": 33104
+      "impressions": 36405
     },
     "google": {
       "spend": 367.64,
       "adSales": 1802.81,
       "conversions": 12.0,
       "clicks": 187,
-      "impressions": 25245
+      "impressions": 25246
     }
+  },
+  "2026-07-13": {
+    "amazon": {
+      "spend": 498.59,
+      "adSales": 1339.18,
+      "totalSales": 0.0,
+      "orders": 17,
+      "clicks": 190,
+      "impressions": 30533
+    },
+    "google": {}
   }
 }
