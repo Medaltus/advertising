@@ -25,7 +25,9 @@ jobs:
       - name: Write config.json
         env:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
-        run: echo "$CONFIG_JSON" > config.json
+        run: |
+          echo "$CONFIG_JSON" > config.json
+          python3 -c "import json; c=json.load(open('config.json')); c['brands']=[b for b in c['brands'] if b!='Skinside']+['Skinside']; json.dump(c,open('config.json','w'))"
 
       # ── Amazon Ads (shared account — fetches all brands including Skinuva) ──
       - name: Fetch Amazon Ads data
