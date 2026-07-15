@@ -27,7 +27,16 @@ jobs:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
         run: |
           echo "$CONFIG_JSON" > config.json
-          python3 -c "import json; c=json.load(open('config.json')); c['brands']=[b for b in c['brands'] if b!='Skinside']+['Skinside']; json.dump(c,open('config.json','w'))"
+          python3 - <<'PYEOF'
+          import json
+          with open('config.json') as f:
+              c = json.load(f)
+          if 'Skinside' not in c['brands']:
+              c['brands'].append('Skinside')
+          with open('config.json', 'w') as f:
+              json.dump(c, f)
+          print('brands:', c['brands'])
+          PYEOF
 
       # ── Amazon Ads (shared account — fetches all brands including Skinuva) ──
       - name: Fetch Amazon Ads data
