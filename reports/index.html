@@ -81,7 +81,7 @@ body {
 .pacing-set-btn { display:inline-flex;padding:5px 12px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s; }
 .pacing-set-btn:hover { background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7); }
 .pacing-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px; }
-.pacing-card { background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 18px;position:relative; }
+.pacing-card { background:linear-gradient(160deg,rgba(255,255,255,0.07) 0%,rgba(255,255,255,0.02) 100%);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 18px;position:relative;backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4); }
 .pacing-card::before { content:'';position:absolute;top:0;left:10px;right:10px;height:1px;background:linear-gradient(90deg,transparent 5%,rgba(255,255,255,0.15) 50%,transparent 95%); }
 .pacing-card-header { display:flex;justify-content:space-between;align-items:center;margin-bottom:12px; }
 .pacing-brand-name { font-size:13px;font-weight:700;letter-spacing:0.2px; }
