@@ -1459,17 +1459,21 @@ function render(){
       const etl=ERACLEA_AMAZON.timeline.filter(r=>r.date.startsWith(curPfx));
       if(etl.length){
         const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
-        emd={amazon:{spend:sumK(etl,'spend'),adSales:sumK(etl,'sales'),orders:sumK(etl,'purchases'),clicks:sumK(etl,'clicks'),impressions:sumK(etl,'impressions')}};
+        // totalSales in timeline is company-wide; use summary.totalSales which is eraclea-specific
+        const eTotal=(ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales)||0;
+        emd={amazon:{spend:sumK(etl,'spend'),adSales:sumK(etl,'sales'),orders:sumK(etl,'purchases'),clicks:sumK(etl,'clicks'),impressions:sumK(etl,'impressions'),totalSales:eTotal}};
       }
     }
     const eprev=prev?ERACLEA_MONTHLY[prev.month]:null;
     if(emd&&emd.amazon){const ea=emd.amazon;
-      md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0)};
-      md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?(md.totalSales||0)/md.orders:null;
+      const eTot=ea.totalSales||0;
+      md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0),totalSales:(md.totalSales||0)+eTot};
+      md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.tacos=md.totalSales>0?md.adSpend/md.totalSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?md.totalSales/md.orders:null;
     }
     if(prev&&eprev&&eprev.amazon){const ea=eprev.amazon;
-      prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0)};
-      prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?(prev.totalSales||0)/prev.orders:null;
+      const eTot=ea.totalSales||0;
+      prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0),totalSales:(prev.totalSales||0)+eTot};
+      prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.tacos=prev.totalSales>0?prev.adSpend/prev.totalSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?prev.totalSales/prev.orders:null;
     }
   }
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
