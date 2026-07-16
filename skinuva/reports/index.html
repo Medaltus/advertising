@@ -3679,7 +3679,10 @@ function injectHistoricalApiData(){
     const a=mData.amazon||{}, g=mData.google||{};
     if (!a.spend || a.spend <= 0) return; // no Amazon data — let the sheet handle this month
 
-    const combined=mData.combinedTotalSales||null;
+    // Prefer combinedTotalSales from monthly JSON; fall back to existing sheet value so
+    // we don't overwrite Google Sheet totalSales for months the SP-API didn't backfill.
+    const _sheetEntry=DATA.monthly.find(m=>m.month===mk);
+    const combined=mData.combinedTotalSales||(_sheetEntry&&_sheetEntry.totalSales>0?_sheetEntry.totalSales:null);
 
     // ── Amazon channel ──
     const amzSpend=a.spend||0, amzSales=a.adSales||0, amzOrders=a.orders||0;
