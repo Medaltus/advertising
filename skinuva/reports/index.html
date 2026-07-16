@@ -2116,21 +2116,31 @@ function renderDayOfWeekHeatmap() {
   const container = document.getElementById('dow-container');
   if (!section || !container) return;
 
-  const timeline = ACTIVE_SUPPLEMENT ? (ACTIVE_SUPPLEMENT.timeline || []) : [];
-  if (!timeline.length) { section.style.display='none'; return; }
+  // For All tab, merge both Skinuva + eraclea timelines
+  let timelines = [];
+  if (selectedOzleeBrand === 'All') {
+    if (SKINUVA_AMAZON && SKINUVA_AMAZON.timeline) timelines.push(...SKINUVA_AMAZON.timeline);
+    if (ERACLEA_AMAZON && ERACLEA_AMAZON.timeline) timelines.push(...ERACLEA_AMAZON.timeline);
+  } else {
+    timelines = ACTIVE_SUPPLEMENT ? (ACTIVE_SUPPLEMENT.timeline || []) : [];
+  }
+  if (!timelines.length) { section.style.display='none'; return; }
 
   const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   const buckets   = DAY_NAMES.map(() => ({spend:0, sales:0, orders:0, clicks:0, count:0}));
 
-  timeline.forEach(row => {
+  // Track unique dates per DoW to get accurate day counts when merging two brands
+  const dowDates = DAY_NAMES.map(() => new Set());
+  timelines.forEach(row => {
     const d   = new Date(row.date + 'T12:00:00');
     const dow = (d.getDay() + 6) % 7; // Mon=0 … Sun=6
     buckets[dow].spend  += row.spend      || 0;
     buckets[dow].sales  += row.sales      || 0;
     buckets[dow].orders += row.purchases  || 0;
     buckets[dow].clicks += row.clicks     || 0;
-    buckets[dow].count  += 1;
+    dowDates[dow].add(row.date);
   });
+  DAY_NAMES.forEach((_,i) => { buckets[i].count = dowDates[i].size; });
 
   const total = buckets.reduce((s,b) => s + b.count, 0);
   if (!total) { section.style.display='none'; return; }
@@ -2175,7 +2185,7 @@ function renderDayOfWeekHeatmap() {
   });
 
   container.appendChild(grid);
-  const _dowBrand = selectedOzleeBrand==='eraclea' ? 'eraclea' : 'Skinuva';
+  const _dowBrand = selectedOzleeBrand==='eraclea' ? 'eraclea' : selectedOzleeBrand==='All' ? 'Skinuva + eraclea' : 'Skinuva';
   document.getElementById('dow-sub').textContent = _dowBrand + ' · ACOS & CVR by day of week · last 30 days';
 }
 
