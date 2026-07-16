@@ -1288,6 +1288,8 @@ function buildBrandSelector(){
 
 function renderEracleaView(){
   buildBrandSelector();
+  // Ensure KPI animation guard doesn't suppress eraclea values
+  if(!initialLoadDone) initialLoadDone=true;
   // Build month list from ERACLEA_MONTHLY + inject current from ERACLEA_AMAZON
   const monthOrder=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const monthsObj={...ERACLEA_MONTHLY};
@@ -1375,13 +1377,18 @@ function renderEracleaView(){
     const fvol=(v)=>(isP&&daysElapsed>0&&daysInMonth>0&&v!=null)?v/daysElapsed*daysInMonth:null;
     const fmom=(fv,pv)=>fv!=null&&pv!=null&&pv!==0?(fv-pv)/Math.abs(pv)*100:null;
 
+    // For partial current month, totalSales comes from ERACLEA_AMAZON.summary (brand-specific SP-API)
+    // ERACLEA_MONTHLY sets totalSales=0 to avoid company-wide bleed; supplement has the real value
+    const eTotalSales=(isP&&ERACLEA_AMAZON&&ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales)
+      ?ERACLEA_AMAZON.summary.totalSales:(amz.totalSales||0);
+
     // Computed metrics — match Skinuva layout exactly
     const roas=amz.spend>0?amz.adSales/amz.spend:null;
     const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
-    const tacos=amz.totalSales>0?amz.spend/amz.totalSales*100:null;
+    const tacos=eTotalSales>0?amz.spend/eTotalSales*100:null;
     const ctr=amz.impressions>0?amz.clicks/amz.impressions*100:null;
     const cpc=amz.clicks>0?amz.spend/amz.clicks:null;
-    const aov=amz.orders>0?amz.totalSales/amz.orders:null;
+    const aov=amz.orders>0?eTotalSales/amz.orders:null;
     const proas=pamz&&pamz.spend>0?pamz.adSales/pamz.spend:null;
     const pacos=pamz&&pamz.adSales>0?pamz.spend/pamz.adSales*100:null;
     const ptacos=pamz&&pamz.totalSales>0?pamz.spend/pamz.totalSales*100:null;
@@ -1391,7 +1398,7 @@ function renderEracleaView(){
     const mom=(a,b)=>!isP&&b!=null&&b!==0&&a!=null?(a-b)/Math.abs(b)*100:null;
 
     // Forecasted volume values
-    const fSpend=fvol(amz.spend), fSales=fvol(amz.adSales), fTotSales=fvol(amz.totalSales);
+    const fSpend=fvol(amz.spend), fSales=fvol(amz.adSales), fTotSales=fvol(eTotalSales);
     const fOrders=fvol(amz.orders), fClicks=fvol(amz.clicks), fImps=fvol(amz.impressions);
     const fRoas=fSpend&&fSales&&fSpend>0?fSales/fSpend:null;
     const fAcos=fSpend&&fSales&&fSales>0?fSpend/fSales*100:null;
@@ -1404,7 +1411,7 @@ function renderEracleaView(){
         {l:'Ad Sales',   v:fmt(amz.adSales),     k:'adSales',    fFmt:fSales!=null?fmt(fSales):null,         fMom:fmom(fSales,pamz?.adSales)},
         {l:'ROAS',       v:roas?roas.toFixed(1)+'x':'—',         prev:proas?proas.toFixed(1)+'x':null, mom:mom(roas,proas), fFmt:fRoas?fRoas.toFixed(1)+'x':null, fMom:fmom(fRoas,proas)},
         {l:'ACOS',       v:pct(acos),            k:'acos',       inv:true, fFmt:fAcos!=null?pct(fAcos):null, fMom:fmom(fAcos,pacos)},
-        {l:'Total Sales',v:fmt(amz.totalSales),  k:'totalSales', fFmt:fTotSales!=null?fmt(fTotSales):null,   fMom:fmom(fTotSales,pamz?.totalSales)},
+        {l:'Total Sales',v:fmt(eTotalSales),      k:'totalSales', fFmt:fTotSales!=null?fmt(fTotSales):null,   fMom:fmom(fTotSales,pamz?.totalSales)},
         {l:'TACOS',      v:pct(tacos),           k:'tacos',      inv:true, fFmt:fTacos!=null?pct(fTacos):null, fMom:fmom(fTacos,ptacos)},
       ].forEach(x=>{
         const o={sub:x.sub,warn:x.warn,inv:x.inv,days,fFmt:x.fFmt,fMom:x.fMom};
