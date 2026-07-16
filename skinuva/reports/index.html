@@ -1249,10 +1249,11 @@ function kpi(label,value,opts){
   if(opts.sub) h+=`<div class="kpi-sub${opts.warn?' warn':''}">${opts.sub}</div>`;
   if(opts.fFmt!=null){
     h+=`<div class="kpi-forecast"><div class="kpi-forecast-label">Forecast${opts.days?' &middot; '+opts.days:''}</div><div class="kpi-forecast-value">${opts.fFmt}</div>`;
-    if(opts.fMom!=null&&isFinite(opts.fMom)){const c=(opts.inv?opts.fMom<=0:opts.fMom>=0)?'positive':'negative'; h+=`<div class="mom mom-sm ${c}"><span class="mom-badge mom-badge-sm">${opts.fMom>=0?'&#9650;':'&#9660;'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% vs prev</div>`;}
+    if(opts.fMom!=null&&isFinite(opts.fMom)){const c=(opts.inv?opts.fMom<=0:opts.fMom>=0)?'positive':'negative'; h+=`<div class="mom ${c}" style="font-size:11px;margin-top:3px;"><span class="mom-badge" style="width:15px;height:15px;">${opts.fMom>=0?'&#9650;':'&#9660;'}</span>${opts.fMom>0?'+':''}${opts.fMom.toFixed(1)}% MoM</div>`;}
+    if(opts.prev) h+=`<div class="prev-row" style="margin-top:3px;">prev mo: <span>${opts.prev}</span></div>`;
     h+=`</div>`;
   }
-  if(opts.prev) h+=`<div class="prev-row">prev: <span>${opts.prev}</span></div>`;
+  if(opts.prev&&opts.fFmt==null) h+=`<div class="prev-row">prev: <span>${opts.prev}</span></div>`;
   if(opts.mom!=null&&isFinite(opts.mom)){
     const c=(opts.inv?opts.mom<=0:opts.mom>=0)?'positive':'negative';
     h+=`<div class="mom ${c}"><span class="mom-badge">${opts.mom>=0?'&#9650;':'&#9660;'}</span>${opts.mom>0?'+':''}${opts.mom.toFixed(1)}% MoM</div>`;
