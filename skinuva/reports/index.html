@@ -1987,7 +1987,7 @@ function renderSearchTermInsights(){
     const avgY=yS(avg30).toFixed(1);
     const lineColor=isSpike?'#ff6b6b':'#818cf8';
     body.innerHTML=
-      '<div style="margin-bottom:4px;font-size:11px;color:rgba(255,255,255,0.35);">Skinuva</div>'+
+      '<div style="margin-bottom:4px;font-size:11px;color:rgba(255,255,255,0.35);">'+(selectedOzleeBrand==='eraclea'?'eraclea':'Skinuva')+'</div>'+
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">'+
         '<div style="font-size:16px;font-weight:700;color:rgba(255,255,255,0.9);">'+t.query+'</div>'+
         (isSpike?'<span style="background:#ff6b6b22;color:#ff6b6b;border:1px solid #ff6b6b44;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;">⚠ CPC SPIKE</span>':'')+
