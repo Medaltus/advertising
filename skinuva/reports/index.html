@@ -800,7 +800,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
     </div>
   </div>
 
-  <div class="charts-grid">
+  <div class="charts-grid" id="trend-row">
     <div class="chart-card full-width">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
         <div class="section-header" style="margin-bottom:0;"><div class="section-title">Monthly Trends</div><div class="section-sub">Full months shown; partial month paces linearly</div></div>
@@ -810,14 +810,14 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
     </div>
   </div>
 
-  <div class="charts-grid">
+  <div class="charts-grid" id="acos-row">
     <div class="chart-card full-width">
       <div class="section-header"><div class="section-title">Amazon vs Google — ACOS Trend</div><div class="section-sub">Top two channels compared</div></div>
       <div class="chart-wrap" style="height:240px;"><canvas id="chart-acos"></canvas></div>
     </div>
   </div>
 
-  <div class="chart-card glass" style="margin-bottom:24px;">
+  <div class="chart-card glass" id="channels-card" style="margin-bottom:24px;">
     <div class="section-header"><div class="section-title">Channel Breakdown</div><div class="section-sub" id="table-sub"></div></div>
     <div class="table-wrap"><table><thead><tr>
       <th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>ACOS</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Orders</th><th>AOV</th><th>CVR</th>
@@ -1344,7 +1344,7 @@ function renderEracleaView(){
   ['amazon-api-section','search-terms-section','dow-section','asin-section','placement-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='';
   });
-  ['google-api-section','wlos-section','agents-section'].forEach(id=>{
+  ['google-api-section','wlos-section','agents-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   if(document.getElementById('audio-btn')) document.getElementById('audio-btn').style.display='none';
@@ -1414,7 +1414,7 @@ function render(){
   buildBrandSelector();
   if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
   // Restore sections that eraclea view may have hidden
-  ['google-api-section','wlos-section'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  ['google-api-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
   const rb=document.getElementById('range-bar'); if(rb) rb.style.display='';
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
