@@ -1257,6 +1257,7 @@ function kpi(label,value,opts){
     const c=(opts.inv?opts.mom<=0:opts.mom>=0)?'positive':'negative';
     h+=`<div class="mom ${c}"><span class="mom-badge">${opts.mom>=0?'&#9650;':'&#9660;'}</span>${opts.mom>0?'+':''}${opts.mom.toFixed(1)}% MoM</div>`;
   }
+  if(opts.wow!=null&&isFinite(opts.wow)){const c=(opts.inv?opts.wow<=0:opts.wow>=0)?'positive':'negative'; h+=`<div class="mom ${c}" style="font-size:10.5px;opacity:0.78;"><span class="mom-badge" style="width:13px;height:13px;font-size:9px;">${opts.wow>=0?'&#9650;':'&#9660;'}</span>${opts.wow>0?'+':''}${opts.wow.toFixed(1)}% WoW</div>`; if(opts.wowPrev) h+=`<div class="prev-row" style="font-size:10px;">prev wk: <span>${opts.wowPrev}</span></div>`;}
   el.innerHTML=h; return el;
 }
 
@@ -1284,6 +1285,72 @@ function buildBrandSelector(){
   // Update header label
   const hl=document.getElementById('header-label');
   if(hl) hl.textContent=selectedOzleeBrand==='All'?'Ozlee Performance':selectedOzleeBrand==='eraclea'?'eraclea Performance':'Skinuva Performance';
+}
+
+// ── Week-over-Week delta helper ────────────────────────────────────────────
+function computeOzleeWoW(tab){
+  const hasSkinuva=SKINUVA_DAILY&&Object.keys(SKINUVA_DAILY).length>0;
+  const hasEraclea=ERACLEA_DAILY&&Object.keys(ERACLEA_DAILY).length>0;
+  if(tab==='skinuva'&&!hasSkinuva) return null;
+  if(tab==='eraclea'&&!hasEraclea) return null;
+  if(tab==='All'&&!hasSkinuva&&!hasEraclea) return null;
+  const today=new Date();
+  const dow=today.getDay();
+  const daysSinceMonday=(dow+6)%7;
+  const toISO=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  let curStart,curEnd,priorStart,priorEnd;
+  if(daysSinceMonday===0){
+    const lm=new Date(today); lm.setDate(today.getDate()-7);
+    const ls=new Date(today); ls.setDate(today.getDate()-1);
+    const pm=new Date(today); pm.setDate(today.getDate()-14);
+    const ps=new Date(today); ps.setDate(today.getDate()-8);
+    curStart=toISO(lm); curEnd=toISO(ls); priorStart=toISO(pm); priorEnd=toISO(ps);
+  } else {
+    const thisMon=new Date(today); thisMon.setDate(today.getDate()-daysSinceMonday);
+    const yest=new Date(today); yest.setDate(today.getDate()-1);
+    const prevMon=new Date(thisMon); prevMon.setDate(thisMon.getDate()-7);
+    const prevSame=new Date(prevMon); prevSame.setDate(prevMon.getDate()+daysSinceMonday-1);
+    curStart=toISO(thisMon); curEnd=toISO(yest); priorStart=toISO(prevMon); priorEnd=toISO(prevSame);
+  }
+  const sumDays=(archive,s,e)=>{
+    const acc={adSpend:0,adSales:0,orders:0,clicks:0,impressions:0};
+    Object.entries(archive).forEach(([d,entry])=>{
+      if(d<s||d>e) return;
+      const amz=entry.amazon||{};
+      acc.adSpend+=amz.spend||0; acc.adSales+=amz.adSales||0;
+      acc.orders+=amz.orders||0; acc.clicks+=amz.clicks||0; acc.impressions+=amz.impressions||0;
+    });
+    acc.roas=acc.adSpend>0?acc.adSales/acc.adSpend:null;
+    acc.acos=acc.adSales>0?acc.adSpend/acc.adSales*100:null;
+    acc.ctr=acc.impressions>0?acc.clicks/acc.impressions*100:null;
+    acc.cpc=acc.clicks>0?acc.adSpend/acc.clicks:null;
+    return acc;
+  };
+  const merge=(a,b)=>{
+    const m={adSpend:a.adSpend+b.adSpend,adSales:a.adSales+b.adSales,orders:a.orders+b.orders,clicks:a.clicks+b.clicks,impressions:a.impressions+b.impressions};
+    m.roas=m.adSpend>0?m.adSales/m.adSpend:null; m.acos=m.adSales>0?m.adSpend/m.adSales*100:null;
+    m.ctr=m.impressions>0?m.clicks/m.impressions*100:null; m.cpc=m.clicks>0?m.adSpend/m.clicks:null;
+    return m;
+  };
+  let cur,prev2;
+  if(tab==='skinuva'){cur=sumDays(SKINUVA_DAILY,curStart,curEnd);prev2=sumDays(SKINUVA_DAILY,priorStart,priorEnd);}
+  else if(tab==='eraclea'){cur=sumDays(ERACLEA_DAILY,curStart,curEnd);prev2=sumDays(ERACLEA_DAILY,priorStart,priorEnd);}
+  else{
+    const empty={adSpend:0,adSales:0,orders:0,clicks:0,impressions:0,roas:null,acos:null,ctr:null,cpc:null};
+    const sc=hasSkinuva?sumDays(SKINUVA_DAILY,curStart,curEnd):{...empty};
+    const ec=hasEraclea?sumDays(ERACLEA_DAILY,curStart,curEnd):{...empty};
+    const sp=hasSkinuva?sumDays(SKINUVA_DAILY,priorStart,priorEnd):{...empty};
+    const ep=hasEraclea?sumDays(ERACLEA_DAILY,priorStart,priorEnd):{...empty};
+    cur=merge(sc,ec); prev2=merge(sp,ep);
+  }
+  const d=(c,p)=>p!=null&&p!==0?(c-p)/Math.abs(p)*100:null;
+  return {
+    adSpend:d(cur.adSpend,prev2.adSpend), adSales:d(cur.adSales,prev2.adSales),
+    roas:d(cur.roas,prev2.roas), acos:d(cur.acos,prev2.acos),
+    impressions:d(cur.impressions,prev2.impressions), clicks:d(cur.clicks,prev2.clicks),
+    ctr:d(cur.ctr,prev2.ctr), cpc:d(cur.cpc,prev2.cpc), orders:d(cur.orders,prev2.orders),
+    prevRaw:prev2, daysLabel:`${daysSinceMonday}d`
+  };
 }
 
 function renderEracleaView(){
@@ -1404,34 +1471,55 @@ function renderEracleaView(){
     const fAcos=fSpend&&fSales&&fSales>0?fSpend/fSales*100:null;
     const fTacos=fSpend&&fTotSales&&fTotSales>0?fSpend/fTotSales*100:null;
 
+    // WoW — eraclea Amazon daily archive
+    const wowE=computeOzleeWoW('eraclea');
+
     // Row 1: Ad Spend, Ad Sales, ROAS, ACOS, Total Sales, TACOS
     const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
       [
-        {l:'Ad Spend',   v:fmt(amz.spend),      k:'spend',      sub:isP?'Month in progress':null, warn:isP, fFmt:fSpend!=null?fmt(fSpend):null,         fMom:fmom(fSpend,pamz?.spend)},
-        {l:'Ad Sales',   v:fmt(amz.adSales),     k:'adSales',    fFmt:fSales!=null?fmt(fSales):null,         fMom:fmom(fSales,pamz?.adSales)},
-        {l:'ROAS',       v:roas?roas.toFixed(1)+'x':'—',         prev:proas?proas.toFixed(1)+'x':null, mom:mom(roas,proas), fFmt:fRoas?fRoas.toFixed(1)+'x':null, fMom:fmom(fRoas,proas)},
-        {l:'ACOS',       v:pct(acos),            k:'acos',       inv:true, fFmt:fAcos!=null?pct(fAcos):null, fMom:fmom(fAcos,pacos)},
-        {l:'Total Sales',v:fmt(eTotalSales),      k:'totalSales', fFmt:fTotSales!=null?fmt(fTotSales):null,   fMom:fmom(fTotSales,pamz?.totalSales)},
-        {l:'TACOS',      v:pct(tacos),           k:'tacos',      inv:true, fFmt:fTacos!=null?pct(fTacos):null, fMom:fmom(fTacos,ptacos)},
+        {l:'Ad Spend',   v:fmt(amz.spend),      k:'spend',      wk:'adSpend', sub:isP?'Month in progress':null, warn:isP, fFmt:fSpend!=null?fmt(fSpend):null,         fMom:fmom(fSpend,pamz?.spend)},
+        {l:'Ad Sales',   v:fmt(amz.adSales),     k:'adSales',   wk:'adSales', fFmt:fSales!=null?fmt(fSales):null,         fMom:fmom(fSales,pamz?.adSales)},
+        {l:'ROAS',       v:roas?roas.toFixed(1)+'x':'—',        wk:'roas',    prev:proas?proas.toFixed(1)+'x':null, mom:mom(roas,proas), fFmt:fRoas?fRoas.toFixed(1)+'x':null, fMom:fmom(fRoas,proas)},
+        {l:'ACOS',       v:pct(acos),            k:'acos',      wk:'acos',    inv:true, fFmt:fAcos!=null?pct(fAcos):null, fMom:fmom(fAcos,pacos)},
+        {l:'Total Sales',v:fmt(eTotalSales),      k:'totalSales',               fFmt:fTotSales!=null?fmt(fTotSales):null,   fMom:fmom(fTotSales,pamz?.totalSales)},
+        {l:'TACOS',      v:pct(tacos),           k:'tacos',                    inv:true, fFmt:fTacos!=null?pct(fTacos):null, fMom:fmom(fTacos,ptacos)},
       ].forEach(x=>{
         const o={sub:x.sub,warn:x.warn,inv:x.inv,days,fFmt:x.fFmt,fMom:x.fMom};
         if(x.k==='acos'||x.k==='tacos'){o.prev=x.k==='acos'?(pacos!=null?pct(pacos):null):(ptacos!=null?pct(ptacos):null); if(!isP) o.mom=x.k==='acos'?mom(acos,pacos):mom(tacos,ptacos);}
         else if(x.k){o.prev=pamz!=null?fmt(pamz[x.k]||0):null; if(!isP) o.mom=mom(amz[x.k],pamz?pamz[x.k]:null);}
         else{o.prev=x.prev; o.mom=x.mom;}
+        if(wowE&&x.wk&&wowE[x.wk]!=null&&isFinite(wowE[x.wk])){
+          o.wow=wowE[x.wk];
+          if(wowE.prevRaw){const pv=wowE.prevRaw[x.wk]; if(pv!=null){
+            if(x.wk==='roas') o.wowPrev=pv.toFixed(1)+'x';
+            else if(x.wk==='acos') o.wowPrev=pct(pv);
+            else o.wowPrev=fmt(pv);
+          }}
+        }
         r1.appendChild(kpi(x.l,x.v,o));
       });
     }
     // Row 2: Impressions, Clicks, CTR, CPC, Orders, AOV
     const r2=document.getElementById('kpi-row-2'); if(r2){r2.innerHTML='';
       [
-        {l:'Impressions', v:fmt(amz.impressions,'',0), prev:pamz!=null?fmt(pamz.impressions||0,'',0):null, mom:mom(amz.impressions,pamz?.impressions), fFmt:fImps!=null?fmt(fImps,'',0):null, fMom:fmom(fImps,pamz?.impressions)},
-        {l:'Clicks',      v:fmt(amz.clicks,'',0),      prev:pamz!=null?fmt(pamz.clicks||0,'',0):null,      mom:mom(amz.clicks,pamz?.clicks),           fFmt:fClicks!=null?fmt(fClicks,'',0):null, fMom:fmom(fClicks,pamz?.clicks)},
-        {l:'CTR',         v:pct(ctr),                  prev:pctr!=null?pct(pctr):null,                     mom:mom(ctr,pctr)},
-        {l:'CPC',         v:cpc!=null?'$'+cpc.toFixed(2):'—', prev:pcpc!=null?'$'+pcpc.toFixed(2):null,    mom:mom(cpc,pcpc), inv:true},
-        {l:'Orders',      v:amz.orders!=null?Math.round(amz.orders).toLocaleString():'—', prev:pamz?.orders!=null?Math.round(pamz.orders).toLocaleString():null, mom:mom(amz.orders,pamz?.orders), fFmt:fOrders!=null?Math.round(fOrders).toLocaleString():null, fMom:fmom(fOrders,pamz?.orders)},
-        {l:'AOV',         v:aov!=null?'$'+aov.toFixed(2):'—', prev:paov!=null?'$'+paov.toFixed(2):null,    mom:mom(aov,paov)},
+        {l:'Impressions', v:fmt(amz.impressions,'',0), wk:'impressions', prev:pamz!=null?fmt(pamz.impressions||0,'',0):null, mom:mom(amz.impressions,pamz?.impressions), fFmt:fImps!=null?fmt(fImps,'',0):null, fMom:fmom(fImps,pamz?.impressions)},
+        {l:'Clicks',      v:fmt(amz.clicks,'',0),      wk:'clicks',      prev:pamz!=null?fmt(pamz.clicks||0,'',0):null,      mom:mom(amz.clicks,pamz?.clicks),           fFmt:fClicks!=null?fmt(fClicks,'',0):null, fMom:fmom(fClicks,pamz?.clicks)},
+        {l:'CTR',         v:pct(ctr),                  wk:'ctr',         prev:pctr!=null?pct(pctr):null,                     mom:mom(ctr,pctr)},
+        {l:'CPC',         v:cpc!=null?'$'+cpc.toFixed(2):'—', wk:'cpc', prev:pcpc!=null?'$'+pcpc.toFixed(2):null,            mom:mom(cpc,pcpc), inv:true},
+        {l:'Orders',      v:amz.orders!=null?Math.round(amz.orders).toLocaleString():'—', wk:'orders', prev:pamz?.orders!=null?Math.round(pamz.orders).toLocaleString():null, mom:mom(amz.orders,pamz?.orders), fFmt:fOrders!=null?Math.round(fOrders).toLocaleString():null, fMom:fmom(fOrders,pamz?.orders)},
+        {l:'AOV',         v:aov!=null?'$'+aov.toFixed(2):'—', prev:paov!=null?'$'+paov.toFixed(2):null, mom:mom(aov,paov)},
       ].forEach(x=>{
-        r2.appendChild(kpi(x.l,x.v,{prev:x.prev,mom:x.mom,inv:x.inv,days,fFmt:x.fFmt,fMom:x.fMom}));
+        const o={prev:x.prev,mom:x.mom,inv:x.inv,days,fFmt:x.fFmt,fMom:x.fMom};
+        if(wowE&&x.wk&&wowE[x.wk]!=null&&isFinite(wowE[x.wk])){
+          o.wow=wowE[x.wk];
+          if(wowE.prevRaw){const pv=wowE.prevRaw[x.wk]; if(pv!=null){
+            if(x.wk==='ctr') o.wowPrev=pct(pv);
+            else if(x.wk==='cpc') o.wowPrev='$'+pv.toFixed(2);
+            else if(x.wk==='orders') o.wowPrev=Math.round(pv).toLocaleString();
+            else o.wowPrev=fmt(pv,'',0);
+          }}
+        }
+        r2.appendChild(kpi(x.l,x.v,o));
       });
     }
   }
@@ -1530,13 +1618,16 @@ function render(){
     tb.appendChild(btn);
   })();
 
+  // WoW — Amazon daily archive (skinuva or all-brands)
+  const wow=computeOzleeWoW(selectedOzleeBrand==='All'?'All':'skinuva');
+
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
   const k1=[
-    {l:'Ad Spend',v:fmt(md.adSpend),k:'adSpend',sub:ip?'Month in progress':null,warn:ip},
-    {l:'Ad Sales',v:fmt(md.adSales),k:'adSales'},
-    {l:'ROAS',v:cr?cr.toFixed(1)+'x':'—',pf:pr?pr.toFixed(1)+'x':null,mm:momPct(cr,pr),ff:fr,ffm:fr?fr.toFixed(1)+'x':null,fmm:fr&&pr?momPct(fr,pr):null},
-    {l:'ACOS',v:pct(md.acos),k:'acos',inv:true},
+    {l:'Ad Spend',v:fmt(md.adSpend),k:'adSpend',wk:'adSpend',sub:ip?'Month in progress':null,warn:ip},
+    {l:'Ad Sales',v:fmt(md.adSales),k:'adSales',wk:'adSales'},
+    {l:'ROAS',v:cr?cr.toFixed(1)+'x':'—',pf:pr?pr.toFixed(1)+'x':null,mm:momPct(cr,pr),ff:fr,ffm:fr?fr.toFixed(1)+'x':null,fmm:fr&&pr?momPct(fr,pr):null,wk:'roas'},
+    {l:'ACOS',v:pct(md.acos),k:'acos',wk:'acos',inv:true},
     {l:'Total Sales',v:fmt(md.totalSales),k:'totalSales'},
     {l:'TACOS',v:pct(md.tacos),k:'tacos',inv:true},
   ];
@@ -1546,17 +1637,25 @@ function render(){
       o.prev=pv!=null?(isPct?pct(pv):fmt(pv)):null; if(!ip) o.mom=momPct(md[x.k],pv);
       const fval=f(x.k); if(fval!=null){o.fFmt=isPct?pct(fval):fmt(fval);o.fMom=prev?momPct(fval,prev[x.k]):null;}
     } else {o.prev=x.pf;if(!ip) o.mom=x.mm;if(x.ff!=null){o.fFmt=x.ffm;o.fMom=x.fmm;}}
+    if(wow&&x.wk&&wow[x.wk]!=null&&isFinite(wow[x.wk])){
+      o.wow=wow[x.wk];
+      if(wow.prevRaw){const pv=wow.prevRaw[x.wk]; if(pv!=null){
+        if(x.wk==='roas') o.wowPrev=pv.toFixed(1)+'x';
+        else if(x.wk==='acos') o.wowPrev=pct(pv);
+        else o.wowPrev=fmt(pv);
+      }}
+    }
     r1.appendChild(kpi(x.l,x.v,o));
   });
 
   // KPI Row 2
   const r2=document.getElementById('kpi-row-2'); r2.innerHTML='';
   const k2=[
-    {l:'Impressions',v:fmt(md.impressions,'',0),k:'impressions',px:'',dc:0},
-    {l:'Clicks',v:fmt(md.clicks,'',0),k:'clicks',px:'',dc:0},
-    {l:'CTR',v:pct(md.ctr),k:'ctr',ip:true},
-    {l:'CPC',v:md.cpc!=null?'$'+md.cpc.toFixed(2):'—',k:'cpc',inv:true,dl:true},
-    {l:'Orders',v:md.orders!=null?Math.round(md.orders).toLocaleString():'—',k:'orders',ord:true},
+    {l:'Impressions',v:fmt(md.impressions,'',0),k:'impressions',wk:'impressions',px:'',dc:0},
+    {l:'Clicks',v:fmt(md.clicks,'',0),k:'clicks',wk:'clicks',px:'',dc:0},
+    {l:'CTR',v:pct(md.ctr),k:'ctr',wk:'ctr',ip:true},
+    {l:'CPC',v:md.cpc!=null?'$'+md.cpc.toFixed(2):'—',k:'cpc',wk:'cpc',inv:true,dl:true},
+    {l:'Orders',v:md.orders!=null?Math.round(md.orders).toLocaleString():'—',k:'orders',wk:'orders',ord:true},
     {l:'AOV',v:md.aov!=null?'$'+md.aov.toFixed(2):'—',k:'aov',dl:true},
   ];
   k2.forEach(x=>{
@@ -1572,6 +1671,15 @@ function render(){
       else if(x.ord) o.fFmt=Math.round(fval).toLocaleString();
       else o.fFmt=fmt(fval,x.px||'$',x.dc||0);
       o.fMom=prev?momPct(fval,prev[x.k]):null;
+    }
+    if(wow&&x.wk&&wow[x.wk]!=null&&isFinite(wow[x.wk])){
+      o.wow=wow[x.wk];
+      if(wow.prevRaw){const pv=wow.prevRaw[x.wk]; if(pv!=null){
+        if(x.wk==='ctr') o.wowPrev=pct(pv);
+        else if(x.wk==='cpc') o.wowPrev='$'+pv.toFixed(2);
+        else if(x.wk==='orders') o.wowPrev=Math.round(pv).toLocaleString();
+        else o.wowPrev=fmt(pv,'',0);
+      }}
     }
     r2.appendChild(kpi(x.l,x.v,o));
   });
