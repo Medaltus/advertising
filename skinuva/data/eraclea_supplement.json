@@ -1,36 +1,4384 @@
 {
-  "fetched_at": "pending",
-  "lookback_days": 0,
+  "fetched_at": "2026-07-16T15:47:13Z",
+  "lookback_days": 31,
   "currency": "USD",
-  "brand": "eraclea",
   "summary": {
-    "impressions": 0,
-    "clicks": 0,
-    "spend": 0,
-    "sales": 0,
-    "purchases": 0,
-    "ctr": null,
-    "cpc": null,
-    "acos": null,
-    "roas": null,
-    "totalSales": 0
+    "impressions": 30857,
+    "clicks": 147,
+    "spend": 220.46,
+    "sales": 466.96,
+    "purchases": 8,
+    "ctr": 0.0048,
+    "cpc": 1.4997,
+    "acos": 47.21,
+    "roas": 2.12,
+    "totalSales": 1130.37
   },
-  "timeline": [],
-  "campaigns": [],
-  "search_terms": [],
-  "asins": [],
-  "placements": [],
+  "timeline": [
+    {
+      "date": "2026-06-15",
+      "impressions": 1486,
+      "clicks": 9,
+      "spend": 8.09,
+      "sales": 191.98,
+      "purchases": 3,
+      "acos": 4.21,
+      "roas": 23.73,
+      "totalSales": 7160.88
+    },
+    {
+      "date": "2026-06-16",
+      "impressions": 1982,
+      "clicks": 7,
+      "spend": 7.34,
+      "sales": 39.99,
+      "purchases": 1,
+      "acos": 18.35,
+      "roas": 5.45,
+      "totalSales": 6430.58
+    },
+    {
+      "date": "2026-06-17",
+      "impressions": 2177,
+      "clicks": 10,
+      "spend": 10.9,
+      "sales": 39.99,
+      "purchases": 1,
+      "acos": 27.26,
+      "roas": 3.67,
+      "totalSales": 7929.68
+    },
+    {
+      "date": "2026-06-18",
+      "impressions": 1841,
+      "clicks": 3,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6905.49
+    },
+    {
+      "date": "2026-06-19",
+      "impressions": 2568,
+      "clicks": 2,
+      "spend": 0.98,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5869.16
+    },
+    {
+      "date": "2026-06-20",
+      "impressions": 2344,
+      "clicks": 10,
+      "spend": 13.72,
+      "sales": 95.0,
+      "purchases": 1,
+      "acos": 14.44,
+      "roas": 6.92,
+      "totalSales": 5031.84
+    },
+    {
+      "date": "2026-06-21",
+      "impressions": 1268,
+      "clicks": 5,
+      "spend": 3.76,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6066.34
+    },
+    {
+      "date": "2026-06-22",
+      "impressions": 1081,
+      "clicks": 6,
+      "spend": 6.53,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6764.04
+    },
+    {
+      "date": "2026-06-23",
+      "impressions": 1637,
+      "clicks": 4,
+      "spend": 8.2,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 17777.77
+    },
+    {
+      "date": "2026-06-24",
+      "impressions": 965,
+      "clicks": 6,
+      "spend": 10.73,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 15079.08
+    },
+    {
+      "date": "2026-06-25",
+      "impressions": 654,
+      "clicks": 5,
+      "spend": 9.58,
+      "sales": 32.0,
+      "purchases": 1,
+      "acos": 29.94,
+      "roas": 3.34,
+      "totalSales": 10736.82
+    },
+    {
+      "date": "2026-06-26",
+      "impressions": 847,
+      "clicks": 6,
+      "spend": 12.5,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 14126.32
+    },
+    {
+      "date": "2026-06-27",
+      "impressions": 315,
+      "clicks": 3,
+      "spend": 6.89,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5092.49
+    },
+    {
+      "date": "2026-06-28",
+      "impressions": 816,
+      "clicks": 4,
+      "spend": 6.88,
+      "sales": 68.0,
+      "purchases": 1,
+      "acos": 10.12,
+      "roas": 9.88,
+      "totalSales": 6311.31
+    },
+    {
+      "date": "2026-06-29",
+      "impressions": 754,
+      "clicks": 2,
+      "spend": 1.54,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5646.81
+    },
+    {
+      "date": "2026-06-30",
+      "impressions": 823,
+      "clicks": 5,
+      "spend": 4.14,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5922.54
+    },
+    {
+      "date": "2026-07-01",
+      "impressions": 647,
+      "clicks": 5,
+      "spend": 7.79,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 7322.3
+    },
+    {
+      "date": "2026-07-02",
+      "impressions": 1662,
+      "clicks": 4,
+      "spend": 8.82,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6725.16
+    },
+    {
+      "date": "2026-07-03",
+      "impressions": 239,
+      "clicks": 7,
+      "spend": 17.79,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5539.67
+    },
+    {
+      "date": "2026-07-04",
+      "impressions": 860,
+      "clicks": 4,
+      "spend": 11.52,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 4404.88
+    },
+    {
+      "date": "2026-07-05",
+      "impressions": 156,
+      "clicks": 4,
+      "spend": 10.08,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5417.47
+    },
+    {
+      "date": "2026-07-06",
+      "impressions": 859,
+      "clicks": 1,
+      "spend": 0.14,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6402.93
+    },
+    {
+      "date": "2026-07-07",
+      "impressions": 511,
+      "clicks": 3,
+      "spend": 2.85,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 7564.02
+    },
+    {
+      "date": "2026-07-08",
+      "impressions": 711,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6503.64
+    },
+    {
+      "date": "2026-07-09",
+      "impressions": 676,
+      "clicks": 4,
+      "spend": 3.66,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6394.17
+    },
+    {
+      "date": "2026-07-10",
+      "impressions": 473,
+      "clicks": 5,
+      "spend": 9.65,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6657.88
+    },
+    {
+      "date": "2026-07-11",
+      "impressions": 526,
+      "clicks": 3,
+      "spend": 4.72,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6862.41
+    },
+    {
+      "date": "2026-07-12",
+      "impressions": 428,
+      "clicks": 6,
+      "spend": 8.49,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 5981.1
+    },
+    {
+      "date": "2026-07-13",
+      "impressions": 559,
+      "clicks": 4,
+      "spend": 4.5,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6095.61
+    },
+    {
+      "date": "2026-07-14",
+      "impressions": 596,
+      "clicks": 5,
+      "spend": 8.21,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 6369.45
+    },
+    {
+      "date": "2026-07-15",
+      "impressions": 396,
+      "clicks": 4,
+      "spend": 6.89,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "roas": 0.0,
+      "totalSales": 0
+    }
+  ],
+  "campaigns": [
+    {
+      "id": 163136390316507,
+      "name": "eraclea - SP - A - All Products (minus HEROs 1/3/6) - 4.26",
+      "impressions": 25948,
+      "clicks": 118,
+      "spend": 161.67,
+      "sales": 179.98,
+      "purchases": 4,
+      "ctr": 0.0045,
+      "cpc": 1.3701,
+      "acos": 89.83,
+      "roas": 1.11
+    },
+    {
+      "id": 309431604356282,
+      "name": "eraclea - SP - M - Product Targeting",
+      "impressions": 1136,
+      "clicks": 27,
+      "spend": 53.15,
+      "sales": 286.98,
+      "purchases": 4,
+      "ctr": 0.0238,
+      "cpc": 1.9685,
+      "acos": 18.52,
+      "roas": 5.4
+    },
+    {
+      "id": 245252659571477,
+      "name": "eraclea - SP - A - Gel Cleanser 3 - 4.26",
+      "impressions": 715,
+      "clicks": 1,
+      "spend": 4.18,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": 0.0014,
+      "cpc": 4.18,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": 166091452533342,
+      "name": "eraclea - SP - A - Pure Hydration 6 - 4.26",
+      "impressions": 3053,
+      "clicks": 1,
+      "spend": 1.46,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": 0.0003,
+      "cpc": 1.46,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": 248619547347593,
+      "name": "eraclea - SP - A - BambooExfoliant 1 - 4.26",
+      "impressions": 2,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": 0.0,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    },
+    {
+      "id": 22838149820093,
+      "name": "eraclea - SP - M - Summer Combo 6.26",
+      "impressions": 3,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": 0.0,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    },
+    {
+      "id": 527256519496101,
+      "name": "Eraclea - SP - M - Acne",
+      "impressions": 0,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": null,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    },
+    {
+      "id": 390048611196044,
+      "name": "Eraclea - SP - M - Acne - Product Targeting",
+      "impressions": 0,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": null,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    },
+    {
+      "id": 270260229193260,
+      "name": "eraclea - SB - Auto - Hydrate - 2.26",
+      "impressions": 0,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": null,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    },
+    {
+      "id": 52595980514647,
+      "name": "eraclea - SB - M - 1 + 4 _ 3.26",
+      "impressions": 0,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "ctr": null,
+      "cpc": null,
+      "acos": null,
+      "roas": null
+    }
+  ],
+  "pacing": [
+    {
+      "id": 309431604356282,
+      "name": "eraclea - SP - M - Product Targeting",
+      "state": "enabled",
+      "dailyBudget": 15.0,
+      "recentSpend": 1.71,
+      "pacingPct": 11.4
+    },
+    {
+      "id": 245252659571477,
+      "name": "eraclea - SP - A - Gel Cleanser 3 - 4.26",
+      "state": "enabled",
+      "dailyBudget": 6.0,
+      "recentSpend": 0.13,
+      "pacingPct": 2.2
+    },
+    {
+      "id": 248619547347593,
+      "name": "eraclea - SP - A - BambooExfoliant 1 - 4.26",
+      "state": "enabled",
+      "dailyBudget": 5.0,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 166091452533342,
+      "name": "eraclea - SP - A - Pure Hydration 6 - 4.26",
+      "state": "enabled",
+      "dailyBudget": 5.0,
+      "recentSpend": 0.05,
+      "pacingPct": 0.9
+    },
+    {
+      "id": 22838149820093,
+      "name": "eraclea - SP - M - Summer Combo 6.26",
+      "state": "enabled",
+      "dailyBudget": 5.0,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 270260229193260,
+      "name": "eraclea - SB - Auto - Hydrate - 2.26",
+      "state": "paused",
+      "dailyBudget": 5.0,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 52595980514647,
+      "name": "eraclea - SB - M - 1 + 4 _ 3.26",
+      "state": "paused",
+      "dailyBudget": 5.0,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 527256519496101,
+      "name": "Eraclea - SP - M - Acne",
+      "state": "enabled",
+      "dailyBudget": 3.75,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 390048611196044,
+      "name": "Eraclea - SP - M - Acne - Product Targeting",
+      "state": "enabled",
+      "dailyBudget": 3.75,
+      "recentSpend": 0.0,
+      "pacingPct": 0.0
+    },
+    {
+      "id": 163136390316507,
+      "name": "eraclea - SP - A - All Products (minus HEROs 1/3/6) - 4.26",
+      "state": "enabled",
+      "dailyBudget": 3.0,
+      "recentSpend": 5.22,
+      "pacingPct": 173.8
+    }
+  ],
+  "search_terms": [
+    {
+      "query": "eraclea",
+      "impressions": 199,
+      "clicks": 13,
+      "spend": 11.09,
+      "sales": 159.98,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-06-15",
+          "impressions": 95,
+          "clicks": 4,
+          "spend": 3.87,
+          "sales": 159.98,
+          "cpc": 0.9675
+        },
+        {
+          "date": "2026-06-17",
+          "impressions": 20,
+          "clicks": 1,
+          "spend": 0.45,
+          "sales": 0.0,
+          "cpc": 0.45
+        },
+        {
+          "date": "2026-06-24",
+          "impressions": 17,
+          "clicks": 1,
+          "spend": 2.03,
+          "sales": 0.0,
+          "cpc": 2.03
+        },
+        {
+          "date": "2026-06-26",
+          "impressions": 14,
+          "clicks": 1,
+          "spend": 2.3,
+          "sales": 0.0,
+          "cpc": 2.3
+        },
+        {
+          "date": "2026-06-29",
+          "impressions": 14,
+          "clicks": 1,
+          "spend": 0.59,
+          "sales": 0.0,
+          "cpc": 0.59
+        },
+        {
+          "date": "2026-07-03",
+          "impressions": 16,
+          "clicks": 3,
+          "spend": 1.26,
+          "sales": 0.0,
+          "cpc": 0.42
+        },
+        {
+          "date": "2026-07-06",
+          "impressions": 16,
+          "clicks": 1,
+          "spend": 0.14,
+          "sales": 0.0,
+          "cpc": 0.14
+        },
+        {
+          "date": "2026-07-13",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 0.45,
+          "sales": 0.0,
+          "cpc": 0.45
+        }
+      ],
+      "acos": 6.93,
+      "cvr": 0.1538,
+      "ctr": 0.0653,
+      "cpc": 0.8531
+    },
+    {
+      "query": "hydrate eraclear",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 9.16,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-03",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 9.16,
+          "sales": 0.0,
+          "cpc": 9.16
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 9.16
+    },
+    {
+      "query": "eraclea ever-moist lip balm",
+      "impressions": 7,
+      "clicks": 1,
+      "spend": 5.84,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-04",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 5.84,
+          "sales": 0.0,
+          "cpc": 5.84
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1429,
+      "cpc": 5.84
+    },
+    {
+      "query": "eraclea intensive hydrating day cream",
+      "impressions": 6,
+      "clicks": 4,
+      "spend": 5.38,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-12",
+          "impressions": 6,
+          "clicks": 4,
+          "spend": 5.38,
+          "sales": 0.0,
+          "cpc": 1.345
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.6667,
+      "cpc": 1.345
+    },
+    {
+      "query": "eraclear",
+      "impressions": 13,
+      "clicks": 2,
+      "spend": 5.28,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-10",
+          "impressions": 13,
+          "clicks": 2,
+          "spend": 5.28,
+          "sales": 0.0,
+          "cpc": 2.64
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1538,
+      "cpc": 2.64
+    },
+    {
+      "query": "b0fpq7pwvy",
+      "impressions": 3,
+      "clicks": 2,
+      "spend": 5.15,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-25",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        },
+        {
+          "date": "2026-06-27",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.93,
+          "sales": 0.0,
+          "cpc": 2.93
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.6667,
+      "cpc": 2.575
+    },
+    {
+      "query": "oxygen mask",
+      "impressions": 37,
+      "clicks": 3,
+      "spend": 5.07,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-21",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 0.92,
+          "sales": 0.0,
+          "cpc": 0.92
+        },
+        {
+          "date": "2026-06-22",
+          "impressions": 14,
+          "clicks": 1,
+          "spend": 1.75,
+          "sales": 0.0,
+          "cpc": 1.75
+        },
+        {
+          "date": "2026-06-23",
+          "impressions": 20,
+          "clicks": 1,
+          "spend": 2.4,
+          "sales": 0.0,
+          "cpc": 2.4
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0811,
+      "cpc": 1.69
+    },
+    {
+      "query": "b01agy65na",
+      "impressions": 27,
+      "clicks": 3,
+      "spend": 5.05,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-23",
+          "impressions": 16,
+          "clicks": 2,
+          "spend": 3.4,
+          "sales": 0.0,
+          "cpc": 1.7
+        },
+        {
+          "date": "2026-06-25",
+          "impressions": 11,
+          "clicks": 1,
+          "spend": 1.65,
+          "sales": 0.0,
+          "cpc": 1.65
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1111,
+      "cpc": 1.6833
+    },
+    {
+      "query": "eraclea pure hydration serum",
+      "impressions": 10,
+      "clicks": 2,
+      "spend": 4.89,
+      "sales": 95.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 10,
+          "clicks": 2,
+          "spend": 4.89,
+          "sales": 95.0,
+          "cpc": 2.445
+        }
+      ],
+      "acos": 5.15,
+      "cvr": 0.5,
+      "ctr": 0.2,
+      "cpc": 2.445
+    },
+    {
+      "query": "gentle face cleansers",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 4.18,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-17",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 4.18,
+          "sales": 0.0,
+          "cpc": 4.18
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 4.18
+    },
+    {
+      "query": "b075mm84dc",
+      "impressions": 13,
+      "clicks": 1,
+      "spend": 4.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-05",
+          "impressions": 13,
+          "clicks": 1,
+          "spend": 4.02,
+          "sales": 0.0,
+          "cpc": 4.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0769,
+      "cpc": 4.02
+    },
+    {
+      "query": "b097vzgtzk",
+      "impressions": 691,
+      "clicks": 9,
+      "spend": 3.98,
+      "sales": 32.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-06-15",
+          "impressions": 159,
+          "clicks": 2,
+          "spend": 1.4,
+          "sales": 32.0,
+          "cpc": 0.7
+        },
+        {
+          "date": "2026-06-16",
+          "impressions": 137,
+          "clicks": 2,
+          "spend": 1.02,
+          "sales": 0.0,
+          "cpc": 0.51
+        },
+        {
+          "date": "2026-06-17",
+          "impressions": 160,
+          "clicks": 2,
+          "spend": 0.32,
+          "sales": 0.0,
+          "cpc": 0.16
+        },
+        {
+          "date": "2026-06-18",
+          "impressions": 74,
+          "clicks": 1,
+          "spend": 0.12,
+          "sales": 0.0,
+          "cpc": 0.12
+        },
+        {
+          "date": "2026-06-19",
+          "impressions": 78,
+          "clicks": 1,
+          "spend": 0.6,
+          "sales": 0.0,
+          "cpc": 0.6
+        },
+        {
+          "date": "2026-06-21",
+          "impressions": 83,
+          "clicks": 1,
+          "spend": 0.52,
+          "sales": 0.0,
+          "cpc": 0.52
+        }
+      ],
+      "acos": 12.44,
+      "cvr": 0.1111,
+      "ctr": 0.013,
+      "cpc": 0.4422
+    },
+    {
+      "query": "eraclea bamboo",
+      "impressions": 3,
+      "clicks": 3,
+      "spend": 3.91,
+      "sales": 79.98,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-06-16",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.48,
+          "sales": 39.99,
+          "cpc": 1.48
+        },
+        {
+          "date": "2026-06-17",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.48,
+          "sales": 39.99,
+          "cpc": 1.48
+        },
+        {
+          "date": "2026-06-29",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.95,
+          "sales": 0.0,
+          "cpc": 0.95
+        }
+      ],
+      "acos": 4.89,
+      "cvr": 0.6667,
+      "ctr": 1.0,
+      "cpc": 1.3033
+    },
+    {
+      "query": "b075mlz3s6",
+      "impressions": 3,
+      "clicks": 2,
+      "spend": 3.77,
+      "sales": 32.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-06-16",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.51,
+          "sales": 0.0,
+          "cpc": 1.51
+        },
+        {
+          "date": "2026-06-25",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.26,
+          "sales": 32.0,
+          "cpc": 2.26
+        }
+      ],
+      "acos": 11.78,
+      "cvr": 0.5,
+      "ctr": 0.6667,
+      "cpc": 1.885
+    },
+    {
+      "query": "b01n13w31f",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 3.51,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-27",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 3.51,
+          "sales": 0.0,
+          "cpc": 3.51
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 3.51
+    },
+    {
+      "query": "b0dmqxzj86",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 3.51,
+      "sales": 68.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-06-28",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 3.51,
+          "sales": 68.0,
+          "cpc": 3.51
+        }
+      ],
+      "acos": 5.16,
+      "cvr": 1.0,
+      "ctr": 0.5,
+      "cpc": 3.51
+    },
+    {
+      "query": "hylatopic plus cream",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 3.51,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-26",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 3.51,
+          "sales": 0.0,
+          "cpc": 3.51
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 3.51
+    },
+    {
+      "query": "spf lip balm",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 3.06,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-02",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 3.06,
+          "sales": 0.0,
+          "cpc": 3.06
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 3.06
+    },
+    {
+      "query": "b0c6yw1gjl",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.96,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-01",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.96,
+          "sales": 0.0,
+          "cpc": 2.96
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.96
+    },
+    {
+      "query": "b0dndz7n56",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 2.93,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-03",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 2.93,
+          "sales": 0.0,
+          "cpc": 2.93
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 2.93
+    },
+    {
+      "query": "eraclea zinc serum",
+      "impressions": 16,
+      "clicks": 1,
+      "spend": 2.84,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-02",
+          "impressions": 16,
+          "clicks": 1,
+          "spend": 2.84,
+          "sales": 0.0,
+          "cpc": 2.84
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0625,
+      "cpc": 2.84
+    },
+    {
+      "query": "b01n37ak8v",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 2.4,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-23",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 2.4,
+          "sales": 0.0,
+          "cpc": 2.4
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 2.4
+    },
+    {
+      "query": "perricone md chlorophyll detox mask",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.34,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-15",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.34,
+          "sales": 0.0,
+          "cpc": 2.34
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.34
+    },
+    {
+      "query": "oxygen face mask",
+      "impressions": 26,
+      "clicks": 2,
+      "spend": 2.3,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-16",
+          "impressions": 21,
+          "clicks": 1,
+          "spend": 1.15,
+          "sales": 0.0,
+          "cpc": 1.15
+        },
+        {
+          "date": "2026-06-22",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 1.15,
+          "sales": 0.0,
+          "cpc": 1.15
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0769,
+      "cpc": 1.15
+    },
+    {
+      "query": "b06xwrzdhm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-26",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.22
+    },
+    {
+      "query": "b0grwfbkxn",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-03",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.22
+    },
+    {
+      "query": "lip plumper balm",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-02",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.22
+    },
+    {
+      "query": "natural facial cleanser",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-03",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.22
+    },
+    {
+      "query": "oxygen face mask skincare",
+      "impressions": 3,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-24",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.3333,
+      "cpc": 2.22
+    },
+    {
+      "query": "oxygen masks for face adult",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 2.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-24",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.22,
+          "sales": 0.0,
+          "cpc": 2.22
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.22
+    },
+    {
+      "query": "the best cream for chest",
+      "impressions": 2,
+      "clicks": 2,
+      "spend": 2.2,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 2,
+          "clicks": 2,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 1.1
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.1
+    },
+    {
+      "query": "eraclea skincare",
+      "impressions": 7,
+      "clicks": 1,
+      "spend": 2.14,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-14",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 2.14,
+          "sales": 0.0,
+          "cpc": 2.14
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1429,
+      "cpc": 2.14
+    },
+    {
+      "query": "eraclea daily bamboo",
+      "impressions": 2,
+      "clicks": 2,
+      "spend": 2.11,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.1,
+          "sales": 0.0,
+          "cpc": 1.1
+        },
+        {
+          "date": "2026-06-22",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.01,
+          "sales": 0.0,
+          "cpc": 1.01
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.055
+    },
+    {
+      "query": "b0fmszp73d",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-05",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0ft93jhps",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-05",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0gt1ffc6q",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-04",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0gyrlr3dh",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-05",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0h337cw4b",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-25",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0fzlqqb2c",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-11",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0g3whhgk6",
+      "impressions": 3,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-14",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.3333,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0gs9vhmqd",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-15",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0gwpbt5qs",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-10",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.02,
+          "sales": 0.0,
+          "cpc": 2.02
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.02
+    },
+    {
+      "query": "b0f1mzwzr3",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 2.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-01",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 2.0,
+          "sales": 0.0,
+          "cpc": 2.0
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 2.0
+    },
+    {
+      "query": "b004n32ivy",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.85,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-04",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.85,
+          "sales": 0.0,
+          "cpc": 1.85
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.85
+    },
+    {
+      "query": "b0flbmlsh6",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.81,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-04",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.81,
+          "sales": 0.0,
+          "cpc": 1.81
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.81
+    },
+    {
+      "query": "b0grkltszj",
+      "impressions": 4,
+      "clicks": 1,
+      "spend": 1.76,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-12",
+          "impressions": 4,
+          "clicks": 1,
+          "spend": 1.76,
+          "sales": 0.0,
+          "cpc": 1.76
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.25,
+      "cpc": 1.76
+    },
+    {
+      "query": "oxygenating mask",
+      "impressions": 10,
+      "clicks": 1,
+      "spend": 1.71,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-24",
+          "impressions": 10,
+          "clicks": 1,
+          "spend": 1.71,
+          "sales": 0.0,
+          "cpc": 1.71
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1,
+      "cpc": 1.71
+    },
+    {
+      "query": "b086gnhqrs",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.64,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-26",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.64,
+          "sales": 0.0,
+          "cpc": 1.64
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.64
+    },
+    {
+      "query": "oxygen mask powder",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.48,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-26",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.48,
+          "sales": 0.0,
+          "cpc": 1.48
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.48
+    },
+    {
+      "query": "recovery gel for skin",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.48,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-10",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.48,
+          "sales": 0.0,
+          "cpc": 1.48
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.48
+    },
+    {
+      "query": "b075mm23vz",
+      "impressions": 191,
+      "clicks": 1,
+      "spend": 1.46,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 191,
+          "clicks": 1,
+          "spend": 1.46,
+          "sales": 0.0,
+          "cpc": 1.46
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0052,
+      "cpc": 1.46
+    },
+    {
+      "query": "b0gnhzkdhl",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.46,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-09",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.46,
+          "sales": 0.0,
+          "cpc": 1.46
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.46
+    },
+    {
+      "query": "b01hse2w1k",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.43,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-25",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.43,
+          "sales": 0.0,
+          "cpc": 1.43
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.43
+    },
+    {
+      "query": "medicines to relax the muscles of the face",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.39,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-15",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.39,
+          "sales": 0.0,
+          "cpc": 1.39
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.39
+    },
+    {
+      "query": "b01d7vevmg",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-24",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b086m3xrk1",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-30",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0b3d8c6tx",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-28",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0cdj5562p",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-01",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0d69xc2c2",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-26",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0dhylcml2",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-30",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0fq432gnm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-22",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0gq23d4y6",
+      "impressions": 3,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-28",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.3333,
+      "cpc": 1.35
+    },
+    {
+      "query": "b00365dabc",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-09",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 1.35
+    },
+    {
+      "query": "b092zpmg16",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-14",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b09838t1rk",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-07",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0b45ll4dd",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-14",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0dwqqx6lk",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-12",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0g3pggtt4",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-14",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0gp648128",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-11",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0gqkkvq7q",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-08",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0gyc88zgl",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-13",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0h154sr9w",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-13",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "b0h46cd2fr",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-13",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "pb face cream",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.35,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-11",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.35,
+          "sales": 0.0,
+          "cpc": 1.35
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.35
+    },
+    {
+      "query": "eraclea cleansing",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.3,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-15",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.3,
+          "sales": 0.0,
+          "cpc": 1.3
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.3
+    },
+    {
+      "query": "gentle face cleanser for dry skin",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.26,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-15",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.26,
+          "sales": 0.0,
+          "cpc": 1.26
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.26
+    },
+    {
+      "query": "b0g2m33vj7",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.25,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-17",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.25,
+          "sales": 0.0,
+          "cpc": 1.25
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.25
+    },
+    {
+      "query": "b0gylw25nb",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.25,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-17",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.25,
+          "sales": 0.0,
+          "cpc": 1.25
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.25
+    },
+    {
+      "query": "prequel cleanser",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.25,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.25,
+          "sales": 0.0,
+          "cpc": 1.25
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.25
+    },
+    {
+      "query": "lip balm with hyaluronic acid",
+      "impressions": 225,
+      "clicks": 3,
+      "spend": 1.2,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-17",
+          "impressions": 139,
+          "clicks": 2,
+          "spend": 0.82,
+          "sales": 0.0,
+          "cpc": 0.41
+        },
+        {
+          "date": "2026-06-19",
+          "impressions": 86,
+          "clicks": 1,
+          "spend": 0.38,
+          "sales": 0.0,
+          "cpc": 0.38
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0133,
+      "cpc": 0.4
+    },
+    {
+      "query": "moisture face mask",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.2,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-24",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.2,
+          "sales": 0.0,
+          "cpc": 1.2
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.2
+    },
+    {
+      "query": "barrier balm",
+      "impressions": 64,
+      "clicks": 1,
+      "spend": 1.15,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 64,
+          "clicks": 1,
+          "spend": 1.15,
+          "sales": 0.0,
+          "cpc": 1.15
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0156,
+      "cpc": 1.15
+    },
+    {
+      "query": "rosacea treatment for face",
+      "impressions": 18,
+      "clicks": 1,
+      "spend": 1.15,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-17",
+          "impressions": 18,
+          "clicks": 1,
+          "spend": 1.15,
+          "sales": 0.0,
+          "cpc": 1.15
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0556,
+      "cpc": 1.15
+    },
+    {
+      "query": "b0djv8myyn",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.14,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-07",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.14,
+          "sales": 0.0,
+          "cpc": 1.14
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.14
+    },
+    {
+      "query": "dr melaxin calcium balm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.14,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-15",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.14,
+          "sales": 0.0,
+          "cpc": 1.14
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.14
+    },
+    {
+      "query": "glycerin lip balm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.1,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-21",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.1,
+          "sales": 0.0,
+          "cpc": 1.1
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.1
+    },
+    {
+      "query": "lip oil",
+      "impressions": 15,
+      "clicks": 1,
+      "spend": 1.1,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-18",
+          "impressions": 15,
+          "clicks": 1,
+          "spend": 1.1,
+          "sales": 0.0,
+          "cpc": 1.1
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0667,
+      "cpc": 1.1
+    },
+    {
+      "query": "ormedic lip balm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.1,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.1,
+          "sales": 0.0,
+          "cpc": 1.1
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.1
+    },
+    {
+      "query": "oxy mask",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 1.1,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-16",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.1,
+          "sales": 0.0,
+          "cpc": 1.1
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 1.1
+    },
+    {
+      "query": "lip treatment",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.08,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-16",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.08,
+          "sales": 0.0,
+          "cpc": 1.08
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.08
+    },
+    {
+      "query": "eraclea zinc",
+      "impressions": 12,
+      "clicks": 1,
+      "spend": 1.03,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-01",
+          "impressions": 12,
+          "clicks": 1,
+          "spend": 1.03,
+          "sales": 0.0,
+          "cpc": 1.03
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0833,
+      "cpc": 1.03
+    },
+    {
+      "query": "lip peptide treatment",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 1.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-18",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.0,
+          "sales": 0.0,
+          "cpc": 1.0
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 1.0
+    },
+    {
+      "query": "yahoo-placeholder-keyword",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.88,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-22",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.88,
+          "sales": 0.0,
+          "cpc": 0.88
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.88
+    },
+    {
+      "query": "b07k4cqdkc",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.87,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-10",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.87,
+          "sales": 0.0,
+          "cpc": 0.87
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.87
+    },
+    {
+      "query": "b07sz2pkff",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.7,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-02",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.7,
+          "sales": 0.0,
+          "cpc": 0.7
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.7
+    },
+    {
+      "query": "oxidizingpara la piel",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.67,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-28",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.67,
+          "sales": 0.0,
+          "cpc": 0.67
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.67
+    },
+    {
+      "query": "eraclea face wash",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.62,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-21",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.62,
+          "sales": 0.0,
+          "cpc": 0.62
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.62
+    },
+    {
+      "query": "beeswax for lips",
+      "impressions": 77,
+      "clicks": 1,
+      "spend": 0.6,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-21",
+          "impressions": 77,
+          "clicks": 1,
+          "spend": 0.6,
+          "sales": 0.0,
+          "cpc": 0.6
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.013,
+      "cpc": 0.6
+    },
+    {
+      "query": "b0frr1gskc",
+      "impressions": 3,
+      "clicks": 1,
+      "spend": 0.58,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-30",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 0.58,
+          "sales": 0.0,
+          "cpc": 0.58
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.3333,
+      "cpc": 0.58
+    },
+    {
+      "query": "gravity cream",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.57,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-20",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.57,
+          "sales": 0.0,
+          "cpc": 0.57
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.57
+    },
+    {
+      "query": "b00hnssjr8",
+      "impressions": 7,
+      "clicks": 1,
+      "spend": 0.45,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-01",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 0.45,
+          "sales": 0.0,
+          "cpc": 0.45
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1429,
+      "cpc": 0.45
+    },
+    {
+      "query": "b0djtsd8zt",
+      "impressions": 6,
+      "clicks": 1,
+      "spend": 0.45,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-27",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 0.45,
+          "sales": 0.0,
+          "cpc": 0.45
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1667,
+      "cpc": 0.45
+    },
+    {
+      "query": "eraclea purifying gel cleanser",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.45,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-30",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.45,
+          "sales": 0.0,
+          "cpc": 0.45
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.45
+    },
+    {
+      "query": "b0dw62t7z9",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.43,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-09",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.43,
+          "sales": 0.0,
+          "cpc": 0.43
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.43
+    },
+    {
+      "query": "b0gpfx42sj",
+      "impressions": 3,
+      "clicks": 1,
+      "spend": 0.42,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-09",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 0.42,
+          "sales": 0.0,
+          "cpc": 0.42
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.3333,
+      "cpc": 0.42
+    },
+    {
+      "query": "b0fv5t7zj4",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.41,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-30",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.41,
+          "sales": 0.0,
+          "cpc": 0.41
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.41
+    },
+    {
+      "query": "b01hq1yhwm",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.39,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-22",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.39,
+          "sales": 0.0,
+          "cpc": 0.39
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.39
+    },
+    {
+      "query": "b0fwvr26qw",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 0.36,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-07",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 0.36,
+          "sales": 0.0,
+          "cpc": 0.36
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
+      "cpc": 0.36
+    },
+    {
+      "query": "eos lip balm",
+      "impressions": 81,
+      "clicks": 1,
+      "spend": 0.26,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-06-15",
+          "impressions": 81,
+          "clicks": 1,
+          "spend": 0.26,
+          "sales": 0.0,
+          "cpc": 0.26
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0123,
+      "cpc": 0.26
+    }
+  ],
+  "asins": [
+    {
+      "asin": "B075MM84DC",
+      "sku": "ERA0002.1",
+      "impressions": 3549,
+      "clicks": 39,
+      "spend": 52.06,
+      "sales": 111.98,
+      "purchases": 3,
+      "acos": 46.49,
+      "ctr": 0.011,
+      "cpc": 1.3349,
+      "cvr": 0.0769,
+      "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)"
+    },
+    {
+      "asin": "B075MMNCL1",
+      "sku": "ERA0016",
+      "impressions": 7080,
+      "clicks": 26,
+      "spend": 44.32,
+      "sales": 68.0,
+      "purchases": 1,
+      "acos": 65.18,
+      "ctr": 0.0037,
+      "cpc": 1.7046,
+      "cvr": 0.0385,
+      "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)"
+    },
+    {
+      "asin": "B075MLB8ZW",
+      "sku": "ERA0005.1",
+      "impressions": 2469,
+      "clicks": 16,
+      "spend": 39.31,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0065,
+      "cpc": 2.4569,
+      "cvr": 0.0,
+      "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)"
+    },
+    {
+      "asin": "B075MKD8DQ",
+      "sku": "ERA0018",
+      "impressions": 1470,
+      "clicks": 18,
+      "spend": 29.64,
+      "sales": 159.98,
+      "purchases": 2,
+      "acos": 18.53,
+      "ctr": 0.0122,
+      "cpc": 1.6467,
+      "cvr": 0.1111,
+      "title": "eraclea Hylacare Recovery Gel with Hyaluronic Acid (1.7 fl oz)"
+    },
+    {
+      "asin": "B097VZGTZK",
+      "sku": "ERA0007.1",
+      "impressions": 6280,
+      "clicks": 22,
+      "spend": 17.87,
+      "sales": 32.0,
+      "purchases": 1,
+      "acos": 55.84,
+      "ctr": 0.0035,
+      "cpc": 0.8123,
+      "cvr": 0.0455,
+      "title": "eraclea Ever-Moist Lip Balm with Beeswax and Hyaluronic Acid (0.4 oz)"
+    },
+    {
+      "asin": "B075MKWFQM",
+      "sku": "ERA0004",
+      "impressions": 693,
+      "clicks": 8,
+      "spend": 9.77,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0115,
+      "cpc": 1.2212,
+      "cvr": 0.0,
+      "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)"
+    },
+    {
+      "asin": "B075MM3977",
+      "sku": "ERA0012",
+      "impressions": 1021,
+      "clicks": 6,
+      "spend": 8.18,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0059,
+      "cpc": 1.3633,
+      "cvr": 0.0,
+      "title": "eraclea Soothe and Calm Facial Sculpting Lotion, Hyaluronic Acid (1 fl oz)"
+    },
+    {
+      "asin": "B075MM23VZ",
+      "sku": "ERA0006",
+      "impressions": 3069,
+      "clicks": 3,
+      "spend": 6.35,
+      "sales": 95.0,
+      "purchases": 1,
+      "acos": 6.68,
+      "ctr": 0.001,
+      "cpc": 2.1167,
+      "cvr": 0.3333,
+      "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)"
+    },
+    {
+      "asin": "B075MLZ3S6",
+      "sku": "ERA0003.1",
+      "impressions": 715,
+      "clicks": 1,
+      "spend": 4.18,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0014,
+      "cpc": 4.18,
+      "cvr": 0.0,
+      "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)"
+    },
+    {
+      "asin": "B075MKF9P3",
+      "sku": "ERA0011",
+      "impressions": 328,
+      "clicks": 4,
+      "spend": 3.22,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0122,
+      "cpc": 0.805,
+      "cvr": 0.0,
+      "title": "eraclea Neck and Chest Anti-Gravity Cream (1 fl oz)"
+    },
+    {
+      "asin": "B075MMCXMF",
+      "sku": "ERA0008.1",
+      "impressions": 2777,
+      "clicks": 2,
+      "spend": 2.46,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0007,
+      "cpc": 1.23,
+      "cvr": 0.0,
+      "title": "eraclea Hydrating Night Cream +Melatonin with Hyaluronic Acid (1 fl oz)"
+    },
+    {
+      "asin": "B09Q2SFYW4",
+      "sku": "ERA0020",
+      "impressions": 423,
+      "clicks": 1,
+      "spend": 2.02,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0024,
+      "cpc": 2.02,
+      "cvr": 0.0,
+      "title": "eraclea Vitamin C 15% Advanced Booster with Hyaluronic Acid (1 oz)"
+    },
+    {
+      "asin": "B0GHPCY22Y",
+      "sku": "VMP_ERA0007.1_4_PK",
+      "impressions": 999,
+      "clicks": 1,
+      "spend": 1.08,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.001,
+      "cpc": 1.08,
+      "cvr": 0.0
+    },
+    {
+      "asin": "B075MPPFKF",
+      "sku": "ERA0001",
+      "impressions": 2,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0,
+      "cpc": null,
+      "cvr": null,
+      "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)"
+    },
+    {
+      "asin": "B0H4WR8FJK",
+      "sku": "ERA0007.1+18",
+      "impressions": 2,
+      "clicks": 0,
+      "spend": 0.0,
+      "sales": 0.0,
+      "purchases": 0,
+      "acos": null,
+      "ctr": 0.0,
+      "cpc": null,
+      "cvr": null
+    }
+  ],
+  "placements": [
+    {
+      "placement": "Top of Search",
+      "impressions": 1455,
+      "clicks": 36,
+      "spend": 71.42,
+      "sales": 147.98,
+      "purchases": 3,
+      "acos": 48.26,
+      "ctr": 0.0247,
+      "cpc": 1.9839,
+      "cvr": 0.0833,
+      "spendShare": 32.4
+    },
+    {
+      "placement": "Rest of Search",
+      "impressions": 9450,
+      "clicks": 60,
+      "spend": 78.72,
+      "sales": 286.98,
+      "purchases": 4,
+      "acos": 27.43,
+      "ctr": 0.0063,
+      "cpc": 1.312,
+      "cvr": 0.0667,
+      "spendShare": 35.7
+    },
+    {
+      "placement": "Product Pages",
+      "impressions": 19800,
+      "clicks": 51,
+      "spend": 70.32,
+      "sales": 32.0,
+      "purchases": 1,
+      "acos": 219.75,
+      "ctr": 0.0026,
+      "cpc": 1.3788,
+      "cvr": 0.0196,
+      "spendShare": 31.9
+    }
+  ],
   "searchTermInsights": {
-    "top_performing": [],
-    "wasted_spend": [],
-    "opportunities": [],
-    "cpc_changes": []
+    "top_performing": [
+      {
+        "query": "eraclea",
+        "spend": 11.09,
+        "sales": 159.98,
+        "acos": 6.93,
+        "impressions": 199,
+        "clicks": 13,
+        "ctr": 0.0653,
+        "cpc": 0.8531,
+        "purchases": 2,
+        "cvr": 0.1538,
+        "daily": [
+          {
+            "date": "2026-06-15",
+            "impressions": 95,
+            "clicks": 4,
+            "spend": 3.87,
+            "sales": 159.98,
+            "cpc": 0.9675
+          },
+          {
+            "date": "2026-06-17",
+            "impressions": 20,
+            "clicks": 1,
+            "spend": 0.45,
+            "sales": 0.0,
+            "cpc": 0.45
+          },
+          {
+            "date": "2026-06-24",
+            "impressions": 17,
+            "clicks": 1,
+            "spend": 2.03,
+            "sales": 0.0,
+            "cpc": 2.03
+          },
+          {
+            "date": "2026-06-26",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 2.3,
+            "sales": 0.0,
+            "cpc": 2.3
+          },
+          {
+            "date": "2026-06-29",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 0.59,
+            "sales": 0.0,
+            "cpc": 0.59
+          },
+          {
+            "date": "2026-07-03",
+            "impressions": 16,
+            "clicks": 3,
+            "spend": 1.26,
+            "sales": 0.0,
+            "cpc": 0.42
+          },
+          {
+            "date": "2026-07-06",
+            "impressions": 16,
+            "clicks": 1,
+            "spend": 0.14,
+            "sales": 0.0,
+            "cpc": 0.14
+          },
+          {
+            "date": "2026-07-13",
+            "impressions": 7,
+            "clicks": 1,
+            "spend": 0.45,
+            "sales": 0.0,
+            "cpc": 0.45
+          }
+        ]
+      }
+    ],
+    "wasted_spend": [
+      {
+        "query": "hydrate eraclear",
+        "spend": 9.16,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 6,
+        "clicks": 1,
+        "ctr": 0.1667,
+        "cpc": 9.16,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-03",
+            "impressions": 6,
+            "clicks": 1,
+            "spend": 9.16,
+            "sales": 0.0,
+            "cpc": 9.16
+          }
+        ]
+      },
+      {
+        "query": "eraclea ever-moist lip balm",
+        "spend": 5.84,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 7,
+        "clicks": 1,
+        "ctr": 0.1429,
+        "cpc": 5.84,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-04",
+            "impressions": 7,
+            "clicks": 1,
+            "spend": 5.84,
+            "sales": 0.0,
+            "cpc": 5.84
+          }
+        ]
+      },
+      {
+        "query": "eraclea intensive hydrating day cream",
+        "spend": 5.38,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 6,
+        "clicks": 4,
+        "ctr": 0.6667,
+        "cpc": 1.345,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-12",
+            "impressions": 6,
+            "clicks": 4,
+            "spend": 5.38,
+            "sales": 0.0,
+            "cpc": 1.345
+          }
+        ]
+      },
+      {
+        "query": "eraclear",
+        "spend": 5.28,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 13,
+        "clicks": 2,
+        "ctr": 0.1538,
+        "cpc": 2.64,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-10",
+            "impressions": 13,
+            "clicks": 2,
+            "spend": 5.28,
+            "sales": 0.0,
+            "cpc": 2.64
+          }
+        ]
+      },
+      {
+        "query": "b0fpq7pwvy",
+        "spend": 5.15,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 3,
+        "clicks": 2,
+        "ctr": 0.6667,
+        "cpc": 2.575,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-06-25",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 2.22,
+            "sales": 0.0,
+            "cpc": 2.22
+          },
+          {
+            "date": "2026-06-27",
+            "impressions": 2,
+            "clicks": 1,
+            "spend": 2.93,
+            "sales": 0.0,
+            "cpc": 2.93
+          }
+        ]
+      },
+      {
+        "query": "oxygen mask",
+        "spend": 5.07,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 37,
+        "clicks": 3,
+        "ctr": 0.0811,
+        "cpc": 1.69,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-06-21",
+            "impressions": 3,
+            "clicks": 1,
+            "spend": 0.92,
+            "sales": 0.0,
+            "cpc": 0.92
+          },
+          {
+            "date": "2026-06-22",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 1.75,
+            "sales": 0.0,
+            "cpc": 1.75
+          },
+          {
+            "date": "2026-06-23",
+            "impressions": 20,
+            "clicks": 1,
+            "spend": 2.4,
+            "sales": 0.0,
+            "cpc": 2.4
+          }
+        ]
+      },
+      {
+        "query": "b01agy65na",
+        "spend": 5.05,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 27,
+        "clicks": 3,
+        "ctr": 0.1111,
+        "cpc": 1.6833,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-06-23",
+            "impressions": 16,
+            "clicks": 2,
+            "spend": 3.4,
+            "sales": 0.0,
+            "cpc": 1.7
+          },
+          {
+            "date": "2026-06-25",
+            "impressions": 11,
+            "clicks": 1,
+            "spend": 1.65,
+            "sales": 0.0,
+            "cpc": 1.65
+          }
+        ]
+      }
+    ],
+    "opportunities": [
+      {
+        "query": "b0dmqxzj86",
+        "spend": 3.51,
+        "sales": 68.0,
+        "acos": 5.16,
+        "impressions": 2,
+        "clicks": 1,
+        "ctr": 0.5,
+        "cpc": 3.51,
+        "purchases": 1,
+        "cvr": 1.0,
+        "daily": [
+          {
+            "date": "2026-06-28",
+            "impressions": 2,
+            "clicks": 1,
+            "spend": 3.51,
+            "sales": 68.0,
+            "cpc": 3.51
+          }
+        ]
+      },
+      {
+        "query": "eraclea bamboo",
+        "spend": 3.91,
+        "sales": 79.98,
+        "acos": 4.89,
+        "impressions": 3,
+        "clicks": 3,
+        "ctr": 1.0,
+        "cpc": 1.3033,
+        "purchases": 2,
+        "cvr": 0.6667,
+        "daily": [
+          {
+            "date": "2026-06-16",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 1.48,
+            "sales": 39.99,
+            "cpc": 1.48
+          },
+          {
+            "date": "2026-06-17",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 1.48,
+            "sales": 39.99,
+            "cpc": 1.48
+          },
+          {
+            "date": "2026-06-29",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 0.95,
+            "sales": 0.0,
+            "cpc": 0.95
+          }
+        ]
+      },
+      {
+        "query": "eraclea pure hydration serum",
+        "spend": 4.89,
+        "sales": 95.0,
+        "acos": 5.15,
+        "impressions": 10,
+        "clicks": 2,
+        "ctr": 0.2,
+        "cpc": 2.445,
+        "purchases": 1,
+        "cvr": 0.5,
+        "daily": [
+          {
+            "date": "2026-06-20",
+            "impressions": 10,
+            "clicks": 2,
+            "spend": 4.89,
+            "sales": 95.0,
+            "cpc": 2.445
+          }
+        ]
+      },
+      {
+        "query": "b075mlz3s6",
+        "spend": 3.77,
+        "sales": 32.0,
+        "acos": 11.78,
+        "impressions": 3,
+        "clicks": 2,
+        "ctr": 0.6667,
+        "cpc": 1.885,
+        "purchases": 1,
+        "cvr": 0.5,
+        "daily": [
+          {
+            "date": "2026-06-16",
+            "impressions": 2,
+            "clicks": 1,
+            "spend": 1.51,
+            "sales": 0.0,
+            "cpc": 1.51
+          },
+          {
+            "date": "2026-06-25",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 2.26,
+            "sales": 32.0,
+            "cpc": 2.26
+          }
+        ]
+      },
+      {
+        "query": "eraclea",
+        "spend": 11.09,
+        "sales": 159.98,
+        "acos": 6.93,
+        "impressions": 199,
+        "clicks": 13,
+        "ctr": 0.0653,
+        "cpc": 0.8531,
+        "purchases": 2,
+        "cvr": 0.1538,
+        "daily": [
+          {
+            "date": "2026-06-15",
+            "impressions": 95,
+            "clicks": 4,
+            "spend": 3.87,
+            "sales": 159.98,
+            "cpc": 0.9675
+          },
+          {
+            "date": "2026-06-17",
+            "impressions": 20,
+            "clicks": 1,
+            "spend": 0.45,
+            "sales": 0.0,
+            "cpc": 0.45
+          },
+          {
+            "date": "2026-06-24",
+            "impressions": 17,
+            "clicks": 1,
+            "spend": 2.03,
+            "sales": 0.0,
+            "cpc": 2.03
+          },
+          {
+            "date": "2026-06-26",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 2.3,
+            "sales": 0.0,
+            "cpc": 2.3
+          },
+          {
+            "date": "2026-06-29",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 0.59,
+            "sales": 0.0,
+            "cpc": 0.59
+          },
+          {
+            "date": "2026-07-03",
+            "impressions": 16,
+            "clicks": 3,
+            "spend": 1.26,
+            "sales": 0.0,
+            "cpc": 0.42
+          },
+          {
+            "date": "2026-07-06",
+            "impressions": 16,
+            "clicks": 1,
+            "spend": 0.14,
+            "sales": 0.0,
+            "cpc": 0.14
+          },
+          {
+            "date": "2026-07-13",
+            "impressions": 7,
+            "clicks": 1,
+            "spend": 0.45,
+            "sales": 0.0,
+            "cpc": 0.45
+          }
+        ]
+      },
+      {
+        "query": "b097vzgtzk",
+        "spend": 3.98,
+        "sales": 32.0,
+        "acos": 12.44,
+        "impressions": 691,
+        "clicks": 9,
+        "ctr": 0.013,
+        "cpc": 0.4422,
+        "purchases": 1,
+        "cvr": 0.1111,
+        "daily": [
+          {
+            "date": "2026-06-15",
+            "impressions": 159,
+            "clicks": 2,
+            "spend": 1.4,
+            "sales": 32.0,
+            "cpc": 0.7
+          },
+          {
+            "date": "2026-06-16",
+            "impressions": 137,
+            "clicks": 2,
+            "spend": 1.02,
+            "sales": 0.0,
+            "cpc": 0.51
+          },
+          {
+            "date": "2026-06-17",
+            "impressions": 160,
+            "clicks": 2,
+            "spend": 0.32,
+            "sales": 0.0,
+            "cpc": 0.16
+          },
+          {
+            "date": "2026-06-18",
+            "impressions": 74,
+            "clicks": 1,
+            "spend": 0.12,
+            "sales": 0.0,
+            "cpc": 0.12
+          },
+          {
+            "date": "2026-06-19",
+            "impressions": 78,
+            "clicks": 1,
+            "spend": 0.6,
+            "sales": 0.0,
+            "cpc": 0.6
+          },
+          {
+            "date": "2026-06-21",
+            "impressions": 83,
+            "clicks": 1,
+            "spend": 0.52,
+            "sales": 0.0,
+            "cpc": 0.52
+          }
+        ]
+      }
+    ],
+    "cpc_changes": [
+      {
+        "query": "oxygen mask",
+        "spend": 5.07,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 37,
+        "clicks": 3,
+        "ctr": 0.0811,
+        "cpc": 1.69,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-06-21",
+            "impressions": 3,
+            "clicks": 1,
+            "spend": 0.92,
+            "sales": 0.0,
+            "cpc": 0.92
+          },
+          {
+            "date": "2026-06-22",
+            "impressions": 14,
+            "clicks": 1,
+            "spend": 1.75,
+            "sales": 0.0,
+            "cpc": 1.75
+          },
+          {
+            "date": "2026-06-23",
+            "impressions": 20,
+            "clicks": 1,
+            "spend": 2.4,
+            "sales": 0.0,
+            "cpc": 2.4
+          }
+        ],
+        "latest_cpc": 2.4,
+        "cpc_change_pct": 42.0
+      },
+      {
+        "query": "b075mlz3s6",
+        "spend": 3.77,
+        "sales": 32.0,
+        "acos": 11.78,
+        "impressions": 3,
+        "clicks": 2,
+        "ctr": 0.6667,
+        "cpc": 1.885,
+        "purchases": 1,
+        "cvr": 0.5,
+        "daily": [
+          {
+            "date": "2026-06-16",
+            "impressions": 2,
+            "clicks": 1,
+            "spend": 1.51,
+            "sales": 0.0,
+            "cpc": 1.51
+          },
+          {
+            "date": "2026-06-25",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 2.26,
+            "sales": 32.0,
+            "cpc": 2.26
+          }
+        ],
+        "latest_cpc": 2.26,
+        "cpc_change_pct": 19.9
+      },
+      {
+        "query": "b097vzgtzk",
+        "spend": 3.98,
+        "sales": 32.0,
+        "acos": 12.44,
+        "impressions": 691,
+        "clicks": 9,
+        "ctr": 0.013,
+        "cpc": 0.4422,
+        "purchases": 1,
+        "cvr": 0.1111,
+        "daily": [
+          {
+            "date": "2026-06-15",
+            "impressions": 159,
+            "clicks": 2,
+            "spend": 1.4,
+            "sales": 32.0,
+            "cpc": 0.7
+          },
+          {
+            "date": "2026-06-16",
+            "impressions": 137,
+            "clicks": 2,
+            "spend": 1.02,
+            "sales": 0.0,
+            "cpc": 0.51
+          },
+          {
+            "date": "2026-06-17",
+            "impressions": 160,
+            "clicks": 2,
+            "spend": 0.32,
+            "sales": 0.0,
+            "cpc": 0.16
+          },
+          {
+            "date": "2026-06-18",
+            "impressions": 74,
+            "clicks": 1,
+            "spend": 0.12,
+            "sales": 0.0,
+            "cpc": 0.12
+          },
+          {
+            "date": "2026-06-19",
+            "impressions": 78,
+            "clicks": 1,
+            "spend": 0.6,
+            "sales": 0.0,
+            "cpc": 0.6
+          },
+          {
+            "date": "2026-06-21",
+            "impressions": 83,
+            "clicks": 1,
+            "spend": 0.52,
+            "sales": 0.0,
+            "cpc": 0.52
+          }
+        ],
+        "latest_cpc": 0.52,
+        "cpc_change_pct": 17.6
+      },
+      {
+        "query": "b0fpq7pwvy",
+        "spend": 5.15,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 3,
+        "clicks": 2,
+        "ctr": 0.6667,
+        "cpc": 2.575,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-06-25",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 2.22,
+            "sales": 0.0,
+            "cpc": 2.22
+          },
+          {
+            "date": "2026-06-27",
+            "impressions": 2,
+            "clicks": 1,
+            "spend": 2.93,
+            "sales": 0.0,
+            "cpc": 2.93
+          }
+        ],
+        "latest_cpc": 2.93,
+        "cpc_change_pct": 13.8
+      }
+    ]
   },
   "productInsights": {
-    "top_performers": [],
-    "wasted_spend": [],
-    "opportunities": [],
-    "all": []
+    "top_performers": [
+      {
+        "asin": "B075MKD8DQ",
+        "sku": "ERA0018",
+        "title": "eraclea Hylacare Recovery Gel with Hyaluronic Acid (1.7 fl oz)",
+        "impressions": 1470,
+        "clicks": 18,
+        "spend": 29.64,
+        "sales": 159.98,
+        "purchases": 2,
+        "acos": 18.53,
+        "ctr": 0.0122,
+        "cpc": 1.6467,
+        "cvr": 0.1111
+      },
+      {
+        "asin": "B075MM23VZ",
+        "sku": "ERA0006",
+        "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
+        "impressions": 3069,
+        "clicks": 3,
+        "spend": 6.35,
+        "sales": 95.0,
+        "purchases": 1,
+        "acos": 6.68,
+        "ctr": 0.001,
+        "cpc": 2.1167,
+        "cvr": 0.3333
+      }
+    ],
+    "wasted_spend": [
+      {
+        "asin": "B075MLB8ZW",
+        "sku": "ERA0005.1",
+        "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
+        "impressions": 2469,
+        "clicks": 16,
+        "spend": 39.31,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0065,
+        "cpc": 2.4569,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MKWFQM",
+        "sku": "ERA0004",
+        "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)",
+        "impressions": 693,
+        "clicks": 8,
+        "spend": 9.77,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0115,
+        "cpc": 1.2212,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MM3977",
+        "sku": "ERA0012",
+        "title": "eraclea Soothe and Calm Facial Sculpting Lotion, Hyaluronic Acid (1 fl oz)",
+        "impressions": 1021,
+        "clicks": 6,
+        "spend": 8.18,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0059,
+        "cpc": 1.3633,
+        "cvr": 0.0
+      }
+    ],
+    "opportunities": [
+      {
+        "asin": "B075MM23VZ",
+        "sku": "ERA0006",
+        "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
+        "impressions": 3069,
+        "clicks": 3,
+        "spend": 6.35,
+        "sales": 95.0,
+        "purchases": 1,
+        "acos": 6.68,
+        "ctr": 0.001,
+        "cpc": 2.1167,
+        "cvr": 0.3333
+      },
+      {
+        "asin": "B075MKD8DQ",
+        "sku": "ERA0018",
+        "title": "eraclea Hylacare Recovery Gel with Hyaluronic Acid (1.7 fl oz)",
+        "impressions": 1470,
+        "clicks": 18,
+        "spend": 29.64,
+        "sales": 159.98,
+        "purchases": 2,
+        "acos": 18.53,
+        "ctr": 0.0122,
+        "cpc": 1.6467,
+        "cvr": 0.1111
+      }
+    ],
+    "all": [
+      {
+        "asin": "B075MM84DC",
+        "sku": "ERA0002.1",
+        "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)",
+        "impressions": 3549,
+        "clicks": 39,
+        "spend": 52.06,
+        "sales": 111.98,
+        "purchases": 3,
+        "acos": 46.49,
+        "ctr": 0.011,
+        "cpc": 1.3349,
+        "cvr": 0.0769
+      },
+      {
+        "asin": "B075MMNCL1",
+        "sku": "ERA0016",
+        "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)",
+        "impressions": 7080,
+        "clicks": 26,
+        "spend": 44.32,
+        "sales": 68.0,
+        "purchases": 1,
+        "acos": 65.18,
+        "ctr": 0.0037,
+        "cpc": 1.7046,
+        "cvr": 0.0385
+      },
+      {
+        "asin": "B075MLB8ZW",
+        "sku": "ERA0005.1",
+        "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
+        "impressions": 2469,
+        "clicks": 16,
+        "spend": 39.31,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0065,
+        "cpc": 2.4569,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MKD8DQ",
+        "sku": "ERA0018",
+        "title": "eraclea Hylacare Recovery Gel with Hyaluronic Acid (1.7 fl oz)",
+        "impressions": 1470,
+        "clicks": 18,
+        "spend": 29.64,
+        "sales": 159.98,
+        "purchases": 2,
+        "acos": 18.53,
+        "ctr": 0.0122,
+        "cpc": 1.6467,
+        "cvr": 0.1111
+      },
+      {
+        "asin": "B097VZGTZK",
+        "sku": "ERA0007.1",
+        "title": "eraclea Ever-Moist Lip Balm with Beeswax and Hyaluronic Acid (0.4 oz)",
+        "impressions": 6280,
+        "clicks": 22,
+        "spend": 17.87,
+        "sales": 32.0,
+        "purchases": 1,
+        "acos": 55.84,
+        "ctr": 0.0035,
+        "cpc": 0.8123,
+        "cvr": 0.0455
+      },
+      {
+        "asin": "B075MKWFQM",
+        "sku": "ERA0004",
+        "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)",
+        "impressions": 693,
+        "clicks": 8,
+        "spend": 9.77,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0115,
+        "cpc": 1.2212,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MM3977",
+        "sku": "ERA0012",
+        "title": "eraclea Soothe and Calm Facial Sculpting Lotion, Hyaluronic Acid (1 fl oz)",
+        "impressions": 1021,
+        "clicks": 6,
+        "spend": 8.18,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0059,
+        "cpc": 1.3633,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MM23VZ",
+        "sku": "ERA0006",
+        "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
+        "impressions": 3069,
+        "clicks": 3,
+        "spend": 6.35,
+        "sales": 95.0,
+        "purchases": 1,
+        "acos": 6.68,
+        "ctr": 0.001,
+        "cpc": 2.1167,
+        "cvr": 0.3333
+      },
+      {
+        "asin": "B075MLZ3S6",
+        "sku": "ERA0003.1",
+        "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)",
+        "impressions": 715,
+        "clicks": 1,
+        "spend": 4.18,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0014,
+        "cpc": 4.18,
+        "cvr": 0.0
+      },
+      {
+        "asin": "B075MKF9P3",
+        "sku": "ERA0011",
+        "title": "eraclea Neck and Chest Anti-Gravity Cream (1 fl oz)",
+        "impressions": 328,
+        "clicks": 4,
+        "spend": 3.22,
+        "sales": 0.0,
+        "purchases": 0,
+        "acos": null,
+        "ctr": 0.0122,
+        "cpc": 0.805,
+        "cvr": 0.0
+      }
+    ]
   },
-  "placementInsights": []
+  "placementInsights": [
+    {
+      "placement": "Top of Search",
+      "impressions": 1455,
+      "clicks": 36,
+      "spend": 71.42,
+      "sales": 147.98,
+      "purchases": 3,
+      "acos": 48.26,
+      "ctr": 0.0247,
+      "cpc": 1.9839,
+      "cvr": 0.0833,
+      "spendShare": 32.4
+    },
+    {
+      "placement": "Rest of Search",
+      "impressions": 9450,
+      "clicks": 60,
+      "spend": 78.72,
+      "sales": 286.98,
+      "purchases": 4,
+      "acos": 27.43,
+      "ctr": 0.0063,
+      "cpc": 1.312,
+      "cvr": 0.0667,
+      "spendShare": 35.7
+    },
+    {
+      "placement": "Product Pages",
+      "impressions": 19800,
+      "clicks": 51,
+      "spend": 70.32,
+      "sales": 32.0,
+      "purchases": 1,
+      "acos": 219.75,
+      "ctr": 0.0026,
+      "cpc": 1.3788,
+      "cvr": 0.0196,
+      "spendShare": 31.9
+    }
+  ]
 }
