@@ -1316,26 +1316,49 @@ function renderEracleaView(){
 
   // Render KPI rows from ERACLEA_MONTHLY
   const md=monthsObj[selectedEracleaMonth];
+  const curIdx=sortedMonths.indexOf(selectedEracleaMonth);
+  const prevMonthKey=curIdx>0?sortedMonths[curIdx-1]:null;
+  const prevMd=prevMonthKey?monthsObj[prevMonthKey]:null;
   if(md){
     const amz=md.amazon||{};
+    const pamz=prevMd?prevMd.amazon||{}:null;
+    const isP=!!md._partial;
+    // Computed metrics
+    const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
+    const roas=amz.spend>0?amz.adSales/amz.spend:null;
+    const cpc=amz.clicks>0?amz.spend/amz.clicks:null;
+    const ctr=amz.impressions>0?amz.clicks/amz.impressions*100:null;
+    const cvr=amz.clicks>0?amz.orders/amz.clicks*100:null;
+    // Previous computed metrics
+    const pacos=pamz&&pamz.adSales>0?pamz.spend/pamz.adSales*100:null;
+    const proas=pamz&&pamz.spend>0?pamz.adSales/pamz.spend:null;
+    const pcpc=pamz&&pamz.clicks>0?pamz.spend/pamz.clicks:null;
+    const pctr=pamz&&pamz.impressions>0?pamz.clicks/pamz.impressions*100:null;
+    const pcvr=pamz&&pamz.clicks>0?pamz.orders/pamz.clicks*100:null;
+    const eM=(cur,prv)=>prv!=null&&prv!==0&&cur!=null?((cur-prv)/Math.abs(prv)*100):null;
+    const eFmt=(v)=>v!=null?'$'+(v.toLocaleString(undefined,{maximumFractionDigits:0})):'—';
     const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
-      const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
-      const roas=amz.spend>0?amz.adSales/amz.spend:null;
-      const acosStr=acos?acos.toFixed(1)+'%':'—';
-      const roasStr=roas?roas.toFixed(2)+'x':'—';
       [
-        ['Ad Spend','$'+((amz.spend||0).toLocaleString(undefined,{maximumFractionDigits:0}))],
-        ['Ad Sales','$'+((amz.adSales||0).toLocaleString(undefined,{maximumFractionDigits:0}))],
-        ['ACOS',acosStr],['ROAS',roasStr],
-        ['Orders',(amz.orders||0).toLocaleString()],
-        ['Impressions',amz.impressions?((amz.impressions/1000).toFixed(0)+'K'):'—'],
-      ].forEach(([l,v])=>{
-        const el=document.createElement('div'); el.className='kpi-card';
-        el.innerHTML=`<div class="kpi-label">${l}</div><div class="kpi-value">${v}</div>`;
-        r1.appendChild(el);
+        {l:'Ad Spend', v:eFmt(amz.spend), prev:pamz?eFmt(pamz.spend):null, mom:eM(amz.spend,pamz?pamz.spend:null), sub:isP?'Month in progress':null, warn:isP},
+        {l:'Ad Sales', v:eFmt(amz.adSales), prev:pamz?eFmt(pamz.adSales):null, mom:eM(amz.adSales,pamz?pamz.adSales:null)},
+        {l:'ACOS', v:acos!=null?acos.toFixed(1)+'%':'—', prev:pacos!=null?pacos.toFixed(1)+'%':null, mom:eM(acos,pacos), inv:true},
+        {l:'ROAS', v:roas!=null?roas.toFixed(2)+'x':'—', prev:proas!=null?proas.toFixed(2)+'x':null, mom:eM(roas,proas)},
+        {l:'Orders', v:(amz.orders||0).toLocaleString(), prev:pamz!=null?(pamz.orders||0).toLocaleString():null, mom:eM(amz.orders,pamz?pamz.orders:null)},
+        {l:'Clicks', v:(amz.clicks||0).toLocaleString(), prev:pamz!=null?(pamz.clicks||0).toLocaleString():null, mom:eM(amz.clicks,pamz?pamz.clicks:null)},
+      ].forEach(x=>{
+        r1.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv, sub:x.sub, warn:x.warn}));
       });
     }
-    const r2=document.getElementById('kpi-row-2'); if(r2) r2.innerHTML='';
+    const r2=document.getElementById('kpi-row-2'); if(r2){r2.innerHTML='';
+      [
+        {l:'Impressions', v:amz.impressions?(amz.impressions/1000).toFixed(0)+'K':'—', prev:pamz&&pamz.impressions?(pamz.impressions/1000).toFixed(0)+'K':null, mom:eM(amz.impressions,pamz?pamz.impressions:null)},
+        {l:'CTR', v:ctr!=null?ctr.toFixed(2)+'%':'—', prev:pctr!=null?pctr.toFixed(2)+'%':null, mom:eM(ctr,pctr)},
+        {l:'CPC', v:cpc!=null?'$'+cpc.toFixed(2):'—', prev:pcpc!=null?'$'+pcpc.toFixed(2):null, mom:eM(cpc,pcpc), inv:true},
+        {l:'CVR', v:cvr!=null?cvr.toFixed(2)+'%':'—', prev:pcvr!=null?pcvr.toFixed(2)+'%':null, mom:eM(cvr,pcvr)},
+      ].forEach(x=>{
+        r2.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv}));
+      });
+    }
   }
 
   // Render Amazon supplement section using eraclea data
