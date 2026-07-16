@@ -1198,6 +1198,7 @@ Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', san
 let DATA=null, selectedMonth=null, trendMode='spend_vs_sales', charts={}, initialLoadDone=false;
 let ERACLEA_AMAZON=null, ERACLEA_MONTHLY={}, ERACLEA_DAILY={};
 let selectedOzleeBrand='All', selectedEracleaMonth=null;
+let ACTIVE_SUPPLEMENT=null;
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 // ── KPI builder ──
@@ -1361,8 +1362,13 @@ function renderEracleaView(){
     }
   }
 
-  // Render Amazon supplement section using eraclea data
+  // Set active supplement to eraclea and render all brand-specific sections
+  ACTIVE_SUPPLEMENT = ERACLEA_AMAZON;
   renderAmazonSection('month', ERACLEA_AMAZON);
+  renderSearchTermInsights();
+  renderDayOfWeekHeatmap();
+  renderPlacementPerformance();
+  renderProductPerformance();
 }
 
 function render(){
@@ -1578,6 +1584,7 @@ function render(){
     tbody.appendChild(tr);
   });
   // Search Term Insights
+  ACTIVE_SUPPLEMENT = SKINUVA_AMAZON;
   renderSearchTermInsights();
   renderDayOfWeekHeatmap();
   renderPlacementPerformance();
@@ -1654,7 +1661,7 @@ function renderSearchTermInsights(){
   const sec=document.getElementById('search-terms-section');
   const container=document.getElementById('search-terms-container');
   if(!sec||!container) return;
-  const _sti_src=typeof SKINUVA_AMAZON!=='undefined'&&SKINUVA_AMAZON?SKINUVA_AMAZON.searchTermInsights:null;
+  const _sti_src=ACTIVE_SUPPLEMENT?ACTIVE_SUPPLEMENT.searchTermInsights:null;
   if(!_sti_src){sec.style.display='none';return;}
   const sti=_sti_src;
   const hasData=sti.top_performing.length||sti.wasted_spend.length||sti.opportunities.length||(sti.cpc_changes||[]).length;
@@ -1897,7 +1904,7 @@ function renderDayOfWeekHeatmap() {
   const container = document.getElementById('dow-container');
   if (!section || !container) return;
 
-  const timeline = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON) ? (SKINUVA_AMAZON.timeline || []) : [];
+  const timeline = ACTIVE_SUPPLEMENT ? (ACTIVE_SUPPLEMENT.timeline || []) : [];
   if (!timeline.length) { section.style.display='none'; return; }
 
   const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
@@ -1965,8 +1972,7 @@ function renderPlacementPerformance() {
   if (!sec || !container) return;
 
   const CANONICAL = ['Top of Search', 'Rest of Search', 'Product Pages'];
-  const allPlacements = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON)
-    ? (SKINUVA_AMAZON.placementInsights || []) : [];
+  const allPlacements = ACTIVE_SUPPLEMENT ? (ACTIVE_SUPPLEMENT.placementInsights || []) : [];
   const placements = allPlacements.filter(p => CANONICAL.includes(p.placement));
 
   if (!placements.length) { sec.style.display='none'; return; }
@@ -2039,8 +2045,7 @@ function renderProductPerformance() {
   const container = document.getElementById('asin-container');
   if (!sec || !container) return;
 
-  const pi = (typeof SKINUVA_AMAZON !== 'undefined' && SKINUVA_AMAZON)
-    ? (SKINUVA_AMAZON.productInsights || null) : null;
+  const pi = ACTIVE_SUPPLEMENT ? (ACTIVE_SUPPLEMENT.productInsights || null) : null;
 
   if (!pi || (!pi.top_performers.length && !pi.wasted_spend.length && !pi.opportunities.length)) {
     sec.style.display = 'none'; return;
@@ -3545,7 +3550,7 @@ function _setApiTabs(prefix, period){
 function renderAmazonSection(period, supplement){
   period=period||'month';
   _setApiTabs('amazon',period);
-  const d=supplement||SKINUVA_AMAZON; if(!d||!d.timeline) return;
+  const d=supplement!=null?supplement:ACTIVE_SUPPLEMENT; if(!d||!d.timeline) return;
   const tl=_filterTL(d.timeline,period);
   if(!tl.length) return;
 
