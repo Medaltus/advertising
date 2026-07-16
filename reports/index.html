@@ -1682,6 +1682,7 @@ function getBrandData(md, brand) {
 
 function renderBrandSelector(md) {
   const el = document.getElementById('brand-selector'); el.innerHTML = '';
+  const old = document.getElementById('brand-dd-portal'); if (old) old.remove();
 
   // All Brands pill
   const allBtn = document.createElement('button');
@@ -1718,15 +1719,18 @@ function renderBrandSelector(md) {
 
   dropBtn.onclick = (e) => {
     e.stopPropagation();
+    const existing = document.getElementById('brand-dd-portal');
+    if (existing) { existing.remove(); return; }
     const r = dropBtn.getBoundingClientRect();
     menu.style.top = (r.bottom + 6) + 'px';
     menu.style.left = r.left + 'px';
-    menu.classList.toggle('open');
+    menu.id = 'brand-dd-portal';
+    menu.classList.add('open');
+    document.body.appendChild(menu);
+    setTimeout(() => document.addEventListener('click', () => { menu.remove(); }, { once: true }), 0);
   };
-  document.addEventListener('click', () => menu.classList.remove('open'), { once: false });
 
   wrap.appendChild(dropBtn);
-  wrap.appendChild(menu);
   el.appendChild(wrap);
 }
 
