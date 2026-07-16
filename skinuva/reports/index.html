@@ -1414,7 +1414,7 @@ function renderEracleaView(){
   ['amazon-api-section','search-terms-section','dow-section','asin-section','placement-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='';
   });
-  ['google-api-section','wlos-section','agents-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{
+  ['google-api-section','wlos-section','agents-section','charts-row-1','acos-row','channels-card'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   if(document.getElementById('audio-btn')) document.getElementById('audio-btn').style.display='none';
@@ -1532,6 +1532,7 @@ function renderEracleaView(){
   renderDayOfWeekHeatmap();
   renderPlacementPerformance();
   renderProductPerformance();
+  renderEracleaTrend();
 }
 
 function render(){
@@ -1805,6 +1806,76 @@ function render(){
   renderWLOS();
   document.getElementById('footer').textContent='Skinuva Ads Tracking · Live from Google Sheets · '+new Date().toLocaleDateString();
   buildTicker();
+}
+
+function renderEracleaTrend(){
+  const monthOrder=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const sorted=Object.entries(ERACLEA_MONTHLY).sort((a,b)=>{
+    const [am,ay]=a[0].split(' '), [bm,by]=b[0].split(' ');
+    return ay!==by?parseInt(ay)-parseInt(by):monthOrder.indexOf(am)-monthOrder.indexOf(bm);
+  });
+  // Inject current partial month from supplement if available
+  if(ERACLEA_AMAZON&&ERACLEA_AMAZON.fetched_at&&ERACLEA_AMAZON.fetched_at!=='pending'){
+    const now=new Date(ERACLEA_AMAZON.fetched_at);
+    const mk=monthOrder[now.getMonth()]+' '+now.getFullYear();
+    const ts=ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales?ERACLEA_AMAZON.summary.totalSales:0;
+    const entry=[mk,{amazon:{spend:ERACLEA_AMAZON.summary.spend||0,adSales:ERACLEA_AMAZON.summary.sales||0,totalSales:ts,orders:ERACLEA_AMAZON.summary.purchases||0,clicks:0,impressions:ERACLEA_AMAZON.summary.impressions||0},_partial:true}];
+    if(!sorted.find(e=>e[0]===mk)) sorted.push(entry);
+    else sorted[sorted.findIndex(e=>e[0]===mk)]=entry;
+  }
+  if(!sorted.length) return;
+  const td=sorted.map(([month,mdata])=>{
+    const a=mdata.amazon||{};
+    const spend=a.spend||0, adSales=a.adSales||0, totalSales=a.totalSales||0;
+    return {
+      month: month.split(' ')[0].slice(0,3)+' '+month.split(' ')[1],
+      adSpend: spend, adSales, totalSales,
+      roas: spend>0?adSales/spend:0,
+      acos: adSales>0?spend/adSales*100:null,
+      tacos: totalSales>0?spend/totalSales*100:null,
+      orders: a.orders||0, clicks: a.clicks||0
+    };
+  });
+  const tb=document.getElementById('trend-tabs'); tb.innerHTML='';
+  ['spend_vs_sales','efficiency','volume'].forEach(m=>{
+    const b=document.createElement('button');b.className='tab-btn'+(trendMode===m?' active':'');
+    b.textContent=m==='spend_vs_sales'?'Spend vs Sales':m==='efficiency'?'Efficiency':'Volume';
+    b.onclick=()=>{trendMode=m;renderEracleaTrend();}; tb.appendChild(b);
+  });
+  kill('trend');
+  const base={responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},
+    tooltip:{backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
+    scales:{x:{ticks:{color:'rgba(255,255,255,0.4)',font:{size:12}},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},
+    y:{ticks:{color:'rgba(255,255,255,0.3)',font:{family:"'SF Mono','Menlo',monospace",size:11}},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}}};
+  const labels=td.map(d=>d.month);
+  if(trendMode==='spend_vs_sales'){
+    base.scales.y.ticks.callback=v=>fmt(v);
+    base.plugins.tooltip.callbacks={label:c=>'$'+c.raw.toLocaleString()};
+    charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'line',
+      data:{labels,datasets:[
+        {label:'Ad Spend',data:td.map(d=>d.adSpend),borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.1)',fill:true,tension:.3,pointRadius:4,borderWidth:2.5,pointBackgroundColor:'#4ade80'},
+        {label:'Ad Sales',data:td.map(d=>d.adSales),borderColor:'#a78bfa',backgroundColor:'rgba(167,139,250,0.1)',fill:true,tension:.3,pointRadius:4,borderWidth:2.5,pointBackgroundColor:'#a78bfa'},
+        {label:'Total Sales',data:td.map(d=>d.totalSales),borderColor:'#14b8a6',backgroundColor:'rgba(20,184,166,0.08)',fill:true,tension:.3,pointRadius:4,borderWidth:2.5,pointBackgroundColor:'#14b8a6'}
+      ]},options:base});
+  } else if(trendMode==='efficiency'){
+    base.scales.y.ticks.callback=v=>v+'%';
+    base.plugins.tooltip.callbacks={label:c=>c.dataset.label+(c.dataset.label.includes('ROAS')?': '+c.raw.toFixed(1)+'x':': '+c.raw.toFixed(1)+'%')};
+    charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'line',
+      data:{labels,datasets:[
+        {label:'ACOS',data:td.map(d=>d.acos),borderColor:'#f59e0b',pointBackgroundColor:'#f59e0b',tension:.3,pointRadius:4,borderWidth:2.5},
+        {label:'TACOS',data:td.map(d=>d.tacos),borderColor:'#818cf8',pointBackgroundColor:'#818cf8',tension:.3,pointRadius:4,borderWidth:2.5},
+        {label:'ROAS (x)',data:td.map(d=>d.roas),borderColor:'#4ade80',pointBackgroundColor:'#4ade80',tension:.3,pointRadius:4,borderWidth:2.5}
+      ]},options:base});
+  } else {
+    base.scales.y.ticks.callback=v=>fmt(v,'',0);
+    base.plugins.tooltip.callbacks={label:c=>Math.round(c.raw).toLocaleString()};
+    charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'bar',
+      data:{labels,datasets:[
+        {label:'Orders',data:td.map(d=>d.orders),backgroundColor:'rgba(129,140,248,0.8)',borderRadius:6,barPercentage:.6},
+        {label:'Clicks',data:td.map(d=>d.clicks),backgroundColor:'rgba(56,189,248,0.5)',borderRadius:6,barPercentage:.6}
+      ]},options:base});
+  }
 }
 
 function renderTrend(){
