@@ -1363,6 +1363,18 @@ function renderEracleaView(){
     const amz=md.amazon||{};
     const pamz=prevMd?prevMd.amazon||{}:null;
     const isP=!!md._partial;
+
+    // Forecast setup — use ERACLEA_AMAZON timeline for current partial month
+    let daysElapsed=0, daysInMonth=0;
+    if(isP && ERACLEA_AMAZON && ERACLEA_AMAZON.timeline){
+      const curPfx=_currentMonthPrefix();
+      daysElapsed=ERACLEA_AMAZON.timeline.filter(r=>r.date.startsWith(curPfx)).length;
+      daysInMonth=_daysInCurrentMonth();
+    }
+    const days=isP&&daysElapsed>0?`${daysElapsed}/${daysInMonth} days`:null;
+    const fvol=(v)=>(isP&&daysElapsed>0&&daysInMonth>0&&v!=null)?v/daysElapsed*daysInMonth:null;
+    const fmom=(fv,pv)=>fv!=null&&pv!=null&&pv!==0?(fv-pv)/Math.abs(pv)*100:null;
+
     // Computed metrics
     const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
     const roas=amz.spend>0?amz.adSales/amz.spend:null;
@@ -1375,28 +1387,35 @@ function renderEracleaView(){
     const pcpc=pamz&&pamz.clicks>0?pamz.spend/pamz.clicks:null;
     const pctr=pamz&&pamz.impressions>0?pamz.clicks/pamz.impressions*100:null;
     const pcvr=pamz&&pamz.clicks>0?pamz.orders/pamz.clicks*100:null;
-    const eM=(cur,prv)=>prv!=null&&prv!==0&&cur!=null?((cur-prv)/Math.abs(prv)*100):null;
+    const eM=(cur,prv)=>!isP&&prv!=null&&prv!==0&&cur!=null?((cur-prv)/Math.abs(prv)*100):null;
     const eFmt=(v)=>v!=null?'$'+(v.toLocaleString(undefined,{maximumFractionDigits:0})):'—';
+
+    // Forecasted volume values
+    const fSpend=fvol(amz.spend), fSales=fvol(amz.adSales);
+    const fOrders=fvol(amz.orders), fClicks=fvol(amz.clicks), fImps=fvol(amz.impressions);
+    const fRoas=fSpend&&fSales&&fSpend>0?fSales/fSpend:null;
+    const fAcos=fSpend&&fSales&&fSales>0?fSpend/fSales*100:null;
+
     const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
       [
-        {l:'Ad Spend', v:eFmt(amz.spend), prev:pamz?eFmt(pamz.spend):null, mom:eM(amz.spend,pamz?pamz.spend:null), sub:isP?'Month in progress':null, warn:isP},
-        {l:'Ad Sales', v:eFmt(amz.adSales), prev:pamz?eFmt(pamz.adSales):null, mom:eM(amz.adSales,pamz?pamz.adSales:null)},
-        {l:'ACOS', v:acos!=null?acos.toFixed(1)+'%':'—', prev:pacos!=null?pacos.toFixed(1)+'%':null, mom:eM(acos,pacos), inv:true},
-        {l:'ROAS', v:roas!=null?roas.toFixed(2)+'x':'—', prev:proas!=null?proas.toFixed(2)+'x':null, mom:eM(roas,proas)},
-        {l:'Orders', v:(amz.orders||0).toLocaleString(), prev:pamz!=null?(pamz.orders||0).toLocaleString():null, mom:eM(amz.orders,pamz?pamz.orders:null)},
-        {l:'Clicks', v:(amz.clicks||0).toLocaleString(), prev:pamz!=null?(pamz.clicks||0).toLocaleString():null, mom:eM(amz.clicks,pamz?pamz.clicks:null)},
+        {l:'Ad Spend', v:eFmt(amz.spend), prev:pamz?eFmt(pamz.spend):null, mom:eM(amz.spend,pamz?pamz.spend:null), sub:isP?'Month in progress':null, warn:isP, fFmt:fSpend!=null?eFmt(fSpend):null, fMom:fmom(fSpend,pamz?pamz.spend:null)},
+        {l:'Ad Sales', v:eFmt(amz.adSales), prev:pamz?eFmt(pamz.adSales):null, mom:eM(amz.adSales,pamz?pamz.adSales:null), fFmt:fSales!=null?eFmt(fSales):null, fMom:fmom(fSales,pamz?pamz.adSales:null)},
+        {l:'ACOS', v:acos!=null?acos.toFixed(1)+'%':'—', prev:pacos!=null?pacos.toFixed(1)+'%':null, mom:eM(acos,pacos), inv:true, fFmt:fAcos!=null?fAcos.toFixed(1)+'%':null, fMom:fmom(fAcos,pacos)},
+        {l:'ROAS', v:roas!=null?roas.toFixed(2)+'x':'—', prev:proas!=null?proas.toFixed(2)+'x':null, mom:eM(roas,proas), fFmt:fRoas!=null?fRoas.toFixed(2)+'x':null, fMom:fmom(fRoas,proas)},
+        {l:'Orders', v:(amz.orders||0).toLocaleString(), prev:pamz!=null?(pamz.orders||0).toLocaleString():null, mom:eM(amz.orders,pamz?pamz.orders:null), fFmt:fOrders!=null?Math.round(fOrders).toLocaleString():null, fMom:fmom(fOrders,pamz?pamz.orders:null)},
+        {l:'Clicks', v:(amz.clicks||0).toLocaleString(), prev:pamz!=null?(pamz.clicks||0).toLocaleString():null, mom:eM(amz.clicks,pamz?pamz.clicks:null), fFmt:fClicks!=null?Math.round(fClicks).toLocaleString():null, fMom:fmom(fClicks,pamz?pamz.clicks:null)},
       ].forEach(x=>{
-        r1.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv, sub:x.sub, warn:x.warn}));
+        r1.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv, sub:x.sub, warn:x.warn, fFmt:x.fFmt, fMom:x.fMom, days}));
       });
     }
     const r2=document.getElementById('kpi-row-2'); if(r2){r2.innerHTML='';
       [
-        {l:'Impressions', v:amz.impressions?(amz.impressions/1000).toFixed(0)+'K':'—', prev:pamz&&pamz.impressions?(pamz.impressions/1000).toFixed(0)+'K':null, mom:eM(amz.impressions,pamz?pamz.impressions:null)},
+        {l:'Impressions', v:amz.impressions?(amz.impressions/1000).toFixed(0)+'K':'—', prev:pamz&&pamz.impressions?(pamz.impressions/1000).toFixed(0)+'K':null, mom:eM(amz.impressions,pamz?pamz.impressions:null), fFmt:fImps!=null?(fImps/1000).toFixed(0)+'K':null, fMom:fmom(fImps,pamz?pamz.impressions:null)},
         {l:'CTR', v:ctr!=null?ctr.toFixed(2)+'%':'—', prev:pctr!=null?pctr.toFixed(2)+'%':null, mom:eM(ctr,pctr)},
         {l:'CPC', v:cpc!=null?'$'+cpc.toFixed(2):'—', prev:pcpc!=null?'$'+pcpc.toFixed(2):null, mom:eM(cpc,pcpc), inv:true},
         {l:'CVR', v:cvr!=null?cvr.toFixed(2)+'%':'—', prev:pcvr!=null?pcvr.toFixed(2)+'%':null, mom:eM(cvr,pcvr)},
       ].forEach(x=>{
-        r2.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv}));
+        r2.appendChild(kpi(x.l, x.v, {prev:x.prev, mom:x.mom, inv:x.inv, fFmt:x.fFmt, fMom:x.fMom, days}));
       });
     }
   }
