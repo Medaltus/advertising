@@ -241,6 +241,14 @@ body {
 .tab-btn { padding: 7px 16px; border-radius: 9px; border: none; background: transparent; color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.25s ease; }
 .tab-btn.active { background: linear-gradient(135deg, rgba(129,140,248,0.3), rgba(129,140,248,0.12)); color: #fff; box-shadow: 0 2px 12px rgba(129,140,248,0.25), 0 0 1px rgba(129,140,248,0.4); border: 1px solid rgba(129,140,248,0.2); }
 .tab-btn:hover:not(.active) { color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.06); }
+/* Month dropdown */
+.month-dd-btn { display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:9px;border:1px solid rgba(129,140,248,0.3);background:linear-gradient(135deg,rgba(129,140,248,0.18),rgba(129,140,248,0.07));color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap; }
+.month-dd-btn.teal { border-color:rgba(20,184,166,0.3);background:linear-gradient(135deg,rgba(20,184,166,0.18),rgba(20,184,166,0.07));color:#2dd4bf; }
+.month-dd-menu { position:fixed;z-index:9000;min-width:180px;max-height:340px;overflow-y:auto;background:rgba(18,18,32,0.97);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.7);backdrop-filter:blur(24px); }
+.month-dd-item { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);transition:all 0.15s; }
+.month-dd-item.active { background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));color:#fff;border:1px solid rgba(129,140,248,0.25); }
+.month-dd-item.active-teal { background:linear-gradient(135deg,rgba(20,184,166,0.25),rgba(20,184,166,0.1));color:#2dd4bf;border:1px solid rgba(20,184,166,0.25); }
+.month-dd-year { opacity:0.45;font-size:11px; }
 
 /* KPI Cards */
 .kpi-row { display: flex; gap: 14px; margin-bottom: 28px; flex-wrap: wrap; }
@@ -679,7 +687,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
       <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08));border:1px solid rgba(56,189,248,0.25);color:rgba(56,189,248,0.8);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.35),rgba(56,189,248,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08))'">&#9741; QC Check</button>
       <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
       </div>
-      <div class="tab-bar" id="month-tabs"></div>
+      <div id="month-tabs"></div>
     </div>
   </div>
   <!-- ── Date Range Control Bar ── -->
@@ -1259,34 +1267,33 @@ function renderEracleaView(){
   }
   if(!selectedEracleaMonth||!monthsObj[selectedEracleaMonth]) selectedEracleaMonth=sortedMonths[sortedMonths.length-1];
 
-  // Build month dropdown (same pattern as brand-selector dropdown)
+  // Build month dropdown (eraclea — teal variant)
   (function buildEracleaMonthDropdown(){
     const tb=document.getElementById('month-tabs'); tb.innerHTML='';
-    const old=document.getElementById('eraclea-month-dd-portal'); if(old) old.remove();
+    const old=document.getElementById('month-dd-portal'); if(old) old.remove();
     const parts=selectedEracleaMonth.split(' ');
     const isPartial=monthsObj[selectedEracleaMonth]&&monthsObj[selectedEracleaMonth]._partial;
     const label=(parts[0]||'Month')+(isPartial?' ⏳':'')+' '+(parts[1]||'');
     const btn=document.createElement('button');
-    btn.style.cssText='display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:9px;border:1px solid rgba(20,184,166,0.3);background:linear-gradient(135deg,rgba(20,184,166,0.18),rgba(20,184,166,0.07));color:#2dd4bf;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;';
+    btn.className='month-dd-btn teal';
     btn.innerHTML=`<span>&#128197;</span><span>${label}</span><span style="opacity:0.4;font-size:10px;">&#9660;</span>`;
     const menu=document.createElement('div');
-    menu.style.cssText='position:fixed;z-index:9000;min-width:180px;max-height:340px;overflow-y:auto;background:rgba(18,18,32,0.97);border:1px solid rgba(20,184,166,0.2);border-radius:12px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.7);backdrop-filter:blur(24px);';
+    menu.className='month-dd-menu';
     [...sortedMonths].reverse().forEach(mk=>{
       const p=mk.split(' ');
       const isP=monthsObj[mk]&&monthsObj[mk]._partial;
       const item=document.createElement('div');
-      item.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.15s;'+(mk===selectedEracleaMonth?'background:linear-gradient(135deg,rgba(20,184,166,0.25),rgba(20,184,166,0.1));color:#2dd4bf;border:1px solid rgba(20,184,166,0.25);':'color:rgba(255,255,255,0.5);');
-      item.innerHTML=`<span>${p[0]}${isP?' ⏳':''}</span><span style="opacity:0.5">${p[1]||''}</span>`;
+      item.className='month-dd-item'+(mk===selectedEracleaMonth?' active-teal':'');
+      item.innerHTML=`<span>${p[0]}${isP?' ⏳':''}</span><span class="month-dd-year">${p[1]||''}</span>`;
       item.onclick=()=>{selectedEracleaMonth=mk;menu.remove();renderEracleaView();};
       menu.appendChild(item);
     });
     btn.onclick=(e)=>{
       e.stopPropagation();
-      const existing=document.getElementById('eraclea-month-dd-portal');
-      if(existing){existing.remove();return;}
+      const ex=document.getElementById('month-dd-portal'); if(ex){ex.remove();return;}
       const r=btn.getBoundingClientRect();
       menu.style.top=(r.bottom+6)+'px'; menu.style.left=r.left+'px';
-      menu.id='eraclea-month-dd-portal';
+      menu.id='month-dd-portal';
       document.body.appendChild(menu);
       setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
     };
@@ -1361,9 +1368,37 @@ function render(){
   const ms=DATA.monthly.map(m=>m.month.replace(/\s\d{4}$/,'')), yr=DATA.monthly[0].month.split(' ')[1];
   document.getElementById('subtitle').textContent=`Live from Google Sheets · Data from ${ms[0]}–${ms[ms.length-1]} ${yr}`;
 
-  // Month tabs
-  const tb=document.getElementById('month-tabs'); tb.innerHTML='';
-  DATA.monthly.forEach(m=>{const b=document.createElement('button');b.className='tab-btn'+(m.month===selectedMonth?' active':'');b.textContent=m.month.replace(/\s\d{4}$/,'')+(m.partial?' ⏳':'');b.onclick=()=>{selectedMonth=m.month;render();};tb.appendChild(b);});
+  // Month dropdown
+  (function buildMonthDropdown(){
+    const tb=document.getElementById('month-tabs'); tb.innerHTML='';
+    const old=document.getElementById('month-dd-portal'); if(old) old.remove();
+    const cur=DATA.monthly.find(m=>m.month===selectedMonth);
+    const p=(cur?cur.month:'').split(' ');
+    const label=(p[0]||'Month')+(cur&&cur.partial?' ⏳':'')+' '+(p[1]||'');
+    const btn=document.createElement('button');
+    btn.className='month-dd-btn';
+    btn.innerHTML=`<span>&#128197;</span><span>${label}</span><span style="opacity:0.4;font-size:10px;">&#9660;</span>`;
+    const menu=document.createElement('div');
+    menu.className='month-dd-menu';
+    [...DATA.monthly].reverse().forEach(m=>{
+      const mp=m.month.split(' ');
+      const item=document.createElement('div');
+      item.className='month-dd-item'+(m.month===selectedMonth?' active':'');
+      item.innerHTML=`<span>${mp[0]}${m.partial?' ⏳':''}</span><span class="month-dd-year">${mp[1]||''}</span>`;
+      item.onclick=()=>{selectedMonth=m.month;menu.remove();render();};
+      menu.appendChild(item);
+    });
+    btn.onclick=(e)=>{
+      e.stopPropagation();
+      const ex=document.getElementById('month-dd-portal'); if(ex){ex.remove();return;}
+      const r=btn.getBoundingClientRect();
+      menu.style.top=(r.bottom+6)+'px'; menu.style.left=r.left+'px';
+      menu.id='month-dd-portal';
+      document.body.appendChild(menu);
+      setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
+    };
+    tb.appendChild(btn);
+  })();
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
