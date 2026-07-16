@@ -13,8 +13,6 @@ import sys
 import argparse
 from datetime import datetime
 from pathlib import Path
-from calendar import monthrange
-
 try:
     import requests
 except ImportError:
@@ -165,9 +163,10 @@ def main():
     for r in rows:
         seg = r.get("segments", {})
         met = r.get("metrics", {})
-        mk = month_key(seg.get("month", ""))
-        if not mk:
+        raw_month = seg.get("month", "")
+        if not raw_month:
             continue
+        mk = month_key(raw_month)
         if mk not in by_month:
             by_month[mk] = {"spend": 0.0, "adSales": 0.0, "conversions": 0.0,
                             "clicks": 0, "impressions": 0}
