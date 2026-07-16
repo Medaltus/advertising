@@ -2412,6 +2412,13 @@ function appendEracleaSuppSections(){
             `<td>${c.cpc!=null?'$'+c.cpc.toFixed(2):'—'}</td>`;
           tbody.appendChild(tr);
         });
+        // eraclea total row (uses period-accurate timeline totals)
+        const eTotAcos=sales>0?(spend/sales*100).toFixed(1)+'%':'—';
+        const eTotRoas=spend>0?(sales/spend).toFixed(2)+'x':'—';
+        const eTotTR=document.createElement('tr');
+        eTotTR.style.cssText='border-top:2px solid rgba(20,184,166,0.3);font-weight:700;';
+        eTotTR.innerHTML=`<td style="color:rgba(255,255,255,0.9)">Total</td><td style="color:#fff">$${spend.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">$${sales.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">${eTotAcos}</td><td style="color:#fff">${eTotRoas}</td><td style="color:#fff">${orders}</td><td style="color:rgba(255,255,255,0.7)">${clicks.toLocaleString()}</td><td></td>`;
+        tbody.appendChild(eTotTR);
       }
     }
   }
