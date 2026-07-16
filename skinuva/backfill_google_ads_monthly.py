@@ -28,17 +28,27 @@ MONTH_NAMES = [
 
 # ── Load credentials from config.json ────────────────────────────────────────
 
-def _load_config() -> dict:
+def _load_config(explicit_path: str = None) -> dict:
     script_dir = Path(__file__).parent.resolve()
-    for cfg_path in [script_dir.parent / 'config.json', script_dir / 'config.json']:
-        if cfg_path.exists():
-            with open(cfg_path) as f:
+    candidates = [
+        Path(explicit_path) if explicit_path else None,
+        Path.cwd() / 'config.json',
+        script_dir.parent / 'config.json',
+        script_dir / 'config.json',
+        Path.home() / 'Documents' / 'Claude' / 'Projects' / 'All Brands Ad Dashboard' / 'deploy' / 'config.json',
+    ]
+    for p in candidates:
+        if p and p.exists():
+            print(f"  Using config: {p}")
+            with open(p) as f:
                 return json.load(f).get('skinuva_google_ads', {})
-    print("✗ config.json not found.")
+    print("✗ config.json not found. Pass the path explicitly:")
+    print("  python3 skinuva/backfill_google_ads_monthly.py --config /path/to/config.json")
     sys.exit(1)
 
-cfg            = _load_config()
-DEVELOPER_TOKEN = cfg['developer_token']
+# Config loaded in main() after args are parsed — see below
+DEVELOPER_TOKEN = None
+CLIENT_ID = CLIENT_SECRET = REFRESH_TOKEN = CUSTOMER_ID = MANAGER_ID = None
 CLIENT_ID       = cfg['client_id']
 CLIENT_SECRET   = cfg['client_secret']
 REFRESH_TOKEN   = cfg['refresh_token']
@@ -116,9 +126,20 @@ def month_key(date_str: str) -> str:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--start", default="2024-07-01", help="Start date YYYY-MM-DD")
-    parser.add_argument("--end",   default="2026-04-30", help="End date YYYY-MM-DD")
+    parser.add_argument("--start",  default="2024-07-01", help="Start date YYYY-MM-DD")
+    parser.add_argument("--end",    default="2026-04-30", help="End date YYYY-MM-DD")
+    parser.add_argument("--config", default=None, help="Path to config.json")
     args = parser.parse_args()
+
+    # Load credentials now that we have args
+    global DEVELOPER_TOKEN, CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, CUSTOMER_ID, MANAGER_ID
+    cfg = _load_config(args.config)
+    DEVELOPER_TOKEN = cfg['developer_token']
+    CLIENT_ID       = cfg['client_id']
+    CLIENT_SECRET   = cfg['client_secret']
+    REFRESH_TOKEN   = cfg['refresh_token']
+    CUSTOMER_ID     = cfg['customer_id']
+    MANAGER_ID      = cfg['manager_id']
 
     print(f"\n{'═'*60}")
     print(f"  Google Ads Monthly Backfill  |  Skinuva")
