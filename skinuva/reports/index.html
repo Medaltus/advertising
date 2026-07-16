@@ -1199,6 +1199,45 @@ let DATA=null, selectedMonth=null, trendMode='spend_vs_sales', charts={}, initia
 let ERACLEA_AMAZON=null, ERACLEA_MONTHLY={}, ERACLEA_DAILY={};
 let selectedOzleeBrand='All', selectedEracleaMonth=null;
 let ACTIVE_SUPPLEMENT=null;
+
+function buildMergedSupplement(s1,s2){
+  if(!s1||!s1.timeline) return s2;
+  if(!s2||!s2.timeline) return s1;
+  const tlMap={};
+  (s1.timeline||[]).forEach(r=>{tlMap[r.date]={...r};});
+  (s2.timeline||[]).forEach(r=>{
+    if(tlMap[r.date]){
+      tlMap[r.date].spend=(tlMap[r.date].spend||0)+(r.spend||0);
+      tlMap[r.date].sales=(tlMap[r.date].sales||0)+(r.sales||0);
+      tlMap[r.date].purchases=(tlMap[r.date].purchases||0)+(r.purchases||0);
+      tlMap[r.date].clicks=(tlMap[r.date].clicks||0)+(r.clicks||0);
+      tlMap[r.date].impressions=(tlMap[r.date].impressions||0)+(r.impressions||0);
+    } else { tlMap[r.date]={...r}; }
+  });
+  const timeline=Object.values(tlMap).sort((a,b)=>a.date.localeCompare(b.date));
+  const sum1=s1.summary||{},sum2=s2.summary||{};
+  const spend=(sum1.spend||0)+(sum2.spend||0),sales=(sum1.sales||0)+(sum2.sales||0);
+  const clicks=(sum1.clicks||0)+(sum2.clicks||0),impressions=(sum1.impressions||0)+(sum2.impressions||0);
+  const purchases=(sum1.purchases||0)+(sum2.purchases||0);
+  const pi1=s1.productInsights||{},pi2=s2.productInsights||{};
+  return {
+    fetched_at:s1.fetched_at, timeline,
+    campaigns:[...(s1.campaigns||[]),...(s2.campaigns||[])],
+    searchTermInsights:[...(s1.searchTermInsights||[]),...(s2.searchTermInsights||[])],
+    placementInsights:[...(s1.placementInsights||[]),...(s2.placementInsights||[])],
+    productInsights:{
+      top_performers:[...(pi1.top_performers||[]),...(pi2.top_performers||[])],
+      wasted_spend:[...(pi1.wasted_spend||[]),...(pi2.wasted_spend||[])],
+      opportunities:[...(pi1.opportunities||[]),...(pi2.opportunities||[])],
+    },
+    summary:{spend,sales,purchases,clicks,impressions,
+      acos:sales>0?(spend/sales*100).toFixed(1):null,
+      roas:spend>0?(sales/spend).toFixed(2):null,
+      ctr:impressions>0?(clicks/impressions*100).toFixed(2):null,
+      cpc:clicks>0?(spend/clicks).toFixed(2):null,
+    },
+  };
+}
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 // ── KPI builder ──
@@ -1380,8 +1419,22 @@ function render(){
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
-  const md=DATA.monthly.find(m=>m.month===selectedMonth); if(!md) return;
-  const idx=DATA.monthly.indexOf(md), prev=idx>0?DATA.monthly[idx-1]:null;
+  let md=DATA.monthly.find(m=>m.month===selectedMonth); if(!md) return;
+  const idx=DATA.monthly.indexOf(md);
+  let prev=idx>0?DATA.monthly[idx-1]:null;
+  // Ozlee 'All' view: augment md and prev with eraclea Amazon numbers
+  if(selectedOzleeBrand==='All'){
+    const emd=ERACLEA_MONTHLY[selectedMonth];
+    const eprev=prev?ERACLEA_MONTHLY[prev.month]:null;
+    if(emd&&emd.amazon){const ea=emd.amazon;
+      md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0)};
+      md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?(md.totalSales||0)/md.orders:null;
+    }
+    if(prev&&eprev&&eprev.amazon){const ea=eprev.amazon;
+      prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0)};
+      prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?(prev.totalSales||0)/prev.orders:null;
+    }
+  }
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
   const f=k=>ip?fv(md,k):null;
 
@@ -1583,8 +1636,9 @@ function render(){
       <td style="${totalStyle}">${c.cvr!=null?c.cvr+'%':'—'}${momLine(c.cvr,p&&p.cvr,fPct)}</td>`;
     tbody.appendChild(tr);
   });
-  // Search Term Insights
-  ACTIVE_SUPPLEMENT = SKINUVA_AMAZON;
+  // Amazon supplement sections — use merged data for Ozlee 'All', Skinuva-only otherwise
+  ACTIVE_SUPPLEMENT = selectedOzleeBrand==='All' ? buildMergedSupplement(SKINUVA_AMAZON, ERACLEA_AMAZON) : SKINUVA_AMAZON;
+  renderAmazonSection('month');
   renderSearchTermInsights();
   renderDayOfWeekHeatmap();
   renderPlacementPerformance();
