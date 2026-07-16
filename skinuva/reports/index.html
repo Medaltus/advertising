@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>v2 Skinuva Ad Analytics Dashboard</title>
+<title>v2 Ozlee Ad Analytics Dashboard</title>
 <style>
 :root { color-scheme: dark; }
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -225,6 +225,14 @@ body {
   box-shadow: 0 4px 32px rgba(0,0,0,0.5);
 }
 .header-label { font-size: 20px; font-weight: 700; letter-spacing: 3px; color: rgba(129,140,248,0.6); text-transform: uppercase; margin-bottom: 8px; }
+/* Ozlee brand selector */
+.ozlee-brand-bar { display:flex; gap:6px; margin-bottom:12px; }
+.ozlee-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.12); background:transparent; color:rgba(255,255,255,0.45); font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; letter-spacing:0.5px; text-transform:uppercase; transition:all 0.2s; }
+.ozlee-pill:hover:not(.active) { border-color:rgba(255,255,255,0.25); color:rgba(255,255,255,0.7); }
+.ozlee-pill.active-all { background:linear-gradient(135deg,rgba(129,140,248,0.28),rgba(129,140,248,0.1)); border-color:rgba(129,140,248,0.4); color:#fff; }
+.ozlee-pill.active-skinuva { background:linear-gradient(135deg,rgba(129,140,248,0.28),rgba(129,140,248,0.1)); border-color:rgba(129,140,248,0.4); color:#fff; }
+.ozlee-pill.active-eraclea { background:linear-gradient(135deg,rgba(20,184,166,0.28),rgba(20,184,166,0.1)); border-color:rgba(20,184,166,0.5); color:#2dd4bf; }
+.ozlee-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 .header h1 { font-size: 32px; font-weight: 800; margin: 0; background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 50%, rgba(129,140,248,0.8) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; }
 .subtitle { font-size: 12px; color: rgba(255,255,255,0.3); margin: 8px 0 0; letter-spacing: 0.3px; }
 
@@ -644,7 +652,8 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 <div id="dashboard">
   <div class="header">
     <div>
-      <div class="header-label">Skinuva Performance</div>
+      <div class="ozlee-brand-bar" id="ozlee-brand-bar"></div>
+      <div class="header-label" id="header-label">Ozlee Performance</div>
       <h1>Ad Analytics Dashboard</h1>
       <p class="subtitle" id="subtitle"></p>
     </div>
@@ -1179,6 +1188,8 @@ Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 let DATA=null, selectedMonth=null, trendMode='spend_vs_sales', charts={}, initialLoadDone=false;
+let ERACLEA_AMAZON=null, ERACLEA_MONTHLY={}, ERACLEA_DAILY={};
+let selectedOzleeBrand='All', selectedEracleaMonth=null;
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 // ── KPI builder ──
@@ -1202,7 +1213,134 @@ function kpi(label,value,opts){
 }
 
 // ── Main render ──
+function buildBrandSelector(){
+  const bar=document.getElementById('ozlee-brand-bar'); if(!bar) return;
+  const brands=[
+    {id:'All',label:'All (Ozlee)',dot:'#818cf8',cls:'active-all'},
+    {id:'Skinuva',label:'Skinuva',dot:'#818cf8',cls:'active-skinuva'},
+    {id:'eraclea',label:'eraclea',dot:'#14b8a6',cls:'active-eraclea'},
+  ];
+  bar.innerHTML='';
+  brands.forEach(b=>{
+    const btn=document.createElement('button');
+    btn.className='ozlee-pill'+(selectedOzleeBrand===b.id?' '+b.cls:'');
+    btn.innerHTML=`<span class="ozlee-dot" style="background:${b.dot};${selectedOzleeBrand===b.id?'':'opacity:0.3'}"></span>${b.label}`;
+    btn.onclick=()=>{
+      selectedOzleeBrand=b.id;
+      // Reset eraclea month when switching to it
+      if(b.id==='eraclea') selectedEracleaMonth=null;
+      render();
+    };
+    bar.appendChild(btn);
+  });
+  // Update header label
+  const hl=document.getElementById('header-label');
+  if(hl) hl.textContent=selectedOzleeBrand==='All'?'Ozlee Performance':selectedOzleeBrand==='eraclea'?'eraclea Performance':'Skinuva Performance';
+}
+
+function renderEracleaView(){
+  buildBrandSelector();
+  // Build month list from ERACLEA_MONTHLY + inject current from ERACLEA_AMAZON
+  const monthOrder=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const monthsObj={...ERACLEA_MONTHLY};
+  // Inject current month from live supplement if it has data
+  if(ERACLEA_AMAZON && ERACLEA_AMAZON.fetched_at && ERACLEA_AMAZON.fetched_at!=='pending'){
+    const now=new Date(ERACLEA_AMAZON.fetched_at);
+    const mk=monthOrder[now.getMonth()]+' '+now.getFullYear();
+    if(!monthsObj[mk]) monthsObj[mk]={amazon:{spend:ERACLEA_AMAZON.summary.spend||0,adSales:ERACLEA_AMAZON.summary.sales||0,totalSales:ERACLEA_AMAZON.summary.totalSales||0,orders:ERACLEA_AMAZON.summary.purchases||0,clicks:0,impressions:ERACLEA_AMAZON.summary.impressions||0},fetched_at:ERACLEA_AMAZON.fetched_at,_partial:true};
+  }
+  const sortedMonths=Object.keys(monthsObj).sort((a,b)=>{
+    const [am,ay]=a.split(' '); const [bm,by]=b.split(' ');
+    return ay!==by?parseInt(ay)-parseInt(by):monthOrder.indexOf(am)-monthOrder.indexOf(bm);
+  });
+  if(!sortedMonths.length){
+    document.getElementById('month-tabs').innerHTML='<span style="color:rgba(255,255,255,0.3);font-size:12px;">No eraclea data yet</span>';
+    return;
+  }
+  if(!selectedEracleaMonth||!monthsObj[selectedEracleaMonth]) selectedEracleaMonth=sortedMonths[sortedMonths.length-1];
+
+  // Build month dropdown (same pattern as brand-selector dropdown)
+  (function buildEracleaMonthDropdown(){
+    const tb=document.getElementById('month-tabs'); tb.innerHTML='';
+    const old=document.getElementById('eraclea-month-dd-portal'); if(old) old.remove();
+    const parts=selectedEracleaMonth.split(' ');
+    const isPartial=monthsObj[selectedEracleaMonth]&&monthsObj[selectedEracleaMonth]._partial;
+    const label=(parts[0]||'Month')+(isPartial?' ⏳':'')+' '+(parts[1]||'');
+    const btn=document.createElement('button');
+    btn.style.cssText='display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:9px;border:1px solid rgba(20,184,166,0.3);background:linear-gradient(135deg,rgba(20,184,166,0.18),rgba(20,184,166,0.07));color:#2dd4bf;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;';
+    btn.innerHTML=`<span>&#128197;</span><span>${label}</span><span style="opacity:0.4;font-size:10px;">&#9660;</span>`;
+    const menu=document.createElement('div');
+    menu.style.cssText='position:fixed;z-index:9000;min-width:180px;max-height:340px;overflow-y:auto;background:rgba(18,18,32,0.97);border:1px solid rgba(20,184,166,0.2);border-radius:12px;padding:6px;box-shadow:0 16px 48px rgba(0,0,0,0.7);backdrop-filter:blur(24px);';
+    [...sortedMonths].reverse().forEach(mk=>{
+      const p=mk.split(' ');
+      const isP=monthsObj[mk]&&monthsObj[mk]._partial;
+      const item=document.createElement('div');
+      item.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;transition:all 0.15s;'+(mk===selectedEracleaMonth?'background:linear-gradient(135deg,rgba(20,184,166,0.25),rgba(20,184,166,0.1));color:#2dd4bf;border:1px solid rgba(20,184,166,0.25);':'color:rgba(255,255,255,0.5);');
+      item.innerHTML=`<span>${p[0]}${isP?' ⏳':''}</span><span style="opacity:0.5">${p[1]||''}</span>`;
+      item.onclick=()=>{selectedEracleaMonth=mk;menu.remove();renderEracleaView();};
+      menu.appendChild(item);
+    });
+    btn.onclick=(e)=>{
+      e.stopPropagation();
+      const existing=document.getElementById('eraclea-month-dd-portal');
+      if(existing){existing.remove();return;}
+      const r=btn.getBoundingClientRect();
+      menu.style.top=(r.bottom+6)+'px'; menu.style.left=r.left+'px';
+      menu.id='eraclea-month-dd-portal';
+      document.body.appendChild(menu);
+      setTimeout(()=>document.addEventListener('click',()=>menu.remove(),{once:true}),0);
+    };
+    tb.appendChild(btn);
+  })();
+
+  // Show/hide sections appropriate for eraclea (Amazon-only)
+  ['amazon-api-section','search-terms-section','dow-section','asin-section','placement-section'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='';
+  });
+  ['google-api-section','wlos-section','agents-section'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.style.display='none';
+  });
+  if(document.getElementById('audio-btn')) document.getElementById('audio-btn').style.display='none';
+  if(document.getElementById('range-bar')) document.getElementById('range-bar').style.display='none';
+
+  // Update subtitle
+  const subtitleEl=document.getElementById('subtitle');
+  if(subtitleEl) subtitleEl.textContent='eraclea · Amazon Ads only · '+selectedEracleaMonth;
+
+  // Render KPI rows from ERACLEA_MONTHLY
+  const md=monthsObj[selectedEracleaMonth];
+  if(md){
+    const amz=md.amazon||{};
+    const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
+      const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
+      const roas=amz.spend>0?amz.adSales/amz.spend:null;
+      const acosStr=acos?acos.toFixed(1)+'%':'—';
+      const roasStr=roas?roas.toFixed(2)+'x':'—';
+      [
+        ['Ad Spend','$'+((amz.spend||0).toLocaleString(undefined,{maximumFractionDigits:0}))],
+        ['Ad Sales','$'+((amz.adSales||0).toLocaleString(undefined,{maximumFractionDigits:0}))],
+        ['ACOS',acosStr],['ROAS',roasStr],
+        ['Orders',(amz.orders||0).toLocaleString()],
+        ['Impressions',amz.impressions?((amz.impressions/1000).toFixed(0)+'K'):'—'],
+      ].forEach(([l,v])=>{
+        const el=document.createElement('div'); el.className='kpi-card';
+        el.innerHTML=`<div class="kpi-label">${l}</div><div class="kpi-value">${v}</div>`;
+        r1.appendChild(el);
+      });
+    }
+    const r2=document.getElementById('kpi-row-2'); if(r2) r2.innerHTML='';
+  }
+
+  // Render Amazon supplement section using eraclea data
+  renderAmazonSection('month', ERACLEA_AMAZON);
+}
+
 function render(){
+  buildBrandSelector();
+  if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
+  // Restore sections that eraclea view may have hidden
+  ['google-api-section','wlos-section'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  const rb=document.getElementById('range-bar'); if(rb) rb.style.display='';
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
@@ -2595,6 +2733,9 @@ async function init(){
       fetch('/data/manual_totals.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
       fetch('/data/skinuva_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_MONTHLY=d;}).catch(()=>{}),
       fetch('/data/skinuva_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_DAILY=d;}).catch(()=>{}),
+      fetch('/data/eraclea_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_AMAZON=d;}).catch(()=>{}),
+      fetch('/data/eraclea_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_MONTHLY=d;}).catch(()=>{}),
+      fetch('/data/eraclea_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_DAILY=d;}).catch(()=>{}),
     ]);
     injectHistoricalApiData();
     injectJuneApiData();
@@ -3343,10 +3484,10 @@ function _setApiTabs(prefix, period){
 }
 
 // ── Amazon section renderer ──
-function renderAmazonSection(period){
+function renderAmazonSection(period, supplement){
   period=period||'month';
   _setApiTabs('amazon',period);
-  const d=SKINUVA_AMAZON; if(!d) return;
+  const d=supplement||SKINUVA_AMAZON; if(!d||!d.timeline) return;
   const tl=_filterTL(d.timeline,period);
   if(!tl.length) return;
 

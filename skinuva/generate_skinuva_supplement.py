@@ -368,9 +368,55 @@ def main():
     daily_path.write_text(json.dumps(merged_daily, indent=2))
     print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
 
+    # ── Also generate eraclea supplement (Amazon-only brand) ─────────────────
+    try:
+        eraclea_supplement = extract_brand(data, 'eraclea')
+        eraclea_supplement['searchTermInsights'] = build_search_term_insights(
+            eraclea_supplement.get('search_terms', []))
+        eraclea_supplement['productInsights'] = build_asin_insights(
+            eraclea_supplement.get('asins', []))
+        eraclea_supplement['placementInsights'] = eraclea_supplement.get('placements', [])
+
+        eraclea_out = out_dir / 'eraclea_supplement.json'
+        eraclea_out.write_text(json.dumps(eraclea_supplement, indent=2))
+        print(f"\n✓ Wrote {eraclea_out}")
+
+        # eraclea_monthly.json (Amazon-only, no Google/Shopify paths)
+        eraclea_monthly_path = out_dir / 'eraclea_monthly.json'
+        no_google = out_dir / '_no_google.json'   # intentionally absent
+        no_manual = out_dir / '_no_manual.json'   # intentionally absent
+        eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual)
+        existing_eraclea = {}
+        if eraclea_monthly_path.exists():
+            try:
+                existing_eraclea = json.loads(eraclea_monthly_path.read_text())
+            except Exception:
+                pass
+        merged_eraclea = {**existing_eraclea, **eraclea_new_monthly}
+        merged_eraclea = dict(sorted(merged_eraclea.items(), key=lambda x: datetime.strptime(x[0], '%B %Y')))
+        eraclea_monthly_path.write_text(json.dumps(merged_eraclea, indent=2))
+        print(f"✓ Updated {eraclea_monthly_path} ({len(merged_eraclea)} months)")
+
+        # eraclea_daily_archive.json
+        eraclea_daily_path = out_dir / 'eraclea_daily_archive.json'
+        eraclea_new_daily = build_daily_archive(eraclea_supplement, no_google)
+        existing_eraclea_daily = {}
+        if eraclea_daily_path.exists():
+            try:
+                existing_eraclea_daily = json.loads(eraclea_daily_path.read_text())
+            except Exception:
+                pass
+        merged_eraclea_daily = {**existing_eraclea_daily, **eraclea_new_daily}
+        merged_eraclea_daily = dict(sorted(merged_eraclea_daily.items()))
+        eraclea_daily_path.write_text(json.dumps(merged_eraclea_daily, indent=2))
+        print(f"✓ Updated {eraclea_daily_path} ({len(merged_eraclea_daily)} days)")
+
+    except ValueError as e:
+        print(f"  ⚠  No eraclea data in ads_data.js: {e}")
+
     print("\nNext steps:")
-    print("  git add skinuva/data/skinuva_supplement.json skinuva/data/google_ads_data.json skinuva/data/skinuva_monthly.json skinuva/data/skinuva_daily_archive.json")
-    print("  git commit -m 'chore: refresh Skinuva ad data'")
+    print("  git add skinuva/data/")
+    print("  git commit -m 'chore: refresh Skinuva + eraclea ad data'")
     print("  git push  →  Vercel auto-deploys")
 
 
