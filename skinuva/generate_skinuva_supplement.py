@@ -386,10 +386,25 @@ def main():
         no_google = out_dir / '_no_google.json'   # intentionally absent
         no_manual = out_dir / '_no_manual.json'   # intentionally absent
         eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual)
+        # Fix: timeline totalSales is company-wide (all brands), not eraclea-specific.
+        # Override with the SP-API brand total from summary.totalSales which is filtered
+        # to eraclea ASINs only via the ASIN-brand map in fetch_total_sales.py.
+        eraclea_summary_total = float((eraclea_supplement.get('summary') or {}).get('totalSales') or 0)
+        for mk, mdata in eraclea_new_monthly.items():
+            amz = mdata.get('amazon', {})
+            amz['totalSales'] = round(eraclea_summary_total, 2)
+            mdata['combinedTotalSales'] = round(eraclea_summary_total, 2) if eraclea_summary_total else None
         existing_eraclea = {}
         if eraclea_monthly_path.exists():
             try:
                 existing_eraclea = json.loads(eraclea_monthly_path.read_text())
+                # Zero out totalSales on all historical months — they were populated from
+                # company-wide timeline data and are incorrect. Only the current month
+                # (from summary.totalSales) is reliable.
+                for mk, mdata in existing_eraclea.items():
+                    if mk not in eraclea_new_monthly:
+                        (mdata.get('amazon') or {}).pop('totalSales', None)
+                        mdata.pop('combinedTotalSales', None)
             except Exception:
                 pass
         merged_eraclea = {**existing_eraclea, **eraclea_new_monthly}
