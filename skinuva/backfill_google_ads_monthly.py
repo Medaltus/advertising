@@ -46,16 +46,9 @@ def _load_config(explicit_path: str = None) -> dict:
     print("  python3 skinuva/backfill_google_ads_monthly.py --config /path/to/config.json")
     sys.exit(1)
 
-# Config loaded in main() after args are parsed — see below
-DEVELOPER_TOKEN = None
-CLIENT_ID = CLIENT_SECRET = REFRESH_TOKEN = CUSTOMER_ID = MANAGER_ID = None
-CLIENT_ID       = cfg['client_id']
-CLIENT_SECRET   = cfg['client_secret']
-REFRESH_TOKEN   = cfg['refresh_token']
-CUSTOMER_ID     = cfg['customer_id']
-MANAGER_ID      = cfg['manager_id']
-API_VERSION     = "v23"
-API_BASE        = f"https://googleads.googleapis.com/{API_VERSION}"
+DEVELOPER_TOKEN = CLIENT_ID = CLIENT_SECRET = REFRESH_TOKEN = CUSTOMER_ID = MANAGER_ID = None
+API_VERSION = "v23"
+API_BASE    = f"https://googleads.googleapis.com/{API_VERSION}"
 
 
 # ── Auth ──────────────────────────────────────────────────────────────────────
