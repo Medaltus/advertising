@@ -107,11 +107,7 @@
   "November 2025": {
     "amazon": {
       "spend": 533.7,
-<<<<<<< Updated upstream
       "adSales": 1099.18,
-=======
-      "adSales": 0.0,
->>>>>>> Stashed changes
       "totalSales": 0.0,
       "orders": 18,
       "clicks": 184,
@@ -198,7 +194,6 @@
     "combinedTotalSales": null,
     "fetched_at": "backfill"
   },
-<<<<<<< Updated upstream
   "May 2026": {
     "amazon": {
       "spend": 242.56,
@@ -228,35 +223,12 @@
     "walmart": 0.0,
     "combinedTotalSales": null,
     "fetched_at": "backfill"
-=======
-  "June 2026": {
-    "amazon": {
-      "spend": 114.0,
-      "adSales": 466.96,
-      "totalSales": 132851.15,
-      "orders": 8,
-      "clicks": 87,
-      "impressions": 21558
-    },
-    "google": {
-      "spend": 0.0,
-      "adSales": 0.0,
-      "conversions": 0,
-      "clicks": 0,
-      "impressions": 0
-    },
-    "shopify": 0.0,
-    "walmart": 0.0,
-    "combinedTotalSales": 132851.15,
-    "fetched_at": "2026-07-16T15:47:13Z"
->>>>>>> Stashed changes
   },
   "July 2026": {
     "amazon": {
       "spend": 106.46,
       "adSales": 0.0,
-<<<<<<< Updated upstream
-      "totalSales": 0.0,
+      "totalSales": 88240.69,
       "orders": 0,
       "clicks": 60,
       "impressions": 9379
@@ -264,26 +236,8 @@
     "google": { "spend": 0.0, "adSales": 0.0, "conversions": 0, "clicks": 0, "impressions": 0 },
     "shopify": 0.0,
     "walmart": 0.0,
-    "combinedTotalSales": null,
-    "fetched_at": "backfill",
-    "_partial": true
-=======
-      "totalSales": 88240.69,
-      "orders": 0,
-      "clicks": 60,
-      "impressions": 9299
-    },
-    "google": {
-      "spend": 0.0,
-      "adSales": 0.0,
-      "conversions": 0,
-      "clicks": 0,
-      "impressions": 0
-    },
-    "shopify": 0.0,
-    "walmart": 0.0,
     "combinedTotalSales": 88240.69,
-    "fetched_at": "2026-07-16T15:47:13Z"
->>>>>>> Stashed changes
+    "fetched_at": "2026-07-16T15:47:13Z",
+    "_partial": true
   }
 }

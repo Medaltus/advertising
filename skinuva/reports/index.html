@@ -1424,7 +1424,16 @@ function render(){
   let prev=idx>0?DATA.monthly[idx-1]:null;
   // Ozlee 'All' view: augment md and prev with eraclea Amazon numbers
   if(selectedOzleeBrand==='All'){
-    const emd=ERACLEA_MONTHLY[selectedMonth];
+    // For current partial month use live ERACLEA_AMAZON timeline (more up-to-date than monthly JSON)
+    let emd=ERACLEA_MONTHLY[selectedMonth];
+    if(md.partial && ERACLEA_AMAZON && ERACLEA_AMAZON.timeline){
+      const curPfx=_currentMonthPrefix();
+      const etl=ERACLEA_AMAZON.timeline.filter(r=>r.date.startsWith(curPfx));
+      if(etl.length){
+        const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
+        emd={amazon:{spend:sumK(etl,'spend'),adSales:sumK(etl,'sales'),orders:sumK(etl,'purchases'),clicks:sumK(etl,'clicks'),impressions:sumK(etl,'impressions')}};
+      }
+    }
     const eprev=prev?ERACLEA_MONTHLY[prev.month]:null;
     if(emd&&emd.amazon){const ea=emd.amazon;
       md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0)};
