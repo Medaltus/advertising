@@ -1472,8 +1472,8 @@ function renderEracleaView(){
     const fAcos=fSpend&&fSales&&fSales>0?fSpend/fSales*100:null;
     const fTacos=fSpend&&fTotSales&&fTotSales>0?fSpend/fTotSales*100:null;
 
-    // WoW — eraclea Amazon daily archive
-    const wowE=computeOzleeWoW('eraclea');
+    // WoW — eraclea Amazon daily archive (current month only)
+    const wowE=isP?computeOzleeWoW('eraclea'):null;
 
     // Row 1: Ad Spend, Ad Sales, ROAS, ACOS, Total Sales, TACOS
     const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
@@ -1619,8 +1619,8 @@ function render(){
     tb.appendChild(btn);
   })();
 
-  // WoW — Amazon daily archive (skinuva or all-brands)
-  const wow=computeOzleeWoW(selectedOzleeBrand==='All'?'All':'skinuva');
+  // WoW — Amazon daily archive (current month only)
+  const wow=ip?computeOzleeWoW(selectedOzleeBrand==='All'?'All':'skinuva'):null;
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';

@@ -1580,7 +1580,7 @@ function render() {
   // Get display data (brand or aggregate)
   const bdata = getBrandData(md, selectedBrand);
   const prevBdata = prev ? getBrandData(prev, selectedBrand) : null;
-  const wow = computeWoW(selectedBrand);
+  const wow = ip ? computeWoW(selectedBrand) : null;
 
   // KPI Row 1
   const r1 = document.getElementById('kpi-row-1'); r1.innerHTML = '';
