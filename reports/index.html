@@ -1089,7 +1089,7 @@ Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
 let DATA = null, selectedMonth = null, selectedBrand = 'All', trendMode = 'spend_vs_sales', brandBarMode = 'spend', charts = {}, sortKey = 'name', sortDir = 1;
-let internalAdsMode = false, INTERNAL_ADS_DATA = [], internalPlatformFilter = 'All';
+let internalAdsMode = false, INTERNAL_ADS_DATA = [], internalPlatformFilter = 'All', MEDALTUS_GADS_DATA = {monthly_summary:{},by_month_campaign:[]};
 
 function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
@@ -3707,12 +3707,14 @@ speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 // ── Init ──
 async function init() {
   try {
-    const [text, _supplement, _daily] = await Promise.all([
+    const [text, _supplement, _daily, _gads] = await Promise.all([
       fetch('/api/sheets').then(r => { if (!r.ok) throw new Error('Sheets API error: ' + r.status); return r.text(); }),
       fetch('/data/api_supplement.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
-      fetch('/data/medaltus_daily_archive.json', {cache:'no-store'}).then(r => r.ok ? r.json() : {}).catch(() => ({}))
+      fetch('/data/medaltus_daily_archive.json', {cache:'no-store'}).then(r => r.ok ? r.json() : {}).catch(() => ({})),
+      fetch('/data/medaltus_google_ads_monthly.json').then(r => r.ok ? r.json() : {monthly_summary:{},by_month_campaign:[]}).catch(() => ({monthly_summary:{},by_month_campaign:[]}))
     ]);
     if (_daily) MEDALTUS_DAILY = _daily;
+    if (_gads) MEDALTUS_GADS_DATA = _gads;
     API_SUPPLEMENT = _supplement;
     parseSopTabs(text);
     parseMedaltusAdsTab(text);
@@ -3961,7 +3963,7 @@ function renderInternalAdsView(){
 
   const $v=n=>n==null?'—':'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   const nv=(n,d=0)=>n==null?'—':n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
-  const pct=n=>n==null?'—':(+n).toFixed(2)+'%';
+  const pct=n=>n==null?'—':(+n*100).toFixed(2)+'%';
 
   // Sort months newest-first
   const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -3972,21 +3974,21 @@ function renderInternalAdsView(){
   const platforms=['All',...new Set(INTERNAL_ADS_DATA.map(r=>r.platform))].filter(Boolean);
   const pillsHtml=platforms.map(p=>`<button onclick="internalPlatformFilter='${p}';renderInternalAdsView();" style="padding:5px 16px;border-radius:20px;border:1px solid ${internalPlatformFilter===p?'rgba(250,204,21,0.5)':'rgba(255,255,255,0.12)'};background:${internalPlatformFilter===p?'rgba(250,204,21,0.18)':'rgba(255,255,255,0.04)'};color:${internalPlatformFilter===p?'#fde047':'rgba(255,255,255,0.45)'};font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">${p}</button>`).join('');
 
-  // KPI cards — matching existing dashboard kpi-card style
+  // KPI cards
   const kpis=[
     {label:'Total Spend',val:$v(totSpend),color:'#a78bfa'},
     {label:'Total Leads',val:nv(totLeads),color:'#34d399'},
     {label:'Avg CPL',val:$v(avgCpl),color:'#f87171'},
     {label:'Impressions',val:nv(totImps),color:'#60a5fa'},
     {label:'Clicks',val:nv(totClicks),color:'#fb923c'},
-    {label:'Avg CTR',val:pct(avgCtr),color:'#e879f9'},
+    {label:'Avg CTR',val:pct(avgCtr/100),color:'#e879f9'},
     {label:'Avg CPC',val:$v(avgCpc),color:'#facc15'},
   ].map(k=>`<div class="kpi-card glass" style="flex:1;min-width:110px;">
     <div class="kpi-label">${k.label}</div>
     <div class="kpi-value" style="color:${k.color};">${k.val}</div>
   </div>`).join('');
 
-  // Build table rows with per-month subtotals
+  // ── Summary table (from Google Sheet — Google + LinkedIn by month) ──────────
   const thStyle='padding:10px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;white-space:nowrap;';
   const tdStyle='padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);';
 
@@ -3998,10 +4000,9 @@ function renderInternalAdsView(){
     const mImps=mRows.reduce((s,r)=>s+r.imps,0);
     const mClicks=mRows.reduce((s,r)=>s+r.clicks,0);
     const mCpl=mLeads>0?mSpend/mLeads:null;
-    const mCtr=mImps>0?mClicks/mImps*100:0;
+    const mCtr=mImps>0?mClicks/mImps:0;
     const mCpc=mClicks>0?mSpend/mClicks:0;
 
-    // Individual platform rows for this month
     for(let i=0;i<mRows.length;i++){
       const r=mRows[i];
       const platColor=r.platform==='LinkedIn'?'#0a66c2':r.platform==='Google'?'#4285F4':'#818cf8';
@@ -4017,49 +4018,98 @@ function renderInternalAdsView(){
         <td style="${tdStyle}color:rgba(255,255,255,0.45);">${$v(r.cpc)}</td>
       </tr>`;
     }
-    // Month subtotal row (only if more than 1 platform)
     if(mRows.length>1){
       tableRows+=`<tr style="background:rgba(255,255,255,0.03);">
-        <td style="padding:9px 16px;font-size:11px;color:rgba(255,255,255,0.35);"></td>
-        <td style="padding:9px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.5px;">Total</td>
-        <td style="padding:9px 16px;font-weight:700;color:#a78bfa;font-size:13px;">${$v(mSpend)}</td>
-        <td style="padding:9px 16px;font-weight:700;color:#34d399;font-size:13px;">${nv(mLeads)}</td>
-        <td style="padding:9px 16px;font-weight:700;color:rgba(255,255,255,0.6);font-size:13px;">${$v(mCpl)}</td>
-        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);font-size:13px;">${nv(mImps)}</td>
-        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);font-size:13px;">${nv(mClicks)}</td>
-        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);font-size:13px;">${pct(mCtr)}</td>
-        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);font-size:13px;">${$v(mCpc)}</td>
+        <td style="padding:9px 16px;"></td>
+        <td style="padding:9px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);">Total</td>
+        <td style="padding:9px 16px;font-weight:700;color:#a78bfa;">${$v(mSpend)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:#34d399;">${nv(mLeads)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:rgba(255,255,255,0.6);">${$v(mCpl)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);">${nv(mImps)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);">${nv(mClicks)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);">${pct(mCtr)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);">${$v(mCpc)}</td>
       </tr><tr style="height:6px;background:rgba(0,0,0,0.15);"><td colspan="9"></td></tr>`;
     }
   }
-
-  // All-time totals
+  const totCtr=totImps>0?totClicks/totImps:0;
   tableRows+=`<tr style="background:rgba(0,0,0,0.35);border-top:2px solid rgba(255,255,255,0.15);">
-    <td colspan="2" style="padding:13px 16px;font-weight:700;color:#fde047;font-size:13px;letter-spacing:0.5px;">All Time</td>
-    <td style="padding:13px 16px;color:#a78bfa;font-weight:700;font-size:14px;">${$v(totSpend)}</td>
-    <td style="padding:13px 16px;color:#34d399;font-weight:700;font-size:14px;">${nv(totLeads)}</td>
-    <td style="padding:13px 16px;color:#f87171;font-weight:700;font-size:14px;">${$v(avgCpl)}</td>
-    <td style="padding:13px 16px;color:rgba(255,255,255,0.7);font-weight:700;">${nv(totImps)}</td>
-    <td style="padding:13px 16px;color:rgba(255,255,255,0.7);font-weight:700;">${nv(totClicks)}</td>
-    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);font-weight:700;">${pct(avgCtr)}</td>
-    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);font-weight:700;">${$v(avgCpc)}</td>
+    <td colspan="2" style="padding:13px 16px;font-weight:700;color:#fde047;">All Time</td>
+    <td style="padding:13px 16px;font-weight:700;color:#a78bfa;">${$v(totSpend)}</td>
+    <td style="padding:13px 16px;font-weight:700;color:#34d399;">${nv(totLeads)}</td>
+    <td style="padding:13px 16px;font-weight:700;color:rgba(255,255,255,0.7);">${$v(avgCpl)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);">${nv(totImps)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);">${nv(totClicks)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.5);">${pct(totCtr)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.5);">${$v(avgCpc)}</td>
   </tr>`;
 
-  sec.innerHTML=`
-  <div style="margin-bottom:28px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
-      <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(250,204,21,0.6);margin-bottom:4px;">MEDALTUS INTERNAL</div>
-        <div style="font-size:22px;font-weight:700;color:#fff;">B2B Acquisition Ads</div>
-        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:2px;">Lead gen campaigns for new brands · Google & LinkedIn</div>
-      </div>
-      <div style="display:flex;gap:8px;align-items:center;">${pillsHtml}</div>
+  // ── Google Ads Campaign Breakdown ─────────────────────────────────────────
+  const gCamps = MEDALTUS_GADS_DATA.by_month_campaign || [];
+  const gSummary = MEDALTUS_GADS_DATA.monthly_summary || {};
+  const gMonths = Object.keys(gSummary).sort((a,b)=>nmSort(b)-nmSort(a));
+
+  const typeLabel = t => ({'SEARCH':'Search','DISPLAY':'Display','PERFORMANCE_MAX':'PMax',
+    'VIDEO':'Video','SHOPPING':'Shopping','SMART':'Smart','DISCOVERY':'Discovery'}[t]||t||'Other');
+  const typeColor = t => ({'SEARCH':'#4285F4','DISPLAY':'#34A853','PERFORMANCE_MAX':'#FBBC04',
+    'VIDEO':'#EA4335','SHOPPING':'#4285F4','SMART':'#9E9E9E'}[t]||'#818cf8');
+
+  let campRows = '';
+  for(const mk of gMonths){
+    const mCamps = gCamps.filter(c=>c.month===mk).sort((a,b)=>b.spend-a.spend);
+    const ms = gSummary[mk]||{};
+    for(let i=0;i<mCamps.length;i++){
+      const c=mCamps[i];
+      const tc=typeColor(c.type);
+      campRows+=`<tr>
+        <td style="${tdStyle}font-weight:600;color:rgba(255,255,255,0.85);">${i===0?mk:''}</td>
+        <td style="${tdStyle};max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.campaign_name}">${c.campaign_name}</td>
+        <td style="${tdStyle}"><span style="background:${tc}22;color:${tc};border:1px solid ${tc}44;border-radius:6px;padding:2px 8px;font-size:10px;font-weight:700;">${typeLabel(c.type)}</span></td>
+        <td style="${tdStyle}color:#a78bfa;font-weight:600;">${$v(c.spend)}</td>
+        <td style="${tdStyle}color:#34d399;">${nv(c.conversions)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.6);">${c.cpl!=null?$v(c.cpl):'—'}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.55);">${nv(c.impressions)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.55);">${nv(c.clicks)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.45);">${c.ctr!=null?pct(c.ctr):'—'}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.45);">${c.cpc!=null?$v(c.cpc):'—'}</td>
+      </tr>`;
+    }
+    if(mCamps.length>0){
+      campRows+=`<tr style="background:rgba(255,255,255,0.03);">
+        <td style="padding:9px 16px;"></td>
+        <td style="padding:9px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);" colspan="2">Month Total</td>
+        <td style="padding:9px 16px;font-weight:700;color:#a78bfa;">${$v(ms.spend)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:#34d399;">${nv(ms.conversions)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:rgba(255,255,255,0.6);">${ms.cpl!=null?$v(ms.cpl):'—'}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);">${nv(ms.impressions)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);">${nv(ms.clicks)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);">${ms.ctr!=null?pct(ms.ctr):'—'}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);">${ms.cpc!=null?$v(ms.cpc):'—'}</td>
+      </tr><tr style="height:6px;background:rgba(0,0,0,0.15);"><td colspan="10"></td></tr>`;
+    }
+  }
+
+  const campPlaceholder = gCamps.length===0
+    ? `<tr><td colspan="10" style="padding:40px;text-align:center;color:rgba(255,255,255,0.3);">No Google Ads campaign data yet — run <code>backfill_medaltus_google_ads_monthly.py</code> locally first</td></tr>`
+    : '';
+
+  sec.innerHTML = `
+  <div style="padding:0 0 32px;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+      <h2 style="margin:0;font-size:20px;font-weight:700;color:#fff;">Medaltus Internal Ads</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">${pillsHtml}</div>
     </div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">${kpis}</div>
-    <div class="glass" style="border-radius:14px;overflow:hidden;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead>
-          <tr style="background:rgba(0,0,0,0.25);">
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:28px;">${kpis}</div>
+
+    <!-- Summary table -->
+    <div class="chart-card glass" style="margin-bottom:24px;padding:0;overflow:hidden;">
+      <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Monthly Summary — Google Sheet</div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
             <th style="${thStyle}">Month</th>
             <th style="${thStyle}">Platform</th>
             <th style="${thStyle}">Spend</th>
@@ -4069,10 +4119,35 @@ function renderInternalAdsView(){
             <th style="${thStyle}">Clicks</th>
             <th style="${thStyle}">CTR</th>
             <th style="${thStyle}">CPC</th>
-          </tr>
-        </thead>
-        <tbody>${tableRows||'<tr><td colspan="9" style="padding:40px;text-align:center;color:rgba(255,255,255,0.3);">No data found in &ldquo;Medaltus Ads&rdquo; sheet tab</td></tr>'}</tbody>
-      </table>
+          </tr></thead>
+          <tbody>${tableRows||'<tr><td colspan="9" style="padding:40px;text-align:center;color:rgba(255,255,255,0.3);">No data in &ldquo;Medaltus Ads&rdquo; sheet tab</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Google Ads campaign breakdown -->
+    <div class="chart-card glass" style="padding:0;overflow:hidden;">
+      <div style="padding:16px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;">
+        <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.5px;">Google Ads — Campaign Breakdown</div>
+        <span style="background:#4285F422;color:#4285F4;border:1px solid #4285F444;border-radius:6px;padding:2px 10px;font-size:10px;font-weight:700;">Live via API</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid rgba(255,255,255,0.08);">
+            <th style="${thStyle}">Month</th>
+            <th style="${thStyle}">Campaign</th>
+            <th style="${thStyle}">Type</th>
+            <th style="${thStyle}">Spend</th>
+            <th style="${thStyle}">Conv.</th>
+            <th style="${thStyle}">CPL</th>
+            <th style="${thStyle}">Impressions</th>
+            <th style="${thStyle}">Clicks</th>
+            <th style="${thStyle}">CTR</th>
+            <th style="${thStyle}">CPC</th>
+          </tr></thead>
+          <tbody>${campPlaceholder}${campRows}</tbody>
+        </table>
+      </div>
     </div>
   </div>`;
 }

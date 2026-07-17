@@ -56,6 +56,10 @@ jobs:
       - name: Fetch Skinuva Google Ads data
         run: python3 skinuva/fetch_google_ads.py
 
+      # ── Medaltus Internal Google Ads ─────────────────────────────────────────
+      - name: Fetch Medaltus Google Ads data
+        run: python3 fetch_medaltus_google_ads.py
+
       # ── Commit everything ────────────────────────────────────────────────────
       - name: Commit and push updated data
         run: |
@@ -64,6 +68,7 @@ jobs:
           git pull --rebase --autostash
           git add data/api_supplement.json \
                   data/medaltus_daily_archive.json \
+                  data/medaltus_google_ads_monthly.json \
                   skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json \
                   skinuva/data/skinuva_monthly.json \
