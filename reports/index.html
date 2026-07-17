@@ -9,7 +9,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   min-height: 100vh;
-  background-color: #06060a;
+  background: transparent;
   background-image:
     repeating-linear-gradient(0deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
     repeating-linear-gradient(90deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
@@ -407,10 +407,18 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
   position: fixed;
   border-radius: 50%;
   filter: blur(90px);
-  opacity: 0.35;
+  opacity: 0.55;
   pointer-events: none;
   z-index: 0;
 }
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-color: #06060a;
+  z-index: -1;
+}
+
 .bg-orb-1 {
   width: 600px; height: 600px;
   background: radial-gradient(circle, #7c3aed, #4f46e5);
