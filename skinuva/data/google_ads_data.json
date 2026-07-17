@@ -1,29 +1,19 @@
 {
-  "fetched_at": "2026-07-16T15:50:16Z",
+  "fetched_at": "2026-07-17T08:28:39Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 768175,
-    "clicks": 5891,
-    "spend": 9580.65,
-    "sales": 32053.8,
-    "conversions": 209,
-    "ctr": 0.0077,
-    "cpc": 1.6263,
-    "acos": 29.89,
-    "roas": 3.35
+    "impressions": 775373,
+    "clicks": 5898,
+    "spend": 9547.94,
+    "sales": 31145.96,
+    "conversions": 205,
+    "ctr": 0.0076,
+    "cpc": 1.6188,
+    "acos": 30.66,
+    "roas": 3.26
   },
   "timeline": [
-    {
-      "date": "2026-06-15",
-      "impressions": 31257,
-      "clicks": 217,
-      "spend": 405.08,
-      "sales": 1869.45,
-      "conversions": 11.0,
-      "acos": 21.67,
-      "roas": 4.62
-    },
     {
       "date": "2026-06-16",
       "impressions": 32462,
@@ -246,7 +236,7 @@
     },
     {
       "date": "2026-07-08",
-      "impressions": 25569,
+      "impressions": 25561,
       "clicks": 234,
       "spend": 334.02,
       "sales": 1324.14,
@@ -256,17 +246,17 @@
     },
     {
       "date": "2026-07-09",
-      "impressions": 26160,
-      "clicks": 215,
-      "spend": 326.41,
+      "impressions": 26158,
+      "clicks": 209,
+      "spend": 325.59,
       "sales": 792.29,
       "conversions": 4.0,
-      "acos": 41.2,
+      "acos": 41.09,
       "roas": 2.43
     },
     {
       "date": "2026-07-10",
-      "impressions": 24637,
+      "impressions": 24628,
       "clicks": 237,
       "spend": 330.18,
       "sales": 394.57,
@@ -296,33 +286,43 @@
     },
     {
       "date": "2026-07-13",
-      "impressions": 27246,
+      "impressions": 27245,
       "clicks": 238,
       "spend": 366.41,
-      "sales": 1725.13,
-      "conversions": 9.0,
-      "acos": 21.24,
-      "roas": 4.71
+      "sales": 1885.79,
+      "conversions": 10.0,
+      "acos": 19.43,
+      "roas": 5.15
     },
     {
       "date": "2026-07-14",
       "impressions": 23407,
       "clicks": 213,
       "spend": 374.89,
-      "sales": 1026.14,
-      "conversions": 8.0,
-      "acos": 36.53,
-      "roas": 2.74
+      "sales": 1169.33,
+      "conversions": 9.0,
+      "acos": 32.06,
+      "roas": 3.12
     },
     {
       "date": "2026-07-15",
-      "impressions": 35232,
-      "clicks": 226,
-      "spend": 324.23,
+      "impressions": 35231,
+      "clicks": 227,
+      "spend": 326.66,
       "sales": 371.38,
       "conversions": 3.0,
-      "acos": 87.3,
-      "roas": 1.15
+      "acos": 87.96,
+      "roas": 1.14
+    },
+    {
+      "date": "2026-07-16",
+      "impressions": 38476,
+      "clicks": 229,
+      "spend": 370.76,
+      "sales": 657.76,
+      "conversions": 5.0,
+      "acos": 56.37,
+      "roas": 1.77
     }
   ],
   "campaigns": [
@@ -330,194 +330,129 @@
       "id": "18209518057",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
       "type": "PERFORMANCE_MAX",
-      "impressions": 664031,
-      "clicks": 3469,
-      "spend": 6144.89,
-      "sales": 18754.76,
-      "conversions": 121.98250599999997,
-      "cpc": 1.7714,
-      "acos": 32.76,
-      "roas": 3.05
+      "impressions": 665756,
+      "clicks": 3476,
+      "spend": 6132.25,
+      "sales": 19001.14,
+      "conversions": 124.982506,
+      "cpc": 1.7642,
+      "acos": 32.27,
+      "roas": 3.1
     },
     {
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
       "type": "SEARCH",
-      "impressions": 3236,
-      "clicks": 440,
-      "spend": 1239.84,
-      "sales": 6659.25,
-      "conversions": 46.47602,
-      "cpc": 2.8178,
-      "acos": 18.62,
-      "roas": 5.37
+      "impressions": 3145,
+      "clicks": 424,
+      "spend": 1174.0,
+      "sales": 5448.14,
+      "conversions": 39.476020000000005,
+      "cpc": 2.7689,
+      "acos": 21.55,
+      "roas": 4.64
     },
     {
       "id": "21466459569",
       "name": "Skinuva Bruise Topical Leads",
       "type": "SEARCH",
-      "impressions": 3340,
-      "clicks": 208,
-      "spend": 639.86,
-      "sales": 2384.68,
-      "conversions": 16.034635,
-      "cpc": 3.0762,
-      "acos": 26.83,
-      "roas": 3.73
+      "impressions": 3192,
+      "clicks": 205,
+      "spend": 634.45,
+      "sales": 2280.92,
+      "conversions": 15.031027000000002,
+      "cpc": 3.0949,
+      "acos": 27.82,
+      "roas": 3.6
     },
     {
       "id": "23613752580",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING",
       "type": "SEARCH",
-      "impressions": 2365,
-      "clicks": 118,
-      "spend": 342.69,
+      "impressions": 2558,
+      "clicks": 123,
+      "spend": 369.84,
       "sales": 1293.6,
       "conversions": 9.505464,
-      "cpc": 2.9042,
-      "acos": 26.49,
-      "roas": 3.77
-    },
-    {
-      "id": "23824649207",
-      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Competitor Targeting - LP v2",
-      "type": "SEARCH",
-      "impressions": 3726,
-      "clicks": 124,
-      "spend": 160.53,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 1.2946,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23944321916",
-      "name": "PMax: Skinuva Smart Shopping CANADA",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 11622,
-      "clicks": 185,
-      "spend": 150.17,
-      "sales": 735.74,
-      "conversions": 3.0,
-      "cpc": 0.8117,
-      "acos": 20.41,
-      "roas": 4.9
+      "cpc": 3.0068,
+      "acos": 28.59,
+      "roas": 3.5
     },
     {
       "id": "24018309787",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
       "type": "PERFORMANCE_MAX",
-      "impressions": 19611,
-      "clicks": 131,
-      "spend": 140.24,
+      "impressions": 21339,
+      "clicks": 149,
+      "spend": 171.12,
       "sales": 427.29,
       "conversions": 2.975674,
-      "cpc": 1.0705,
-      "acos": 32.82,
-      "roas": 3.05
+      "cpc": 1.1485,
+      "acos": 40.05,
+      "roas": 2.5
+    },
+    {
+      "id": "23944321916",
+      "name": "PMax: Skinuva Smart Shopping CANADA",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 12970,
+      "clicks": 194,
+      "spend": 159.23,
+      "sales": 735.74,
+      "conversions": 3.0,
+      "cpc": 0.8208,
+      "acos": 21.64,
+      "roas": 4.62
+    },
+    {
+      "id": "23824649207",
+      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Competitor Targeting - LP v2",
+      "type": "SEARCH",
+      "impressions": 3516,
+      "clicks": 111,
+      "spend": 150.0,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 1.3514,
+      "acos": null,
+      "roas": 0.0
     },
     {
       "id": "23939195988",
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "type": "PERFORMANCE_MAX",
-      "impressions": 3479,
-      "clicks": 96,
-      "spend": 93.04,
+      "impressions": 3751,
+      "clicks": 97,
+      "spend": 95.04,
       "sales": 1005.49,
       "conversions": 5.5,
-      "cpc": 0.9692,
-      "acos": 9.25,
-      "roas": 10.81
+      "cpc": 0.9798,
+      "acos": 9.45,
+      "roas": 10.58
     },
     {
       "id": "24022316578",
       "name": "PMax: Skinuva Smart Shopping UK",
       "type": "PERFORMANCE_MAX",
-      "impressions": 11334,
-      "clicks": 60,
-      "spend": 88.19,
-      "sales": 721.41,
-      "conversions": 3.0,
-      "cpc": 1.4698,
-      "acos": 12.22,
-      "roas": 8.18
+      "impressions": 13209,
+      "clicks": 67,
+      "spend": 94.21,
+      "sales": 882.07,
+      "conversions": 4.0,
+      "cpc": 1.4061,
+      "acos": 10.68,
+      "roas": 9.36
     },
     {
       "id": "23605094807",
       "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Non-Branded KW",
       "type": "SEARCH",
-      "impressions": 1167,
-      "clicks": 101,
-      "spend": 73.88,
+      "impressions": 1137,
+      "clicks": 96,
+      "spend": 70.34,
       "sales": 0.0,
       "conversions": 0.0,
-      "cpc": 0.7315,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23620605037",
-      "name": "4 Skinuva Bruise - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 1917,
-      "clicks": 97,
-      "spend": 72.55,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.7479,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23710714741",
-      "name": "1 Skinuva Scar - Display Campaign - Sales Objective - Non-Branded v1",
-      "type": "DISPLAY",
-      "impressions": 8031,
-      "clicks": 134,
-      "spend": 71.41,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.5329,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23605103939",
-      "name": "2 Skinuva Scar+ - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 1380,
-      "clicks": 130,
-      "spend": 70.24,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.5403,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23610643809",
-      "name": "5 Skinuva Bruise ARC - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 1556,
-      "clicks": 81,
-      "spend": 70.1,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.8654,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23612955814",
-      "name": "3 Skinuva Brite - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 1776,
-      "clicks": 127,
-      "spend": 69.72,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.549,
+      "cpc": 0.7327,
       "acos": null,
       "roas": 0.0
     },
@@ -525,12 +460,77 @@
       "id": "23980438719",
       "name": "Skinuva - NYC Blitz - 2026",
       "type": "DISPLAY",
-      "impressions": 16210,
-      "clicks": 287,
-      "spend": 68.97,
+      "impressions": 16716,
+      "clicks": 292,
+      "spend": 69.64,
       "sales": 0.0,
       "conversions": 0.0,
-      "cpc": 0.2403,
+      "cpc": 0.2385,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": "23620605037",
+      "name": "4 Skinuva Bruise - Search Campaign - Sales Objective - Non-Branded KW",
+      "type": "SEARCH",
+      "impressions": 1633,
+      "clicks": 93,
+      "spend": 69.37,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 0.7459,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": "23710714741",
+      "name": "1 Skinuva Scar - Display Campaign - Sales Objective - Non-Branded v1",
+      "type": "DISPLAY",
+      "impressions": 7561,
+      "clicks": 125,
+      "spend": 67.4,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 0.5392,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": "23610643809",
+      "name": "5 Skinuva Bruise ARC - Search Campaign - Sales Objective - Non-Branded KW",
+      "type": "SEARCH",
+      "impressions": 1528,
+      "clicks": 78,
+      "spend": 67.19,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 0.8614,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": "23605103939",
+      "name": "2 Skinuva Scar+ - Search Campaign - Sales Objective - Non-Branded KW",
+      "type": "SEARCH",
+      "impressions": 1322,
+      "clicks": 124,
+      "spend": 67.05,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 0.5407,
+      "acos": null,
+      "roas": 0.0
+    },
+    {
+      "id": "23612955814",
+      "name": "3 Skinuva Brite - Search Campaign - Sales Objective - Non-Branded KW",
+      "type": "SEARCH",
+      "impressions": 1687,
+      "clicks": 124,
+      "spend": 66.76,
+      "sales": 0.0,
+      "conversions": 0.0,
+      "cpc": 0.5384,
       "acos": null,
       "roas": 0.0
     },
@@ -551,12 +551,12 @@
       "id": "24017770751",
       "name": "Skinuva - NYC Blitz - 2026 #2",
       "type": "DISPLAY",
-      "impressions": 7048,
-      "clicks": 64,
-      "spend": 30.91,
+      "impressions": 7938,
+      "clicks": 78,
+      "spend": 36.17,
       "sales": 0.0,
       "conversions": 0.0,
-      "cpc": 0.483,
+      "cpc": 0.4637,
       "acos": null,
       "roas": 0.0
     },
@@ -564,12 +564,12 @@
       "id": "21719229797",
       "name": "Skinuva Brite Search Campaign",
       "type": "SEARCH",
-      "impressions": 474,
-      "clicks": 21,
-      "spend": 3.11,
+      "impressions": 482,
+      "clicks": 22,
+      "spend": 3.22,
       "sales": 0.0,
       "conversions": 0.0,
-      "cpc": 0.1481,
+      "cpc": 0.1464,
       "acos": null,
       "roas": 0.0
     },
@@ -577,12 +577,12 @@
       "id": "21714470857",
       "name": "Skinuva Bruise Search Campaign",
       "type": "SEARCH",
-      "impressions": 99,
-      "clicks": 14,
-      "spend": 2.28,
+      "impressions": 100,
+      "clicks": 15,
+      "spend": 2.48,
       "sales": 0.0,
       "conversions": 0.0,
-      "cpc": 0.1629,
+      "cpc": 0.1653,
       "acos": null,
       "roas": 0.0
     },
@@ -590,14 +590,14 @@
       "id": "24014053364",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v2 *",
       "type": "SEARCH",
-      "impressions": 250,
-      "clicks": 3,
-      "spend": 1.39,
+      "impressions": 310,
+      "clicks": 4,
+      "spend": 1.54,
       "sales": 71.59,
       "conversions": 0.5,
-      "cpc": 0.4633,
-      "acos": 1.94,
-      "roas": 51.5
+      "cpc": 0.385,
+      "acos": 2.15,
+      "roas": 46.49
     }
   ],
   "pacing": [
@@ -606,136 +606,128 @@
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
       "state": "enabled",
       "dailyBudget": 240.0,
-      "recentSpend": 198.22,
-      "pacingPct": 82.6
+      "recentSpend": 197.81,
+      "pacingPct": 82.4
     },
     {
       "id": "23613752580",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING",
       "state": "enabled",
       "dailyBudget": 50.0,
-      "recentSpend": 11.05,
-      "pacingPct": 22.1
+      "recentSpend": 11.93,
+      "pacingPct": 23.9
     },
     {
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
       "state": "enabled",
       "dailyBudget": 25.0,
-      "recentSpend": 39.99,
-      "pacingPct": 160.0
+      "recentSpend": 37.87,
+      "pacingPct": 151.5
     },
     {
       "id": "21466459569",
       "name": "Skinuva Bruise Topical Leads",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 20.64,
-      "pacingPct": 103.2
+      "recentSpend": 20.47,
+      "pacingPct": 102.3
     },
     {
       "id": "24018309787",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 4.52,
-      "pacingPct": 22.6
+      "recentSpend": 5.52,
+      "pacingPct": 27.6
     },
     {
       "id": "23944321916",
       "name": "PMax: Skinuva Smart Shopping CANADA",
       "state": "enabled",
       "dailyBudget": 15.0,
-      "recentSpend": 4.84,
-      "pacingPct": 32.3
+      "recentSpend": 5.14,
+      "pacingPct": 34.2
     },
     {
       "id": "23939195988",
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "state": "enabled",
       "dailyBudget": 15.0,
-      "recentSpend": 3.0,
-      "pacingPct": 20.0
+      "recentSpend": 3.07,
+      "pacingPct": 20.4
     },
     {
       "id": "24022316578",
       "name": "PMax: Skinuva Smart Shopping UK",
       "state": "enabled",
       "dailyBudget": 15.0,
-      "recentSpend": 2.84,
-      "pacingPct": 19.0
+      "recentSpend": 3.04,
+      "pacingPct": 20.3
     },
     {
       "id": "24014053364",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v2 *",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 0.04,
-      "pacingPct": 0.4
+      "recentSpend": 0.05,
+      "pacingPct": 0.5
     },
     {
       "id": "23824649207",
       "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Competitor Targeting - LP v2",
       "state": "paused",
       "dailyBudget": 5.0,
-      "recentSpend": 5.18,
-      "pacingPct": 103.6
-    },
-    {
-      "id": "24017770751",
-      "name": "Skinuva - NYC Blitz - 2026 #2",
-      "state": "enabled",
-      "dailyBudget": 4.0,
-      "recentSpend": 1.0,
-      "pacingPct": 24.9
+      "recentSpend": 4.84,
+      "pacingPct": 96.8
     },
     {
       "id": "23605094807",
       "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Non-Branded KW",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.38,
-      "pacingPct": 79.4
+      "recentSpend": 2.27,
+      "pacingPct": 75.6
     },
     {
       "id": "23605103939",
       "name": "2 Skinuva Scar+ - Search Campaign - Sales Objective - Non-Branded KW",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.27,
-      "pacingPct": 75.5
+      "recentSpend": 2.16,
+      "pacingPct": 72.1
     },
     {
       "id": "23610643809",
       "name": "5 Skinuva Bruise ARC - Search Campaign - Sales Objective - Non-Branded KW",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.26,
-      "pacingPct": 75.4
+      "recentSpend": 2.17,
+      "pacingPct": 72.2
     },
     {
       "id": "23612955814",
       "name": "3 Skinuva Brite - Search Campaign - Sales Objective - Non-Branded KW",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.25,
-      "pacingPct": 75.0
+      "recentSpend": 2.15,
+      "pacingPct": 71.8
     },
     {
       "id": "23620605037",
       "name": "4 Skinuva Bruise - Search Campaign - Sales Objective - Non-Branded KW",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.34,
-      "pacingPct": 78.0
+      "recentSpend": 2.24,
+      "pacingPct": 74.6
     },
     {
       "id": "23710714741",
       "name": "1 Skinuva Scar - Display Campaign - Sales Objective - Non-Branded v1",
       "state": "paused",
       "dailyBudget": 3.0,
-      "recentSpend": 2.3,
-      "pacingPct": 76.8
+      "recentSpend": 2.17,
+      "pacingPct": 72.5
     },
     {
       "id": "23948635093",
@@ -750,16 +742,24 @@
       "name": "Skinuva - NYC Blitz - 2026",
       "state": "enabled",
       "dailyBudget": 1.0,
-      "recentSpend": 2.22,
-      "pacingPct": 222.5
+      "recentSpend": 2.25,
+      "pacingPct": 224.6
+    },
+    {
+      "id": "24017770751",
+      "name": "Skinuva - NYC Blitz - 2026 #2",
+      "state": "enabled",
+      "dailyBudget": 1.0,
+      "recentSpend": 1.17,
+      "pacingPct": 116.7
     },
     {
       "id": "21714470857",
       "name": "Skinuva Bruise Search Campaign",
       "state": "enabled",
       "dailyBudget": 0.1,
-      "recentSpend": 0.07,
-      "pacingPct": 73.5
+      "recentSpend": 0.08,
+      "pacingPct": 80.0
     },
     {
       "id": "21719229797",
@@ -767,7 +767,7 @@
       "state": "enabled",
       "dailyBudget": 0.1,
       "recentSpend": 0.1,
-      "pacingPct": 100.3
+      "pacingPct": 103.9
     }
   ]
 }
