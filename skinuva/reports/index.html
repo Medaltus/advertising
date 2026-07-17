@@ -224,6 +224,7 @@ body {
   border-bottom: 1px solid rgba(255,255,255,0.07);
   box-shadow: 0 4px 32px rgba(0,0,0,0.5);
 }
+.header-label { font-size: 20px; font-weight: 700; letter-spacing: 3px; color: rgba(129,140,248,0.6); text-transform: uppercase; margin-bottom: 8px; }
 /* Ozlee brand selector — matches Medaltus style */
 .ozlee-brand-selector { display:flex; gap:10px; align-items:center; margin-bottom:24px; padding:10px 16px; background:linear-gradient(160deg,rgba(255,255,255,0.06) 0%,rgba(255,255,255,0.02) 100%); border:1px solid rgba(255,255,255,0.1); border-radius:14px; backdrop-filter:blur(20px); position:relative; z-index:300; }
 .ozlee-pill { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); color:rgba(255,255,255,0.45); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.2s; white-space:nowrap; }
@@ -658,6 +659,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 <div id="dashboard">
   <div class="header">
     <div>
+      <div class="header-label" id="header-label">Ozlee Performance</div>
       <h1>Ad Analytics Dashboard</h1>
       <p class="subtitle" id="subtitle"></p>
     </div>
@@ -1269,6 +1271,9 @@ function buildBrandSelector(){
     {id:'Skinuva',label:'Skinuva',dot:'#818cf8',cls:'active-skinuva'},
     {id:'eraclea',label:'eraclea',dot:'#14b8a6',cls:'active-eraclea'},
   ];
+  // Update header label
+  const hl=document.getElementById('header-label');
+  if(hl) hl.textContent=selectedOzleeBrand==='All'?'Ozlee Performance':selectedOzleeBrand==='eraclea'?'eraclea Performance':'Skinuva Performance';
   bar.innerHTML='';
   brands.forEach(b=>{
     const btn=document.createElement('button');
