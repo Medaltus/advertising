@@ -1526,8 +1526,6 @@ function computeWoW(brand) {
 
 function render() {
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
-  // Always rebuild brand selector so active states update
-  if(DATA&&DATA.monthly.length) buildBrandSelector();
   if(internalAdsMode){renderInternalAdsView();return;}
   if (!DATA || !DATA.monthly.length) return;
   // Restore all normal sections when not in internal mode
