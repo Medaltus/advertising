@@ -1766,7 +1766,7 @@ function renderBrandSelector(md) {
   el.appendChild(wrap);
   // ── Medaltus Internal Ads button ──
   const intBtn = document.createElement('button');
-  intBtn.className = 'brand-pill internal-pill' + (internalAdsMode ? ' active' : '');
+  intBtn.className = 'brand-pill internal-pill' + (internalAdsMode ? ' active' : ''); intBtn.style.marginLeft = 'auto';
   intBtn.textContent = 'Medaltus Internal Ads';
   intBtn.onclick = () => { internalAdsMode = !internalAdsMode; if(internalAdsMode) selectedBrand='All'; intBtn.classList.toggle('active',internalAdsMode); render(); };
   el.appendChild(intBtn);
