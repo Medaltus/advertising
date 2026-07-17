@@ -921,7 +921,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
     <div id="asin-container"></div>
   </div>
 
-  <div class="chart-card glass" style="margin-bottom:24px;" id="geo-section">
+  <div class="chart-card glass" style="margin-bottom:24px;display:none;" id="geo-section">
     <div class="section-header">
       <div class="section-title">US Geographic Performance</div>
       <div class="section-sub">Google Ads reach by state — where your audience is located</div>
@@ -1444,7 +1444,7 @@ function renderEracleaView(){
   ['amazon-api-section','search-terms-section','dow-section','asin-section','placement-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='';
   });
-  ['google-api-section','geo-section','wlos-section','agents-section','charts-row-1','acos-row','channels-card'].forEach(id=>{
+  ['google-api-section','wlos-section','agents-section','charts-row-1','acos-row','channels-card'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   if(document.getElementById('audio-btn')) document.getElementById('audio-btn').style.display='none';
@@ -1569,7 +1569,9 @@ function render(){
   buildBrandSelector();
   if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
   // Restore sections that eraclea view may have hidden
-  ['google-api-section','geo-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  ['google-api-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  // Geo heatmap: Skinuva-only
+  if(selectedOzleeBrand==='Skinuva'){renderGeoHeatmap();}else{const gs=document.getElementById('geo-section');if(gs)gs.style.display='none';}
   const rb=document.getElementById('range-bar'); if(rb) rb.style.display='';
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
@@ -3399,6 +3401,7 @@ async function init(){
     injectJuneApiData();
     renderAmazonSection('month');
     renderGoogleSection('month');
+    if(selectedOzleeBrand==='Skinuva') renderGeoHeatmap();
     selectedMonth=DATA.monthly[DATA.monthly.length-1].month;
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
@@ -4312,6 +4315,10 @@ function setGeoMetric(m) {
 async function renderGeoHeatmap() {
   const section = document.getElementById('geo-section');
   if (!section) return;
+  // Only render on Skinuva tab
+  if (selectedOzleeBrand !== 'Skinuva') { section.style.display = 'none'; return; }
+  // D3/topojson must be loaded
+  if (typeof d3 === 'undefined' || typeof topojson === 'undefined') { section.style.display = 'none'; return; }
 
   const geo = typeof GOOGLE_ADS_DATA !== 'undefined' && GOOGLE_ADS_DATA && GOOGLE_ADS_DATA.geo_by_state;
   if (!geo || !geo.length) { section.style.display = 'none'; return; }
