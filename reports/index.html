@@ -9,7 +9,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   min-height: 100vh;
-  background: transparent;
+  background-color: #06060a;
   background-image:
     repeating-linear-gradient(0deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
     repeating-linear-gradient(90deg,rgba(212,175,55,0.14) 0px,rgba(212,175,55,0.14) 1px,transparent 1px,transparent 3px,rgba(212,175,55,0.08) 3px,rgba(212,175,55,0.08) 4px,transparent 4px,transparent 8px),
@@ -401,68 +401,10 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 .range-clear{padding:5px 11px;border-radius:7px;background:rgba(255,100,100,0.1);border:1px solid rgba(255,100,100,0.2);color:rgba(255,120,120,0.7);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;}
 .range-clear:hover{background:rgba(255,100,100,0.2);}
 .range-active-pill{font-size:11px;color:#a78bfa;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:6px;padding:4px 10px;}
-
-/* ── Animated background orbs ─────────────────────────────────────────────── */
-.bg-orb {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.55;
-  pointer-events: none;
-  z-index: 0;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-color: #06060a;
-  z-index: -1;
-}
-
-.bg-orb-1 {
-  width: 600px; height: 600px;
-  background: radial-gradient(circle, #7c3aed, #4f46e5);
-  top: -180px; left: -120px;
-  animation: orbDrift1 20s ease-in-out infinite;
-}
-.bg-orb-2 {
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, #2563eb, #0ea5e9);
-  bottom: -150px; right: -100px;
-  animation: orbDrift2 25s ease-in-out infinite;
-}
-.bg-orb-3 {
-  width: 380px; height: 380px;
-  background: radial-gradient(circle, #6d28d9, #1d4ed8);
-  top: 45%; left: 45%;
-  animation: orbDrift3 30s ease-in-out infinite;
-}
-@keyframes orbDrift1 {
-  0%   { transform: translate(0,0) scale(1); }
-  33%  { transform: translate(80px,60px) scale(1.08); }
-  66%  { transform: translate(-40px,90px) scale(0.94); }
-  100% { transform: translate(0,0) scale(1); }
-}
-@keyframes orbDrift2 {
-  0%   { transform: translate(0,0) scale(1); }
-  33%  { transform: translate(-90px,-60px) scale(1.1); }
-  66%  { transform: translate(50px,-40px) scale(0.92); }
-  100% { transform: translate(0,0) scale(1); }
-}
-@keyframes orbDrift3 {
-  0%   { transform: translate(-50%,-50%) scale(1); }
-  25%  { transform: translate(calc(-50% + 100px),calc(-50% - 50px)) scale(1.12); }
-  50%  { transform: translate(calc(-50% - 40px),calc(-50% + 80px)) scale(0.9); }
-  75%  { transform: translate(calc(-50% + 60px),calc(-50% + 40px)) scale(1.05); }
-  100% { transform: translate(-50%,-50%) scale(1); }
-}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 </head>
 <body style="padding-top:56px;">
-<div class="bg-orb bg-orb-1"></div>
-<div class="bg-orb bg-orb-2"></div>
-<div class="bg-orb bg-orb-3"></div>
 
 <div class="market-ticker" id="market-ticker" style="display:none;">
   <div class="market-ticker-loading" id="market-ticker-loading">MARKET DATA LOADING...</div>
