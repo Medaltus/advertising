@@ -1072,14 +1072,26 @@ function parseSheet(text, updatedDate) {
       if(ch==='Total Paid Media'){totalRow=row;continue;}
       if(AD_CHANNELS.has(ch)) adRows.push(row);
     }
-    if(!totalRow||totalRow.adSpend==null||adRows.length===0) continue;
+    // For isSkinuvaCh tables, totalRow is optional — injectJuneApiData recalculates it anyway
+    if(isSkinuvaCh){if(adRows.length===0) continue;}
+    else{if(!totalRow||totalRow.adSpend==null||adRows.length===0) continue;}
 
+    // Normalize "Jul 2026" / "Jul '26" → "July 2026" for robust matching
+    const _nmM=s=>{if(!s)return'';const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];const ab=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];const m=s.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*'?(\d{2,4})/i);if(!m)return s.trim();const i=ab.indexOf(m[1].toLowerCase().slice(0,3));const y=m[2].length===2?'20'+m[2]:m[2];return i>=0?MO[i]+' '+y:s.trim();};
     // Skinuva: match directly by month name; standard: match by Total Paid Media spend proximity
     let best=null, bestD=Infinity;
-    if(isSkinuvaCh&&tableMonth&&monthly.find(m=>m.month===tableMonth)){
-      best=tableMonth;
+    if(isSkinuvaCh&&tableMonth){
+      const nmT=_nmM(tableMonth);
+      const foundM=monthly.find(m=>m.month===tableMonth||_nmM(m.month)===nmT);
+      if(foundM){best=foundM.month;}
+      else{
+        // Fallback: current month may not be in monthly totals yet — store under canonical label
+        const _now=new Date(),_MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+        const curLbl=_MO[_now.getMonth()]+' '+_now.getFullYear();
+        if(nmT===_nmM(curLbl)) best=curLbl;
+      }
     } else {
-      for(const m of monthly){const d=Math.abs((m.adSpend||0)-(totalRow.adSpend||0));if(d<bestD){bestD=d;best=m.month;}}
+      for(const m of monthly){const d=Math.abs((m.adSpend||0)-((totalRow&&totalRow.adSpend)||0));if(d<bestD){bestD=d;best=m.month;}}
       if(bestD>=100) best=null;
     }
     if(totalRow) adRows.push(totalRow);
