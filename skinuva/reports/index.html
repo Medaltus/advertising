@@ -645,6 +645,8 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 .range-active-pill{font-size:11px;color:#a78bfa;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:6px;padding:4px 10px;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 </head>
 <body style="padding-top: 56px;">
 
@@ -917,6 +919,21 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
       <div class="section-sub" id="asin-sub">Top performers · wasted spend · opportunities · 30-day rolling</div>
     </div>
     <div id="asin-container"></div>
+  </div>
+
+  <div class="chart-card glass" style="margin-bottom:24px;" id="geo-section">
+    <div class="section-header">
+      <div class="section-title">US Geographic Performance</div>
+      <div class="section-sub">Google Ads reach by state — where your audience is located</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <button class="tab-btn active" id="geo-tab-spend" onclick="setGeoMetric('spend')">Spend</button>
+      <button class="tab-btn" id="geo-tab-clicks" onclick="setGeoMetric('clicks')">Clicks</button>
+      <button class="tab-btn" id="geo-tab-impressions" onclick="setGeoMetric('impressions')">Impressions</button>
+      <button class="tab-btn" id="geo-tab-conversions" onclick="setGeoMetric('conversions')">Conversions</button>
+    </div>
+    <div id="geo-map-container" style="width:100%;position:relative;"></div>
+    <div id="geo-state-table" style="margin-top:20px;"></div>
   </div>
 
   <div class="chart-card glass" style="margin-bottom:24px;" id="wlos-section">
@@ -1427,7 +1444,7 @@ function renderEracleaView(){
   ['amazon-api-section','search-terms-section','dow-section','asin-section','placement-section'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='';
   });
-  ['google-api-section','wlos-section','agents-section','charts-row-1','acos-row','channels-card'].forEach(id=>{
+  ['google-api-section','geo-section','wlos-section','agents-section','charts-row-1','acos-row','channels-card'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.style.display='none';
   });
   if(document.getElementById('audio-btn')) document.getElementById('audio-btn').style.display='none';
@@ -1552,7 +1569,7 @@ function render(){
   buildBrandSelector();
   if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
   // Restore sections that eraclea view may have hidden
-  ['google-api-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
+  ['google-api-section','geo-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
   const rb=document.getElementById('range-bar'); if(rb) rb.style.display='';
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
@@ -4265,6 +4282,167 @@ function renderGoogleSection(period){
   ttr.innerHTML=`<td style="color:rgba(255,255,255,0.9)">Total</td><td style="color:#fff">$${tot.spend.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">$${tot.sales.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">${totAcos}</td><td style="color:#fff">${totRoas}</td><td style="color:#fff">${Math.round(tot.conversions)}</td><td style="color:rgba(255,255,255,0.7)">${tot.clicks.toLocaleString()}</td><td></td>`;
   tbody.appendChild(ttr);
 }
+// ── US Geo Heatmap ──────────────────────────────────────────────────────────
+const FIPS_TO_STATE = {
+  "01":"Alabama","02":"Alaska","04":"Arizona","05":"Arkansas","06":"California",
+  "08":"Colorado","09":"Connecticut","10":"Delaware","11":"District of Columbia",
+  "12":"Florida","13":"Georgia","15":"Hawaii","16":"Idaho","17":"Illinois",
+  "18":"Indiana","19":"Iowa","20":"Kansas","21":"Kentucky","22":"Louisiana",
+  "23":"Maine","24":"Maryland","25":"Massachusetts","26":"Michigan","27":"Minnesota",
+  "28":"Mississippi","29":"Missouri","30":"Montana","31":"Nebraska","32":"Nevada",
+  "33":"New Hampshire","34":"New Jersey","35":"New Mexico","36":"New York",
+  "37":"North Carolina","38":"North Dakota","39":"Ohio","40":"Oklahoma","41":"Oregon",
+  "42":"Pennsylvania","44":"Rhode Island","45":"South Carolina","46":"South Dakota",
+  "47":"Tennessee","48":"Texas","49":"Utah","50":"Vermont","51":"Virginia",
+  "53":"Washington","54":"West Virginia","55":"Wisconsin","56":"Wyoming","72":"Puerto Rico"
+};
+
+let _usTopoJson = null;
+let _geoMetric  = 'spend';
+
+function setGeoMetric(m) {
+  _geoMetric = m;
+  ['spend','clicks','impressions','conversions'].forEach(k => {
+    const btn = document.getElementById('geo-tab-'+k);
+    if (btn) btn.classList.toggle('active', k === m);
+  });
+  renderGeoHeatmap();
+}
+
+async function renderGeoHeatmap() {
+  const section = document.getElementById('geo-section');
+  if (!section) return;
+
+  const geo = typeof GOOGLE_ADS_DATA !== 'undefined' && GOOGLE_ADS_DATA && GOOGLE_ADS_DATA.geo_by_state;
+  if (!geo || !geo.length) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  const container = document.getElementById('geo-map-container');
+  if (!container) return;
+
+  // Load TopoJSON once
+  if (!_usTopoJson) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:13px;">Loading map…</div>';
+    try {
+      _usTopoJson = await d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json');
+    } catch(e) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);font-size:13px;">Map unavailable (network error)</div>';
+      return;
+    }
+  }
+
+  // Build state lookup
+  const stateData = {};
+  geo.forEach(d => { stateData[d.state] = d; });
+
+  const metric = _geoMetric;
+  const metricFmt = {
+    spend: v => '$' + Math.round(v).toLocaleString(),
+    clicks: v => v.toLocaleString(),
+    impressions: v => v.toLocaleString(),
+    conversions: v => v.toFixed(1)
+  }[metric] || (v => v);
+
+  const values = geo.map(d => d[metric] || 0).filter(v => v > 0);
+  const maxVal = values.length ? Math.max(...values) : 1;
+
+  // Color: near-black → gold
+  const colorScale = d3.scaleSequential()
+    .domain([0, maxVal])
+    .interpolator(d3.interpolate('#16103a', '#d4af37'));
+
+  const width = container.clientWidth || 820;
+  const height = Math.round(width * 0.60);
+
+  container.innerHTML = '';
+  container.style.position = 'relative';
+
+  const svg = d3.select(container).append('svg')
+    .attr('width', width).attr('height', height);
+
+  const statesFeature = topojson.feature(_usTopoJson, _usTopoJson.objects.states);
+  const projection = d3.geoAlbersUsa().fitSize([width, height], statesFeature);
+  const pathGen = d3.geoPath().projection(projection);
+
+  // Tooltip
+  const tip = d3.select(container).append('div')
+    .style('position','absolute').style('pointer-events','none')
+    .style('background','rgba(8,8,18,0.96)').style('border','1px solid rgba(212,175,55,0.5)')
+    .style('border-radius','8px').style('padding','10px 14px')
+    .style('font-size','12px').style('color','#fff').style('opacity','0')
+    .style('transition','opacity 0.15s').style('z-index','10').style('max-width','200px');
+
+  svg.selectAll('path.state')
+    .data(statesFeature.features)
+    .enter().append('path')
+    .attr('class','state')
+    .attr('d', pathGen)
+    .attr('fill', d => {
+      const name = FIPS_TO_STATE[String(d.id).padStart(2,'0')];
+      const sd = name && stateData[name];
+      return (sd && sd[metric] > 0) ? colorScale(sd[metric]) : 'rgba(255,255,255,0.05)';
+    })
+    .attr('stroke','rgba(255,255,255,0.12)').attr('stroke-width','0.5')
+    .on('mouseover', function(event, d) {
+      const name = FIPS_TO_STATE[String(d.id).padStart(2,'0')];
+      const sd = name && stateData[name];
+      d3.select(this).attr('stroke','rgba(212,175,55,0.9)').attr('stroke-width','1.5');
+      tip.style('opacity','1').html(sd
+        ? `<div style="font-weight:700;margin-bottom:6px;color:#d4af37">${name}</div>
+           <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 10px;">
+             <span style="opacity:.6">Spend</span><span>$${Math.round(sd.spend).toLocaleString()}</span>
+             <span style="opacity:.6">Clicks</span><span>${sd.clicks.toLocaleString()}</span>
+             <span style="opacity:.6">Impr.</span><span>${sd.impressions.toLocaleString()}</span>
+             <span style="opacity:.6">Conv.</span><span>${sd.conversions}</span>
+           </div>`
+        : `<div style="font-weight:700;color:rgba(255,255,255,0.5)">${name||'Unknown'}</div><div style="opacity:.4;margin-top:4px">No data</div>`);
+    })
+    .on('mousemove', function(event) {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left + 12;
+      const y = event.clientY - rect.top  - 10;
+      tip.style('left', Math.min(x, width - 180) + 'px').style('top', y + 'px');
+    })
+    .on('mouseout', function() {
+      d3.select(this).attr('stroke','rgba(255,255,255,0.12)').attr('stroke-width','0.5');
+      tip.style('opacity','0');
+    });
+
+  // State meshes (borders between states)
+  svg.append('path')
+    .datum(topojson.mesh(_usTopoJson, _usTopoJson.objects.states, (a,b) => a !== b))
+    .attr('fill','none').attr('stroke','rgba(255,255,255,0.08)').attr('stroke-width','0.5')
+    .attr('d', pathGen);
+
+  // Top-states table
+  const tableEl = document.getElementById('geo-state-table');
+  if (!tableEl) return;
+  const top10 = [...geo].sort((a,b) => (b[metric]||0) - (a[metric]||0)).slice(0,10);
+  const thStyle = 'padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);border-bottom:1px solid rgba(255,255,255,0.08);white-space:nowrap;';
+  const tdStyle = 'padding:8px 12px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.05);';
+  tableEl.innerHTML = `
+    <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);margin-bottom:10px;text-transform:uppercase;letter-spacing:.08em;">Top 10 States by ${metric.charAt(0).toUpperCase()+metric.slice(1)}</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr>
+        <th style="${thStyle}">#</th>
+        <th style="${thStyle}">State</th>
+        <th style="${thStyle}">Spend</th>
+        <th style="${thStyle}">Clicks</th>
+        <th style="${thStyle}">Impressions</th>
+        <th style="${thStyle}">Conv.</th>
+      </tr></thead>
+      <tbody>${top10.map((s,i) => `<tr>
+        <td style="${tdStyle}color:rgba(255,255,255,0.3)">${i+1}</td>
+        <td style="${tdStyle}font-weight:600">${s.state}</td>
+        <td style="${tdStyle}">$${Math.round(s.spend).toLocaleString()}</td>
+        <td style="${tdStyle}">${s.clicks.toLocaleString()}</td>
+        <td style="${tdStyle}">${s.impressions.toLocaleString()}</td>
+        <td style="${tdStyle}">${s.conversions}</td>
+      </tr>`).join('')}</tbody>
+    </table>`;
+}
+
+
 
 
 </script>

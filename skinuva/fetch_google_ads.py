@@ -250,6 +250,52 @@ def main():
         pacing.append({**b, "recentSpend": round(avg, 2), "pacingPct": pct})
     pacing.sort(key=lambda x: x.get("dailyBudget") or 0, reverse=True)
 
+    # ── Geographic performance ───────────────────────────────────────────────
+    print("\nFetching geographic performance (US states)...")
+    geo_query = f"""
+        SELECT
+          geographic_view.location_type,
+          geo_target_constant.name,
+          geo_target_constant.country_code,
+          geo_target_constant.target_type,
+          metrics.impressions,
+          metrics.clicks,
+          metrics.cost_micros,
+          metrics.conversions
+        FROM geographic_view
+        WHERE segments.date BETWEEN '{start}' AND '{end}'
+          AND geographic_view.location_type = 'LOCATION_OF_PRESENCE'
+          AND geo_target_constant.country_code = 'US'
+    """
+    try:
+        geo_rows = fetch_all_pages(access_token, geo_query)
+        print(f"  ✓ {{len(geo_rows)}} geographic rows")
+    except Exception as e:
+        print(f"  ⚠  Geographic query failed: {{e}}")
+        geo_rows = []
+
+    by_state = {}
+    for r in geo_rows:
+        geo = r.get("geoTargetConstant", {})
+        met_g = r.get("metrics", {})
+        name  = geo.get("name", "")
+        ttype = geo.get("targetType", "")
+        if ttype != "State" or not name:
+            continue
+        if name not in by_state:
+            by_state[name] = {"state": name, "impressions": 0, "clicks": 0,
+                               "spend": 0.0, "conversions": 0.0}
+        s = by_state[name]
+        s["impressions"] += int(met_g.get("impressions", 0) or 0)
+        s["clicks"]      += int(met_g.get("clicks", 0) or 0)
+        s["spend"]       += micros(met_g.get("costMicros", 0))
+        s["conversions"] += float(met_g.get("conversions", 0) or 0)
+
+    geo_list = sorted(by_state.values(), key=lambda x: x["spend"], reverse=True)
+    for s in geo_list:
+        s["spend"]       = round(s["spend"], 2)
+        s["conversions"] = round(s["conversions"], 1)
+
     imp  = sum(r["impressions"] for r in timeline)
     clk  = sum(r["clicks"]     for r in timeline)
     spd  = round(sum(r["spend"]  for r in timeline), 2)
@@ -273,6 +319,7 @@ def main():
         "timeline":      timeline,
         "campaigns":     campaigns[:50],
         "pacing":        pacing,
+        "geo_by_state":  geo_list,
     }
 
     # Write pure JSON to data/ directory (served by Vercel at /data/google_ads_data.json)
