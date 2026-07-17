@@ -590,7 +590,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
   </div>
 
   <!-- Brand Leaderboard Table -->
-  <div class="chart-card glass" style="margin-bottom:24px;">
+  <div id="leaderboard-section" class="chart-card glass" style="margin-bottom:24px;">
     <div class="section-header">
       <div class="section-title">Brand Leaderboard</div>
       <div class="section-sub" id="table-sub">Click headers to sort</div>
@@ -1532,7 +1532,7 @@ function render() {
   document.getElementById('internal-ads-section').classList.remove('visible');
   ['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
    'panel-analytics','panel-strategy','panel-forecast','panel-market',
-   'charts-row-1','campaigns-section','search-terms-section','dow-section',
+   'charts-row-1','leaderboard-section','campaigns-section','search-terms-section','dow-section',
    'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'
   ].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='';});
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
@@ -3931,7 +3931,7 @@ function parseMedaltusAdsTab(rawText){
 // ── Medaltus Internal Ads: hide/show helpers ──
 const _IA_HIDE=['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
   'panel-analytics','panel-strategy','panel-forecast','panel-market',
-  'charts-row-1','campaigns-section','search-terms-section','dow-section',
+  'charts-row-1','leaderboard-section','campaigns-section','search-terms-section','dow-section',
   'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'];
 
 function renderInternalAdsView(){
