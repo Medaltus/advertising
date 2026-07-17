@@ -1720,7 +1720,7 @@ function renderBrandSelector(md) {
   const allBtn = document.createElement('button');
   allBtn.className = 'brand-pill all-pill' + (selectedBrand === 'All' ? ' active' : '');
   allBtn.textContent = 'All Brands';
-  allBtn.onclick = () => { selectedBrand = 'All'; render(); };
+  allBtn.onclick = () => { selectedBrand = 'All'; internalAdsMode = false; render(); };
   el.appendChild(allBtn);
 
   // Brand dropdown
@@ -1745,7 +1745,7 @@ function renderBrandSelector(md) {
     const item = document.createElement('div');
     item.className = 'brand-dropdown-item' + (selectedBrand === b.name ? ' active' : '');
     item.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>${b.name}`;
-    item.onclick = () => { selectedBrand = b.name; menu.classList.remove('open'); render(); };
+    item.onclick = () => { selectedBrand = b.name; internalAdsMode = false; menu.classList.remove('open'); render(); };
     menu.appendChild(item);
   });
 
