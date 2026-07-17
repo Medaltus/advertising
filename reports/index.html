@@ -566,7 +566,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
       </div>
       <div class="chart-wrap" style="height:320px;"><canvas id="chart-brand-bar"></canvas></div>
     </div>
-    <div class="chart-card">
+    <div id="acos-section" class="chart-card">
       <div class="section-header">
         <div class="section-title">ACOS by Brand</div>
         <div class="section-sub" id="acos-bar-sub">Green &lt;30% · Amber 30–45% · Red &gt;45%</div>
@@ -577,7 +577,7 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
 
   <!-- Charts Row 2: Monthly Trend + Channel Breakdown -->
   <div class="charts-grid">
-    <div class="chart-card full-width">
+    <div id="trend-section" class="chart-card full-width">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:18px;">
         <div class="section-header" style="margin-bottom:0;">
           <div class="section-title" id="trend-title">Monthly Trend</div>
@@ -1532,7 +1532,7 @@ function render() {
   document.getElementById('internal-ads-section').classList.remove('visible');
   ['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
    'panel-analytics','panel-strategy','panel-forecast','panel-market',
-   'charts-row-1','leaderboard-section','campaigns-section','search-terms-section','dow-section',
+   'charts-row-1','acos-section','trend-section','leaderboard-section','campaigns-section','search-terms-section','dow-section',
    'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'
   ].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='';});
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
@@ -3931,7 +3931,7 @@ function parseMedaltusAdsTab(rawText){
 // ── Medaltus Internal Ads: hide/show helpers ──
 const _IA_HIDE=['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
   'panel-analytics','panel-strategy','panel-forecast','panel-market',
-  'charts-row-1','leaderboard-section','campaigns-section','search-terms-section','dow-section',
+  'charts-row-1','acos-section','trend-section','leaderboard-section','campaigns-section','search-terms-section','dow-section',
   'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'];
 
 function renderInternalAdsView(){
