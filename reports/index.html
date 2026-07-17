@@ -1090,6 +1090,7 @@ Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', san
 
 let DATA = null, selectedMonth = null, selectedBrand = 'All', trendMode = 'spend_vs_sales', brandBarMode = 'spend', charts = {}, sortKey = 'name', sortDir = 1;
 let internalAdsMode = false, INTERNAL_ADS_DATA = [], internalPlatformFilter = 'All', MEDALTUS_GADS_DATA = {monthly_summary:{},by_month_campaign:[]};
+let initialLoadDone = false;
 
 function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
@@ -1097,7 +1098,8 @@ function kill(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; }
 function kpi(label, value, opts) {
   opts = opts || {};
   const el = document.createElement('div'); el.className = 'kpi-card';
-  let h = `<div class="kpi-label">${label}</div><div class="kpi-value">${value}</div>`;
+  const displayVal = initialLoadDone ? value : '—';
+  let h = `<div class="kpi-label">${label}</div><div class="kpi-value" data-final="${value.replace(/"/g,'&quot;')}">${displayVal}</div>`;
   if (opts.sub) h += `<div class="kpi-sub${opts.warn?' warn':''}">${opts.sub}</div>`;
   if (opts.fFmt != null) {
     h += `<div class="kpi-forecast"><div class="kpi-forecast-label">Forecast${opts.days?' · '+opts.days:''}</div><div class="kpi-forecast-value">${opts.fFmt}</div>`;
@@ -1693,6 +1695,7 @@ function render() {
   renderWLOS();
   buildTicker(md);
   document.getElementById('footer').textContent = 'Medaltus Ad Reports · All Brands · Google Sheets + Amazon Ads API · ' + new Date().toLocaleDateString();
+  if(initialLoadDone) revealKpisSequentially();
 }
 
 function getBrandData(md, brand) {
@@ -3725,6 +3728,7 @@ async function init() {
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
     render();
+    revealKpisSequentially().then(()=>{ initialLoadDone=true; });
     startRefreshTimer();
     document.getElementById('audio-btn').style.display = 'flex';
     loadMarketTicker();
@@ -4150,6 +4154,46 @@ function renderInternalAdsView(){
       </div>
     </div>
   </div>`;
+}
+
+function animateKpiValue(valEl, duration){
+  return new Promise(resolve=>{
+    const finalText=valEl.getAttribute('data-final');
+    if(!finalText||finalText==='—'){ valEl.textContent=finalText||'—'; resolve(); return; }
+    const match=finalText.match(/^([^0-9\-]*)([-]?[\d,.]+)(.*)/);
+    if(!match){ valEl.textContent=finalText; resolve(); return; }
+    const prefix=match[1], numStr=match[2], suffix=match[3];
+    const target=parseFloat(numStr.replace(/,/g,''));
+    if(isNaN(target)){ valEl.textContent=finalText; resolve(); return; }
+    const hasDecimal=numStr.includes('.');
+    const decimals=hasDecimal?(numStr.split('.')[1]||'').length:0;
+    const hasCommas=numStr.includes(',');
+    const startTime=performance.now();
+    function step(ts){
+      const elapsed=ts-startTime;
+      const progress=Math.min(elapsed/duration,1);
+      const eased=1-Math.pow(1-progress,3);
+      const current=target*eased;
+      let numFormatted=current.toFixed(decimals);
+      if(hasCommas){
+        const parts=numFormatted.split('.');
+        parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+        numFormatted=parts.join('.');
+      }
+      valEl.textContent=prefix+numFormatted+suffix;
+      if(progress<1) requestAnimationFrame(step);
+      else { valEl.textContent=finalText; resolve(); }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+async function revealKpisSequentially(){
+  const allCards=document.querySelectorAll('#kpi-row-1 .kpi-card, #kpi-row-2 .kpi-card');
+  for(const card of allCards){
+    const valEl=card.querySelector('.kpi-value');
+    if(valEl) await animateKpiValue(valEl, 300);
+  }
 }
 </script>
 
