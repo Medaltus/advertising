@@ -1770,6 +1770,15 @@ function renderBrandSelector(md) {
   intBtn.textContent = 'Medaltus Internal Ads';
   intBtn.onclick = () => { internalAdsMode = !internalAdsMode; if(internalAdsMode) selectedBrand='All'; intBtn.classList.toggle('active',internalAdsMode); render(); };
   el.appendChild(intBtn);
+
+  const ozleeBtn = document.createElement('a');
+  ozleeBtn.href = 'https://ozlee-advertising-dashboard.vercel.app/';
+  ozleeBtn.target = '_blank';
+  ozleeBtn.rel = 'noopener noreferrer';
+  ozleeBtn.className = 'brand-pill';
+  ozleeBtn.style.cssText = 'text-decoration:none;';
+  ozleeBtn.textContent = 'Ozlee Dashboard ↗';
+  el.appendChild(ozleeBtn);
 }
 
 function renderBrandBar(md) {
