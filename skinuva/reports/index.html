@@ -279,7 +279,7 @@ body {
   pointer-events: none;
 }
 .kpi-label { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 10px; }
-.kpi-value { font-size: 28px; font-weight: 700; color: #fff; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; line-height: 1.1; }
+.kpi-value { font-size: 28px; font-weight: 700; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace; line-height: 1.1; background:linear-gradient(135deg,#a78bfa 0%,#818cf8 40%,#60a5fa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
 .kpi-sub { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 6px; }
 .kpi-sub.warn { color:rgba(56,189,248,0.8); }
 .kpi-forecast { margin-top: 10px; padding: 8px 10px; border-radius: 10px; background: linear-gradient(135deg, rgba(129,140,248,0.14) 0%, rgba(129,140,248,0.04) 100%); border: 1px solid rgba(129,140,248,0.22); box-shadow: 0 2px 12px rgba(129,140,248,0.08), 0 0 1px rgba(129,140,248,0.2) inset; }
@@ -603,7 +603,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
     box-shadow: none !important; animation: none !important;
   }
   .kpi-card { background: #16162a !important; }
-  .kpi-value { color: #fff !important; }
+  .kpi-value { -webkit-text-fill-color: #fff !important; color: #fff !important; }
   .kpi-label { color: rgba(255,255,255,0.6) !important; }
   .kpi-forecast { background: #1a1a35 !important; }
   h1 { -webkit-text-fill-color: #fff !important; background: none !important; color: #fff !important; }
