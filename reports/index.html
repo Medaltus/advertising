@@ -1526,11 +1526,17 @@ function computeWoW(brand) {
 
 function render() {
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
+  // Always rebuild brand selector so active states update
+  if(DATA&&DATA.monthly.length) buildBrandSelector();
   if(internalAdsMode){renderInternalAdsView();return;}
   if (!DATA || !DATA.monthly.length) return;
-  // Restore normal sections when not in internal mode
+  // Restore all normal sections when not in internal mode
   document.getElementById('internal-ads-section').classList.remove('visible');
-  ['range-bar','kpi-row-1','kpi-row-2'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='';});
+  ['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
+   'panel-analytics','panel-strategy','panel-forecast','panel-market',
+   'charts-row-1','campaigns-section','search-terms-section','dow-section',
+   'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'
+  ].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='';});
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
   const md = DATA.monthly.find(m => m.month === selectedMonth); if (!md) return;
   const idx = DATA.monthly.indexOf(md), prev = idx > 0 ? DATA.monthly[idx - 1] : null;
@@ -3906,14 +3912,14 @@ function parseMedaltusAdsTab(rawText){
     const nl=sec.indexOf('\n'); if(nl<0) continue;
     const tabName=sec.substring(0,nl).split(':GID:')[0].trim().toLowerCase();
     if(tabName!=='medaltus ads') continue;
-    const pn=v=>{if(!v)return null;const s=String(v).replace(/[$,%]/g,'').trim();if(s===''||s.toLowerCase().includes('div'))return null;const n=parseFloat(s);return isNaN(n)?null:n;};
+    const pn=v=>{if(!v)return null;const s=String(v).replace(/[$,%#\/]/g,'').trim();if(s===''||s.toLowerCase().includes('div'))return null;const n=parseFloat(s.replace(/,/g,''));return isNaN(n)?null:n;};
     const rows=sec.substring(nl+1).split('\n').filter(l=>l.trim().startsWith('|')).map(l=>l.split('|').map(c=>c.trim()).slice(1));
     let headerFound=false;
     for(const r of rows){
       if(!headerFound){if(r[0]==='Month'){headerFound=true;} continue;}
-      const month=r[0],platform=r[1];
+      const month=(r[0]||'').trim(), platform=(r[1]||'').trim();
       if(!month||!month.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/i)) continue;
-      if(month==='All Time') continue;
+      if(month==='All Time'||platform==='All') continue;
       const spend=pn(r[2])||0, leads=pn(r[3])||0;
       const cpl=leads>0?(spend/leads):null;
       const imps=pn(r[5])||0, clicks=pn(r[6])||0;
@@ -3924,94 +3930,117 @@ function parseMedaltusAdsTab(rawText){
   }
 }
 
-// ── Medaltus Internal Ads: render view ──
+// ── Medaltus Internal Ads: hide/show helpers ──
+const _IA_HIDE=['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section',
+  'panel-analytics','panel-strategy','panel-forecast','panel-market',
+  'charts-row-1','campaigns-section','search-terms-section','dow-section',
+  'placement-section','asin-section','wlos-section','footer','ticker-bar','month-tabs'];
+
 function renderInternalAdsView(){
-  // Hide normal sections, show internal section
-  ['range-bar','kpi-row-1','kpi-row-2','pacing-section','agents-section','month-tabs',
-   'charts-row-1','trend-row','acos-row','channels-card','wlos-section',
-   'campaign-section','search-term-section','placement-section','product-section',
-   'week-section','budget-section'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.style.display='none';
-  });
+  _IA_HIDE.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none';});
   const sec=document.getElementById('internal-ads-section');
   sec.classList.add('visible');
 
-  // Filter data by platform
   const filtered=internalPlatformFilter==='All'?INTERNAL_ADS_DATA:INTERNAL_ADS_DATA.filter(r=>r.platform===internalPlatformFilter);
 
-  // Aggregate totals
+  // Totals
   const totSpend=filtered.reduce((s,r)=>s+r.spend,0);
   const totLeads=filtered.reduce((s,r)=>s+r.leads,0);
   const totImps=filtered.reduce((s,r)=>s+r.imps,0);
   const totClicks=filtered.reduce((s,r)=>s+r.clicks,0);
   const avgCpl=totLeads>0?totSpend/totLeads:null;
-  const avgCtr=totClicks>0?totClicks/totImps*100:0;
+  const avgCtr=totImps>0?totClicks/totImps*100:0;
   const avgCpc=totClicks>0?totSpend/totClicks:0;
 
-  const $ = n=>n==null?'—':'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const n = (n,d=0)=>n==null?'—':n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
-  const pct = n=>n==null?'—':(n).toFixed(2)+'%';
+  const $v=n=>n==null?'—':'$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const nv=(n,d=0)=>n==null?'—':n.toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+  const pct=n=>n==null?'—':(+n).toFixed(2)+'%';
 
   // Sort months newest-first
   const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const nmSort=(s)=>{const p=s.split(' ');return parseInt(p[1]||0)*100+MO.indexOf(p[0]);};
+  const nmSort=s=>{const p=s.split(' ');return parseInt(p[1]||0)*100+MO.indexOf(p[0]);};
   const months=[...new Set(filtered.map(r=>r.month))].sort((a,b)=>nmSort(b)-nmSort(a));
 
-  // Platform pills
+  // Platform filter pills
   const platforms=['All',...new Set(INTERNAL_ADS_DATA.map(r=>r.platform))].filter(Boolean);
-  const pillsHtml=platforms.map(p=>`<button onclick="internalPlatformFilter='${p}';renderInternalAdsView();" style="padding:5px 14px;border-radius:20px;border:1px solid ${internalPlatformFilter===p?'rgba(250,204,21,0.5)':'rgba(255,255,255,0.12)'};background:${internalPlatformFilter===p?'rgba(250,204,21,0.2)':'rgba(255,255,255,0.04)'};color:${internalPlatformFilter===p?'#fde047':'rgba(255,255,255,0.5)'};font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;">${p}</button>`).join('');
+  const pillsHtml=platforms.map(p=>`<button onclick="internalPlatformFilter='${p}';renderInternalAdsView();" style="padding:5px 16px;border-radius:20px;border:1px solid ${internalPlatformFilter===p?'rgba(250,204,21,0.5)':'rgba(255,255,255,0.12)'};background:${internalPlatformFilter===p?'rgba(250,204,21,0.18)':'rgba(255,255,255,0.04)'};color:${internalPlatformFilter===p?'#fde047':'rgba(255,255,255,0.45)'};font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;">${p}</button>`).join('');
 
-  // KPI cards
-  const kpiCards=[
-    {label:'Total Spend',val:$(totSpend),color:'#a78bfa'},
-    {label:'Total Leads',val:n(totLeads),color:'#34d399'},
-    {label:'Avg CPL',val:$(avgCpl),color:'#f87171'},
-    {label:'Impressions',val:n(totImps),color:'#60a5fa'},
-    {label:'Clicks',val:n(totClicks),color:'#fb923c'},
+  // KPI cards — matching existing dashboard kpi-card style
+  const kpis=[
+    {label:'Total Spend',val:$v(totSpend),color:'#a78bfa'},
+    {label:'Total Leads',val:nv(totLeads),color:'#34d399'},
+    {label:'Avg CPL',val:$v(avgCpl),color:'#f87171'},
+    {label:'Impressions',val:nv(totImps),color:'#60a5fa'},
+    {label:'Clicks',val:nv(totClicks),color:'#fb923c'},
     {label:'Avg CTR',val:pct(avgCtr),color:'#e879f9'},
-    {label:'Avg CPC',val:$(avgCpc),color:'#facc15'},
-  ].map(k=>`<div style="background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 20px;flex:1;min-width:120px;">
-    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:6px;">${k.label}</div>
-    <div style="font-size:22px;font-weight:700;color:${k.color};">${k.val}</div>
+    {label:'Avg CPC',val:$v(avgCpc),color:'#facc15'},
+  ].map(k=>`<div class="kpi-card glass" style="flex:1;min-width:110px;">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value" style="color:${k.color};">${k.val}</div>
   </div>`).join('');
 
-  // Monthly table rows (group by month, show each platform)
+  // Build table rows with per-month subtotals
+  const thStyle='padding:10px 16px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;white-space:nowrap;';
+  const tdStyle='padding:11px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);';
+
   let tableRows='';
   for(const month of months){
-    const monthRows=filtered.filter(r=>r.month===month);
-    const isFirst=months.indexOf(month)===0;
-    for(let i=0;i<monthRows.length;i++){
-      const r=monthRows[i];
+    const mRows=filtered.filter(r=>r.month===month);
+    const mSpend=mRows.reduce((s,r)=>s+r.spend,0);
+    const mLeads=mRows.reduce((s,r)=>s+r.leads,0);
+    const mImps=mRows.reduce((s,r)=>s+r.imps,0);
+    const mClicks=mRows.reduce((s,r)=>s+r.clicks,0);
+    const mCpl=mLeads>0?mSpend/mLeads:null;
+    const mCtr=mImps>0?mClicks/mImps*100:0;
+    const mCpc=mClicks>0?mSpend/mClicks:0;
+
+    // Individual platform rows for this month
+    for(let i=0;i<mRows.length;i++){
+      const r=mRows[i];
       const platColor=r.platform==='LinkedIn'?'#0a66c2':r.platform==='Google'?'#4285F4':'#818cf8';
-      tableRows+=`<tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
-        <td style="padding:10px 14px;font-weight:600;color:rgba(255,255,255,0.85);">${i===0?month:''}</td>
-        <td style="padding:10px 14px;"><span style="background:${platColor}22;color:${platColor};border:1px solid ${platColor}44;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700;">${r.platform}</span></td>
-        <td style="padding:10px 14px;color:#a78bfa;font-weight:600;">${$(r.spend)}</td>
-        <td style="padding:10px 14px;color:#34d399;font-weight:600;">${n(r.leads)}</td>
-        <td style="padding:10px 14px;color:#f87171;">${r.cpl!=null?$(r.cpl):'—'}</td>
-        <td style="padding:10px 14px;color:rgba(255,255,255,0.6);">${n(r.imps)}</td>
-        <td style="padding:10px 14px;color:rgba(255,255,255,0.6);">${n(r.clicks)}</td>
-        <td style="padding:10px 14px;color:rgba(255,255,255,0.5);">${pct(r.ctr)}</td>
-        <td style="padding:10px 14px;color:rgba(255,255,255,0.5);">${$(r.cpc)}</td>
+      tableRows+=`<tr>
+        <td style="${tdStyle}font-weight:600;color:rgba(255,255,255,0.85);">${i===0?month:''}</td>
+        <td style="${tdStyle}"><span style="background:${platColor}22;color:${platColor};border:1px solid ${platColor}44;border-radius:6px;padding:2px 10px;font-size:11px;font-weight:700;">${r.platform}</span></td>
+        <td style="${tdStyle}color:#a78bfa;font-weight:600;">${$v(r.spend)}</td>
+        <td style="${tdStyle}color:#34d399;">${nv(r.leads)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.6);">${r.cpl!=null?$v(r.cpl):'—'}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.55);">${nv(r.imps)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.55);">${nv(r.clicks)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.45);">${pct(r.ctr)}</td>
+        <td style="${tdStyle}color:rgba(255,255,255,0.45);">${$v(r.cpc)}</td>
       </tr>`;
+    }
+    // Month subtotal row (only if more than 1 platform)
+    if(mRows.length>1){
+      tableRows+=`<tr style="background:rgba(255,255,255,0.03);">
+        <td style="padding:9px 16px;font-size:11px;color:rgba(255,255,255,0.35);"></td>
+        <td style="padding:9px 16px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.5px;">Total</td>
+        <td style="padding:9px 16px;font-weight:700;color:#a78bfa;font-size:13px;">${$v(mSpend)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:#34d399;font-size:13px;">${nv(mLeads)}</td>
+        <td style="padding:9px 16px;font-weight:700;color:rgba(255,255,255,0.6);font-size:13px;">${$v(mCpl)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);font-size:13px;">${nv(mImps)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.5);font-size:13px;">${nv(mClicks)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);font-size:13px;">${pct(mCtr)}</td>
+        <td style="padding:9px 16px;color:rgba(255,255,255,0.4);font-size:13px;">${$v(mCpc)}</td>
+      </tr><tr style="height:6px;background:rgba(0,0,0,0.15);"><td colspan="9"></td></tr>`;
     }
   }
 
-  // Totals row
-  tableRows+=`<tr style="border-top:2px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);">
-    <td colspan="2" style="padding:12px 14px;font-weight:700;color:#fde047;font-size:13px;">All Time</td>
-    <td style="padding:12px 14px;color:#a78bfa;font-weight:700;">${$(totSpend)}</td>
-    <td style="padding:12px 14px;color:#34d399;font-weight:700;">${n(totLeads)}</td>
-    <td style="padding:12px 14px;color:#f87171;font-weight:700;">${$(avgCpl)}</td>
-    <td style="padding:12px 14px;color:rgba(255,255,255,0.7);font-weight:700;">${n(totImps)}</td>
-    <td style="padding:12px 14px;color:rgba(255,255,255,0.7);font-weight:700;">${n(totClicks)}</td>
-    <td style="padding:12px 14px;color:rgba(255,255,255,0.6);font-weight:700;">${pct(avgCtr)}</td>
-    <td style="padding:12px 14px;color:rgba(255,255,255,0.6);font-weight:700;">${$(avgCpc)}</td>
+  // All-time totals
+  tableRows+=`<tr style="background:rgba(0,0,0,0.35);border-top:2px solid rgba(255,255,255,0.15);">
+    <td colspan="2" style="padding:13px 16px;font-weight:700;color:#fde047;font-size:13px;letter-spacing:0.5px;">All Time</td>
+    <td style="padding:13px 16px;color:#a78bfa;font-weight:700;font-size:14px;">${$v(totSpend)}</td>
+    <td style="padding:13px 16px;color:#34d399;font-weight:700;font-size:14px;">${nv(totLeads)}</td>
+    <td style="padding:13px 16px;color:#f87171;font-weight:700;font-size:14px;">${$v(avgCpl)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.7);font-weight:700;">${nv(totImps)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.7);font-weight:700;">${nv(totClicks)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);font-weight:700;">${pct(avgCtr)}</td>
+    <td style="padding:13px 16px;color:rgba(255,255,255,0.6);font-weight:700;">${$v(avgCpc)}</td>
   </tr>`;
 
   sec.innerHTML=`
   <div style="margin-bottom:28px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;">
       <div>
         <div style="font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(250,204,21,0.6);margin-bottom:4px;">MEDALTUS INTERNAL</div>
         <div style="font-size:22px;font-weight:700;color:#fff;">B2B Acquisition Ads</div>
@@ -4019,28 +4048,25 @@ function renderInternalAdsView(){
       </div>
       <div style="display:flex;gap:8px;align-items:center;">${pillsHtml}</div>
     </div>
-    <!-- KPI cards -->
-    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">${kpiCards}</div>
-    <!-- Table -->
-    <div style="background:linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.1);border-radius:14px;overflow:hidden;">
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:24px;">${kpis}</div>
+    <div class="glass" style="border-radius:14px;overflow:hidden;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
-          <tr style="background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.1);">
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Month</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Platform</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Spend</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Leads</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">CPL</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Impressions</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">Clicks</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">CTR</th>
-            <th style="padding:10px 14px;text-align:left;font-size:10px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);text-transform:uppercase;">CPC</th>
+          <tr style="background:rgba(0,0,0,0.25);">
+            <th style="${thStyle}">Month</th>
+            <th style="${thStyle}">Platform</th>
+            <th style="${thStyle}">Spend</th>
+            <th style="${thStyle}">Leads</th>
+            <th style="${thStyle}">CPL</th>
+            <th style="${thStyle}">Impressions</th>
+            <th style="${thStyle}">Clicks</th>
+            <th style="${thStyle}">CTR</th>
+            <th style="${thStyle}">CPC</th>
           </tr>
         </thead>
-        <tbody>${tableRows}</tbody>
+        <tbody>${tableRows||'<tr><td colspan="9" style="padding:40px;text-align:center;color:rgba(255,255,255,0.3);">No data found in &ldquo;Medaltus Ads&rdquo; sheet tab</td></tr>'}</tbody>
       </table>
     </div>
-    ${INTERNAL_ADS_DATA.length===0?'<div style="text-align:center;padding:40px;color:rgba(255,255,255,0.3);">No data found in &ldquo;Medaltus Ads&rdquo; sheet tab</div>':''}
   </div>`;
 }
 </script>
