@@ -112,7 +112,34 @@ def get_sp_access_token(cfg, refresh_token_key="sp_refresh_token"):
 # 429 with backoff (honoring Retry-After when Amazon sends it) instead of
 # failing fast, so a burst of requests actually succeeds (slower) rather than
 # silently coming back empty.
+#
+# IMPORTANT — global time budget: retrying is per-call, but a single run can
+# make dozens of calls (2 monthly enrichment calls + up to 30 daily backfill
+# calls, each potentially submit+poll+download). Without a shared budget, a
+# still-rate-limited account makes EVERY one of those calls retry its full
+# ~11 minutes before giving up — turning a step that used to fail in under a
+# minute into one that can run for hours. _BUDGET_DEADLINE is a wall-clock
+# cutoff shared across every call in the process; once it passes, calls stop
+# retrying and just return whatever they last got, so the whole SP-API phase
+# is bounded no matter how many months/days it's trying to fetch.
 MAX_429_RETRIES = 6
+_BUDGET_DEADLINE = None  # epoch seconds; None = no cap
+
+
+def set_sp_api_time_budget(seconds):
+    """Call once at the start of a run to cap total time spent retrying
+    across every SP-API call made afterward (submit/poll/download, for every
+    month and every day). Pass None to remove the cap."""
+    global _BUDGET_DEADLINE
+    _BUDGET_DEADLINE = (time.time() + seconds) if seconds is not None else None
+
+
+def budget_remaining():
+    """Seconds left in the shared retry budget, or None if uncapped."""
+    if _BUDGET_DEADLINE is None:
+        return None
+    return _BUDGET_DEADLINE - time.time()
+
 
 def _retry_after_seconds(resp, attempt, base=20, cap=180):
     ra = resp.headers.get("Retry-After") if resp is not None else None
@@ -129,7 +156,14 @@ def _request_with_backoff(method, url, max_retries=MAX_429_RETRIES, **kwargs):
     for attempt in range(max_retries + 1):
         resp = requests.request(method, url, **kwargs)
         if resp.status_code == 429 and attempt < max_retries:
+            remaining = budget_remaining()
+            if remaining is not None and remaining <= 0:
+                print(f"    ⏹  SP-API time budget used up — not retrying further "
+                      f"({url.split('?')[0]})")
+                return resp
             wait = _retry_after_seconds(resp, attempt)
+            if remaining is not None:
+                wait = max(0, min(wait, remaining))
             print(f"    ⏳ 429 rate limited ({url.split('?')[0]}) — "
                   f"waiting {wait:.0f}s before retry ({attempt + 1}/{max_retries})…")
             time.sleep(wait)

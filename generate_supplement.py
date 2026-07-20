@@ -454,11 +454,17 @@ def fetch_daily_brand_sales(cfg: dict, dates: list) -> dict:
     for p in [str(Path(__file__).parent.parent), str(Path(__file__).parent)]:
         if p not in sys.path:
             sys.path.insert(0, p)
+    import fetch_total_sales as _fts
     from fetch_total_sales import fetch_brand_sales_for_period  # noqa
 
     result = {}
     total = len(dates)
     for i, date_str in enumerate(sorted(dates), 1):
+        remaining = _fts.budget_remaining()
+        if remaining is not None and remaining <= 0:
+            print(f"  ⏹  SP-API time budget used up — skipping remaining "
+                  f"{total - i + 1} day(s), including {date_str}")
+            break
         print(f"  [{i}/{total}] SP-API brand sales for {date_str}…")
         try:
             brand_sales = fetch_brand_sales_for_period(cfg, date_str, date_str)
@@ -522,8 +528,21 @@ def main():
 
     # Enrich supplement with SP-API total sales per calendar month
     if cfg:
+        # Shared time budget for EVERY SP-API call made below (monthly
+        # enrichment here, plus the daily backfill loop further down). Without
+        # this, a rate-limited account makes each of the ~32 possible report
+        # calls (2 months + up to 30 days) retry its own full ~11 minutes
+        # before giving up, so one slow account can turn this step into an
+        # hours-long grind instead of the ~5 minutes it normally takes. 8
+        # minutes total is generous enough to ride out a real transient
+        # blip but bounded enough that the step can't run away.
+        for p in [str(Path(__file__).parent.parent), str(Path(__file__).parent)]:
+            if p not in sys.path:
+                sys.path.insert(0, p)
+        import fetch_total_sales as _fts
+        _fts.set_sp_api_time_budget(8 * 60)
         try:
-            print("\nEnriching with SP-API total sales…")
+            print("\nEnriching with SP-API total sales… (max 8 min total across all SP-API calls)")
             enrich_with_sp_sales(supplement, cfg, existing)
         except Exception as exc:
             print(f"\n⚠  SP-API enrichment failed: {exc}")
