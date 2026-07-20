@@ -360,10 +360,17 @@ def build_supplement(data: dict) -> dict:
     ))
 
 
-def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
+def enrich_with_sp_sales(supplement: dict, cfg: dict, existing: dict = None) -> None:
     """
     Populate totalSales and tacos in the supplement using SP-API data.
     Calls SP-API once per calendar month that appears in the supplement.
+
+    `existing` is the previously-committed api_supplement.json (if any). If the
+    SP-API call fails outright, or comes back without a value for a given brand,
+    we fall back to the last known-good totalSales/tacos for that month/brand
+    instead of leaving it None. Without this, a single transient SP-API failure
+    (rate limit, timeout, auth hiccup) silently zeroes out Total Sales/TACOS on
+    the live dashboard, even though yesterday's real numbers were fine.
     """
     # Support both local dev (script in deploy/ subdir) and CI (script at repo root)
     for p in [str(Path(__file__).parent.parent), str(Path(__file__).parent)]:
@@ -376,12 +383,16 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
     API_ERA_START = (2026, 6)
 
     today = date.today()
+    existing = existing or {}
 
     for mk, entry in supplement.items():
         month_dt  = datetime.strptime(mk, '%B %Y')
         if (month_dt.year, month_dt.month) < API_ERA_START:
             # Pre-API era: totalSales comes from the Google Sheet.
             continue
+
+        prev_entry  = existing.get(mk) or {}
+        prev_brands = {b['name']: b for b in prev_entry.get('brands', [])}
 
         first_day = date(month_dt.year, month_dt.month, 1)
 
@@ -398,14 +409,34 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict) -> None:
         try:
             brand_sales = fetch_brand_sales_for_period(cfg, start_str, end_str)
         except Exception as exc:
-            print(f"  ⚠  SP-API failed for {mk}: {exc} — totalSales will be None")
+            print(f"  ⚠  SP-API failed for {mk}: {exc}")
+            if prev_entry.get('totalSales') is not None:
+                print(f"  ↩  Falling back to last known totalSales for {mk}: "
+                      f"${prev_entry['totalSales']:,.2f} (SP-API fetch failed — not overwriting with null)")
+                entry['totalSales'] = prev_entry.get('totalSales')
+                entry['tacos']      = prev_entry.get('tacos')
+                for b in entry['brands']:
+                    pb = prev_brands.get(b['name'])
+                    if pb:
+                        b['totalSales'] = pb.get('totalSales')
+                        b['tacos']      = pb.get('tacos')
+            else:
+                print(f"  ⚠  No previous data to fall back to for {mk} — totalSales will be None")
             continue
 
-        # Brand-level totalSales + tacos
+        # Brand-level totalSales + tacos — only overwrite when SP-API actually
+        # returned a value for this brand. If it's missing from the response,
+        # fall back to the last known value rather than zeroing it out.
         for b in entry['brands']:
             ts = brand_sales.get(b['name'])
-            b['totalSales'] = ts
-            b['tacos']      = acos_pct(b['spend'], ts) if ts else None
+            if ts is not None:
+                b['totalSales'] = ts
+                b['tacos']      = acos_pct(b['spend'], ts) if ts else None
+            else:
+                pb = prev_brands.get(b['name'])
+                if pb and pb.get('totalSales') is not None:
+                    b['totalSales'] = pb.get('totalSales')
+                    b['tacos']      = pb.get('tacos')
 
         # Portfolio-level totalSales = sum of brand totals; tacos = spend / totalSales
         t_total = sum(b['totalSales'] or 0 for b in entry['brands'])
@@ -470,11 +501,21 @@ def main():
     else:
         print(f"\n⚠  config.json not found at {cfg_path} — skipping all SP-API enrichment")
 
+    # ── Load existing (last-committed) supplement early ─────────────────────
+    # Used both as a fallback source if SP-API enrichment fails below, and
+    # later to preserve historical months outside the current lookback window.
+    existing = {}
+    if out_json.exists():
+        try:
+            existing = json.loads(out_json.read_text())
+        except Exception as exc:
+            print(f"\n⚠  Could not read existing supplement: {exc}")
+
     # Enrich supplement with SP-API total sales per calendar month
     if cfg:
         try:
             print("\nEnriching with SP-API total sales…")
-            enrich_with_sp_sales(supplement, cfg)
+            enrich_with_sp_sales(supplement, cfg, existing)
         except Exception as exc:
             print(f"\n⚠  SP-API enrichment failed: {exc}")
             print("   totalSales will be None — check config.json and SP-API credentials")
@@ -484,9 +525,8 @@ def main():
     # ── Merge with existing data to preserve historical months ──────────────
     # Months outside the current lookback window are kept from the existing
     # file untouched; months inside the window are updated with fresh data.
-    if out_json.exists():
+    if existing:
         try:
-            existing = json.loads(out_json.read_text())
             merged = {**existing, **supplement}  # fresh data wins for overlapping months
             supplement = dict(sorted(
                 merged.items(),
