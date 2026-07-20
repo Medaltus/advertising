@@ -260,13 +260,20 @@ def main():
     pacing.sort(key=lambda x: x.get("dailyBudget") or 0, reverse=True)
 
     # ── Geographic performance ───────────────────────────────────────────────
+    # geographic_view is country-level only and does NOT support selecting
+    # geo_target_constant.* fields directly in the same query (that was the
+    # bug here since this was added: the API rejected the query instantly with
+    # a GAQL validation error every single run, which a broken f-string in the
+    # except block below then swallowed instead of printing). State-level rows
+    # come from segmenting by `segments.geo_target_state`, which returns a geo
+    # target *resource name* (e.g. "geoTargetConstants/21137") that has to be
+    # resolved to a human-readable name via a second query against the
+    # standalone geo_target_constant resource.
     print("\nFetching geographic performance (US states)...")
     geo_query = f"""
         SELECT
           geographic_view.location_type,
-          geo_target_constant.name,
-          geo_target_constant.country_code,
-          geo_target_constant.target_type,
+          segments.geo_target_state,
           metrics.impressions,
           metrics.clicks,
           metrics.cost_micros,
@@ -274,31 +281,60 @@ def main():
         FROM geographic_view
         WHERE segments.date BETWEEN '{start}' AND '{end}'
           AND geographic_view.location_type = 'LOCATION_OF_PRESENCE'
-          AND geo_target_constant.country_code = 'US'
+          AND geographic_view.country_criterion_id = 2840
     """
     try:
         geo_rows = fetch_all_pages(access_token, geo_query)
-        print(f"  ✓ {{len(geo_rows)}} geographic rows")
+        print(f"  ✓ {len(geo_rows)} geographic rows")
     except Exception as e:
-        print(f"  ⚠  Geographic query failed: {{e}}")
+        print(f"  ⚠  Geographic query failed: {e}")
         geo_rows = []
 
-    by_state = {}
+    # Aggregate by geo target resource name (e.g. "geoTargetConstants/21137")
+    by_resource = {}
     for r in geo_rows:
-        geo = r.get("geoTargetConstant", {})
+        seg   = r.get("segments", {})
         met_g = r.get("metrics", {})
-        name  = geo.get("name", "")
-        ttype = geo.get("targetType", "")
-        if ttype != "State" or not name:
+        res_name = seg.get("geoTargetState", "")
+        if not res_name:
             continue
-        if name not in by_state:
-            by_state[name] = {"state": name, "impressions": 0, "clicks": 0,
-                               "spend": 0.0, "conversions": 0.0}
-        s = by_state[name]
+        if res_name not in by_resource:
+            by_resource[res_name] = {"impressions": 0, "clicks": 0,
+                                      "spend": 0.0, "conversions": 0.0}
+        s = by_resource[res_name]
         s["impressions"] += int(met_g.get("impressions", 0) or 0)
         s["clicks"]      += int(met_g.get("clicks", 0) or 0)
         s["spend"]       += micros(met_g.get("costMicros", 0))
         s["conversions"] += float(met_g.get("conversions", 0) or 0)
+
+    # Resolve resource names → human-readable state names via geo_target_constant
+    state_names = {}
+    if by_resource:
+        resource_list = "', '".join(sorted(by_resource.keys()))
+        lookup_query = f"""
+            SELECT
+              geo_target_constant.resource_name,
+              geo_target_constant.name,
+              geo_target_constant.target_type
+            FROM geo_target_constant
+            WHERE geo_target_constant.resource_name IN ('{resource_list}')
+        """
+        try:
+            lookup_rows = fetch_all_pages(access_token, lookup_query)
+            for r in lookup_rows:
+                gtc = r.get("geoTargetConstant", {})
+                rn  = gtc.get("resourceName", "")
+                if gtc.get("targetType") == "State" and rn:
+                    state_names[rn] = gtc.get("name", "")
+        except Exception as e:
+            print(f"  ⚠  Geo target constant lookup failed: {e}")
+
+    by_state = {}
+    for res_name, s in by_resource.items():
+        name = state_names.get(res_name)
+        if not name:
+            continue
+        by_state[name] = {"state": name, **s}
 
     geo_list = sorted(by_state.values(), key=lambda x: x["spend"], reverse=True)
     for s in geo_list:
