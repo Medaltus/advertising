@@ -173,7 +173,7 @@ def main():
     rows = fetch_all_pages(access_token, query)
     print(f"  ✓ {len(rows)} campaign-day rows")
 
-    by_date, by_campaign, budgets = {}, {}, {}
+    by_date, by_campaign, budgets, campaigns_daily = {}, {}, {}, []
 
     for r in rows:
         seg  = r.get("segments", {})
@@ -189,6 +189,15 @@ def main():
         spd   = micros(met.get("costMicros", 0))
         conv  = float(met.get("conversions", 0) or 0)
         rev   = float(met.get("conversionsValue", 0) or 0)
+
+        if d and cid:
+            campaigns_daily.append({
+                "date": d, "id": cid, "name": cname,
+                "type": camp.get("advertisingChannelType", ""),
+                "impressions": imp, "clicks": clk,
+                "spend": round(spd, 4), "sales": round(rev, 4),
+                "conversions": round(conv, 2),
+            })
 
         if d:
             if d not in by_date:
@@ -317,9 +326,10 @@ def main():
         "currency":      "USD",
         "summary":       summary,
         "timeline":      timeline,
-        "campaigns":     campaigns[:50],
-        "pacing":        pacing,
-        "geo_by_state":  geo_list,
+        "campaigns":        campaigns[:50],
+        "campaigns_daily":  campaigns_daily,
+        "pacing":           pacing,
+        "geo_by_state":     geo_list,
     }
 
     # Write pure JSON to data/ directory (served by Vercel at /data/google_ads_data.json)
