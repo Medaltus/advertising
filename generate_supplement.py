@@ -21,6 +21,7 @@ import calendar
 import json
 import re
 import sys
+import time
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, date, timedelta
@@ -464,6 +465,14 @@ def fetch_daily_brand_sales(cfg: dict, dates: list) -> dict:
             result[date_str] = brand_sales
         except Exception as exc:
             print(f"  ⚠  SP-API failed for {date_str}: {exc}")
+        # GET_SALES_AND_TRAFFIC_REPORT has a tight quota — submitting one report
+        # per day back-to-back exhausts it after ~2-3 calls (seen as an
+        # immediate 429 QuotaExceeded on every subsequent day). fetch_total_sales
+        # now retries on 429 with backoff, but spacing requests out here too
+        # means most days succeed on the first try instead of needing to wait
+        # out a penalty every time.
+        if i < total:
+            time.sleep(10)
     return result
 
 

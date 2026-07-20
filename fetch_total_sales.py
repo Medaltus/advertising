@@ -103,6 +103,41 @@ def get_sp_access_token(cfg, refresh_token_key="sp_refresh_token"):
     return resp.json()["access_token"]
 
 
+# ── Rate-limit backoff ─────────────────────────────────────────────────────────
+# GET_SALES_AND_TRAFFIC_REPORT has a tight SP-API quota. Calling it in a tight
+# loop (e.g. once per day for a 30-day backfill) burns through that quota after
+# just 2-3 requests, after which every subsequent call fails immediately with
+# HTTP 429 "QuotaExceeded" — and previously that failure was NOT retried, so it
+# just gave up and reported no data for that period. These wrappers retry on
+# 429 with backoff (honoring Retry-After when Amazon sends it) instead of
+# failing fast, so a burst of requests actually succeeds (slower) rather than
+# silently coming back empty.
+MAX_429_RETRIES = 6
+
+def _retry_after_seconds(resp, attempt, base=20, cap=180):
+    ra = resp.headers.get("Retry-After") if resp is not None else None
+    if ra:
+        try:
+            return min(float(ra), cap)
+        except ValueError:
+            pass
+    return min(base * (2 ** attempt), cap)
+
+
+def _request_with_backoff(method, url, max_retries=MAX_429_RETRIES, **kwargs):
+    resp = None
+    for attempt in range(max_retries + 1):
+        resp = requests.request(method, url, **kwargs)
+        if resp.status_code == 429 and attempt < max_retries:
+            wait = _retry_after_seconds(resp, attempt)
+            print(f"    ⏳ 429 rate limited ({url.split('?')[0]}) — "
+                  f"waiting {wait:.0f}s before retry ({attempt + 1}/{max_retries})…")
+            time.sleep(wait)
+            continue
+        return resp
+    return resp
+
+
 # ── Report flow ────────────────────────────────────────────────────────────────
 
 def submit_sales_report(cfg, token, start_date, end_date, marketplace_id):
@@ -118,7 +153,8 @@ def submit_sales_report(cfg, token, start_date, end_date, marketplace_id):
         },
     })
     path = "/reports/2021-06-30/reports"
-    resp = requests.post(
+    resp = _request_with_backoff(
+        "POST",
         f"https://{SPAPI_HOST}{path}",
         headers=sigv4_headers("POST", path, "", token, body, cfg),
         data=body,
@@ -147,7 +183,8 @@ def poll_report(cfg, token, report_id):
 
     while time.time() < deadline:
         path = f"/reports/2021-06-30/reports/{report_id}"
-        resp = requests.get(
+        resp = _request_with_backoff(
+            "GET",
             f"https://{SPAPI_HOST}{path}",
             headers=sigv4_headers("GET", path, "", token, "", cfg),
             timeout=20,
@@ -177,7 +214,8 @@ def poll_report(cfg, token, report_id):
 def download_report(cfg, token, doc_id):
     """Download and decompress the report JSON."""
     path = f"/reports/2021-06-30/documents/{doc_id}"
-    resp = requests.get(
+    resp = _request_with_backoff(
+        "GET",
         f"https://{SPAPI_HOST}{path}",
         headers=sigv4_headers("GET", path, "", token, "", cfg),
         timeout=20,
@@ -185,6 +223,8 @@ def download_report(cfg, token, doc_id):
     resp.raise_for_status()
     doc_info = resp.json()
 
+    # The presigned content URL is a storage host, not an SP-API endpoint —
+    # it isn't subject to the same quota, so no backoff needed here.
     content = requests.get(doc_info["url"], timeout=120).content
     if doc_info.get("compressionAlgorithm") == "GZIP":
         content = gzip.decompress(content)
