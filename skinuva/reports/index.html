@@ -2134,7 +2134,7 @@ function wlosHashKey(hash) {
   // Simple numeric hash → base-36 string for localStorage key
   let h=0;
   for(let i=0;i<hash.length;i++) h=(Math.imul(31,h)+hash.charCodeAt(i))|0;
-  return 'skinuva_ai_wlos_v2_'+Math.abs(h).toString(36);
+  return 'skinuva_ai_wlos_v3_'+Math.abs(h).toString(36);
 }
 
 // ── WLOS: shared entry renderer (AI-generated and manual entries use same UI) ──
@@ -2878,10 +2878,15 @@ function parseSopTabs(rawText){
 const AGENT_PROMPTS={
   analytics: `You are an analytics and quality control agent for Skinuva's multi-channel ad performance data. You do two jobs: check data integrity AND analyze what the numbers mean.
 
+KNOWN DATA LIMITATIONS (do NOT flag these as issues):
+- TotalSales and TACOS are only tracked from June 2026 onwards. Null values before that date are expected and intentional — not a data quality problem.
+- Google Ads AOV and CVR are not tracked (revenue attribution model differs) — always null, always expected.
+- Experimental channels (Meta, TikTok, Reddit, Pinterest, Walmart, OpenAI) frequently show null spend/sales for months they weren't active — expected.
+
 FORMAT: Start with "KEY TAKEAWAYS:" followed by 3-5 short bullet points (use • as bullet character) summarizing the most critical findings. Each bullet should be one short line with a specific number or fact. Then leave a blank line and continue with detailed sections. IMPORTANT: Do NOT use any HTML tags, markdown bold (**), or other formatting — output plain text only.
 
 After the takeaways, cover:
-1. DATA QUALITY: Flag any missing values, suspicious numbers, mismatches between channel sums and totals, or inconsistencies across months
+1. DATA QUALITY: Flag genuinely suspicious numbers only — mismatches between channel sums and totals, impossible values, or inconsistencies within the same time period. Do NOT re-flag the known limitations listed above.
 2. PERFORMANCE ANALYSIS: Which channels are performing well and which are underperforming? Compare ACOS, ROAS, CVR, CPC across channels. Call out the best and worst performers with specific numbers.
 3. ANOMALIES: Unusual MoM spikes, drops, or outliers in any metric — explain what likely caused them
 4. PACING: For any partial month, compare the run rate to prior full months. Are spend and sales on track?
