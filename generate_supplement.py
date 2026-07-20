@@ -559,11 +559,22 @@ def main():
         except Exception:
             pass
 
-    # Merge per-day: new data wins for each brand's day row
+    # Merge per-day: fresh ad-spend fields win, but merge into the existing
+    # record rather than replacing it wholesale. entry['brands'] (this run's
+    # ads-data-only payload) never contains 'totalSales' — it's bolted on
+    # separately below by the SP-API step. A plain dict.update() at the
+    # brand-record level would blow away that 'totalSales' every run (since
+    # the fresh record simply doesn't have the key), forcing every day in the
+    # lookback window to be re-fetched from SP-API from scratch each time
+    # instead of accumulating. Merging preserves it.
     for d, entry in new_daily.items():
         if d not in existing_daily:
             existing_daily[d] = {'brands': {}}
-        existing_daily[d]['brands'].update(entry['brands'])
+        for brand_name, fresh_brand_data in entry['brands'].items():
+            if brand_name in existing_daily[d]['brands']:
+                existing_daily[d]['brands'][brand_name].update(fresh_brand_data)
+            else:
+                existing_daily[d]['brands'][brand_name] = fresh_brand_data
 
     merged_daily = dict(sorted(existing_daily.items()))
 
