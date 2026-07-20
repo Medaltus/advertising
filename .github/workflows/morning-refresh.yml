@@ -59,6 +59,7 @@ jobs:
       # ── Medaltus Internal Google Ads ─────────────────────────────────────────
       - name: Fetch Medaltus Google Ads data
         run: python3 fetch_medaltus_google_ads.py
+        continue-on-error: true
 
       # ── Commit everything ────────────────────────────────────────────────────
       - name: Commit and push updated data
