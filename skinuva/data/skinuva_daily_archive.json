@@ -320,14 +320,7 @@
     }
   },
   "2026-06-19": {
-    "amazon": {
-      "spend": 508.57,
-      "adSales": 1964.98,
-      "totalSales": 5869.16,
-      "orders": 29,
-      "clicks": 220,
-      "impressions": 60295
-    },
+    "amazon": {},
     "google": {
       "spend": 287.2,
       "adSales": 418.19,
@@ -714,7 +707,7 @@
     "amazon": {
       "spend": 444.37,
       "adSales": 1235.0,
-      "totalSales": 5923.1,
+      "totalSales": 5869.1,
       "orders": 17,
       "clicks": 175,
       "impressions": 35972
@@ -765,7 +758,7 @@
     "amazon": {
       "spend": 476.22,
       "adSales": 1680.0,
-      "totalSales": 6065.19,
+      "totalSales": 6025.24,
       "orders": 20,
       "clicks": 241,
       "impressions": 40267
@@ -775,14 +768,14 @@
       "adSales": 561.38,
       "conversions": 5.0,
       "clicks": 227,
-      "impressions": 35219
+      "impressions": 35218
     }
   },
   "2026-07-16": {
     "amazon": {
       "spend": 423.34,
       "adSales": 1434.99,
-      "totalSales": 5785.62,
+      "totalSales": 5645.62,
       "orders": 20,
       "clicks": 268,
       "impressions": 46300
@@ -798,9 +791,9 @@
   "2026-07-17": {
     "amazon": {
       "spend": 448.68,
-      "adSales": 1600.0,
+      "adSales": 1540.0,
       "totalSales": 6252.97,
-      "orders": 19,
+      "orders": 18,
       "clicks": 267,
       "impressions": 42315
     },
@@ -833,17 +826,28 @@
     "amazon": {
       "spend": 449.96,
       "adSales": 2448.96,
-      "totalSales": 0.0,
+      "totalSales": 6742.57,
       "orders": 29,
       "clicks": 212,
-      "impressions": 31131
+      "impressions": 34351
     },
     "google": {
-      "spend": 247.79,
+      "spend": 247.9,
       "adSales": 197.0,
       "conversions": 2.0,
-      "clicks": 149,
+      "clicks": 150,
       "impressions": 19033
     }
+  },
+  "2026-07-20": {
+    "amazon": {
+      "spend": 509.17,
+      "adSales": 1818.94,
+      "totalSales": 0.0,
+      "orders": 21,
+      "clicks": 238,
+      "impressions": 35056
+    },
+    "google": {}
   }
 }
