@@ -4124,6 +4124,32 @@ function _currentMonthPrefix(){
   const now=new Date(); return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 }
 function _filterTL(tl,period){ return period==='month'?tl.filter(r=>r.date.startsWith(_currentMonthPrefix())):tl; }
+const _MONTH_NUM={January:'01',February:'02',March:'03',April:'04',May:'05',June:'06',July:'07',August:'08',September:'09',October:'10',November:'11',December:'12'};
+function _monthPrefixFromLabel(label){
+  if(!label) return null;
+  const parts=label.trim().split(' '); if(parts.length<2) return null;
+  const num=_MONTH_NUM[parts[0]], yr=parts[1];
+  return (num&&yr)?`${yr}-${num}`:null;
+}
+// Reconstruct a timeline-shaped array for an arbitrary month from the permanent daily archive.
+// Needed because the live "supplement" API files only hold a rolling ~31-day window and can't
+// cover a past month once it scrolls outside that window — the archive can, since it's appended
+// to (never replaced) every run.
+function _sumArchiveMonth(archive, monthPrefix, channel){
+  const tl=[];
+  if(archive && monthPrefix){
+    Object.keys(archive).sort().forEach(d=>{
+      if(!d.startsWith(monthPrefix)) return;
+      const row=(archive[d]||{})[channel]||{};
+      if(channel==='amazon'){
+        tl.push({date:d, spend:row.spend||0, sales:row.adSales||0, purchases:row.orders||0, clicks:row.clicks||0, impressions:row.impressions||0});
+      } else {
+        tl.push({date:d, spend:row.spend||0, sales:row.adSales||0, conversions:row.conversions||0, clicks:row.clicks||0, impressions:row.impressions||0});
+      }
+    });
+  }
+  return tl;
+}
 function _buildCampaignStatsFromTL(tl, allCampaigns){
   // For month view: filter campaign_timeline if available; otherwise use full campaign list
   // Since we don't have per-day campaign data in the compact format, filter by dates in TL
@@ -4156,9 +4182,35 @@ function _setApiTabs(prefix, period){
 function renderAmazonSection(period, supplement){
   period=period||'month';
   _setApiTabs('amazon',period);
-  const d=supplement!=null?supplement:ACTIVE_SUPPLEMENT; if(!d||!d.timeline) return;
-  const tl=_filterTL(d.timeline,period);
-  if(!tl.length) return;
+  const isEraclea = supplement===ERACLEA_AMAZON;
+
+  // The month tab should track whichever month is selected at the top of the page, not just
+  // "whatever month it really is" — supplement/timeline is a rolling window so it can only ever
+  // serve the current month; past months are rebuilt from the permanent daily archive instead.
+  // Note: the archive path deliberately doesn't depend on the live supplement object existing —
+  // if that fetch is slow/fails, a past-month selection should still work off the archive.
+  const targetPrefix = period==='month' ? (_monthPrefixFromLabel(selectedMonth)||_currentMonthPrefix()) : null;
+  const isCurrentMonth = period!=='month' || targetPrefix===_currentMonthPrefix();
+
+  let tl, label, campaignsAvailable, d=null;
+  if(period==='month' && !isCurrentMonth){
+    tl=_sumArchiveMonth(isEraclea?ERACLEA_DAILY:SKINUVA_DAILY, targetPrefix, 'amazon');
+    label=selectedMonth;
+    campaignsAvailable=false;
+  } else {
+    d=supplement!=null?supplement:ACTIVE_SUPPLEMENT; if(!d||!d.timeline) return;
+    tl=_filterTL(d.timeline,period);
+    label=period==='month'?_currentMonthLabel():'Past 31 Days';
+    campaignsAvailable=true;
+  }
+  const mTab=document.getElementById('amazon-tab-month'); if(mTab) mTab.textContent=(label||'').split(' ')[0]||'Month';
+  if(!tl.length){
+    document.getElementById('amazon-sub').textContent=`Amazon Ads API · ${label} · no data available`;
+    document.getElementById('amazon-kpi-row').innerHTML='';
+    document.getElementById('amazon-campaign-tbody').innerHTML='<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">No data available for this month</td></tr>';
+    if(_apiCharts['chart-amazon-trend']){_apiCharts['chart-amazon-trend'].destroy();delete _apiCharts['chart-amazon-trend'];}
+    return;
+  }
 
   const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
   const spend=sumK(tl,'spend'),sales=sumK(tl,'sales'),orders=sumK(tl,'purchases');
@@ -4166,9 +4218,9 @@ function renderAmazonSection(period, supplement){
   const acos=sales>0?spend/sales*100:null;
   const roas=spend>0?sales/spend:null;
   const cpc=clicks>0?spend/clicks:null;
-  const label=period==='month'?_currentMonthLabel():'Past 31 Days';
-  const fetched=new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('amazon-sub').textContent=`Amazon Ads API · ${label} · ${tl.length} days · Fetched ${fetched}`;
+  document.getElementById('amazon-sub').textContent = campaignsAvailable
+    ? `Amazon Ads API · ${label} · ${tl.length} days · Fetched ${new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}`
+    : `Amazon Ads API · ${label} · ${tl.length} days · from daily archive`;
 
   const row=document.getElementById('amazon-kpi-row'); row.innerHTML='';
   const acosColor=acos==null?'rgba(255,255,255,0.3)':acos<20?'#4ade80':acos<30?'#f59e0b':'#ff6b6b';
@@ -4185,6 +4237,12 @@ function renderAmazonSection(period, supplement){
 
   // Campaign table — use full campaign list (aggregated over fetch period); filter by spend
   const tbody=document.getElementById('amazon-campaign-tbody'); tbody.innerHTML='';
+  if(!campaignsAvailable){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">Campaign-level detail is only available for the current month</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
   // For month view, scale each metric by its own ratio (period/total) from actual timeline data
   // so campaign totals match header KPIs exactly.
   const tl31=d.timeline;
@@ -4226,9 +4284,29 @@ function renderAmazonSection(period, supplement){
 function renderGoogleSection(period){
   period=period||'month';
   _setApiTabs('google',period);
-  const d=GOOGLE_ADS_DATA; if(!d) return;
-  const tl=_filterTL(d.timeline,period);
-  if(!tl.length) return;
+
+  const targetPrefix = period==='month' ? (_monthPrefixFromLabel(selectedMonth)||_currentMonthPrefix()) : null;
+  const isCurrentMonth = period!=='month' || targetPrefix===_currentMonthPrefix();
+
+  let tl, label, campaignsAvailable, d=null;
+  if(period==='month' && !isCurrentMonth){
+    tl=_sumArchiveMonth(SKINUVA_DAILY, targetPrefix, 'google');
+    label=selectedMonth;
+    campaignsAvailable=false;
+  } else {
+    d=GOOGLE_ADS_DATA; if(!d||!d.timeline) return;
+    tl=_filterTL(d.timeline,period);
+    label=period==='month'?_currentMonthLabel():'Past 31 Days';
+    campaignsAvailable=true;
+  }
+  const gTab=document.getElementById('google-tab-month'); if(gTab) gTab.textContent=(label||'').split(' ')[0]||'Month';
+  if(!tl.length){
+    document.getElementById('google-sub').textContent=`Google Ads API · ${label} · no data available`;
+    document.getElementById('google-kpi-row').innerHTML='';
+    document.getElementById('google-campaign-tbody').innerHTML='<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">No data available for this month</td></tr>';
+    if(_apiCharts['chart-google-trend']){_apiCharts['chart-google-trend'].destroy();delete _apiCharts['chart-google-trend'];}
+    return;
+  }
 
   const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
   const spend=sumK(tl,'spend'),sales=sumK(tl,'sales'),conv=sumK(tl,'conversions');
@@ -4236,9 +4314,9 @@ function renderGoogleSection(period){
   const acos=sales>0?spend/sales*100:null;
   const roas=spend>0?sales/spend:null;
   const cpc=clicks>0?spend/clicks:null;
-  const label=period==='month'?_currentMonthLabel():'Past 31 Days';
-  const fetched=new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  document.getElementById('google-sub').textContent=`Google Ads API · ${label} · ${tl.length} days · Fetched ${fetched}`;
+  document.getElementById('google-sub').textContent = campaignsAvailable
+    ? `Google Ads API · ${label} · ${tl.length} days · Fetched ${new Date(d.fetched_at).toLocaleDateString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}`
+    : `Google Ads API · ${label} · ${tl.length} days · from daily archive`;
 
   const row=document.getElementById('google-kpi-row'); row.innerHTML='';
   const acosColor=acos==null?'rgba(255,255,255,0.3)':acos<20?'#4ade80':acos<30?'#f59e0b':'#ff6b6b';
@@ -4254,6 +4332,12 @@ function renderGoogleSection(period){
   _renderApiChart('chart-google-trend', tl, 'rgb(66,133,244)');
 
   const tbody=document.getElementById('google-campaign-tbody'); tbody.innerHTML='';
+  if(!campaignsAvailable){
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">Campaign-level detail is only available for the current month</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
   const gtl31=d.timeline;
   const gtot31Spend=gtl31.reduce((s,r)=>s+(r.spend||0),0);
   const gtot31Sales=gtl31.reduce((s,r)=>s+(r.sales||0),0);
