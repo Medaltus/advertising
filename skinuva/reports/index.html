@@ -3390,6 +3390,12 @@ async function init(){
     let updatedDate=null;
     parseSopTabs(text);
     DATA=parseSheet(text, updatedDate);
+    // Normalize month labels from the Sheet (trim stray/non-breaking spaces from copy-pasted
+    // cells). Without this, a sheet cell like "June 2026 " (trailing space) creates a SECOND
+    // "June" entry alongside the API-corrected "June 2026" one instead of being recognized as
+    // the same month — both show up in the month dropdown, and whichever one happens to render
+    // first/get clicked can be the stale, uncorrected one while the other is correct.
+    DATA.monthly.forEach(m=>{ if(typeof m.month==='string') m.month=m.month.trim().replace(/\s+/g,' '); });
     if(!DATA.monthly.length) throw new Error('No monthly data found. The sheet format may have changed.');
     // Load API data files then inject into monthly data
     await Promise.all([
