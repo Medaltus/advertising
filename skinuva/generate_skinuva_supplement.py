@@ -14,6 +14,7 @@ Run immediately after fetch_ads_data.py:
 Then commit and push — Vercel auto-deploys.
 """
 
+import calendar
 import json
 import re
 import sys
@@ -202,6 +203,116 @@ def build_daily_archive(supplement: dict, google_path: Path) -> dict:
     return entries
 
 
+def merge_daily_archive(existing: dict, new: dict) -> dict:
+    """
+    Merge freshly-built per-day rows into the existing daily archive.
+
+    Amazon and Google are fetched with separate lookback windows, so a given
+    day can fall inside one channel's window but not the other on a given run.
+    build_daily_archive() always returns both keys for such a day (one real,
+    one an empty placeholder — see its docstring), so a plain
+    {**existing, **new} merge would wipe out a channel's already-good
+    historical data every time that happens. Only overwrite a channel's data
+    for a day when this run actually produced something for it.
+    """
+    merged = dict(existing)
+    for d, entry in new.items():
+        if d not in merged:
+            merged[d] = {'amazon': {}, 'google': {}}
+        for channel in ('amazon', 'google'):
+            fresh = entry.get(channel) or {}
+            if fresh:
+                merged[d][channel] = fresh
+    return dict(sorted(merged.items()))
+
+
+def correct_monthly_from_archive(monthly: dict, daily: dict, today_month_str: str) -> None:
+    """
+    Re-derive Amazon/Google spend, ad sales, orders, clicks and impressions
+    for every COMPLETED month (not the current, still-in-progress month) from
+    the complete daily archive, mutating `monthly` in place.
+
+    The monthly entries are otherwise built from the live ads_data.js
+    timeline, which only covers a rolling lookback window (~31 days). Once a
+    month is no longer the current month it may only be partially covered by
+    that window — e.g. just its last handful of days — which silently
+    truncates spend/sales/orders for that month a little more each day until
+    the window fully exits it. The daily archive accumulates every day
+    permanently (once merge_daily_archive() is used to update it), so summing
+    it gives the true, complete month total instead.
+
+    Deliberately does NOT touch totalSales/combinedTotalSales — Amazon's true
+    (non-ad-attributed) revenue has its own, separately-maintained sourcing
+    per brand and is left exactly as the caller already computed it.
+
+    Skips any month where the archive doesn't cover at least 90% of that
+    month's calendar days — e.g. May 2026 only has archive rows from the 20th
+    onward because the daily-archive feature didn't exist before then, so
+    summing it would silently understate the month instead of fixing it.
+    In that case the existing (already-imperfect) value is left alone rather
+    than replaced with a differently-imperfect one.
+    """
+    archive_monthly: dict = defaultdict(lambda: {
+        'amazon': {'spend': 0.0, 'adSales': 0.0, 'orders': 0, 'clicks': 0, 'impressions': 0},
+        'google': {'spend': 0.0, 'adSales': 0.0, 'conversions': 0.0, 'clicks': 0, 'impressions': 0},
+        'days_covered': set(),
+    })
+    for d_str, day_entry in daily.items():
+        if not day_entry or not day_entry.get('amazon'):
+            continue
+        mk = month_key_from_date(d_str)
+        archive_monthly[mk]['days_covered'].add(d_str)
+        am = day_entry.get('amazon') or {}
+        a = archive_monthly[mk]['amazon']
+        a['spend']       += float(am.get('spend', 0) or 0)
+        a['adSales']     += float(am.get('adSales', 0) or 0)
+        a['orders']      += int(am.get('orders', 0) or 0)
+        a['clicks']      += int(am.get('clicks', 0) or 0)
+        a['impressions'] += int(am.get('impressions', 0) or 0)
+
+        gg = day_entry.get('google') or {}
+        g = archive_monthly[mk]['google']
+        g['spend']       += float(gg.get('spend', 0) or 0)
+        g['adSales']     += float(gg.get('adSales', 0) or 0)
+        g['conversions'] += float(gg.get('conversions', 0) or 0)
+        g['clicks']      += int(gg.get('clicks', 0) or 0)
+        g['impressions'] += int(gg.get('impressions', 0) or 0)
+
+    for mk, arch in archive_monthly.items():
+        if mk == today_month_str or mk not in monthly:
+            continue
+        month_name, year_str = mk.split(' ')
+        month_num = MONTH_NAMES.index(month_name) + 1
+        days_in_month = calendar.monthrange(int(year_str), month_num)[1]
+        coverage = len(arch['days_covered']) / days_in_month
+        if coverage < 0.9:
+            print(f"  [{mk}] Skipped archive correction — only {len(arch['days_covered'])}/{days_in_month} "
+                  f"days covered ({coverage:.0%}); leaving existing value as-is")
+            continue
+        entry = monthly[mk]
+        prev_total_sales = (entry.get('amazon') or {}).get('totalSales')
+        prev_google       = entry.get('google') or {}
+        entry['amazon'] = {
+            'spend':       round(arch['amazon']['spend'], 2),
+            'adSales':     round(arch['amazon']['adSales'], 2),
+            'totalSales':  prev_total_sales,
+            'orders':      arch['amazon']['orders'],
+            'clicks':      arch['amazon']['clicks'],
+            'impressions': arch['amazon']['impressions'],
+        }
+        entry['google'] = {
+            'spend':       round(arch['google']['spend'], 2),
+            'adSales':     round(arch['google']['adSales'], 2),
+            'conversions': (round(arch['google']['conversions'])
+                            if arch['google']['conversions'] else prev_google.get('conversions', 0)),
+            'clicks':      arch['google']['clicks'],
+            'impressions': arch['google']['impressions'],
+        }
+        print(f"  [{mk}] Archive-corrected: amazon.spend=${entry['amazon']['spend']:,.2f}, "
+              f"adSales=${entry['amazon']['adSales']:,.2f}, orders={entry['amazon']['orders']}, "
+              f"google.spend=${entry['google']['spend']:,.2f}")
+
+
 def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path) -> dict:
     """
     Aggregate Amazon + Google timeline data by calendar month.
@@ -331,10 +442,29 @@ def main():
     out_path.write_text(json.dumps(supplement, indent=2))
     print(f"\n✓ Wrote {out_path}")
 
-    # ── Build and merge skinuva_monthly.json (permanent historical archive) ──
-    monthly_path = out_dir / 'skinuva_monthly.json'
     google_path  = out_dir / 'google_ads_data.json'
     manual_path  = out_dir / 'manual_totals.json'
+    today_month_str = f"{MONTH_NAMES[datetime.now().month - 1]} {datetime.now().year}"
+
+    # ── Build and merge skinuva_daily_archive.json FIRST (per-day rows for date
+    # range queries) — the monthly archive below is corrected from this, so it
+    # must be up to date before we touch the monthly file. ──────────────────────
+    daily_path = out_dir / 'skinuva_daily_archive.json'
+    new_daily = build_daily_archive(supplement, google_path)
+
+    existing_daily = {}
+    if daily_path.exists():
+        try:
+            existing_daily = json.loads(daily_path.read_text())
+        except Exception:
+            pass
+
+    merged_daily = merge_daily_archive(existing_daily, new_daily)
+    daily_path.write_text(json.dumps(merged_daily, indent=2))
+    print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
+
+    # ── Build and merge skinuva_monthly.json (permanent historical archive) ──
+    monthly_path = out_dir / 'skinuva_monthly.json'
 
     new_entries = build_monthly_archive(supplement, google_path, manual_path)
 
@@ -349,24 +479,12 @@ def main():
 
     merged = {**existing, **new_entries}
     merged = dict(sorted(merged.items(), key=lambda x: datetime.strptime(x[0], '%B %Y')))
+
+    print("\nCorrecting completed months' spend/orders from complete daily archive…")
+    correct_monthly_from_archive(merged, merged_daily, today_month_str)
+
     monthly_path.write_text(json.dumps(merged, indent=2))
     print(f"✓ Updated {monthly_path} ({len(merged)} months: {', '.join(merged.keys())})")
-
-    # ── Build and merge skinuva_daily_archive.json (per-day rows for date range queries) ──
-    daily_path = out_dir / 'skinuva_daily_archive.json'
-    new_daily = build_daily_archive(supplement, google_path)
-
-    existing_daily = {}
-    if daily_path.exists():
-        try:
-            existing_daily = json.loads(daily_path.read_text())
-        except Exception:
-            pass
-
-    merged_daily = {**existing_daily, **new_daily}
-    merged_daily = dict(sorted(merged_daily.items()))  # YYYY-MM-DD sorts naturally
-    daily_path.write_text(json.dumps(merged_daily, indent=2))
-    print(f"✓ Updated {daily_path} ({len(merged_daily)} days)")
 
     # ── Also generate eraclea supplement (Amazon-only brand) ─────────────────
     try:
@@ -381,10 +499,25 @@ def main():
         eraclea_out.write_text(json.dumps(eraclea_supplement, indent=2))
         print(f"\n✓ Wrote {eraclea_out}")
 
-        # eraclea_monthly.json (Amazon-only, no Google/Shopify paths)
-        eraclea_monthly_path = out_dir / 'eraclea_monthly.json'
         no_google = out_dir / '_no_google.json'   # intentionally absent
         no_manual = out_dir / '_no_manual.json'   # intentionally absent
+
+        # eraclea_daily_archive.json FIRST — eraclea's monthly archive is
+        # corrected from this below, same as Skinuva's.
+        eraclea_daily_path = out_dir / 'eraclea_daily_archive.json'
+        eraclea_new_daily = build_daily_archive(eraclea_supplement, no_google)
+        existing_eraclea_daily = {}
+        if eraclea_daily_path.exists():
+            try:
+                existing_eraclea_daily = json.loads(eraclea_daily_path.read_text())
+            except Exception:
+                pass
+        merged_eraclea_daily = merge_daily_archive(existing_eraclea_daily, eraclea_new_daily)
+        eraclea_daily_path.write_text(json.dumps(merged_eraclea_daily, indent=2))
+        print(f"✓ Updated {eraclea_daily_path} ({len(merged_eraclea_daily)} days)")
+
+        # eraclea_monthly.json (Amazon-only, no Google/Shopify paths)
+        eraclea_monthly_path = out_dir / 'eraclea_monthly.json'
         eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual)
         # Fix: timeline totalSales is company-wide (all brands), not eraclea-specific.
         # Override with the SP-API brand total from summary.totalSales which is filtered
@@ -409,22 +542,12 @@ def main():
                 pass
         merged_eraclea = {**existing_eraclea, **eraclea_new_monthly}
         merged_eraclea = dict(sorted(merged_eraclea.items(), key=lambda x: datetime.strptime(x[0], '%B %Y')))
+
+        print("\nCorrecting eraclea completed months' spend/orders from complete daily archive…")
+        correct_monthly_from_archive(merged_eraclea, merged_eraclea_daily, today_month_str)
+
         eraclea_monthly_path.write_text(json.dumps(merged_eraclea, indent=2))
         print(f"✓ Updated {eraclea_monthly_path} ({len(merged_eraclea)} months)")
-
-        # eraclea_daily_archive.json
-        eraclea_daily_path = out_dir / 'eraclea_daily_archive.json'
-        eraclea_new_daily = build_daily_archive(eraclea_supplement, no_google)
-        existing_eraclea_daily = {}
-        if eraclea_daily_path.exists():
-            try:
-                existing_eraclea_daily = json.loads(eraclea_daily_path.read_text())
-            except Exception:
-                pass
-        merged_eraclea_daily = {**existing_eraclea_daily, **eraclea_new_daily}
-        merged_eraclea_daily = dict(sorted(merged_eraclea_daily.items()))
-        eraclea_daily_path.write_text(json.dumps(merged_eraclea_daily, indent=2))
-        print(f"✓ Updated {eraclea_daily_path} ({len(merged_eraclea_daily)} days)")
 
     except ValueError as e:
         print(f"  ⚠  No eraclea data in ads_data.js: {e}")
