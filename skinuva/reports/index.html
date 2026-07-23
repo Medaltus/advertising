@@ -953,6 +953,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 <script>
 const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
 let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={}, SKINUVA_DAILY={};
+let SKINUVA_CAMPAIGNS_BY_MONTH={}, ERACLEA_CAMPAIGNS_BY_MONTH={};
 let rangeMode=false, rangeStart=null, rangeEnd=null;
 
 const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48', OpenAI:'#10a37f' };
@@ -3407,6 +3408,8 @@ async function init(){
       fetch('/data/eraclea_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_AMAZON=d;}).catch(()=>{}),
       fetch('/data/eraclea_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_MONTHLY=d;}).catch(()=>{}),
       fetch('/data/eraclea_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_DAILY=d;}).catch(()=>{}),
+      fetch('/data/skinuva_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
+      fetch('/data/eraclea_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
     ]);
     injectHistoricalApiData();
     injectJuneApiData();
@@ -4244,9 +4247,37 @@ function renderAmazonSection(period, supplement){
   // Campaign table — use full campaign list (aggregated over fetch period); filter by spend
   const tbody=document.getElementById('amazon-campaign-tbody'); tbody.innerHTML='';
   if(!campaignsAvailable){
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">Campaign-level detail is only available for the current month</td>`;
-    tbody.appendChild(tr);
+    // Past month: our own pipeline only archives channel-level totals, not per-campaign detail.
+    // Helium 10 has full campaign-level history for any month — use it here if we have it.
+    const h10Month = (isEraclea ? ERACLEA_CAMPAIGNS_BY_MONTH : SKINUVA_CAMPAIGNS_BY_MONTH)[selectedMonth];
+    if(h10Month && h10Month.campaigns && h10Month.campaigns.length){
+      const h10Campaigns = h10Month.campaigns.filter(c=>c.spend>0).slice().sort((a,b)=>b.spend-a.spend);
+      h10Campaigns.forEach(c=>{
+        const ac=c.acos==null?'':c.acos<20?'acos-good':c.acos<35?'':'acos-bad';
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td title="${c.name}" style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.name}</td>
+          <td>$${c.spend.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td>$${c.sales.toLocaleString(undefined,{maximumFractionDigits:0})}</td>
+          <td class="${ac}">${c.acos!=null?c.acos.toFixed(1)+'%':'N/A'}</td>
+          <td>${c.roas!=null?c.roas.toFixed(2)+'x':'—'}</td>
+          <td>${c.purchases}</td><td>${(c.clicks||0).toLocaleString()}</td>
+          <td>${c.cpc!=null?'$'+c.cpc.toFixed(2):'—'}</td>`;
+        tbody.appendChild(tr);
+      });
+      const tot={spend:0,sales:0,purchases:0,clicks:0};
+      h10Campaigns.forEach(c=>{tot.spend+=c.spend;tot.sales+=c.sales;tot.purchases+=c.purchases||0;tot.clicks+=c.clicks||0;});
+      const ttr=document.createElement('tr'); ttr.style.cssText='border-top:2px solid rgba(255,255,255,0.15);font-weight:700;';
+      const totAcos=tot.sales>0?(tot.spend/tot.sales*100).toFixed(1)+'%':'—';
+      const totRoas=tot.spend>0?(tot.sales/tot.spend).toFixed(2)+'x':'—';
+      ttr.innerHTML=`<td style="color:rgba(255,255,255,0.9)">Total (Helium 10)</td><td style="color:#fff">$${tot.spend.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">$${tot.sales.toLocaleString(undefined,{maximumFractionDigits:0})}</td><td style="color:#fff">${totAcos}</td><td style="color:#fff">${totRoas}</td><td style="color:#fff">${tot.purchases}</td><td style="color:rgba(255,255,255,0.7)">${tot.clicks.toLocaleString()}</td><td></td>`;
+      tbody.appendChild(ttr);
+      const note=document.createElement('tr');
+      note.innerHTML=`<td colspan="8" style="text-align:center;color:rgba(255,255,255,0.3);font-size:11px;padding:8px;">Campaign detail sourced from Helium 10 — may differ ~1-5% from the totals above (different attribution-window timing than our own archive)</td>`;
+      tbody.appendChild(note);
+    } else {
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td colspan="8" style="text-align:center;color:rgba(255,255,255,0.4);padding:16px;">No campaign-level detail available for this month</td>`;
+      tbody.appendChild(tr);
+    }
     return;
   }
   // For month view, scale each metric by its own ratio (period/total) from actual timeline data
