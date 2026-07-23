@@ -181,6 +181,21 @@ AD_PRODUCT_CONFIGS = [
             "purchases7d": r.pop("purchases", 0) or 0,
         }) or r,
     },
+    {
+        "adProduct":    "SPONSORED_DISPLAY",
+        "reportTypeId": "sdCampaigns",
+        "columns": [
+            "date", "campaignId", "campaignName", "campaignStatus",
+            "campaignBudgetAmount", "campaignBudgetType",
+            "impressions", "clicks", "cost", "purchases", "sales",
+        ],
+        # Rename SD columns to the names build_brand_data expects (same as SB).
+        "normalize": lambda r: r.update({
+            "spend":       r.pop("cost",      0) or 0,
+            "sales7d":     r.pop("sales",     0) or 0,
+            "purchases7d": r.pop("purchases", 0) or 0,
+        }) or r,
+    },
 ]
 
 
