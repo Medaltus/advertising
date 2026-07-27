@@ -983,6 +983,14 @@ function extractText(r) {
 
 // ── Parser ──
 const AD_CHANNELS = new Set(['Amazon','Google','Walmart','Meta','Pinterest','TikTok','Reddit','Shopify Shop','OpenAI']);
+// Case/whitespace-tolerant lookup so a sheet channel label like "meta " or "TIKTOK" still
+// matches -- a channel row silently vanishes with no error if it doesn't match AD_CHANNELS
+// exactly, so this is deliberately forgiving on the input side.
+const _AD_CHANNELS_NORM = new Map([...AD_CHANNELS].map(c=>[c.toLowerCase().replace(/\s+/g,' ').trim(), c]));
+function _canonChannel(ch){
+  if(!ch) return null;
+  return _AD_CHANNELS_NORM.get(ch.toLowerCase().replace(/\s+/g,' ').trim()) || null;
+}
 
 // Extract the S1 cell date from the "Ad Performance by Channel" tab.
 // S1 = date data was downloaded. Data only covers through S1 - 1 day.
@@ -1088,7 +1096,9 @@ function parseSheet(text, updatedDate) {
       const ch=r[co]; if(!ch) continue;
       const row={channel:ch,adSpend:parseNum(r[1+co]),adSales:parseNum(r[2+co]),acos:parseNum(r[3+co]),totalSales:parseNum(r[4+co]),tacos:parseNum(r[5+co]),impressions:parseNum(r[6+co]),clicks:parseNum(r[7+co]),ctr:parseNum(r[8+co]),cpc:parseNum(r[9+co]),orders:parseNum(r[10+co]),aov:parseNum(r[11+co]),cvr:parseNum(r[12+co])};
       if(ch==='Total Paid Media'){totalRow=row;continue;}
-      if(AD_CHANNELS.has(ch)) adRows.push(row);
+      const _canon=_canonChannel(ch);
+      if(_canon){ row.channel=_canon; adRows.push(row); }
+      else if(ch!=='Website Sales'){ console.warn('[parseSheet] Channel name "'+ch+'" not in AD_CHANNELS -- row skipped (spend/sales for this row will not appear anywhere on the dashboard)'); }
     }
     // For isSkinuvaCh tables, totalRow is optional — injectJuneApiData recalculates it anyway
     if(isSkinuvaCh){if(adRows.length===0) continue;}
@@ -1113,7 +1123,11 @@ function parseSheet(text, updatedDate) {
       if(bestD>=100) best=null;
     }
     if(totalRow) adRows.push(totalRow);
-    if(best&&!channels[best]) channels[best]=adRows; // first match wins, no overwriting
+    if(best){
+      if(!channels[best]) channels[best]=adRows; // first match wins, no overwriting
+    } else if(adRows.length){
+      console.warn('[parseSheet] Channel table for "'+(tableMonth||'unknown month')+'" had '+adRows.length+' channel row(s) but could not be matched to any month in Monthly Totals -- entire table discarded:', adRows.map(r=>r.channel).join(', '));
+    }
   }
 
   // Sort chronologically
