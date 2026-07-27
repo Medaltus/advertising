@@ -33,6 +33,8 @@ jobs:
               c = json.load(f)
           if 'Skinside' not in c['brands']:
               c['brands'].append('Skinside')
+          if 'Cosmette' not in c['brands']:
+              c['brands'].append('Cosmette')
           with open('config.json', 'w') as f:
               json.dump(c, f)
           print('brands:', c['brands'])
