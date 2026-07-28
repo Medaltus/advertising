@@ -65,11 +65,20 @@ if month not in sm:
     sys.exit(0)
 entry = sm[month]
 entry[channel] = amount
-amz_total = (entry.get("amazon") or {}).get("totalSales") or 0
+amz_total = (entry.get("amazon") or {}).get("totalSales")
 shopify   = entry.get("shopify") or 0
 walmart   = entry.get("walmart") or 0
-combined  = round(amz_total + shopify + walmart, 2)
-entry["combinedTotalSales"] = combined
+if amz_total is None:
+    # The pipeline could not obtain a trustworthy brand-filtered Amazon total for
+    # this month. Writing shopify+walmart alone would look like a real combined
+    # total while silently omitting all Amazon revenue, so leave it null and let
+    # the dashboard fall back to the Google Sheet instead.
+    entry["combinedTotalSales"] = None
+    combined = None
+    print("  ⚠  Amazon totalSales unavailable for this month — combinedTotalSales left null")
+else:
+    combined = round(amz_total + shopify + walmart, 2)
+    entry["combinedTotalSales"] = combined
 with open(monthly_path, "w") as f:
     json.dump(sm, f, indent=2)
 print(f"  ✓ skinuva_monthly.json updated  (combinedTotalSales = ${combined:,.2f})")
@@ -102,14 +111,24 @@ with open(monthly_path) as f:
 if month in sm:
     entry = sm[month]
     entry[channel] = amount
-    amz_total = (entry.get("amazon") or {}).get("totalSales") or 0
+    amz_total = (entry.get("amazon") or {}).get("totalSales")
     shopify   = entry.get("shopify") or 0
     walmart   = entry.get("walmart") or 0
-    combined  = round(amz_total + shopify + walmart, 2)
-    entry["combinedTotalSales"] = combined
+    if amz_total is None:
+        # See the note in the first python block: never fabricate a combined total
+        # that silently omits Amazon revenue.
+        entry["combinedTotalSales"] = None
+        combined = None
+    else:
+        combined = round(amz_total + shopify + walmart, 2)
+        entry["combinedTotalSales"] = combined
     with open(monthly_path, "w") as f:
         json.dump(sm, f, indent=2)
-    print(f"  ✓ Re-applied {channel}=${amount:,.2f} → combinedTotalSales=${combined:,.2f}")
+    if combined is None:
+        print(f"  ✓ Re-applied {channel}=${amount:,.2f} → combinedTotalSales left null "
+              f"(Amazon totalSales unavailable for this month)")
+    else:
+        print(f"  ✓ Re-applied {channel}=${amount:,.2f} → combinedTotalSales=${combined:,.2f}")
 else:
     print(f"  ⚠  Month '{month}' not found after conflict resolution")
 RESOLVE_PYEOF

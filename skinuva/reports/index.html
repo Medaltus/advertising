@@ -1603,8 +1603,13 @@ function render(){
       const etl=ERACLEA_AMAZON.timeline.filter(r=>r.date.startsWith(curPfx));
       if(etl.length){
         const sumK=(arr,k)=>arr.reduce((s,r)=>s+(r[k]||0),0);
-        // totalSales in timeline is company-wide; use summary.totalSales which is eraclea-specific
-        const eTotal=(ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales)||0;
+        // totalSales in the timeline is company-wide (all brands). summary.totalSales
+        // IS eraclea-specific but covers the rolling ~31-day lookback window, which
+        // straddles month boundaries and so overstates an in-progress month. Prefer
+        // eraclea_monthly.json's brand-filtered, per-calendar-month value when present.
+        const _emCur=(typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY)?(ERACLEA_MONTHLY[selectedMonth]||{}):{};
+        const _emCurTotal=(_emCur.amazon&&_emCur.amazon.totalSales!=null)?_emCur.amazon.totalSales:null;
+        const eTotal=_emCurTotal!=null?_emCurTotal:((ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales)||0);
         emd={amazon:{spend:sumK(etl,'spend'),adSales:sumK(etl,'sales'),orders:sumK(etl,'purchases'),clicks:sumK(etl,'clicks'),impressions:sumK(etl,'impressions'),totalSales:eTotal}};
       }
     }
@@ -4065,8 +4070,19 @@ function injectJuneApiData(){
   // SP-API totalSales lags ~1-2 days; recent timeline entries may have totalSales=0.
   // Fall back to skinuva_monthly.json which aggregates totalSales from the SP-API fetch.
   const _smCur=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?(SKINUVA_MONTHLY[_currentMonthLabel()]||{}):{};
-  const _amzTotalFromTL=sumK(amzTL.filter(r=>r.totalSales>0),'totalSales');
-  const amzTotalSales=_mt.amazonTotal!=null?_mt.amazonTotal:(_amzTotalFromTL||(_smCur.amazon&&_smCur.amazon.totalSales)||0);
+  // IMPORTANT: do NOT sum the timeline's totalSales. That field is the whole
+  // Amazon account's total sales (every Medaltus brand combined) stamped onto
+  // every brand's rows by fetch_ads_data.py — verified empirically: Skinuva and
+  // eraclea carried byte-identical totalSales despite ~30x different ad spend.
+  // skinuva_monthly.json's amazon.totalSales is brand-filtered per calendar
+  // month (backfill_brand_total_sales in generate_skinuva_supplement.py), so
+  // that is the only trustworthy API source here. Order of preference:
+  //   1. explicit manual override
+  //   2. brand-filtered pipeline value
+  //   3. nothing (null → sheet-maintained Total Sales / blank, never a
+  //      portfolio-wide number masquerading as this brand's)
+  const _smCurTotal=(_smCur.amazon&&_smCur.amazon.totalSales!=null)?_smCur.amazon.totalSales:null;
+  const amzTotalSales=_mt.amazonTotal!=null?_mt.amazonTotal:(_smCurTotal!=null?_smCurTotal:0);
   const walmartSales=_mt.walmart||0;
   const shopifySales=_mt.shopify||0;
   const combinedTotalSales=rd(amzTotalSales+walmartSales+shopifySales);

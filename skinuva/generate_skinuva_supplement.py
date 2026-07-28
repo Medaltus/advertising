@@ -334,8 +334,52 @@ def correct_monthly_from_archive(monthly: dict, daily: dict, today_month_str: st
               f"google.spend=${entry['google']['spend']:,.2f}")
 
 
+TOTAL_SALES_SOURCE_OK = 'sp-api-brand-filtered'
+
+
+def _invalidate_total_sales(entry: dict, mk: str, brand_name: str, reason: str,
+                            existing: dict) -> None:
+    """
+    We could not obtain a trustworthy brand-filtered totalSales for this month.
+
+    The value currently sitting in `entry` came from build_monthly_archive(),
+    which sums the ads timeline's portfolio-wide totalSales — a number that is
+    simply wrong for a single brand (see backfill_brand_total_sales docstring).
+    Leaving it in place is the exact failure mode we're fixing, so instead:
+
+      1. Re-use the previously-committed value IF it was itself produced by a
+         successful brand-filtered fetch (marked with totalSalesSource). This
+         mirrors generate_supplement.py's proven behaviour — a transient
+         SP-API hiccup must not wipe out yesterday's good number.
+      2. Otherwise null it out, so the dashboard falls back to the
+         Google-Sheet-maintained Total Sales rather than rendering a
+         portfolio-wide figure as if it were this brand's.
+    """
+    prev = (existing.get(mk) or {}) if existing else {}
+    prev_amz = prev.get('amazon') or {}
+    amz = entry.setdefault('amazon', {})
+
+    if (prev_amz.get('totalSalesSource') == TOTAL_SALES_SOURCE_OK
+            and prev_amz.get('totalSales') is not None):
+        amz['totalSales'] = prev_amz['totalSales']
+        amz['totalSalesSource'] = TOTAL_SALES_SOURCE_OK
+        shopify = float(entry.get('shopify', 0) or 0)
+        walmart = float(entry.get('walmart', 0) or 0)
+        entry['combinedTotalSales'] = round(amz['totalSales'] + shopify + walmart, 2)
+        print(f"  ↩  [{mk}] {brand_name}: {reason} — keeping last known-good "
+              f"brand-filtered totalSales ${amz['totalSales']:,.2f}")
+    else:
+        amz['totalSales'] = None
+        amz['totalSalesSource'] = f'unavailable ({reason})'
+        entry['combinedTotalSales'] = None
+        print(f"  ⚠  [{mk}] {brand_name}: {reason} — totalSales set to null "
+              f"(dashboard will fall back to the Google Sheet rather than show a "
+              f"portfolio-wide number)")
+
+
 def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
-                                today_month_str: str) -> None:
+                                today_month_str: str, existing: dict = None,
+                                fetch_cache: dict = None) -> None:
     """
     Re-derive Amazon totalSales for every month (current + completed) using
     fetch_brand_sales_for_period(), which correctly filters to this brand's
@@ -345,25 +389,36 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
     WHOLE portfolio's total sales (every brand on the shared Amazon account,
     combined) stamped identically onto every brand's rows -- see
     fetch_ads_data.py: `row["totalSales"] = total_sales_by_date.get(...)`,
-    where total_sales_by_date is portfolio-wide. Left uncorrected, this
-    inflates a brand's totalSales/TACOS by however much revenue the *other*
-    brands on the account are doing, and the exact amount drifts day to day
-    as those other brands' sales change -- which is what made this look like
-    disappearing/changing data. fetch_brand_sales_for_period() uses the same
-    ASIN→brand map to get a properly brand-filtered total instead.
+    where total_sales_by_date is portfolio-wide. Verified empirically: Skinuva
+    and eraclea's daily archives held byte-identical totalSales on every date
+    both were populated, despite ~30x different ad spend. Summing it per brand
+    therefore overstates that brand by however much every OTHER brand on the
+    account sold, and the overstatement drifts daily -- which is what looked
+    like data changing/disappearing.
 
-    Only touches months where the daily archive covers >=90% of that
-    month's calendar days (same conservative gate as
-    correct_monthly_from_archive) -- for anything less we'd rather leave
-    the existing value than replace it with a differently-wrong one.
-    Skips entirely if SP-API credentials aren't available (e.g. local runs
-    without secrets) rather than crashing.
+    This mirrors the approach generate_supplement.py already uses successfully
+    for the root Medaltus dashboard: one SP-API call per calendar month, brand
+    totals read out of that single response.
+
+    `fetch_cache` — pass the SAME dict across brands so the per-month SP-API
+    report is submitted once and shared, not re-submitted per brand. Each
+    fetch is a submit+poll+download round trip, so this halves the API work
+    for a two-brand run.
+
+    `existing` — the previously-committed monthly file, used to preserve the
+    last known-good value if this run can't get a trustworthy one.
+
+    Only fetches months where the daily archive covers >=90% of the expected
+    days (full calendar month, or days-elapsed-so-far for the in-progress
+    month). Anything less and we can't trust the month is really complete.
     """
-    if not cfg or not cfg.get('sp_refresh_token') or not cfg.get('sp_client_id'):
-        print(f"  ⚠  No SP-API credentials available -- skipping {brand_name} totalSales backfill")
-        return
+    if fetch_cache is None:
+        fetch_cache = {}
+    existing = existing or {}
 
-    from fetch_total_sales import fetch_brand_sales_for_period
+    have_creds = bool(cfg and cfg.get('sp_refresh_token') and cfg.get('sp_client_id'))
+    if not have_creds:
+        print(f"  ⚠  No SP-API credentials available — cannot verify {brand_name} totalSales")
 
     days_covered = defaultdict(set)
     for d_str, day_entry in daily.items():
@@ -373,9 +428,19 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
     today = datetime.now().date()
 
     for mk in list(monthly.keys()):
-        month_name, year_str = mk.split(' ')
-        month_num = MONTH_NAMES.index(month_name) + 1
-        year = int(year_str)
+        entry = monthly[mk]
+
+        parts = mk.split(' ')
+        if len(parts) != 2 or parts[0] not in MONTH_NAMES or not parts[1].isdigit():
+            print(f"  ⚠  Unrecognised month key '{mk}' — skipping totalSales backfill")
+            continue
+        month_num = MONTH_NAMES.index(parts[0]) + 1
+        year = int(parts[1])
+
+        if not have_creds:
+            _invalidate_total_sales(entry, mk, brand_name, 'no SP-API credentials', existing)
+            continue
+
         days_in_month = calendar.monthrange(year, month_num)[1]
         start = datetime(year, month_num, 1).date()
 
@@ -390,26 +455,49 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
             end = datetime(year, month_num, days_in_month).date()
             expected_days = days_in_month
 
-        coverage = len(days_covered.get(mk, set())) / expected_days
+        covered = len(days_covered.get(mk, set()))
+        coverage = covered / expected_days if expected_days else 0
         if coverage < 0.9:
-            print(f"  [{mk}] {brand_name}: skipped totalSales backfill — only "
-                  f"{len(days_covered.get(mk, set()))}/{expected_days} expected days covered ({coverage:.0%})")
+            _invalidate_total_sales(
+                entry, mk, brand_name,
+                f'archive covers only {covered}/{expected_days} expected days ({coverage:.0%})',
+                existing)
             continue
 
-        try:
-            brand_sales = fetch_brand_sales_for_period(cfg, start.isoformat(), end.isoformat())
-            total = round(float(brand_sales.get(brand_name, 0) or 0), 2)
-        except Exception as e:
-            print(f"  ⚠  [{mk}] {brand_name} totalSales backfill failed: {e} — leaving existing value")
+        key = (start.isoformat(), end.isoformat())
+        if key in fetch_cache:
+            brand_sales = fetch_cache[key]
+        else:
+            from fetch_total_sales import fetch_brand_sales_for_period
+            try:
+                brand_sales = fetch_brand_sales_for_period(cfg, key[0], key[1])
+                fetch_cache[key] = brand_sales
+            except Exception as e:
+                fetch_cache[key] = None
+                brand_sales = None
+                print(f"  ⚠  [{mk}] SP-API fetch failed: {e}")
+
+        if brand_sales is None:
+            _invalidate_total_sales(entry, mk, brand_name, 'SP-API fetch failed', existing)
             continue
 
-        entry = monthly[mk]
+        if brand_name not in brand_sales:
+            # Brand genuinely absent from the response — could be a real zero
+            # (no sales that month) or a broken ASIN→brand mapping. Can't tell
+            # them apart, so don't guess.
+            _invalidate_total_sales(
+                entry, mk, brand_name,
+                'brand missing from SP-API response', existing)
+            continue
+
+        total = round(float(brand_sales.get(brand_name) or 0), 2)
         amz = entry.setdefault('amazon', {})
         amz['totalSales'] = total
+        amz['totalSalesSource'] = TOTAL_SALES_SOURCE_OK
         shopify = float(entry.get('shopify', 0) or 0)
         walmart = float(entry.get('walmart', 0) or 0)
         entry['combinedTotalSales'] = round(total + shopify + walmart, 2) if (total or shopify or walmart) else None
-        print(f"  ✓ [{mk}] {brand_name} totalSales (brand-filtered, {start}→{end}): ${total:,.2f}")
+        print(f"  ✓ [{mk}] {brand_name} totalSales (brand-filtered, {key[0]}→{key[1]}): ${total:,.2f}")
 
 
 def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path) -> dict:
@@ -583,8 +671,13 @@ def main():
     print("\nCorrecting completed months' spend/orders from complete daily archive…")
     correct_monthly_from_archive(merged, merged_daily, today_month_str)
 
+    # Shared across both brands so each calendar month's SP-API report is
+    # submitted once, not once per brand.
+    ts_fetch_cache: dict = {}
+
     print(f"\nBackfilling {BRAND_NAME}-specific totalSales from SP-API (portfolio-wide fix)…")
-    backfill_brand_total_sales(merged, merged_daily, BRAND_NAME, cfg, today_month_str)
+    backfill_brand_total_sales(merged, merged_daily, BRAND_NAME, cfg, today_month_str,
+                               existing=existing, fetch_cache=ts_fetch_cache)
 
     monthly_path.write_text(json.dumps(merged, indent=2))
     print(f"✓ Updated {monthly_path} ({len(merged)} months: {', '.join(merged.keys())})")
@@ -635,7 +728,9 @@ def main():
         correct_monthly_from_archive(merged_eraclea, merged_eraclea_daily, today_month_str)
 
         print("\nBackfilling eraclea-specific totalSales from SP-API (portfolio-wide fix)…")
-        backfill_brand_total_sales(merged_eraclea, merged_eraclea_daily, 'eraclea', cfg, today_month_str)
+        backfill_brand_total_sales(merged_eraclea, merged_eraclea_daily, 'eraclea', cfg,
+                                   today_month_str, existing=existing_eraclea,
+                                   fetch_cache=ts_fetch_cache)
 
         eraclea_monthly_path.write_text(json.dumps(merged_eraclea, indent=2))
         print(f"✓ Updated {eraclea_monthly_path} ({len(merged_eraclea)} months)")
