@@ -19,7 +19,7 @@ import json
 import re
 import sys
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 BRAND_NAME = 'Skinuva'
@@ -27,6 +27,27 @@ MONTH_NAMES = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December',
 ]
+
+
+def _load_root_config(script_dir: Path):
+    """
+    Find config.json (written from the CONFIGJSON GitHub secret at CI time,
+    or present locally for manual/dev runs). Returns None if not found --
+    callers must degrade gracefully rather than crash, since this script
+    already runs with continue-on-error in the workflow.
+    """
+    candidates = [
+        Path.cwd() / 'config.json',
+        script_dir.parent / 'config.json',   # deploy/config.json (the real one in CI)
+        script_dir / 'config.json',          # skinuva/config.json, if ever used standalone
+    ]
+    for p in candidates:
+        if p.exists():
+            try:
+                return json.loads(p.read_text())
+            except Exception:
+                continue
+    return None
 
 
 def parse_ads_js(path: Path) -> dict:
@@ -313,6 +334,84 @@ def correct_monthly_from_archive(monthly: dict, daily: dict, today_month_str: st
               f"google.spend=${entry['google']['spend']:,.2f}")
 
 
+def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
+                                today_month_str: str) -> None:
+    """
+    Re-derive Amazon totalSales for every month (current + completed) using
+    fetch_brand_sales_for_period(), which correctly filters to this brand's
+    ASINs via the SP-API sales report. Mutates `monthly` in place.
+
+    Why this is needed: ads_data.js's per-day timeline['totalSales'] is the
+    WHOLE portfolio's total sales (every brand on the shared Amazon account,
+    combined) stamped identically onto every brand's rows -- see
+    fetch_ads_data.py: `row["totalSales"] = total_sales_by_date.get(...)`,
+    where total_sales_by_date is portfolio-wide. Left uncorrected, this
+    inflates a brand's totalSales/TACOS by however much revenue the *other*
+    brands on the account are doing, and the exact amount drifts day to day
+    as those other brands' sales change -- which is what made this look like
+    disappearing/changing data. fetch_brand_sales_for_period() uses the same
+    ASIN→brand map to get a properly brand-filtered total instead.
+
+    Only touches months where the daily archive covers >=90% of that
+    month's calendar days (same conservative gate as
+    correct_monthly_from_archive) -- for anything less we'd rather leave
+    the existing value than replace it with a differently-wrong one.
+    Skips entirely if SP-API credentials aren't available (e.g. local runs
+    without secrets) rather than crashing.
+    """
+    if not cfg or not cfg.get('sp_refresh_token') or not cfg.get('sp_client_id'):
+        print(f"  ⚠  No SP-API credentials available -- skipping {brand_name} totalSales backfill")
+        return
+
+    from fetch_total_sales import fetch_brand_sales_for_period
+
+    days_covered = defaultdict(set)
+    for d_str, day_entry in daily.items():
+        if day_entry and day_entry.get('amazon'):
+            days_covered[month_key_from_date(d_str)].add(d_str)
+
+    today = datetime.now().date()
+
+    for mk in list(monthly.keys()):
+        month_name, year_str = mk.split(' ')
+        month_num = MONTH_NAMES.index(month_name) + 1
+        year = int(year_str)
+        days_in_month = calendar.monthrange(year, month_num)[1]
+        start = datetime(year, month_num, 1).date()
+
+        if mk == today_month_str:
+            end = today - timedelta(days=1)   # SP-API lags ~1-2 days; exclude today
+            if end < start:
+                continue   # first day of the month — nothing to fetch yet
+            # In-progress month: judge coverage against days elapsed so far, not the
+            # full calendar month, or this would never pass until month-end.
+            expected_days = (end - start).days + 1
+        else:
+            end = datetime(year, month_num, days_in_month).date()
+            expected_days = days_in_month
+
+        coverage = len(days_covered.get(mk, set())) / expected_days
+        if coverage < 0.9:
+            print(f"  [{mk}] {brand_name}: skipped totalSales backfill — only "
+                  f"{len(days_covered.get(mk, set()))}/{expected_days} expected days covered ({coverage:.0%})")
+            continue
+
+        try:
+            brand_sales = fetch_brand_sales_for_period(cfg, start.isoformat(), end.isoformat())
+            total = round(float(brand_sales.get(brand_name, 0) or 0), 2)
+        except Exception as e:
+            print(f"  ⚠  [{mk}] {brand_name} totalSales backfill failed: {e} — leaving existing value")
+            continue
+
+        entry = monthly[mk]
+        amz = entry.setdefault('amazon', {})
+        amz['totalSales'] = total
+        shopify = float(entry.get('shopify', 0) or 0)
+        walmart = float(entry.get('walmart', 0) or 0)
+        entry['combinedTotalSales'] = round(total + shopify + walmart, 2) if (total or shopify or walmart) else None
+        print(f"  ✓ [{mk}] {brand_name} totalSales (brand-filtered, {start}→{end}): ${total:,.2f}")
+
+
 def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path) -> dict:
     """
     Aggregate Amazon + Google timeline data by calendar month.
@@ -405,6 +504,7 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
 
 def main():
     script_dir = Path(__file__).parent.resolve()
+    cfg = _load_root_config(script_dir)
 
     # ads_data.js: same directory (CI) or parent directory (local dev)
     ads_js = script_dir / 'ads_data.js'
@@ -483,6 +583,9 @@ def main():
     print("\nCorrecting completed months' spend/orders from complete daily archive…")
     correct_monthly_from_archive(merged, merged_daily, today_month_str)
 
+    print(f"\nBackfilling {BRAND_NAME}-specific totalSales from SP-API (portfolio-wide fix)…")
+    backfill_brand_total_sales(merged, merged_daily, BRAND_NAME, cfg, today_month_str)
+
     monthly_path.write_text(json.dumps(merged, indent=2))
     print(f"✓ Updated {monthly_path} ({len(merged)} months: {', '.join(merged.keys())})")
 
@@ -519,25 +622,10 @@ def main():
         # eraclea_monthly.json (Amazon-only, no Google/Shopify paths)
         eraclea_monthly_path = out_dir / 'eraclea_monthly.json'
         eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual)
-        # Fix: timeline totalSales is company-wide (all brands), not eraclea-specific.
-        # Override with the SP-API brand total from summary.totalSales which is filtered
-        # to eraclea ASINs only via the ASIN-brand map in fetch_total_sales.py.
-        eraclea_summary_total = float((eraclea_supplement.get('summary') or {}).get('totalSales') or 0)
-        for mk, mdata in eraclea_new_monthly.items():
-            amz = mdata.get('amazon', {})
-            amz['totalSales'] = round(eraclea_summary_total, 2)
-            mdata['combinedTotalSales'] = round(eraclea_summary_total, 2) if eraclea_summary_total else None
         existing_eraclea = {}
         if eraclea_monthly_path.exists():
             try:
                 existing_eraclea = json.loads(eraclea_monthly_path.read_text())
-                # Zero out totalSales on all historical months — they were populated from
-                # company-wide timeline data and are incorrect. Only the current month
-                # (from summary.totalSales) is reliable.
-                for mk, mdata in existing_eraclea.items():
-                    if mk not in eraclea_new_monthly:
-                        (mdata.get('amazon') or {}).pop('totalSales', None)
-                        mdata.pop('combinedTotalSales', None)
             except Exception:
                 pass
         merged_eraclea = {**existing_eraclea, **eraclea_new_monthly}
@@ -545,6 +633,9 @@ def main():
 
         print("\nCorrecting eraclea completed months' spend/orders from complete daily archive…")
         correct_monthly_from_archive(merged_eraclea, merged_eraclea_daily, today_month_str)
+
+        print("\nBackfilling eraclea-specific totalSales from SP-API (portfolio-wide fix)…")
+        backfill_brand_total_sales(merged_eraclea, merged_eraclea_daily, 'eraclea', cfg, today_month_str)
 
         eraclea_monthly_path.write_text(json.dumps(merged_eraclea, indent=2))
         print(f"✓ Updated {eraclea_monthly_path} ({len(merged_eraclea)} months)")
