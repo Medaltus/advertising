@@ -1367,6 +1367,7 @@ function computeOzleeWoW(tab){
       acc.orders+=amz.orders||0; acc.clicks+=amz.clicks||0; acc.impressions+=amz.impressions||0;
     });
     acc.roas=acc.adSpend>0?acc.adSales/acc.adSpend:null;
+    acc.cvr=acc.clicks>0?acc.orders/acc.clicks*100:null;
     acc.acos=acc.adSales>0?acc.adSpend/acc.adSales*100:null;
     acc.ctr=acc.impressions>0?acc.clicks/acc.impressions*100:null;
     acc.cpc=acc.clicks>0?acc.adSpend/acc.clicks:null;
@@ -1375,6 +1376,7 @@ function computeOzleeWoW(tab){
   const merge=(a,b)=>{
     const m={adSpend:a.adSpend+b.adSpend,adSales:a.adSales+b.adSales,orders:a.orders+b.orders,clicks:a.clicks+b.clicks,impressions:a.impressions+b.impressions};
     m.roas=m.adSpend>0?m.adSales/m.adSpend:null; m.acos=m.adSales>0?m.adSpend/m.adSales*100:null;
+    m.cvr=m.clicks>0?m.orders/m.clicks*100:null;
     m.ctr=m.impressions>0?m.clicks/m.impressions*100:null; m.cpc=m.clicks>0?m.adSpend/m.clicks:null;
     return m;
   };
@@ -1496,13 +1498,13 @@ function renderEracleaView(){
       ?ERACLEA_AMAZON.summary.totalSales:(amz.totalSales||0);
 
     // Computed metrics — match Skinuva layout exactly
-    const roas=amz.spend>0?amz.adSales/amz.spend:null;
+    const cvr=amz.clicks>0&&amz.orders!=null?amz.orders/amz.clicks*100:null;
     const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
     const tacos=eTotalSales>0?amz.spend/eTotalSales*100:null;
     const ctr=amz.impressions>0?amz.clicks/amz.impressions*100:null;
     const cpc=amz.clicks>0?amz.spend/amz.clicks:null;
     const aov=amz.orders>0?eTotalSales/amz.orders:null;
-    const proas=pamz&&pamz.spend>0?pamz.adSales/pamz.spend:null;
+    const pcvr=pamz&&pamz.clicks>0&&pamz.orders!=null?pamz.orders/pamz.clicks*100:null;
     const pacos=pamz&&pamz.adSales>0?pamz.spend/pamz.adSales*100:null;
     const ptacos=pamz&&pamz.totalSales>0?pamz.spend/pamz.totalSales*100:null;
     const pctr=pamz&&pamz.impressions>0?pamz.clicks/pamz.impressions*100:null;
@@ -1513,19 +1515,19 @@ function renderEracleaView(){
     // Forecasted volume values
     const fSpend=fvol(amz.spend), fSales=fvol(amz.adSales), fTotSales=fvol(eTotalSales);
     const fOrders=fvol(amz.orders), fClicks=fvol(amz.clicks), fImps=fvol(amz.impressions);
-    const fRoas=fSpend&&fSales&&fSpend>0?fSales/fSpend:null;
+    const fCvr=fClicks&&fOrders&&fClicks>0?fOrders/fClicks*100:null;
     const fAcos=fSpend&&fSales&&fSales>0?fSpend/fSales*100:null;
     const fTacos=fSpend&&fTotSales&&fTotSales>0?fSpend/fTotSales*100:null;
 
     // WoW — eraclea Amazon daily archive (current month only)
     const wowE=isP?computeOzleeWoW('eraclea'):null;
 
-    // Row 1: Ad Spend, Ad Sales, ROAS, ACOS, Total Sales, TACOS
+    // Row 1: Ad Spend, Ad Sales, CVR, ACOS, Total Sales, TACOS
     const r1=document.getElementById('kpi-row-1'); if(r1){r1.innerHTML='';
       [
         {l:'Ad Spend',   v:fmt(amz.spend),      k:'spend',      wk:'adSpend', sub:isP?'Month in progress':null, warn:isP, fFmt:fSpend!=null?fmt(fSpend):null,         fMom:fmom(fSpend,pamz?.spend)},
         {l:'Ad Sales',   v:fmt(amz.adSales),     k:'adSales',   wk:'adSales', fFmt:fSales!=null?fmt(fSales):null,         fMom:fmom(fSales,pamz?.adSales)},
-        {l:'ROAS',       v:roas?roas.toFixed(1)+'x':'—',        wk:'roas',    prev:proas?proas.toFixed(1)+'x':null, mom:mom(roas,proas), fFmt:fRoas?fRoas.toFixed(1)+'x':null, fMom:fmom(fRoas,proas)},
+        {l:'CVR',        v:cvr!=null?cvr.toFixed(2)+'%':'—',    wk:'cvr',     prev:pcvr!=null?pcvr.toFixed(2)+'%':null, mom:mom(cvr,pcvr), fFmt:fCvr!=null?fCvr.toFixed(2)+'%':null, fMom:fmom(fCvr,pcvr)},
         {l:'ACOS',       v:pct(acos),            k:'acos',      wk:'acos',    inv:true, fFmt:fAcos!=null?pct(fAcos):null, fMom:fmom(fAcos,pacos)},
         {l:'Total Sales',v:fmt(eTotalSales),      k:'totalSales',               fFmt:fTotSales!=null?fmt(fTotSales):null,   fMom:fmom(fTotSales,pamz?.totalSales)},
         {l:'TACOS',      v:pct(tacos),           k:'tacos',                    inv:true, fFmt:fTacos!=null?pct(fTacos):null, fMom:fmom(fTacos,ptacos)},
@@ -1633,8 +1635,14 @@ function render(){
   if(agentsSec) agentsSec.style.display=ip?'block':'none';
   const audioBtn=document.getElementById('audio-btn');
   if(audioBtn) audioBtn.style.display=ip?'flex':'none';
-  const cr=md.adSpend>0?md.adSales/md.adSpend:null, pr=prev&&prev.adSpend>0?prev.adSales/prev.adSpend:null;
-  const fr=ip?(()=>{const s=fv(md,'adSpend'),r=fv(md,'adSales');return s&&r?r/s:null;})():null;
+  // CVR (conversion rate) replaces ROAS in KPI Row 1 — ACOS is the efficiency metric in use.
+  // Computed from orders/clicks rather than md.cvr: in Ozlee 'All' mode md is rebuilt by
+  // summing Skinuva + eraclea and only acos/tacos/ctr/cpc/aov get recomputed there, so
+  // md.cvr would still be the Skinuva-only figure. orders and clicks ARE summed, so
+  // deriving it here is correct in every view.
+  const cr=md.clicks>0&&md.orders!=null?md.orders/md.clicks*100:null,
+        pr=prev&&prev.clicks>0&&prev.orders!=null?prev.orders/prev.clicks*100:null;
+  const fr=ip?(()=>{const c=fv(md,'clicks'),o=fv(md,'orders');return c>0&&o!=null?o/c*100:null;})():null;
 
   // Subtitle
   const ms=DATA.monthly.map(m=>m.month.replace(/\s\d{4}$/,'')), yr=DATA.monthly[0].month.split(' ')[1];
@@ -1680,7 +1688,7 @@ function render(){
   const k1=[
     {l:'Ad Spend',v:fmt(md.adSpend),k:'adSpend',wk:'adSpend',sub:ip?'Month in progress':null,warn:ip},
     {l:'Ad Sales',v:fmt(md.adSales),k:'adSales',wk:'adSales'},
-    {l:'ROAS',v:cr?cr.toFixed(1)+'x':'—',pf:pr?pr.toFixed(1)+'x':null,mm:momPct(cr,pr),ff:fr,ffm:fr?fr.toFixed(1)+'x':null,fmm:fr&&pr?momPct(fr,pr):null,wk:'roas'},
+    {l:'CVR',v:cr!=null?cr.toFixed(2)+'%':'—',pf:pr!=null?pr.toFixed(2)+'%':null,mm:momPct(cr,pr),ff:fr,ffm:fr!=null?fr.toFixed(2)+'%':null,fmm:(fr!=null&&pr!=null)?momPct(fr,pr):null,wk:'cvr'},
     {l:'ACOS',v:pct(md.acos),k:'acos',wk:'acos',inv:true},
     {l:'Total Sales',v:fmt(md.totalSales),k:'totalSales'},
     {l:'TACOS',v:pct(md.tacos),k:'tacos',inv:true},
@@ -1694,7 +1702,7 @@ function render(){
     if(wow&&x.wk&&wow[x.wk]!=null&&isFinite(wow[x.wk])){
       o.wow=wow[x.wk];
       if(wow.prevRaw){const pv=wow.prevRaw[x.wk]; if(pv!=null){
-        if(x.wk==='roas') o.wowPrev=pv.toFixed(1)+'x';
+        if(x.wk==='cvr') o.wowPrev=pv.toFixed(2)+'%';
         else if(x.wk==='acos') o.wowPrev=pct(pv);
         else o.wowPrev=fmt(pv);
       }}
@@ -3838,7 +3846,6 @@ function renderRange(){
   }
   const m=computeRangeMetrics(rangeStart,rangeEnd);
   const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
-  const roas=m.adSpend>0?m.adSales/m.adSpend:null;
 
   // Subtitle
   document.getElementById('subtitle').textContent='Date Range View: Amazon & Google · '+rangeStart+' → '+rangeEnd;
@@ -3848,7 +3855,7 @@ function renderRange(){
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:pct(m.acos)},{l:'Total Sales',v:rd2(m.totalSales),sub:'Amazon only'},{l:'TACOS',v:pct(m.tacos),sub:'Amazon only'}]
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:pct(m.acos)},{l:'Total Sales',v:rd2(m.totalSales),sub:'Amazon only'},{l:'TACOS',v:pct(m.tacos),sub:'Amazon only'}]
     .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
 
   // KPI Row 2

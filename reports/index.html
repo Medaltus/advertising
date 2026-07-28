@@ -1208,14 +1208,13 @@ function renderRange(){
   const _selMd = DATA && DATA.monthly.length ? DATA.monthly[DATA.monthly.length-1] : null;
   if(_selMd) renderBrandSelector(_selMd);
   const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
-  const roas=m.adSpend>0?m.adSales/m.adSpend:null;
   document.getElementById('subtitle').textContent='Date Range View · Amazon Ad Metrics · '+rangeStart+' → '+rangeEnd;
   const tb=document.getElementById('month-tabs'); if(tb) tb.style.opacity='0.3';
   document.getElementById('agents-section').style.display='none';
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'ROAS',v:roas?roas.toFixed(1)+'x':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:m.totalSales==null?'Run morning refresh':null},{l:'TACOS',v:m.tacos!=null?m.tacos.toFixed(1)+'%':'—',sub:m.tacos==null&&m.totalSales==null?'Run morning refresh':null}]
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:m.totalSales==null?'Run morning refresh':null},{l:'TACOS',v:m.tacos!=null?m.tacos.toFixed(1)+'%':'—',sub:m.tacos==null&&m.totalSales==null?'Run morning refresh':null}]
     .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
 
   // KPI Row 2
@@ -1508,6 +1507,7 @@ function computeWoW(brand) {
     });
     acc.acos = acc.adSales > 0 ? acc.spend / acc.adSales * 100 : null;
     acc.roas = acc.spend > 0 ? acc.adSales / acc.spend : null;
+    acc.cvr  = acc.clicks > 0 ? acc.orders / acc.clicks * 100 : null;
     acc.cpc  = acc.clicks > 0 ? acc.spend / acc.clicks : null;
     acc.ctr  = acc.impressions > 0 ? acc.clicks / acc.impressions * 100 : null;
     acc.tacos = acc.hasTotalSales && acc.totalSales > 0 ? acc.spend / acc.totalSales * 100 : null;
@@ -1601,15 +1601,19 @@ function render() {
 
   // KPI Row 1
   const r1 = document.getElementById('kpi-row-1'); r1.innerHTML = '';
-  const roas = bdata.spend > 0 ? bdata.adSales / bdata.spend : null;
-  const prevRoas = prevBdata && prevBdata.spend > 0 ? prevBdata.adSales / prevBdata.spend : null;
-  const fRoas = ip ? (() => { const s = f('spend'), r = f('adSales'); return s && r ? r/s : null; })() : null;
+  // CVR (conversion rate) replaces ROAS here — ACOS is the efficiency metric in use.
+  // Computed from orders/clicks rather than the stored `cr` field, which is null
+  // throughout api_supplement.json and so can't be relied on.
+  const cvrOf = o => (o && o.clicks > 0 && o.orders != null) ? o.orders / o.clicks * 100 : null;
+  const cvr = cvrOf(bdata);
+  const prevCvr = cvrOf(prevBdata);
+  const fCvr = ip ? (() => { const c = f('clicks'), o = f('orders'); return c > 0 && o != null ? o/c*100 : null; })() : null;
   const accent = selectedBrand !== 'All' ? BRAND_COLORS[selectedBrand] : null;
 
   const k1 = [
     { l: 'Ad Spend', v: fmt(bdata.spend), k: 'spend', wk: 'spend', sub: ip ? 'Month in progress' : null, warn: ip },
     { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales', wk: 'adSales' },
-    { l: 'ROAS', v: roas ? roas.toFixed(1) + 'x' : '—', pf: prevRoas ? prevRoas.toFixed(1) + 'x' : null, mm: momPct(roas, prevRoas), ff: fRoas, ffm: fRoas ? fRoas.toFixed(1) + 'x' : null, fmm: fRoas && prevRoas ? momPct(fRoas, prevRoas) : null, wk: 'roas' },
+    { l: 'CVR', v: cvr != null ? cvr.toFixed(2) + '%' : '—', pf: prevCvr != null ? prevCvr.toFixed(2) + '%' : null, mm: momPct(cvr, prevCvr), ff: fCvr, ffm: fCvr != null ? fCvr.toFixed(2) + '%' : null, fmm: (fCvr != null && prevCvr != null) ? momPct(fCvr, prevCvr) : null, wk: 'cvr' },
     { l: 'ACOS', v: pct(bdata.acos), k: 'acos', wk: 'acos', inv: true },
     { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales', wk: 'totalSales' },
     { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', wk: 'tacos', inv: true },
@@ -1632,7 +1636,7 @@ function render() {
       if (wow.prevRaw) {
         const pv = wow.prevRaw[x.wk];
         if (pv != null) {
-          if (x.wk === 'roas') o.wowPrev = pv.toFixed(1) + 'x';
+          if (x.wk === 'cvr') o.wowPrev = pv.toFixed(2) + '%';
           else if (x.wk === 'acos' || x.wk === 'tacos') o.wowPrev = pct(pv);
           else o.wowPrev = fmt(pv);
         }
