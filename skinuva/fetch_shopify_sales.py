@@ -31,11 +31,22 @@ Usage:
 
 Config (config.json, from the CONFIGJSON GitHub secret):
   shopify_store_domain      e.g. "http-skinuva-com.myshopify.com"  (required)
-  shopify_access_token      Admin API token, "shpat_..."           (required)
+  shopify_client_id         Dev Dashboard app Client ID           (required*)
+  shopify_client_secret     Dev Dashboard app Client secret       (required*)
+  shopify_access_token      * legacy alternative: a static token, used
+                              directly if present instead of the exchange
   shopify_excluded_channels optional, defaults to ["Draft Orders"]
   shopify_api_version       optional; auto-discovered if omitted
 
-Required Shopify scope: read_reports  (shopifyqlQuery)
+AUTH: uses the client credentials grant. Shopify stopped allowing new legacy
+custom apps on 2026-01-01, so there's no static Admin API token to copy any
+more. Instead the app lives in the Dev Dashboard and we exchange client
+id/secret for a 24h token at the start of every run. That's a better fit for
+a cron job anyway — nothing long-lived to leak or rotate by hand.
+
+Requires: the app installed on the store, with scope read_reports, and the
+app and store in the SAME Shopify organization (otherwise Shopify returns
+shop_not_permitted).
 """
 
 import argparse
@@ -74,6 +85,40 @@ def load_config():
             except Exception:
                 continue
     return None, None
+
+
+def get_access_token(domain, client_id, client_secret):
+    """
+    Client credentials grant — exchange app credentials for a 24h access token.
+    POST https://{shop}.myshopify.com/admin/oauth/access_token
+         grant_type=client_credentials&client_id=..&client_secret=..
+    """
+    r = requests.post(
+        f"https://{domain}/admin/oauth/access_token",
+        data={'grant_type': 'client_credentials',
+              'client_id': client_id,
+              'client_secret': client_secret},
+        headers={'Content-Type': 'application/x-www-form-urlencoded'},
+        timeout=30,
+    )
+    if r.status_code != 200:
+        detail = r.text[:300]
+        hint = ''
+        if 'shop_not_permitted' in detail:
+            hint = ("\n      -> The app and the store must be in the SAME Shopify "
+                    "organization. In the Dev Dashboard, check the store appears "
+                    "under this org.")
+        raise RuntimeError(f"token exchange failed: HTTP {r.status_code}: {detail}{hint}")
+    body = r.json()
+    tok = body.get('access_token')
+    if not tok:
+        raise RuntimeError(f"token exchange returned no access_token: {body}")
+    print(f"  Token acquired (scopes: {body.get('scope')}, "
+          f"expires in {body.get('expires_in')}s)")
+    if 'read_reports' not in (body.get('scope') or ''):
+        print("  ⚠  'read_reports' is NOT in the granted scopes — the analytics "
+              "query will fail. Add it to the app's scopes and re-release/reinstall.")
+    return tok
 
 
 def gql(domain, token, version, query, variables=None):
@@ -184,17 +229,39 @@ def main():
         print("✗ config.json not found — cannot fetch Shopify sales")
         sys.exit(1)
     domain = cfg.get('shopify_store_domain')
-    token = cfg.get('shopify_access_token')
-    if not domain or not token:
-        print("✗ shopify_store_domain / shopify_access_token missing from config.json")
-        print("  See SHOPIFY_SETUP.md — add both to the CONFIGJSON GitHub secret.")
+    if domain and not domain.endswith('.myshopify.com'):
+        domain = f"{domain}.myshopify.com"
+    client_id = cfg.get('shopify_client_id')
+    client_secret = cfg.get('shopify_client_secret')
+    static_token = cfg.get('shopify_access_token')
+
+    if not domain or not (static_token or (client_id and client_secret)):
+        print("✗ Shopify credentials missing from config.json")
+        print("  Need shopify_store_domain plus EITHER")
+        print("    shopify_client_id + shopify_client_secret  (Dev Dashboard app), or")
+        print("    shopify_access_token                       (legacy static token)")
+        print("  See SHOPIFY_SETUP.md.")
         sys.exit(1)
+
     excluded = cfg.get('shopify_excluded_channels') or DEFAULT_EXCLUDED_CHANNELS
     excluded = set(excluded)
 
     print(f"  Config: {cfg_path}")
     print(f"  Store:  {domain}")
     print(f"  Excluding channels: {sorted(excluded)}")
+
+    if static_token:
+        print("  Auth: static access token from config")
+        token = static_token
+    else:
+        print("  Auth: client credentials grant")
+        try:
+            token = get_access_token(domain, client_id, client_secret)
+        except Exception as e:
+            print(f"✗ {e}")
+            print("  Not writing shopify_sales.json — previous values are preserved,")
+            print("  and generate_skinuva_supplement.py falls back to manual_totals.json.")
+            sys.exit(1)
 
     version = cfg.get('shopify_api_version') or discover_api_version(domain, token)
     print(f"  API version: {version}")

@@ -6,50 +6,94 @@ Claude** — it goes straight into the GitHub secret.
 
 ---
 
-## Step 1 — Create a Shopify custom app
+## Important: the old "custom app" route is gone
 
-1. In Shopify admin: **Settings → Apps and sales channels → Develop apps**
-2. Click **Create an app**, name it something like `Medaltus Dashboard`
-3. Click **Configure Admin API scopes** and enable:
-   - **`read_reports`** — required (this is what allows the analytics query)
-4. **Save**, then **Install app**
-5. Under **API credentials**, reveal and copy the **Admin API access token**
-   (starts with `shpat_`). It's shown once.
+> **As of January 1, 2026 Shopify no longer allows new legacy custom apps.**
 
-> `read_reports` is the only scope needed. The script runs the same analytics
-> query the report uses, not a raw order dump, so it doesn't need order or
-> customer scopes.
+So there is no static `shpat_` token to copy any more. New apps live in the
+**Dev Dashboard** and you exchange a Client ID + Secret for a short-lived
+token. Per Shopify's docs:
+
+> "Public and custom apps created in the Dev Dashboard generate tokens using
+> OAuth, and custom apps made in the Shopify admin are authenticated in the
+> Shopify admin."
+
+We use the **client credentials grant** — the option Shopify documents for
+"trusted, server-to-server integrations owned by your organization." Nothing
+long-lived is stored; the script requests a fresh 24-hour token each run.
 
 ---
 
-## Step 2 — Add it to the GitHub secret
+## Step 1 — Create the app in the Dev Dashboard
+
+1. Go to **dev.shopify.com/dashboard** (or store admin → your name, top right
+   → **Dev Dashboard**).
+2. **Apps → Create app**, name it `Medaltus Dashboard`.
+3. You'll land on a **Create version** screen. In the **API access → Scopes**
+   box, enter exactly:
+
+   ```
+   read_reports
+   ```
+
+   That's the only scope needed — the script runs the analytics query behind
+   your report, not a raw order dump, so no order or customer scopes.
+
+   Leave App URL / Redirect URLs / Optional scopes / POS / App proxy alone.
+   They're only used for apps you distribute to other merchants.
+4. Click **Release**.
+
+## Step 2 — Install it on the Skinuva store
+
+The token exchange only works once the app is installed. Install it on
+`skinuva.com` from the Dev Dashboard.
+
+**The app and the store must be in the same Shopify organization** (Ozlee
+Brands). If they aren't, Shopify returns `shop_not_permitted` and the script
+will tell you so explicitly.
+
+## Step 3 — Copy the client credentials
+
+Dev Dashboard → your app → **Settings** → copy **Client ID** and
+**Client secret**.
+
+Note there is no access token on this page — that's expected. You request
+tokens programmatically with these two values.
+
+---
+
+## Step 4 — Add them to the GitHub secret
 
 The pipeline reads credentials from one secret called `CONFIGJSON`.
 
-1. Go to the repo → **Settings → Secrets and variables → Actions**
+1. Repo → **Settings → Secrets and variables → Actions**
 2. Edit the existing **`CONFIGJSON`** secret
-3. Add these two keys to the JSON (keep everything already in there):
+3. Add these three keys to the JSON (keep everything already in there):
 
 ```json
 {
   "shopify_store_domain": "http-skinuva-com.myshopify.com",
-  "shopify_access_token": "shpat_xxxxxxxxxxxxxxxxxxxxx"
+  "shopify_client_id": "your-client-id",
+  "shopify_client_secret": "your-client-secret"
 }
 ```
 
 - `shopify_store_domain` must be the `.myshopify.com` address, **not**
   `skinuva.com`. For this store it's `http-skinuva-com.myshopify.com`
-  (confirmed via the API — the odd-looking name is correct).
-- Optionally add `"shopify_api_version": "2026-07"` to pin the version.
-  Left out, the script asks Shopify for the newest supported one.
-- Optionally add `"shopify_excluded_channels": ["Draft Orders"]` to change
-  which channels are filtered out. That default already matches your report.
+  (confirmed via the API — the odd-looking name is correct). If you paste it
+  without `.myshopify.com` the script appends it for you.
+- Optionally `"shopify_api_version": "2026-07"` to pin the version. Left out,
+  the script asks Shopify for the newest supported one.
+- Optionally `"shopify_excluded_channels": ["Draft Orders"]` to change which
+  channels are filtered out. That default already matches your report.
 
 4. Save.
 
+Keep the client secret in the GitHub secret only. Don't paste it into chat.
+
 ---
 
-## Step 3 — What it's reproducing (already verified)
+## Step 5 — What it's reproducing (already verified)
 
 It runs the same query behind your **Total sales by sales channel** report
 with sales channel "is not" Draft Orders:
