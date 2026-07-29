@@ -25,16 +25,35 @@ jobs:
       - name: Write config.json
         env:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
+          SHOPIFY_CONFIG: ${{ secrets.SHOPIFY_CONFIG }}
         run: |
           echo "$CONFIG_JSON" > config.json
           python3 - <<'PYEOF'
-          import json
+          import json, os
           with open('config.json') as f:
               c = json.load(f)
-          if 'Skinside' not in c['brands']:
-              c['brands'].append('Skinside')
-          if 'Cosmette' not in c['brands']:
-              c['brands'].append('Cosmette')
+          for b in ('Skinside', 'Cosmette'):
+              if b not in c['brands']:
+                  c['brands'].append(b)
+
+          # Shopify credentials live in their OWN secret, merged in here rather
+          # than being added to CONFIGJSON. GitHub secrets are write-only: you
+          # cannot read an existing value back, so editing CONFIGJSON would mean
+          # re-pasting every Amazon/Google credential from scratch and risking
+          # losing one. Keeping them separate makes this additive and reversible.
+          raw = (os.environ.get('SHOPIFY_CONFIG') or '').strip()
+          if raw:
+              try:
+                  shop = json.loads(raw)
+                  c.update(shop)
+                  # key names only — never log the values
+                  print('shopify keys merged:', sorted(shop.keys()))
+              except Exception as e:
+                  print('WARNING: SHOPIFY_CONFIG is not valid JSON, ignoring:', e)
+          else:
+              print('SHOPIFY_CONFIG not set — Shopify fetch will skip, '
+                    'manual_totals.json values remain in use')
+
           with open('config.json', 'w') as f:
               json.dump(c, f)
           print('brands:', c['brands'])

@@ -62,13 +62,25 @@ tokens programmatically with these two values.
 
 ---
 
-## Step 4 — Add them to the GitHub secret
+## Step 4 — Add a NEW GitHub secret (do not edit CONFIGJSON)
 
-The pipeline reads credentials from one secret called `CONFIGJSON`.
+> **Do not click the pencil on `CONFIGJSON`.** GitHub secrets are write-only —
+> you can't read an existing value back. Editing it opens a blank box, and
+> whatever you paste **replaces the whole secret**, which would wipe every
+> Amazon and Google credential in there.
+
+Instead add a second, separate secret. The workflow merges the two at runtime,
+so this is purely additive and `CONFIGJSON` is never touched.
 
 1. Repo → **Settings → Secrets and variables → Actions**
-2. Edit the existing **`CONFIGJSON`** secret
-3. Add these three keys to the JSON (keep everything already in there):
+2. Click the green **New repository secret**
+3. **Name:** exactly
+
+   ```
+   SHOPIFY_CONFIG
+   ```
+
+4. **Secret:** paste this, substituting your two values from Step 3:
 
 ```json
 {
@@ -78,16 +90,23 @@ The pipeline reads credentials from one secret called `CONFIGJSON`.
 }
 ```
 
+5. **Add secret**.
+
+Notes:
+
 - `shopify_store_domain` must be the `.myshopify.com` address, **not**
   `skinuva.com`. For this store it's `http-skinuva-com.myshopify.com`
   (confirmed via the API — the odd-looking name is correct). If you paste it
-  without `.myshopify.com` the script appends it for you.
-- Optionally `"shopify_api_version": "2026-07"` to pin the version. Left out,
-  the script asks Shopify for the newest supported one.
-- Optionally `"shopify_excluded_channels": ["Draft Orders"]` to change which
-  channels are filtered out. That default already matches your report.
+  without `.myshopify.com` the script appends it.
+- Optionally add `"shopify_api_version": "2026-07"` to pin the version. Left
+  out, the script asks Shopify for the newest supported one.
+- Optionally add `"shopify_excluded_channels": ["Draft Orders"]` to change
+  which channels are filtered out. That default already matches your report.
 
-4. Save.
+If `SHOPIFY_CONFIG` is missing, empty, or malformed, the workflow logs a
+warning and carries on using the manual `manual_totals.json` values — it can't
+break the rest of the refresh. Only the key *names* are ever logged, never the
+values.
 
 Keep the client secret in the GitHub secret only. Don't paste it into chat.
 
