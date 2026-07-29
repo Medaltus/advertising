@@ -1840,7 +1840,11 @@ function render(){
     return html;
   }
   const fDol=v=>'$'+v.toLocaleString();
-  const fPct=v=>v+'%';
+  // Round to 2dp. Values reaching here are sometimes raw floats rather than
+  // pre-rounded data (All-mode recomputes prev.acos/prev.tacos on the fly), and
+  // plain string concatenation printed things like "26.226817684373465%".
+  // Math.round rather than toFixed so 27.2 stays "27.2%" instead of "27.20%".
+  const fPct=v=>(Math.round(v*100)/100)+'%';
   const fNum=v=>v.toLocaleString();
   const fCpc=v=>'$'+v.toFixed(2);
   // Linear forecast helper: volume metrics scale with days, rate metrics stay as-is
@@ -3985,7 +3989,7 @@ function renderRange(){
   // Channel table
   document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
   const tbody=document.getElementById('channel-tbody'); tbody.innerHTML='';
-  const fDol=v=>'$'+Number(v).toLocaleString(),fPct=v=>v+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
+  const fDol=v=>'$'+Number(v).toLocaleString(),fPct=v=>(Math.round(v*100)/100)+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
   m.channels.forEach(c=>{
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
