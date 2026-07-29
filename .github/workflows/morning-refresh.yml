@@ -22,6 +22,12 @@ jobs:
       - name: Install Python dependencies
         run: pip install requests
 
+      # Checkout stamps every file with the checkout time, so anything with a
+      # later mtime was genuinely rewritten by a script. Used by the freshness
+      # check for files that carry no internal timestamp.
+      - name: Mark run start
+        run: date +%s > /tmp/run_start_epoch
+
       - name: Write config.json
         env:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
@@ -124,3 +130,10 @@ jobs:
           done
           git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
           git push
+
+      # Runs LAST, and deliberately after the commit: anything that refreshed is
+      # already saved, and this then turns any silently-stale dataset into a red
+      # run. Without it, a failed continue-on-error step produces a green tick
+      # while the dashboards quietly serve yesterday's numbers.
+      - name: Verify data actually refreshed
+        run: python3 verify_data_freshness.py --run-start-file /tmp/run_start_epoch
