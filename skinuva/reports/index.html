@@ -992,6 +992,20 @@ function _canonChannel(ch){
   return _AD_CHANNELS_NORM.get(ch.toLowerCase().replace(/\s+/g,' ').trim()) || null;
 }
 
+// Shopify DTC store sales for a given month label, or null if we don't have it.
+// skinuva_monthly.json is the authoritative source (written by
+// fetch_shopify_sales.py from the "Total sales by sales channel" report with
+// Draft Orders excluded); manual_totals.json is the fallback for months
+// predating that integration or when a fetch failed.
+function _shopifySalesFor(monthLabel){
+  if(!monthLabel) return null;
+  const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
+  if(sm&&sm.shopify!=null) return sm.shopify;
+  const mt=(typeof MANUAL_TOTALS!=='undefined'&&MANUAL_TOTALS)?MANUAL_TOTALS[monthLabel]:null;
+  if(mt&&mt.shopify!=null) return mt.shopify;
+  return null;
+}
+
 // Extract the S1 cell date from the "Ad Performance by Channel" tab.
 // S1 = date data was downloaded. Data only covers through S1 - 1 day.
 function extractS1DateFromSheet(text) {
@@ -1854,6 +1868,29 @@ function render(){
       <td style="${totalStyle}">${c.cvr!=null?c.cvr+'%':'—'}${momLine(c.cvr,p&&p.cvr,fPct)}</td>`;
     tbody.appendChild(tr);
   });
+
+  // ── Shopify store sales, below Total Paid Media ──────────────────────────
+  // Shopify is DTC store revenue, not an ad channel — there's no spend, ACOS,
+  // click or order-attribution data for it, so every ad column stays dashed
+  // rather than showing a zero that could be mistaken for real data. It sits
+  // BELOW the Total Paid Media subtotal and is deliberately not part of it;
+  // the sub-labels say so explicitly so the figure can't be read as ad sales.
+  const _shopNow=_shopifySalesFor(selectedMonth);
+  if(_shopNow!=null){
+    const _shopPrev=prevMonth?_shopifySalesFor(prevMonth):null;
+    const _shopFc=chFv(_shopNow);
+    const _dash='<td style="color:rgba(255,255,255,0.25)">—</td>';
+    const str=document.createElement('tr');
+    str.style.cssText='border-top:2px solid rgba(255,255,255,0.15);';
+    str.innerHTML=`<td><span class="dot" style="background:#96BF48"></span><span style="color:#96BF48;font-weight:700;">Shopify — Store Sales</span>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · excl. Draft Orders</div></td>
+      ${_dash}
+      <td style="font-weight:700;color:#96BF48;">${fDol(_shopNow)}${momLine(_shopNow,_shopPrev,fDol,false,_shopFc)}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">not ad-attributed</div></td>
+      ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
+    tbody.appendChild(str);
+  }
+
   // Amazon supplement sections — always use Skinuva as primary; eraclea appended separately in All mode
   ACTIVE_SUPPLEMENT = SKINUVA_AMAZON;
   renderAmazonSection('month');
