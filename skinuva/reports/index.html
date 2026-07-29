@@ -1005,6 +1005,18 @@ function _shopifySalesFor(monthLabel){
   if(mt&&mt.shopify!=null) return mt.shopify;
   return null;
 }
+// Walmart lives in skinuva_monthly.json / manual_totals.json, NOT on the
+// DATA.monthly entry -- `md.walmart` is always undefined, so reading it there
+// silently hid Walmart from the Total Sales row's composition label even though
+// its revenue was included in the figure.
+function _walmartSalesFor(monthLabel){
+  if(!monthLabel) return 0;
+  const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
+  if(sm&&sm.walmart!=null) return sm.walmart;
+  const mt=(typeof MANUAL_TOTALS!=='undefined'&&MANUAL_TOTALS)?MANUAL_TOTALS[monthLabel]:null;
+  if(mt&&mt.walmart!=null) return mt.walmart;
+  return 0;
+}
 
 // Extract the S1 cell date from the "Ad Performance by Channel" tab.
 // S1 = date data was downloaded. Data only covers through S1 - 1 day.
@@ -1507,23 +1519,30 @@ function renderEracleaView(){
     const fmom=(fv,pv)=>fv!=null&&pv!=null&&pv!==0?(fv-pv)/Math.abs(pv)*100:null;
 
     // For partial current month, totalSales comes from ERACLEA_AMAZON.summary (brand-specific SP-API)
-    // ERACLEA_MONTHLY sets totalSales=0 to avoid company-wide bleed; supplement has the real value
+    // Stays NULL when unavailable rather than collapsing to 0: 13 of eraclea's 16
+    // archived months legitimately have totalSales=null (pre-SP-API, or a month the
+    // brand-filtered fetch couldn't verify), and fmt(0) renders "$0" — indistinguishable
+    // from a real zero-revenue month. fmt(null) renders "—", which is the truth.
     const eTotalSales=(isP&&ERACLEA_AMAZON&&ERACLEA_AMAZON.summary&&ERACLEA_AMAZON.summary.totalSales)
-      ?ERACLEA_AMAZON.summary.totalSales:(amz.totalSales||0);
+      ?ERACLEA_AMAZON.summary.totalSales:(amz.totalSales!=null?amz.totalSales:null);
 
     // Computed metrics — match Skinuva layout exactly
     const cvr=amz.clicks>0&&amz.orders!=null?amz.orders/amz.clicks*100:null;
     const acos=amz.adSales>0?amz.spend/amz.adSales*100:null;
-    const tacos=eTotalSales>0?amz.spend/eTotalSales*100:null;
+    const tacos=(eTotalSales!=null&&eTotalSales>0)?amz.spend/eTotalSales*100:null;
     const ctr=amz.impressions>0?amz.clicks/amz.impressions*100:null;
     const cpc=amz.clicks>0?amz.spend/amz.clicks:null;
-    const aov=amz.orders>0?eTotalSales/amz.orders:null;
+    // AOV = ad sales / ad orders. Was eTotalSales/orders, which paired TOTAL
+    // revenue with only the AD-attributed order count -- numerator and denominator
+    // from different populations, overstating AOV ~2x. Every other AOV in both
+    // dashboards uses adSales/orders; this now matches.
+    const aov=amz.orders>0?amz.adSales/amz.orders:null;
     const pcvr=pamz&&pamz.clicks>0&&pamz.orders!=null?pamz.orders/pamz.clicks*100:null;
     const pacos=pamz&&pamz.adSales>0?pamz.spend/pamz.adSales*100:null;
     const ptacos=pamz&&pamz.totalSales>0?pamz.spend/pamz.totalSales*100:null;
     const pctr=pamz&&pamz.impressions>0?pamz.clicks/pamz.impressions*100:null;
     const pcpc=pamz&&pamz.clicks>0?pamz.spend/pamz.clicks:null;
-    const paov=pamz&&pamz.orders>0?pamz.totalSales/pamz.orders:null;
+    const paov=pamz&&pamz.orders>0?pamz.adSales/pamz.orders:null;
     const mom=(a,b)=>!isP&&b!=null&&b!==0&&a!=null?(a-b)/Math.abs(b)*100:null;
 
     // Forecasted volume values
@@ -1633,12 +1652,12 @@ function render(){
     if(emd&&emd.amazon){const ea=emd.amazon;
       const eTot=ea.totalSales||0;
       md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0),totalSales:(md.totalSales||0)+eTot};
-      md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.tacos=md.totalSales>0?md.adSpend/md.totalSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?md.totalSales/md.orders:null;
+      md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.tacos=md.totalSales>0?md.adSpend/md.totalSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?md.adSales/md.orders:null;
     }
     if(prev&&eprev&&eprev.amazon){const ea=eprev.amazon;
       const eTot=ea.totalSales||0;
       prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0),totalSales:(prev.totalSales||0)+eTot};
-      prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.tacos=prev.totalSales>0?prev.adSpend/prev.totalSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?prev.totalSales/prev.orders:null;
+      prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.tacos=prev.totalSales>0?prev.adSpend/prev.totalSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?prev.adSales/prev.orders:null;
     }
   }
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
@@ -1903,7 +1922,7 @@ function render(){
     const gtr=document.createElement('tr');
     gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
     gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${(md.walmart||0)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${_walmartSalesFor(selectedMonth)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
       <td style="font-weight:700;color:rgba(255,255,255,0.9);">${md.adSpend!=null?fDol(md.adSpend):'—'}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
       <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(md.totalSales)}${momLine(md.totalSales,prev&&prev.totalSales,fDol,false,_tsFc)}
