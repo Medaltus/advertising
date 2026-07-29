@@ -1,0 +1,30 @@
+{
+  "June 2026": {
+    "total": 0.0,
+    "byChannel": {},
+    "excludedChannels": [
+      "Draft Orders"
+    ],
+    "excludedTotal": 0.0,
+    "range": {
+      "since": "2026-06-01",
+      "until": "2026-06-30"
+    },
+    "fetched_at": "2026-07-29T17:25:18Z",
+    "source": "shopifyql-total_sales-by-sales_channel"
+  },
+  "July 2026": {
+    "total": 0.0,
+    "byChannel": {},
+    "excludedChannels": [
+      "Draft Orders"
+    ],
+    "excludedTotal": 0.0,
+    "range": {
+      "since": "2026-07-01",
+      "until": "2026-07-28"
+    },
+    "fetched_at": "2026-07-29T17:25:17Z",
+    "source": "shopifyql-total_sales-by-sales_channel"
+  }
+}
