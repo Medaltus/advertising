@@ -1891,6 +1891,29 @@ function render(){
     tbody.appendChild(str);
   }
 
+  // ── Bottom line: all-channel Total Sales + TACOS ─────────────────────────
+  // Reads md.totalSales / md.tacos — the SAME source the KPI cards use — so
+  // this row can never disagree with the cards at the top of the page. The
+  // paid-media spend is repeated here on purpose so TACOS is verifiable in
+  // place: spend / total sales, both on one line. Column headers say
+  // "Ad Sales"/"ACOS", so each figure carries its own label underneath.
+  if(md.totalSales!=null){
+    const _dash2='<td style="color:rgba(255,255,255,0.25)">—</td>';
+    const _tsFc=chFv(md.totalSales);
+    const gtr=document.createElement('tr');
+    gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
+    gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${(md.walmart||0)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
+      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${md.adSpend!=null?fDol(md.adSpend):'—'}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
+      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(md.totalSales)}${momLine(md.totalSales,prev&&prev.totalSales,fDol,false,_tsFc)}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total sales</div></td>
+      <td style="font-weight:700;color:#fff;">${md.tacos!=null?md.tacos.toFixed(1)+'%':'—'}${momLine(md.tacos,prev&&prev.tacos,fPct,true)}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">TACOS</div></td>
+      ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
+    tbody.appendChild(gtr);
+  }
+
   // Amazon supplement sections — always use Skinuva as primary; eraclea appended separately in All mode
   ACTIVE_SUPPLEMENT = SKINUVA_AMAZON;
   renderAmazonSection('month');
