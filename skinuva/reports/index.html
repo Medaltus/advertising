@@ -954,6 +954,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
 let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={}, SKINUVA_DAILY={};
 let SKINUVA_CAMPAIGNS_BY_MONTH={}, ERACLEA_CAMPAIGNS_BY_MONTH={};
+let WALMART_ADS={};
 let rangeMode=false, rangeStart=null, rangeEnd=null;
 
 const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48', OpenAI:'#10a37f' };
@@ -3523,7 +3524,13 @@ async function init(){
       fetch('/data/eraclea_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_DAILY=d;}).catch(()=>{}),
       fetch('/data/skinuva_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
       fetch('/data/eraclea_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
+      fetch('/data/walmart_ads.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) WALMART_ADS=d;}).catch(()=>{}),
     ]);
+    // MUST run before the two injects below: they rebuild Total Paid Media from
+    // whatever non-Amazon/Google channels are sitting in DATA.channels, so fixing
+    // Walmart first means the totals pick it up automatically instead of needing
+    // their own recomputation.
+    injectWalmartAdsData();
     injectHistoricalApiData();
     injectJuneApiData();
     renderAmazonSection('month');
@@ -4031,6 +4038,40 @@ const _origRenderSubtitle=null; // placeholder — logic is inline in render()
 
 // ── Inject historical month API data from skinuva_monthly.json ──
 // Runs before injectJuneApiData() so current month always wins.
+// ── Walmart ads from Helium 10, replacing the hand-maintained Sheet row ──────
+// The Helium 10 Walmart profile is account-wide (verified: it also carries
+// EverSmile, dearcloud, The Creme Shop, PB & Jay, evolis and Just Bjorn
+// campaigns), so we read the BRAND-ATTRIBUTED figure rather than the profile
+// total. Dumping the profile total in here would repeat the portfolio-wide
+// totalSales bug. Attribution is done upstream by campaign-name matching, the
+// same convention fetch_ads_data.py uses for Amazon.
+// Falls back to leaving the Sheet's row untouched when there's no API figure.
+function injectWalmartAdsData(){
+  if(!DATA||!WALMART_ADS||!Object.keys(WALMART_ADS).length) return;
+  const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  const BRAND='Skinuva';   // the Ozlee Walmart row is Skinuva-only (matches the Sheet to 0.1%)
+  Object.entries(WALMART_ADS).forEach(([mk,mData])=>{
+    const w=((mData||{}).byBrand||{})[BRAND];
+    if(!w||!(w.spend>0)) return;
+    const chs=DATA.channels[mk];
+    if(!chs) return;   // month not in the Sheet — nothing to attach to
+    const entry={
+      channel:'Walmart',
+      adSpend:rd(w.spend), adSales:rd(w.adSales),
+      acos:w.adSales>0?rd(w.spend/w.adSales*100):null,
+      totalSales:null, tacos:null,
+      impressions:w.impressions, clicks:w.clicks,
+      ctr:w.impressions>0?rd(w.clicks/w.impressions*100):null,
+      cpc:w.clicks>0?rd(w.spend/w.clicks):null,
+      orders:w.orders,
+      aov:w.orders>0?rd(w.adSales/w.orders):null,
+      cvr:w.clicks>0?rd(w.orders/w.clicks*100):null,
+    };
+    const idx=chs.findIndex(c=>c.channel==='Walmart');
+    if(idx>=0) chs[idx]=entry; else chs.push(entry);
+  });
+}
+
 function injectHistoricalApiData(){
   if(!DATA||!SKINUVA_MONTHLY||typeof SKINUVA_MONTHLY!=='object') return;
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
