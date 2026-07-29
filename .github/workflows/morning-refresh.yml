@@ -51,6 +51,12 @@ jobs:
         run: python3 generate_supplement.py
 
       # ── Skinuva ──────────────────────────────────────────────────────────────
+      # Must run BEFORE generate_skinuva_supplement.py, which reads
+      # shopify_sales.json to build combinedTotalSales.
+      - name: Fetch Shopify sales
+        run: python3 skinuva/fetch_shopify_sales.py
+        continue-on-error: true
+
       - name: Generate skinuva_supplement.json
         run: python3 skinuva/generate_skinuva_supplement.py
         continue-on-error: true
@@ -72,6 +78,7 @@ jobs:
           git add data/api_supplement.json \
                   data/medaltus_daily_archive.json \
                   data/medaltus_google_ads_monthly.json \
+                  skinuva/data/shopify_sales.json \
                   skinuva/data/skinuva_supplement.json \
                   skinuva/data/google_ads_data.json \
                   skinuva/data/skinuva_monthly.json \

@@ -554,13 +554,35 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
         except Exception:
             pass
 
+    # ── Shopify sales from the Admin API (fetch_shopify_sales.py) ─────────────
+    # Preferred over the hand-entered value in manual_totals.json, but we fall
+    # back to manual whenever the API value is missing for a month — so a
+    # Shopify outage or a month predating the integration keeps working.
+    # Walmart stays manual; there's no API for it here.
+    shopify_api = {}
+    shopify_path = manual_path.parent / 'shopify_sales.json'
+    if shopify_path.exists():
+        try:
+            shopify_api = json.loads(shopify_path.read_text())
+        except Exception:
+            pass
+
     # ── Build per-month entries ───────────────────────────────────────────────
     entries = {}
     for mk in set(amz.keys()) | set(ggl.keys()):
         a  = amz[mk]
         g  = ggl[mk]
         mt = manual.get(mk, {})
-        shopify  = float(mt.get('shopify', 0) or 0)
+        _api_shop = (shopify_api.get(mk) or {}).get('total')
+        if _api_shop is not None:
+            shopify = float(_api_shop)
+            _manual_shop = mt.get('shopify')
+            if _manual_shop is not None and abs(float(_manual_shop) - shopify) > max(1.0, shopify * 0.01):
+                print(f"  ℹ  [{mk}] Shopify: using API ${shopify:,.2f} "
+                      f"(manual value was ${float(_manual_shop):,.2f}, differs by "
+                      f"${shopify - float(_manual_shop):+,.2f})")
+        else:
+            shopify = float(mt.get('shopify', 0) or 0)
         walmart  = float(mt.get('walmart', 0) or 0)
         amz_total = a['totalSales']
         combined = round(amz_total + shopify + walmart, 2) if (amz_total or shopify or walmart) else None
