@@ -1,30 +1,42 @@
 {
   "June 2026": {
-    "total": 0.0,
-    "byChannel": {},
+    "total": 40856.74,
+    "byChannel": {
+      "Draft Orders": 208631.11,
+      "Online Store": 37776.2,
+      "Seal Subscriptions": 1967.39,
+      "Shop": 940.87,
+      "TikTok": 172.28
+    },
     "excludedChannels": [
       "Draft Orders"
     ],
-    "excludedTotal": 0.0,
+    "excludedTotal": 208631.11,
     "range": {
       "since": "2026-06-01",
       "until": "2026-06-30"
     },
-    "fetched_at": "2026-07-29T17:25:18Z",
+    "fetched_at": "2026-07-29T18:00:00Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   },
   "July 2026": {
-    "total": 0.0,
-    "byChannel": {},
+    "total": 46250.76,
+    "byChannel": {
+      "Draft Orders": 193900.55,
+      "Online Store": 41350.19,
+      "Seal Subscriptions": 3479.7,
+      "Shop": 879.56,
+      "TikTok": 541.31
+    },
     "excludedChannels": [
       "Draft Orders"
     ],
-    "excludedTotal": 0.0,
+    "excludedTotal": 193900.55,
     "range": {
       "since": "2026-07-01",
       "until": "2026-07-28"
     },
-    "fetched_at": "2026-07-29T17:25:17Z",
+    "fetched_at": "2026-07-29T18:00:00Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   }
 }

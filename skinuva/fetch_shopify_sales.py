@@ -178,10 +178,38 @@ query($q: String!) {
 """
 
 
+def rows_to_records(table):
+    """
+    Normalise shopifyqlQuery rows into a list of {column_name: value} dicts.
+
+    tableData.rows is typed JSON! and the Admin API returns a list of OBJECTS
+    keyed by column name:
+        [{"sales_channel": "Online Store", "total_sales": "41350.19"}, ...]
+    The Shopify MCP wrapper reshapes the same data into positional arrays:
+        [["Online Store", "41350.19"], ...]
+    The first version of this script only handled the positional form and did
+    `continue` on anything else — so against the real API it silently skipped
+    every row and confidently wrote $0.00 into the dashboard. Handle both, and
+    let the caller treat "no records" as a failure rather than a real zero.
+    """
+    cols = [c.get('name') for c in (table.get('columns') or [])]
+    records = []
+    for row in (table.get('rows') or []):
+        if isinstance(row, dict):
+            records.append(row)
+        elif isinstance(row, (list, tuple)):
+            records.append({cols[i]: row[i]
+                            for i in range(min(len(cols), len(row)))})
+        else:
+            print(f"  ⚠  Unrecognised row shape {type(row).__name__}: {row!r:.80}")
+    return records
+
+
 def fetch_month(domain, token, version, year, month, excluded, upto=None):
     """
     Run the report for one calendar month.
-    Returns (total_excluding, per_channel_dict, excluded_total).
+    Returns (total_excluding, per_channel_dict, excluded_total, start, end).
+    Raises on an empty/unparseable result so the caller keeps the prior value.
     """
     last = calendar.monthrange(year, month)[1]
     start = date(year, month, 1)
@@ -196,23 +224,41 @@ def fetch_month(domain, token, version, year, month, excluded, upto=None):
     if resp.get('parseErrors'):
         raise RuntimeError(f"ShopifyQL parse errors: {resp['parseErrors']}")
     table = resp.get('tableData') or {}
-    rows = table.get('rows') or []
+    records = rows_to_records(table)
+
+    if not records:
+        # Never fall through to 0.00 here. An empty result means the query,
+        # the scopes, or the response shape is wrong -- not that the store sold
+        # nothing. Writing 0 silently wiped ~$47K of Shopify revenue off the
+        # dashboard once already.
+        raise RuntimeError(
+            f"query returned no usable rows for {start}..{end} "
+            f"(raw rows: {str(table.get('rows'))[:200]}) — refusing to record $0")
 
     per_channel, kept, dropped = {}, 0.0, 0.0
-    for row in rows:
-        # rows come back as [sales_channel, total_sales]
-        if not isinstance(row, (list, tuple)) or len(row) < 2:
+    skipped = 0
+    for rec in records:
+        channel = rec.get('sales_channel')
+        raw = rec.get('total_sales')
+        if channel is None or raw is None:
+            skipped += 1
             continue
-        channel = row[0]
         try:
-            amount = float(row[1] or 0)
+            amount = float(raw)
         except (TypeError, ValueError):
+            skipped += 1
             continue
         per_channel[channel] = round(amount, 2)
         if channel in excluded:
             dropped += amount
         else:
             kept += amount
+
+    if skipped:
+        print(f"  ⚠  {skipped} of {len(records)} rows unparseable for {start}..{end}")
+    if not per_channel:
+        raise RuntimeError(
+            f"no channel rows parsed for {start}..{end} — refusing to record $0")
 
     return round(kept, 2), per_channel, round(dropped, 2), start, end
 
