@@ -567,6 +567,18 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
         except Exception:
             pass
 
+    # ── Walmart total sales, from the "Newderm - Walmart Revenue" Google Sheet
+    # (skinuva tab). Preferred over the hand-entered manual_totals value, which
+    # is what it replaces; falls back to manual for months the sheet doesn't
+    # cover so nothing drops to zero.
+    walmart_sheet = {}
+    walmart_path = manual_path.parent / 'walmart_revenue.json'
+    if walmart_path.exists():
+        try:
+            walmart_sheet = json.loads(walmart_path.read_text())
+        except Exception:
+            pass
+
     # ── Build per-month entries ───────────────────────────────────────────────
     entries = {}
     for mk in set(amz.keys()) | set(ggl.keys()):
@@ -583,7 +595,16 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
                       f"${shopify - float(_manual_shop):+,.2f})")
         else:
             shopify = float(mt.get('shopify', 0) or 0)
-        walmart  = float(mt.get('walmart', 0) or 0)
+        _sheet_wm = (walmart_sheet.get(mk) or {}).get('total')
+        if _sheet_wm is not None:
+            walmart = float(_sheet_wm)
+            _manual_wm = mt.get('walmart')
+            if _manual_wm is not None and abs(float(_manual_wm) - walmart) > max(1.0, walmart * 0.01):
+                print(f"  ℹ  [{mk}] Walmart: using sheet ${walmart:,.2f} "
+                      f"(manual value was ${float(_manual_wm):,.2f}, differs by "
+                      f"${walmart - float(_manual_wm):+,.2f})")
+        else:
+            walmart = float(mt.get('walmart', 0) or 0)
         amz_total = a['totalSales']
         combined = round(amz_total + shopify + walmart, 2) if (amz_total or shopify or walmart) else None
 
