@@ -823,7 +823,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
   <div class="chart-card glass" id="channels-card" style="margin-bottom:24px;">
     <div class="section-header"><div class="section-title">Channel Breakdown</div><div class="section-sub" id="table-sub"></div></div>
     <div class="table-wrap"><table><thead><tr>
-      <th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>ACOS</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Orders</th><th>AOV</th><th>CVR</th>
+      <th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>ACOS</th><th>Total Sales</th><th>TACOS</th><th>Impressions</th><th>Clicks</th><th>CPC</th><th>Orders</th><th>AOV</th><th>CVR</th>
     </tr></thead><tbody id="channel-tbody"></tbody></table></div>
   </div>
 
@@ -954,7 +954,7 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 const SHEET_ID = '1CITWFOhGXFSyXFE0j-Rze-oNfmmDqHXFUUSHGDeA7UI';
 let SKINUVA_AMAZON=null, GOOGLE_ADS_DATA=null, MANUAL_TOTALS={}, SKINUVA_MONTHLY={}, SKINUVA_DAILY={};
 let SKINUVA_CAMPAIGNS_BY_MONTH={}, ERACLEA_CAMPAIGNS_BY_MONTH={};
-let WALMART_ADS={};
+let WALMART_ADS={}, WALMART_REVENUE={};
 let rangeMode=false, rangeStart=null, rangeEnd=null;
 
 const CHANNEL_COLORS = { Amazon:'#a78bfa', Google:'#4285F4', Walmart:'#0071CE', Meta:'#0668E1', Pinterest:'#E60023', TikTok:'#00F2EA', Reddit:'#FF4500', 'Shopify Shop':'#96BF48', OpenAI:'#10a37f' };
@@ -1871,6 +1871,8 @@ function render(){
       adSpend:    prev.adSpend,
       adSales:    prev.adSales,
       acos:       prev.acos,
+      totalSales: prev.totalSales,
+      tacos:      prev.tacos,
       impressions:prev.impressions,
       clicks:     prev.clicks,
       cpc:        prev.cpc,
@@ -1887,6 +1889,8 @@ function render(){
       <td style="${totalStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}${momLine(c.adSpend,p&&p.adSpend,fDol,false,fSpend)}</td>
       <td style="${totalStyle}">${c.adSales!=null?fDol(c.adSales):'—'}${momLine(c.adSales,p&&p.adSales,fDol,false,fSales)}</td>
       <td style="${totalStyle}" class="${ac}">${acosDisplay!=null?acosDisplay+'%':'N/A'}${momLine(acosDisplay,p&&p.adSales>0?p.acos:null,fPct,true)}</td>
+      <td style="${totalStyle}">${c.totalSales!=null?fDol(c.totalSales):'—'}${momLine(c.totalSales,p&&p.totalSales,fDol,false,chFv(c.totalSales))}</td>
+      <td style="${totalStyle}">${c.tacos!=null?fPct(c.tacos):'—'}${momLine(c.tacos,p&&p.tacos,fPct,true)}</td>
       <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}${momLine(c.impressions,p&&p.impressions,fNum,false,fImps)}</td>
       <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}${momLine(c.clicks,p&&p.clicks,fNum,false,fClicks)}</td>
       <td style="${totalStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}${momLine(c.cpc,p&&p.cpc,fCpc,true)}</td>
@@ -1909,9 +1913,11 @@ function render(){
     const _dash='<td style="color:rgba(255,255,255,0.25)">—</td>';
     const str=document.createElement('tr');
     str.style.cssText='border-top:2px solid rgba(255,255,255,0.15);';
+    // Shopify revenue belongs in the Total Sales column now that one exists.
+    // No TACOS: there is no Shopify ad spend to divide by.
     str.innerHTML=`<td><span class="dot" style="background:#96BF48"></span><span style="color:#96BF48;font-weight:700;">Shopify — Store Sales</span>
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · excl. Draft Orders</div></td>
-      ${_dash}
+      ${_dash}${_dash}${_dash}
       <td style="font-weight:700;color:#96BF48;">${fDol(_shopNow)}${momLine(_shopNow,_shopPrev,fDol,false,_shopFc)}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">not ad-attributed</div></td>
       ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
@@ -1933,10 +1939,9 @@ function render(){
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${_walmartSalesFor(selectedMonth)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
       <td style="font-weight:700;color:rgba(255,255,255,0.9);">${md.adSpend!=null?fDol(md.adSpend):'—'}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
-      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(md.totalSales)}${momLine(md.totalSales,prev&&prev.totalSales,fDol,false,_tsFc)}
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total sales</div></td>
-      <td style="font-weight:700;color:#fff;">${md.tacos!=null?md.tacos.toFixed(1)+'%':'—'}${momLine(md.tacos,prev&&prev.tacos,fPct,true)}
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">TACOS</div></td>
+      ${_dash2}${_dash2}
+      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(md.totalSales)}${momLine(md.totalSales,prev&&prev.totalSales,fDol,false,_tsFc)}</td>
+      <td style="font-weight:700;color:#fff;">${md.tacos!=null?fPct(md.tacos):'—'}${momLine(md.tacos,prev&&prev.tacos,fPct,true)}</td>
       ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
     tbody.appendChild(gtr);
   }
@@ -3525,6 +3530,7 @@ async function init(){
       fetch('/data/skinuva_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
       fetch('/data/eraclea_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
       fetch('/data/walmart_ads.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) WALMART_ADS=d;}).catch(()=>{}),
+      fetch('/data/walmart_revenue.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) WALMART_REVENUE=d;}).catch(()=>{}),
     ]);
     // MUST run before the two injects below: they rebuild Total Paid Media from
     // whatever non-Amazon/Google channels are sitting in DATA.channels, so fixing
@@ -4013,6 +4019,8 @@ function renderRange(){
       <td style="${tStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}</td>
       <td style="${tStyle}">${c.adSales!=null?fDol(c.adSales):'—'}</td>
       <td style="${tStyle}" class="${ac}">${acD!=null?acD+'%':'N/A'}</td>
+      <td style="${tStyle}">${c.totalSales!=null?fDol(c.totalSales):'—'}</td>
+      <td style="${tStyle}">${c.tacos!=null?fPct(c.tacos):'—'}</td>
       <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}</td>
       <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}</td>
       <td style="${tStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}</td>
@@ -4022,7 +4030,7 @@ function renderRange(){
     tbody.appendChild(tr);
   });
   const noteRow=document.createElement('tr');
-  noteRow.innerHTML=`<td colspan="10" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">Meta, Walmart, Pinterest & other channels available in monthly view only</td>`;
+  noteRow.innerHTML=`<td colspan="12" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">Meta, Walmart, Pinterest & other channels available in monthly view only</td>`;
   tbody.appendChild(noteRow);
 
   renderSearchTermInsights();
@@ -4055,11 +4063,16 @@ function injectWalmartAdsData(){
     if(!w||!(w.spend>0)) return;
     const chs=DATA.channels[mk];
     if(!chs) return;   // month not in the Sheet — nothing to attach to
+    // Walmart total sales comes from the "Newderm - Walmart Revenue" sheet
+    // (skinuva tab), a different source from the Helium 10 ad figures above.
+    const _wmRev=((WALMART_REVENUE||{})[mk]||{}).total;
+    const _wmTot=(_wmRev!=null)?Number(_wmRev):null;
     const entry={
       channel:'Walmart',
       adSpend:rd(w.spend), adSales:rd(w.adSales),
       acos:w.adSales>0?rd(w.spend/w.adSales*100):null,
-      totalSales:null, tacos:null,
+      totalSales:_wmTot!=null?rd(_wmTot):null,
+      tacos:(_wmTot!=null&&_wmTot>0)?rd(w.spend/_wmTot*100):null,
       impressions:w.impressions, clicks:w.clicks,
       ctr:w.impressions>0?rd(w.clicks/w.impressions*100):null,
       cpc:w.clicks>0?rd(w.spend/w.clicks):null,
