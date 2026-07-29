@@ -94,16 +94,33 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase --autostash
-          git add data/api_supplement.json \
-                  data/medaltus_daily_archive.json \
-                  data/medaltus_google_ads_monthly.json \
-                  skinuva/data/shopify_sales.json \
-                  skinuva/data/skinuva_supplement.json \
-                  skinuva/data/google_ads_data.json \
-                  skinuva/data/skinuva_monthly.json \
-                  skinuva/data/skinuva_daily_archive.json \
-                  skinuva/data/eraclea_supplement.json \
-                  skinuva/data/eraclea_monthly.json \
-                  skinuva/data/eraclea_daily_archive.json
+          # Stage only files that actually exist this run.
+          #
+          # Several producing steps are continue-on-error, so any given output
+          # can legitimately be absent -- shopify_sales.json in particular isn't
+          # written until Shopify credentials are configured. `git add` on a
+          # missing pathspec exits 128, and because this step has no
+          # continue-on-error that failed the entire run at the very END, after
+          # ~50 minutes of successful fetching, silently discarding the refresh.
+          DATA_FILES="
+            data/api_supplement.json
+            data/medaltus_daily_archive.json
+            data/medaltus_google_ads_monthly.json
+            skinuva/data/shopify_sales.json
+            skinuva/data/skinuva_supplement.json
+            skinuva/data/google_ads_data.json
+            skinuva/data/skinuva_monthly.json
+            skinuva/data/skinuva_daily_archive.json
+            skinuva/data/eraclea_supplement.json
+            skinuva/data/eraclea_monthly.json
+            skinuva/data/eraclea_daily_archive.json
+          "
+          for f in $DATA_FILES; do
+            if [ -f "$f" ]; then
+              git add "$f"
+            else
+              echo "::warning::not produced this run, skipping: $f"
+            fi
+          done
           git diff --cached --quiet || git commit -m "chore: daily ad data refresh [skip ci]"
           git push
