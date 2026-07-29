@@ -1839,7 +1839,10 @@ function render(){
     }
     return html;
   }
-  const fDol=v=>'$'+v.toLocaleString();
+  // Always exactly 2dp. Bare toLocaleString() drops trailing zeros and allows up
+  // to 3 decimals, so the same column rendered $202,692.6 next to $29,548.89 and
+  // $300 — ragged and inconsistent. Currency should be fixed-width.
+  const fDol=v=>'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   // Round to 2dp. Values reaching here are sometimes raw floats rather than
   // pre-rounded data (All-mode recomputes prev.acos/prev.tacos on the fly), and
   // plain string concatenation printed things like "26.226817684373465%".
@@ -3928,7 +3931,7 @@ function renderRange(){
     return;
   }
   const m=computeRangeMetrics(rangeStart,rangeEnd);
-  const rd2=v=>v!=null?'$'+Number(v).toLocaleString():'—';
+  const rd2=v=>v!=null?'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
 
   // Subtitle
   document.getElementById('subtitle').textContent='Date Range View: Amazon & Google · '+rangeStart+' → '+rangeEnd;
@@ -3989,7 +3992,7 @@ function renderRange(){
   // Channel table
   document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
   const tbody=document.getElementById('channel-tbody'); tbody.innerHTML='';
-  const fDol=v=>'$'+Number(v).toLocaleString(),fPct=v=>(Math.round(v*100)/100)+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
+  const fDol=v=>'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),fPct=v=>(Math.round(v*100)/100)+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
   m.channels.forEach(c=>{
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
