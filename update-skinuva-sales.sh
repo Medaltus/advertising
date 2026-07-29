@@ -91,7 +91,11 @@ git add skinuva/data/manual_totals.json skinuva/data/skinuva_monthly.json
 git commit -m "data: Skinuva ${CHANNEL} for ${MONTH_LABEL} = \$${AMOUNT}"
 
 echo ""
-if git pull --rebase; then
+# --autostash: without it, ANY unrelated modified file in the working tree makes
+# the rebase abort with "cannot pull with rebase: You have unstaged changes",
+# which is what made this script fail every time the dashboard files had been
+# touched. The CI workflow already uses --autostash for the same reason.
+if git pull --rebase --autostash; then
   git push && echo "✓ Pushed. Vercel will redeploy automatically."
 else
   # Auto-recover from conflict on skinuva_monthly.json (cron ran at same time)
