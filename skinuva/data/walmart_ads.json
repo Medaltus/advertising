@@ -135,47 +135,39 @@
     },
     "range": {
       "since": "2026-06-01",
-      "until": "2026-06-30"
+      "until": "2026-07-30"
     },
     "profileId": "224591",
-    "fetched_at": "2026-07-30T13:26:18Z",
+    "fetched_at": "2026-07-31T15:11:17Z",
     "source": "helium10-walmart"
   },
   "July 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 216.26,
+        "spend": 223.24,
         "adSales": 225.0,
         "orders": 3,
-        "clicks": 156,
-        "impressions": 317681
+        "clicks": 161,
+        "impressions": 328485
       }
     },
     "campaigns": {
       "Skinuva": [
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 94.45,
+          "spend": 98.2,
           "adSales": 0,
           "orders": 0,
-          "clicks": 76,
-          "impressions": 294314
+          "clicks": 79,
+          "impressions": 304849
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
-          "spend": 50.49,
+          "spend": 52.92,
           "adSales": 165,
           "orders": 2,
-          "clicks": 29,
-          "impressions": 3527
-        },
-        {
-          "name": "Skinuva - SB - M - video 3.26 v1",
-          "spend": 44.01,
-          "adSales": 60,
-          "orders": 1,
-          "clicks": 29,
-          "impressions": 10401
+          "clicks": 30,
+          "impressions": 3564
         },
         {
           "name": "Skinuva - SP - Auto - Bruise ARC v1",
@@ -184,15 +176,23 @@
           "orders": 0,
           "clicks": 22,
           "impressions": 9439
+        },
+        {
+          "name": "Skinuva - SB - M - video 3.26 v1",
+          "spend": 44.81,
+          "adSales": 60,
+          "orders": 1,
+          "clicks": 30,
+          "impressions": 10633
         }
       ]
     },
     "range": {
-      "since": "2026-07-01",
-      "until": "2026-07-29"
+      "since": "2026-06-01",
+      "until": "2026-07-30"
     },
     "profileId": "224591",
-    "fetched_at": "2026-07-30T13:26:18Z",
+    "fetched_at": "2026-07-31T15:11:17Z",
     "source": "helium10-walmart"
   }
 }
