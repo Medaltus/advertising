@@ -38,7 +38,7 @@ jobs:
           import json, os
           with open('config.json') as f:
               c = json.load(f)
-          for b in ('Skinside', 'Cosmette'):
+          for b in ('Skinside', 'Cosmette', 'Beautility'):
               if b not in c['brands']:
                   c['brands'].append(b)
 
