@@ -1,14 +1,14 @@
 {
-  "fetched_at": "2026-08-01T08:16:43Z",
+  "fetched_at": "2026-08-01T15:17:10Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 38734,
+    "impressions": 38341,
     "clicks": 122,
     "spend": 280.77,
     "sales": 626.98,
     "purchases": 8,
-    "ctr": 0.0031,
+    "ctr": 0.0032,
     "cpc": 2.3014,
     "acos": 44.78,
     "roas": 2.23,
@@ -127,7 +127,7 @@
     },
     {
       "date": "2026-07-11",
-      "impressions": 526,
+      "impressions": 525,
       "clicks": 3,
       "spend": 4.72,
       "sales": 0.0,
@@ -145,7 +145,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 5868.76
+      "totalSales": 5868.75
     },
     {
       "date": "2026-07-13",
@@ -167,7 +167,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 6123.08
+      "totalSales": 6114.08
     },
     {
       "date": "2026-07-15",
@@ -178,7 +178,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 5977.88
+      "totalSales": 5957.88
     },
     {
       "date": "2026-07-16",
@@ -215,7 +215,7 @@
     },
     {
       "date": "2026-07-19",
-      "impressions": 1393,
+      "impressions": 1392,
       "clicks": 4,
       "spend": 1.38,
       "sales": 69.99,
@@ -226,7 +226,7 @@
     },
     {
       "date": "2026-07-20",
-      "impressions": 892,
+      "impressions": 891,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -288,7 +288,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 5544.82
+      "totalSales": 5439.83
     },
     {
       "date": "2026-07-26",
@@ -336,7 +336,7 @@
     },
     {
       "date": "2026-07-30",
-      "impressions": 3008,
+      "impressions": 3004,
       "clicks": 9,
       "spend": 36.94,
       "sales": 0.0,
@@ -347,7 +347,7 @@
     },
     {
       "date": "2026-07-31",
-      "impressions": 4739,
+      "impressions": 4353,
       "clicks": 5,
       "spend": 19.22,
       "sales": 0.0,
@@ -361,7 +361,7 @@
     {
       "id": 245252659571477,
       "name": "eraclea - SP - A - Gel Cleanser 3 - 4.26",
-      "impressions": 16125,
+      "impressions": 16060,
       "clicks": 23,
       "spend": 67.35,
       "sales": 39.99,
@@ -374,12 +374,12 @@
     {
       "id": 163136390316507,
       "name": "eraclea - SP - A - All Products (minus HEROs 1/3/6) - 4.26",
-      "impressions": 9467,
+      "impressions": 9461,
       "clicks": 44,
       "spend": 64.62,
       "sales": 0.0,
       "purchases": 0,
-      "ctr": 0.0046,
+      "ctr": 0.0047,
       "cpc": 1.4686,
       "acos": null,
       "roas": 0.0
@@ -387,7 +387,7 @@
     {
       "id": 166091452533342,
       "name": "eraclea - SP - A - Pure Hydration 6 - 4.26",
-      "impressions": 7620,
+      "impressions": 7470,
       "clicks": 18,
       "spend": 59.57,
       "sales": 190.0,
@@ -413,12 +413,12 @@
     {
       "id": 248619547347593,
       "name": "eraclea - SP - A - BambooExfoliant 1 - 4.26",
-      "impressions": 2355,
+      "impressions": 2186,
       "clicks": 7,
       "spend": 21.98,
       "sales": 47.0,
       "purchases": 1,
-      "ctr": 0.003,
+      "ctr": 0.0032,
       "cpc": 3.14,
       "acos": 46.77,
       "roas": 2.14
@@ -426,7 +426,7 @@
     {
       "id": 83906501217006,
       "name": "eraclea - SB - M - BambooExfoliant - 7.26",
-      "impressions": 1786,
+      "impressions": 1784,
       "clicks": 5,
       "spend": 15.35,
       "sales": 0.0,
@@ -439,12 +439,12 @@
     {
       "id": 20573648193743,
       "name": "eraclea - SP - M - BambooExfoliant - 7.26",
-      "impressions": 78,
+      "impressions": 77,
       "clicks": 1,
       "spend": 2.84,
       "sales": 47.0,
       "purchases": 1,
-      "ctr": 0.0128,
+      "ctr": 0.013,
       "cpc": 2.84,
       "acos": 6.04,
       "roas": 16.55
@@ -653,6 +653,44 @@
       "cpc": 5.6067
     },
     {
+      "query": "gentle face cleanser",
+      "impressions": 1321,
+      "clicks": 3,
+      "spend": 15.2,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-07-29",
+          "impressions": 731,
+          "clicks": 1,
+          "spend": 5.7,
+          "sales": 0.0,
+          "cpc": 5.7
+        },
+        {
+          "date": "2026-07-30",
+          "impressions": 296,
+          "clicks": 1,
+          "spend": 3.8,
+          "sales": 0.0,
+          "cpc": 3.8
+        },
+        {
+          "date": "2026-07-31",
+          "impressions": 294,
+          "clicks": 1,
+          "spend": 5.7,
+          "sales": 0.0,
+          "cpc": 5.7
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0023,
+      "cpc": 5.0667
+    },
+    {
       "query": "face wash",
       "impressions": 1230,
       "clicks": 5,
@@ -719,36 +757,6 @@
       "cvr": 0.0,
       "ctr": 0.0081,
       "cpc": 5.04
-    },
-    {
-      "query": "gentle face cleanser",
-      "impressions": 1037,
-      "clicks": 2,
-      "spend": 9.5,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-07-29",
-          "impressions": 731,
-          "clicks": 1,
-          "spend": 5.7,
-          "sales": 0.0,
-          "cpc": 5.7
-        },
-        {
-          "date": "2026-07-30",
-          "impressions": 306,
-          "clicks": 1,
-          "spend": 3.8,
-          "sales": 0.0,
-          "cpc": 3.8
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0019,
-      "cpc": 4.75
     },
     {
       "query": "hydrate eraclear",
@@ -970,7 +978,7 @@
     },
     {
       "query": "face cleanser",
-      "impressions": 74,
+      "impressions": 73,
       "clicks": 1,
       "spend": 5.7,
       "sales": 0.0,
@@ -978,7 +986,7 @@
       "daily": [
         {
           "date": "2026-07-30",
-          "impressions": 74,
+          "impressions": 73,
           "clicks": 1,
           "spend": 5.7,
           "sales": 0.0,
@@ -987,7 +995,7 @@
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0135,
+      "ctr": 0.0137,
       "cpc": 5.7
     },
     {
@@ -2677,7 +2685,7 @@
     {
       "asin": "B075MLZ3S6",
       "sku": "ERA0003.1",
-      "impressions": 16153,
+      "impressions": 16091,
       "clicks": 23,
       "spend": 67.35,
       "sales": 39.99,
@@ -2691,13 +2699,13 @@
     {
       "asin": "B075MM23VZ",
       "sku": "ERA0006",
-      "impressions": 7662,
+      "impressions": 7515,
       "clicks": 18,
       "spend": 59.57,
       "sales": 190.0,
       "purchases": 1,
       "acos": 31.35,
-      "ctr": 0.0023,
+      "ctr": 0.0024,
       "cpc": 3.3094,
       "cvr": 0.0556,
       "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)"
@@ -2705,7 +2713,7 @@
     {
       "asin": "B075MLB8ZW",
       "sku": "ERA0005.1",
-      "impressions": 1639,
+      "impressions": 1638,
       "clicks": 14,
       "spend": 37.03,
       "sales": 88.0,
@@ -2719,13 +2727,13 @@
     {
       "asin": "B075MM84DC",
       "sku": "ERA0002.1",
-      "impressions": 2462,
+      "impressions": 2458,
       "clicks": 23,
       "spend": 33.68,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.0093,
+      "ctr": 0.0094,
       "cpc": 1.4643,
       "cvr": 0.0,
       "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)"
@@ -2733,13 +2741,13 @@
     {
       "asin": "B075MPPFKF",
       "sku": "ERA0001",
-      "impressions": 2465,
+      "impressions": 2314,
       "clicks": 8,
       "spend": 24.82,
       "sales": 94.0,
       "purchases": 2,
       "acos": 26.4,
-      "ctr": 0.0032,
+      "ctr": 0.0035,
       "cpc": 3.1025,
       "cvr": 0.25,
       "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)"
@@ -2803,13 +2811,13 @@
     {
       "asin": "B075MMNCL1",
       "sku": "ERA0016",
-      "impressions": 288,
+      "impressions": 287,
       "clicks": 2,
       "spend": 5.03,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.0069,
+      "ctr": 0.007,
       "cpc": 2.515,
       "cvr": 0.0,
       "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)"
@@ -2913,33 +2921,33 @@
   "placements": [
     {
       "placement": "Top of Search",
-      "impressions": 2726,
+      "impressions": 2723,
       "clicks": 38,
       "spend": 107.96,
       "sales": 440.98,
       "purchases": 6,
       "acos": 24.48,
-      "ctr": 0.0139,
+      "ctr": 0.014,
       "cpc": 2.8411,
       "cvr": 0.1579,
       "spendShare": 40.7
     },
     {
       "placement": "Rest of Search",
-      "impressions": 10053,
+      "impressions": 9826,
       "clicks": 37,
       "spend": 62.53,
       "sales": 186.0,
       "purchases": 2,
       "acos": 33.62,
-      "ctr": 0.0037,
+      "ctr": 0.0038,
       "cpc": 1.69,
       "cvr": 0.0541,
       "spendShare": 23.6
     },
     {
       "placement": "Product Pages",
-      "impressions": 24174,
+      "impressions": 24017,
       "clicks": 42,
       "spend": 94.93,
       "sales": 0.0,
@@ -3124,6 +3132,44 @@
         ]
       },
       {
+        "query": "gentle face cleanser",
+        "spend": 15.2,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 1321,
+        "clicks": 3,
+        "ctr": 0.0023,
+        "cpc": 5.0667,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-29",
+            "impressions": 731,
+            "clicks": 1,
+            "spend": 5.7,
+            "sales": 0.0,
+            "cpc": 5.7
+          },
+          {
+            "date": "2026-07-30",
+            "impressions": 296,
+            "clicks": 1,
+            "spend": 3.8,
+            "sales": 0.0,
+            "cpc": 3.8
+          },
+          {
+            "date": "2026-07-31",
+            "impressions": 294,
+            "clicks": 1,
+            "spend": 5.7,
+            "sales": 0.0,
+            "cpc": 5.7
+          }
+        ]
+      },
+      {
         "query": "face wash",
         "spend": 13.27,
         "sales": 0.0,
@@ -3188,36 +3234,6 @@
             "spend": 5.39,
             "sales": 0.0,
             "cpc": 5.39
-          }
-        ]
-      },
-      {
-        "query": "gentle face cleanser",
-        "spend": 9.5,
-        "sales": 0.0,
-        "acos": null,
-        "impressions": 1037,
-        "clicks": 2,
-        "ctr": 0.0019,
-        "cpc": 4.75,
-        "purchases": 0,
-        "cvr": 0.0,
-        "daily": [
-          {
-            "date": "2026-07-29",
-            "impressions": 731,
-            "clicks": 1,
-            "spend": 5.7,
-            "sales": 0.0,
-            "cpc": 5.7
-          },
-          {
-            "date": "2026-07-30",
-            "impressions": 306,
-            "clicks": 1,
-            "spend": 3.8,
-            "sales": 0.0,
-            "cpc": 3.8
           }
         ]
       },
@@ -3314,16 +3330,16 @@
         "spend": 5.7,
         "sales": 0.0,
         "acos": null,
-        "impressions": 74,
+        "impressions": 73,
         "clicks": 1,
-        "ctr": 0.0135,
+        "ctr": 0.0137,
         "cpc": 5.7,
         "purchases": 0,
         "cvr": 0.0,
         "daily": [
           {
             "date": "2026-07-30",
-            "impressions": 74,
+            "impressions": 73,
             "clicks": 1,
             "spend": 5.7,
             "sales": 0.0,
@@ -3554,6 +3570,46 @@
     ],
     "cpc_changes": [
       {
+        "query": "gentle face cleanser",
+        "spend": 15.2,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 1321,
+        "clicks": 3,
+        "ctr": 0.0023,
+        "cpc": 5.0667,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-07-29",
+            "impressions": 731,
+            "clicks": 1,
+            "spend": 5.7,
+            "sales": 0.0,
+            "cpc": 5.7
+          },
+          {
+            "date": "2026-07-30",
+            "impressions": 296,
+            "clicks": 1,
+            "spend": 3.8,
+            "sales": 0.0,
+            "cpc": 3.8
+          },
+          {
+            "date": "2026-07-31",
+            "impressions": 294,
+            "clicks": 1,
+            "spend": 5.7,
+            "sales": 0.0,
+            "cpc": 5.7
+          }
+        ],
+        "latest_cpc": 5.7,
+        "cpc_change_pct": 12.5
+      },
+      {
         "query": "b01n9spqhq",
         "spend": 16.82,
         "sales": 0.0,
@@ -3633,13 +3689,13 @@
         "asin": "B075MM23VZ",
         "sku": "ERA0006",
         "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
-        "impressions": 7662,
+        "impressions": 7515,
         "clicks": 18,
         "spend": 59.57,
         "sales": 190.0,
         "purchases": 1,
         "acos": 31.35,
-        "ctr": 0.0023,
+        "ctr": 0.0024,
         "cpc": 3.3094,
         "cvr": 0.0556
       },
@@ -3661,13 +3717,13 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 2465,
+        "impressions": 2314,
         "clicks": 8,
         "spend": 24.82,
         "sales": 94.0,
         "purchases": 2,
         "acos": 26.4,
-        "ctr": 0.0032,
+        "ctr": 0.0035,
         "cpc": 3.1025,
         "cvr": 0.25
       },
@@ -3691,7 +3747,7 @@
         "asin": "B075MLZ3S6",
         "sku": "ERA0003.1",
         "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)",
-        "impressions": 16153,
+        "impressions": 16091,
         "clicks": 23,
         "spend": 67.35,
         "sales": 39.99,
@@ -3705,13 +3761,13 @@
         "asin": "B075MM84DC",
         "sku": "ERA0002.1",
         "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)",
-        "impressions": 2462,
+        "impressions": 2458,
         "clicks": 23,
         "spend": 33.68,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0093,
+        "ctr": 0.0094,
         "cpc": 1.4643,
         "cvr": 0.0
       },
@@ -3747,13 +3803,13 @@
         "asin": "B075MMNCL1",
         "sku": "ERA0016",
         "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)",
-        "impressions": 288,
+        "impressions": 287,
         "clicks": 2,
         "spend": 5.03,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0069,
+        "ctr": 0.007,
         "cpc": 2.515,
         "cvr": 0.0
       }
@@ -3791,13 +3847,13 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 2465,
+        "impressions": 2314,
         "clicks": 8,
         "spend": 24.82,
         "sales": 94.0,
         "purchases": 2,
         "acos": 26.4,
-        "ctr": 0.0032,
+        "ctr": 0.0035,
         "cpc": 3.1025,
         "cvr": 0.25
       },
@@ -3819,7 +3875,7 @@
         "asin": "B075MLB8ZW",
         "sku": "ERA0005.1",
         "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
-        "impressions": 1639,
+        "impressions": 1638,
         "clicks": 14,
         "spend": 37.03,
         "sales": 88.0,
@@ -3835,7 +3891,7 @@
         "asin": "B075MLZ3S6",
         "sku": "ERA0003.1",
         "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)",
-        "impressions": 16153,
+        "impressions": 16091,
         "clicks": 23,
         "spend": 67.35,
         "sales": 39.99,
@@ -3849,13 +3905,13 @@
         "asin": "B075MM23VZ",
         "sku": "ERA0006",
         "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
-        "impressions": 7662,
+        "impressions": 7515,
         "clicks": 18,
         "spend": 59.57,
         "sales": 190.0,
         "purchases": 1,
         "acos": 31.35,
-        "ctr": 0.0023,
+        "ctr": 0.0024,
         "cpc": 3.3094,
         "cvr": 0.0556
       },
@@ -3863,7 +3919,7 @@
         "asin": "B075MLB8ZW",
         "sku": "ERA0005.1",
         "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
-        "impressions": 1639,
+        "impressions": 1638,
         "clicks": 14,
         "spend": 37.03,
         "sales": 88.0,
@@ -3877,13 +3933,13 @@
         "asin": "B075MM84DC",
         "sku": "ERA0002.1",
         "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)",
-        "impressions": 2462,
+        "impressions": 2458,
         "clicks": 23,
         "spend": 33.68,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0093,
+        "ctr": 0.0094,
         "cpc": 1.4643,
         "cvr": 0.0
       },
@@ -3891,13 +3947,13 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 2465,
+        "impressions": 2314,
         "clicks": 8,
         "spend": 24.82,
         "sales": 94.0,
         "purchases": 2,
         "acos": 26.4,
-        "ctr": 0.0032,
+        "ctr": 0.0035,
         "cpc": 3.1025,
         "cvr": 0.25
       },
@@ -3961,13 +4017,13 @@
         "asin": "B075MMNCL1",
         "sku": "ERA0016",
         "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)",
-        "impressions": 288,
+        "impressions": 287,
         "clicks": 2,
         "spend": 5.03,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0069,
+        "ctr": 0.007,
         "cpc": 2.515,
         "cvr": 0.0
       }
@@ -3976,33 +4032,33 @@
   "placementInsights": [
     {
       "placement": "Top of Search",
-      "impressions": 2726,
+      "impressions": 2723,
       "clicks": 38,
       "spend": 107.96,
       "sales": 440.98,
       "purchases": 6,
       "acos": 24.48,
-      "ctr": 0.0139,
+      "ctr": 0.014,
       "cpc": 2.8411,
       "cvr": 0.1579,
       "spendShare": 40.7
     },
     {
       "placement": "Rest of Search",
-      "impressions": 10053,
+      "impressions": 9826,
       "clicks": 37,
       "spend": 62.53,
       "sales": 186.0,
       "purchases": 2,
       "acos": 33.62,
-      "ctr": 0.0037,
+      "ctr": 0.0038,
       "cpc": 1.69,
       "cvr": 0.0541,
       "spendShare": 23.6
     },
     {
       "placement": "Product Pages",
-      "impressions": 24174,
+      "impressions": 24017,
       "clicks": 42,
       "spend": 94.93,
       "sales": 0.0,
