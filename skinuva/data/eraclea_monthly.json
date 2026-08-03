@@ -336,7 +336,7 @@
       "totalSales": 1498.93,
       "orders": 9,
       "clicks": 122,
-      "impressions": 38090,
+      "impressions": 38089,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -349,17 +349,17 @@
     "shopify": 50039.42,
     "walmart": 1059.99,
     "combinedTotalSales": 52598.34,
-    "fetched_at": "2026-08-02T15:09:13Z"
+    "fetched_at": "2026-08-03T09:29:15Z"
   },
   "August 2026": {
     "amazon": {
-      "spend": 24.4,
+      "spend": 52.25,
       "adSales": 95.0,
-      "totalSales": null,
+      "totalSales": 143.0,
       "orders": 1,
-      "clicks": 8,
-      "impressions": 1841,
-      "totalSalesSource": "unavailable (brand missing from SP-API response)"
+      "clicks": 13,
+      "impressions": 3854,
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 0.0,
@@ -368,9 +368,9 @@
       "clicks": 0,
       "impressions": 0
     },
-    "shopify": 1653.04,
+    "shopify": 3051.71,
     "walmart": 0.0,
-    "combinedTotalSales": null,
-    "fetched_at": "2026-08-02T15:09:13Z"
+    "combinedTotalSales": 3194.71,
+    "fetched_at": "2026-08-03T09:29:15Z"
   }
 }
