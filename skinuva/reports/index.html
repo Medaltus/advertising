@@ -4061,8 +4061,15 @@ function injectWalmartAdsData(){
   Object.entries(WALMART_ADS).forEach(([mk,mData])=>{
     const w=((mData||{}).byBrand||{})[BRAND];
     if(!w||!(w.spend>0)) return;
-    const chs=DATA.channels[mk];
-    if(!chs) return;   // month not in the Sheet — nothing to attach to
+    // Create the month's channel array if the Sheet has no table for it yet.
+    // Returning early here was a bug: injectHistoricalApiData/injectJuneApiData
+    // both ASSIGN DATA.channels[mk] (creating it when absent) and rebuild it
+    // from Amazon + Google + whatever other channels are already in the array.
+    // So bailing meant Walmart was silently dropped for every month the Sheet
+    // hadn't been filled in for — the table rendered Amazon, Google and Total
+    // Paid Media with no Walmart row at all.
+    let chs=DATA.channels[mk];
+    if(!chs) chs=DATA.channels[mk]=[];
     // Walmart total sales comes from the "Newderm - Walmart Revenue" sheet
     // (skinuva tab), a different source from the Helium 10 ad figures above.
     const _wmRev=((WALMART_REVENUE||{})[mk]||{}).total;
