@@ -3,11 +3,11 @@
     "amazon": {
       "spend": 17298.03,
       "adSales": 79831.56,
-      "totalSales": null,
+      "totalSales": 159976.5,
       "orders": 1046,
       "clicks": 7171,
       "impressions": 1795111,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 10376.58,
@@ -18,17 +18,17 @@
     },
     "shopify": 40856.74,
     "walmart": 1750.0,
-    "combinedTotalSales": null,
+    "combinedTotalSales": 202583.24,
     "fetched_at": "2026-08-01T08:16:43Z"
   },
   "July 2026": {
     "amazon": {
       "spend": 14258.5,
-      "adSales": 55376.14,
-      "totalSales": 132254.03,
-      "orders": 698,
+      "adSales": 55456.14,
+      "totalSales": 132174.03,
+      "orders": 699,
       "clicks": 6262,
-      "impressions": 1289065,
+      "impressions": 1289064,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -40,29 +40,29 @@
     },
     "shopify": 50039.42,
     "walmart": 1059.99,
-    "combinedTotalSales": 183353.44,
-    "fetched_at": "2026-08-05T15:52:39Z"
+    "combinedTotalSales": 183273.44,
+    "fetched_at": "2026-08-06T08:38:15Z"
   },
   "August 2026": {
     "amazon": {
-      "spend": 1915.76,
-      "adSales": 5786.03,
-      "totalSales": 11298.17,
-      "orders": 69,
-      "clicks": 628,
-      "impressions": 112698,
+      "spend": 2380.23,
+      "adSales": 6685.42,
+      "totalSales": 15754.21,
+      "orders": 82,
+      "clicks": 775,
+      "impressions": 134565,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 1369.83,
+      "spend": 1377.18,
       "adSales": 4200.58,
       "conversions": 30,
-      "clicks": 667,
+      "clicks": 668,
       "impressions": 119065
     },
-    "shopify": 7188.58,
+    "shopify": 8811.05,
     "walmart": 0.0,
-    "combinedTotalSales": 18486.75,
-    "fetched_at": "2026-08-05T15:52:39Z"
+    "combinedTotalSales": 24565.26,
+    "fetched_at": "2026-08-06T08:38:15Z"
   }
 }
