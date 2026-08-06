@@ -4200,10 +4200,15 @@ function computeRangeMetrics(s,e){
         if(c.channel==='Total Paid Media'||c.channel==='Amazon'||c.channel==='Google') return;
         if(_isWebsiteSalesLabel(c.channel)) return;
         const k=c.channel;
-        if(!agg[k]) agg[k]={channel:k,adSpend:0,adSales:0,orders:0,clicks:0,impressions:0,totalSales:null};
-        agg[k].adSpend+=c.adSpend||0; agg[k].adSales+=c.adSales||0; agg[k].orders+=c.orders||0;
-        agg[k].clicks+=c.clicks||0; agg[k].impressions+=c.impressions||0;
-        if(c.totalSales!=null) agg[k].totalSales=(agg[k].totalSales||0)+c.totalSales;
+        // Every field starts null and only becomes a number when a month actually
+        // supplies one. Initialising to 0 made the Sheet's blank impression/click
+        // cells render as a real "0", which reads as "we measured zero traffic"
+        // rather than "not reported" -- and disagreed with the monthly view, which
+        // shows a dash for the same channels.
+        if(!agg[k]) agg[k]={channel:k,adSpend:null,adSales:null,orders:null,clicks:null,impressions:null,totalSales:null};
+        ['adSpend','adSales','orders','clicks','impressions','totalSales'].forEach(f=>{
+          if(c[f]!=null) agg[k][f]=(agg[k][f]||0)+c[f];
+        });
       });
       const sv=_shopifySalesFor(mk);
       if(sv!=null) shopTotal=(shopTotal||0)+sv;
@@ -4211,15 +4216,16 @@ function computeRangeMetrics(s,e){
     Object.values(agg).forEach(c=>{
       // Drop rows with nothing in them, same rule as the monthly table.
       if(!(c.adSpend>0||c.adSales>0||c.orders>0||c.impressions>0||c.clicks>0||c.totalSales>0)) return;
-      monthlyChs.push({channel:c.channel,adSpend:rd(c.adSpend),adSales:rd(c.adSales),
+      const R=v=>v!=null?rd(v):null;
+      monthlyChs.push({channel:c.channel,adSpend:R(c.adSpend),adSales:R(c.adSales),
         acos:c.adSales>0?rd(c.adSpend/c.adSales*100):null,
-        totalSales:c.totalSales!=null?rd(c.totalSales):null,
+        totalSales:R(c.totalSales),
         tacos:(c.totalSales!=null&&c.totalSales>0)?rd(c.adSpend/c.totalSales*100):null,
         impressions:c.impressions,clicks:c.clicks,
         ctr:c.impressions>0?rd(c.clicks/c.impressions*100):null,
         cpc:c.clicks>0?rd(c.adSpend/c.clicks):null,orders:c.orders,
         aov:c.orders>0?rd(c.adSales/c.orders):null,
-        cvr:c.clicks>0?rd(c.orders/c.clicks*100):null});
+        cvr:(c.clicks>0&&c.orders!=null)?rd(c.orders/c.clicks*100):null});
     });
     monthlyChs.sort((x,y)=>(y.adSpend||0)-(x.adSpend||0));
   }
