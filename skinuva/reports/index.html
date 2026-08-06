@@ -1634,6 +1634,12 @@ function render(){
   const idx=DATA.monthly.indexOf(md);
   let prev=idx>0?DATA.monthly[idx-1]:null;
   // Ozlee 'All' view: augment md and prev with eraclea Amazon numbers
+  // Hoisted out of the block below so the channel table can fold the SAME eraclea
+  // figures into its Amazon row. Previously md/prev included eraclea but
+  // DATA.channels did not, so "Total Paid Media" spend (channel sum, Skinuva-only)
+  // disagreed with the KPI cards and with the Total Sales row by exactly eraclea's
+  // spend -- $25,089.92 vs $25,370.69 in July 2026.
+  let _eraCur=null, _eraPrev=null;
   if(selectedOzleeBrand==='All'){
     // For current partial month use live ERACLEA_AMAZON timeline (more up-to-date than monthly JSON)
     let emd=ERACLEA_MONTHLY[selectedMonth];
@@ -1653,6 +1659,8 @@ function render(){
       }
     }
     const eprev=prev?ERACLEA_MONTHLY[prev.month]:null;
+    if(emd&&emd.amazon) _eraCur=emd.amazon;
+    if(eprev&&eprev.amazon) _eraPrev=eprev.amazon;
     if(emd&&emd.amazon){const ea=emd.amazon;
       const eTot=ea.totalSales||0;
       md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0),totalSales:(md.totalSales||0)+eTot};
@@ -1783,9 +1791,99 @@ function render(){
     r2.appendChild(kpi(x.l,x.v,o));
   });
 
+  // ── Channel rows, reconciled ────────────────────────────────────────────────
+  // buildChannelRows() returns a NON-MUTATING copy of DATA.channels[month] with two
+  // corrections. DATA.channels is deliberately left untouched: renderAll runs on
+  // every month/brand switch, so mutating it would compound eraclea in twice, three
+  // times, ... on successive renders.
+  //
+  // 1. In 'All' view, eraclea's Amazon spend/sales/orders/clicks/impressions/totalSales
+  //    are folded INTO the Amazon row. eraclea is a brand, not a channel, and its
+  //    spend genuinely IS Amazon spend -- so it belongs in the Amazon line rather
+  //    than a row of its own. Without this, md (KPI cards) and the Total Sales row
+  //    included eraclea while every channel row and the Total Paid Media subtotal
+  //    did not.
+  //
+  // 2. Total Paid Media is rebuilt from the channel rows instead of trusting the
+  //    value the API injectors wrote. Its Total Sales column was being set to
+  //    combinedTotalSales, which ALREADY CONTAINS Shopify -- and Shopify is then
+  //    rendered as its own row directly beneath. So the Total Sales column
+  //    double-counted Shopify and could not be added down: July 2026 read
+  //    $132,174.03 + $1,059.99 (channels) then $183,273.44 (subtotal) then
+  //    $50,039.42 (Shopify). Total Paid Media's Total Sales is now strictly the sum
+  //    of the marketplace total sales in the rows above it (Amazon + Walmart), so
+  //    subtotal + Shopify == the Total Sales bottom line, exactly.
+  function buildChannelRows(monthKey, era){
+    const src=DATA.channels[monthKey]||[];
+    const r2=(n,d=2)=>n==null?null:Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+    let rows=src.filter(c=>c.channel!=='Total Paid Media');
+    if(era&&((era.spend||0)>0||(era.adSales||0)>0)){
+      let sawAmazon=false;
+      rows=rows.map(c=>{
+        if(c.channel!=='Amazon') return c;
+        sawAmazon=true;
+        const spend=(c.adSpend||0)+(era.spend||0);
+        const sales=(c.adSales||0)+(era.adSales||0);
+        const orders=(c.orders||0)+(era.orders||0);
+        const clicks=(c.clicks||0)+(era.clicks||0);
+        const imps=(c.impressions||0)+(era.impressions||0);
+        // null totalSales means "unknown", not zero, and the two sides are NOT
+        // interchangeable. Skinuva is the overwhelming majority of Amazon revenue,
+        // so a missing eraclea figure is a rounding-level omission -- but if
+        // Skinuva's own SP-API fetch failed, the row is genuinely unknown and must
+        // stay blank. Summing "at least one side present" would have published
+        // eraclea's ~$1.5k alone under the Amazon label and dragged TACOS to ~85%.
+        const ts=c.totalSales!=null?(c.totalSales+(era.totalSales||0)):null;
+        return {...c, adSpend:r2(spend), adSales:r2(sales), orders, clicks, impressions:imps,
+          acos:sales>0?r2(spend/sales*100):null,
+          totalSales:ts!=null?r2(ts):null,
+          tacos:(ts!=null&&ts>0)?r2(spend/ts*100):null,
+          ctr:imps>0?r2(clicks/imps*100):null,
+          cpc:clicks>0?r2(spend/clicks):null,
+          aov:orders>0?r2(sales/orders):null,
+          cvr:clicks>0?r2(orders/clicks*100):null};
+      });
+      // Defensive: if a month has eraclea data but no Amazon row at all, eraclea's
+      // spend would vanish from the table while still sitting in the KPI cards.
+      if(!sawAmazon) rows=rows.concat([{channel:'Amazon',adSpend:r2(era.spend||0),adSales:r2(era.adSales||0),
+        orders:era.orders||0,clicks:era.clicks||0,impressions:era.impressions||0,
+        acos:(era.adSales||0)>0?r2((era.spend||0)/era.adSales*100):null,
+        totalSales:era.totalSales!=null?r2(era.totalSales):null,
+        tacos:(era.totalSales||0)>0?r2((era.spend||0)/era.totalSales*100):null}]);
+    }
+    const sum=k=>rows.reduce((s,c)=>s+(c[k]||0),0);
+    const tSpend=r2(sum('adSpend')), tSales=r2(sum('adSales'));
+    const tOrders=sum('orders'), tClicks=sum('clicks'), tImps=sum('impressions');
+    // Marketplace total sales only -- Shopify is a separate row below and must not
+    // be counted here or the column stops adding up.
+    //
+    // Amazon is the dominant revenue source and the only one whose fetch realistically
+    // fails (June 2026 sat at "unavailable (SP-API fetch failed)" for a while). If its
+    // totalSales is unknown then the whole column is unknown, so blank the subtotal
+    // instead of publishing a Walmart-only figure -- ~$1k presented as the entire
+    // business, with a TACOS in the thousands of percent. Blank is honest; a wrong
+    // number that looks plausible is not.
+    const amzRow=rows.find(c=>c.channel==='Amazon');
+    const tsUnknown=!!(amzRow&&amzRow.totalSales==null);
+    const anyTs=rows.some(c=>c.totalSales!=null);
+    const tTotal=(anyTs&&!tsUnknown)?r2(sum('totalSales')):null;
+    const total={channel:'Total Paid Media',adSpend:tSpend,adSales:tSales,
+      orders:tOrders,clicks:tClicks,impressions:tImps,
+      acos:tSales>0?r2(tSpend/tSales*100):null,
+      totalSales:tTotal,
+      tacos:(tTotal!=null&&tTotal>0)?r2(tSpend/tTotal*100):null,
+      ctr:tImps>0?r2(tClicks/tImps*100):null,
+      cpc:tClicks>0?r2(tSpend/tClicks):null,
+      aov:tOrders>0?r2(tSales/tOrders):null,
+      cvr:tClicks>0?r2(tOrders/tClicks*100):null};
+    return rows.concat([total]);
+  }
+  const curCh=buildChannelRows(selectedMonth,_eraCur);
+  const curTotalRow=curCh.find(c=>c.channel==='Total Paid Media')||{};
+
   // ── Charts ──
-  const chData=(DATA.channels[selectedMonth]||[]).filter(c=>c.adSpend>0&&c.channel!=='Total Paid Media'&&c.channel!=='Website Sales').sort((a,b)=>b.adSpend-a.adSpend);
-  const pieData=(DATA.channels[selectedMonth]||[]).filter(c=>c.adSales>0&&c.channel!=='Total Paid Media'&&c.channel!=='Website Sales');
+  const chData=curCh.filter(c=>c.adSpend>0&&c.channel!=='Total Paid Media'&&c.channel!=='Website Sales').sort((a,b)=>b.adSpend-a.adSpend);
+  const pieData=curCh.filter(c=>c.adSales>0&&c.channel!=='Total Paid Media'&&c.channel!=='Website Sales');
 
   document.getElementById('spend-sub').textContent=selectedMonth;
   document.getElementById('pie-sub').textContent=selectedMonth;
@@ -1817,10 +1915,12 @@ function render(){
   // Table
   document.getElementById('table-sub').textContent=selectedMonth;
   const tbody=document.getElementById('channel-tbody'); tbody.innerHTML='';
-  const allCh=DATA.channels[selectedMonth]||[];
-  // Get previous month's channel data for MoM
+  const allCh=curCh;
+  // Get previous month's channel data for MoM. Built through the same function so
+  // the "prev:" figure under each cell is on the same basis as the value above it --
+  // otherwise the Amazon row would compare All-view current against Skinuva-only prev.
   const prevMonth=idx>0?DATA.monthly[idx-1].month:null;
-  const prevCh=prevMonth?DATA.channels[prevMonth]||[]:[];
+  const prevCh=prevMonth?buildChannelRows(prevMonth,_eraPrev):[];
   function findPrev(name){ return prevCh.find(x=>x.channel===name); }
   // momLine: fcastVal (optional) overrides cur for the % comparison so partial-month arrows
   // reflect forecasted full-month vs prev-month rather than MTD vs prev-month.
@@ -1876,21 +1976,12 @@ function render(){
     const acosDisplay=(c.acos!=null && c.adSales>0)?c.acos:null;
     const ac=acosDisplay!=null?(acosDisplay>50?'acos-bad':acosDisplay<25?'acos-good':''):'';
     const ordersDisplay=c.orders!=null?Math.round(c.orders):null;
-    // For Total Paid Media row use DATA.monthly prev — same source as KPI cards —
-    // so the % arrows are consistent. Individual channel rows use their channel entry.
-    const p = isTotal && prev ? {
-      adSpend:    prev.adSpend,
-      adSales:    prev.adSales,
-      acos:       prev.acos,
-      totalSales: prev.totalSales,
-      tacos:      prev.tacos,
-      impressions:prev.impressions,
-      clicks:     prev.clicks,
-      cpc:        prev.cpc,
-      orders:     prev.orders,
-      aov:        prev.aov,
-      cvr:        prev.cvr,
-    } : findPrev(c.channel);
+    // Both the Total Paid Media row and the channel rows take prev from prevCh, which
+    // buildChannelRows() has put on exactly the same basis as the current row above it.
+    // This used to read DATA.monthly's prev for the total row, whose totalSales
+    // includes Shopify -- so the MoM arrow on Total Paid Media's Total Sales compared
+    // a marketplace-only figure against a Shopify-inclusive one.
+    const p = findPrev(c.channel);
     const pOrders=p&&p.orders!=null?Math.round(p.orders):null;
     const totalStyle=isTotal?'font-weight:700;color:#fff;':'';
     // Forecast volume metrics for %-comparison; rates (ACOS, CPC, AOV, CVR) use current value
@@ -1918,8 +2009,10 @@ function render(){
   // BELOW the Total Paid Media subtotal and is deliberately not part of it;
   // the sub-labels say so explicitly so the figure can't be read as ad sales.
   const _shopNow=_shopifySalesFor(selectedMonth);
+  // Hoisted: the bottom Total Sales row needs it too, to build its prev-month
+  // comparison on the same basis (paid-media total sales + Shopify).
+  const _shopPrev=prevMonth?_shopifySalesFor(prevMonth):null;
   if(_shopNow!=null){
-    const _shopPrev=prevMonth?_shopifySalesFor(prevMonth):null;
     const _shopFc=chFv(_shopNow);
     const _dash='<td style="color:rgba(255,255,255,0.25)">—</td>';
     const str=document.createElement('tr');
@@ -1941,18 +2034,46 @@ function render(){
   // paid-media spend is repeated here on purpose so TACOS is verifiable in
   // place: spend / total sales, both on one line. Column headers say
   // "Ad Sales"/"ACOS", so each figure carries its own label underneath.
-  if(md.totalSales!=null){
+  // Derived as Total Paid Media's Total Sales + Shopify, i.e. literally the sum of
+  // the Total Sales column above it, so the column ALWAYS adds down. It used to read
+  // md.totalSales straight from DATA.monthly; that number is right, but because the
+  // subtotal above double-counted Shopify the column couldn't be reconciled by eye.
+  // Spend is taken from the same Total Paid Media row rather than md.adSpend so the
+  // two spend figures in this table are guaranteed identical.
+  // Gated on the paid-media total being known, NOT on "either side present". With
+  // an OR, a month whose Amazon totalSales was unavailable would render Shopify's
+  // ~$50k on its own as the business's Total Sales -- a ~73% understatement wearing
+  // an "Amazon + Shopify + Walmart" label, with a correspondingly wrong TACOS. The
+  // whole row is hidden instead; the Shopify row above still shows its own figure.
+  const _tpmTs=curTotalRow.totalSales;
+  const _btmTs=_tpmTs!=null?(_tpmTs+(_shopNow||0)):null;
+  // md.totalSales is what the KPI cards show. These are computed from different
+  // sources (channel rows vs the Python pipeline's combinedTotalSales) and must
+  // agree; shout in the console if they ever don't rather than quietly showing two
+  // different totals on one page.
+  if(_btmTs!=null&&md.totalSales!=null&&Math.abs(_btmTs-md.totalSales)>0.01){
+    console.warn('[ozlee] Total Sales mismatch in '+selectedMonth+' ('+selectedOzleeBrand+'): '+
+      'channel rows + Shopify = '+_btmTs.toFixed(2)+' but KPI md.totalSales = '+md.totalSales.toFixed(2)+
+      ' (delta '+(_btmTs-md.totalSales).toFixed(2)+')');
+  }
+  if(_btmTs!=null){
     const _dash2='<td style="color:rgba(255,255,255,0.25)">—</td>';
-    const _tsFc=chFv(md.totalSales);
+    const _tsFc=chFv(_btmTs);
+    const _btmSpend=curTotalRow.adSpend;
+    const _btmTacos=(_btmSpend!=null&&_btmTs>0)?_btmSpend/_btmTs*100:null;
+    // Prev on the identical basis, rather than DATA.monthly's prev.totalSales.
+    const _pTpm=prevCh.find(c=>c.channel==='Total Paid Media')||{};
+    const _pTs=_pTpm.totalSales!=null?(_pTpm.totalSales+(_shopPrev||0)):null;
+    const _pTacos=(_pTpm.adSpend!=null&&_pTs>0)?_pTpm.adSpend/_pTs*100:null;
     const gtr=document.createElement('tr');
     gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
     gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${_walmartSalesFor(selectedMonth)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
-      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${md.adSpend!=null?fDol(md.adSpend):'—'}
+      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${_btmSpend!=null?fDol(_btmSpend):'—'}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
       ${_dash2}${_dash2}
-      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(md.totalSales)}${momLine(md.totalSales,prev&&prev.totalSales,fDol,false,_tsFc)}</td>
-      <td style="font-weight:700;color:#fff;">${md.tacos!=null?fPct(md.tacos):'—'}${momLine(md.tacos,prev&&prev.tacos,fPct,true)}</td>
+      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(_btmTs)}${momLine(_btmTs,_pTs,fDol,false,_tsFc)}</td>
+      <td style="font-weight:700;color:#fff;">${_btmTacos!=null?fPct(_btmTacos):'—'}${momLine(_btmTacos,_pTacos,fPct,true)}</td>
       ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
     tbody.appendChild(gtr);
   }
