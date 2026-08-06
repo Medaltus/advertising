@@ -1369,6 +1369,31 @@ function buildMergedSupplement(s1,s2){
 function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 
 // ── KPI builder ──
+// Backstop for the kpi() placeholder below.
+//
+// kpi() renders '—' and parks the real value in data-final until initialLoadDone,
+// so the load-in animation has something to count up from. But that flag is only
+// ever set by revealKpisSequentially() resolving, ~3.6s after load (12 cards x
+// 300ms) -- and any render that happens meanwhile REPLACES those cards with fresh
+// ones that nothing ever animates. Their values then stay '—' permanently.
+//
+// That is what emptied every card in the date-range view: renderRange rebuilds both
+// KPI rows, and the reveal never runs again. renderEracleaView carries a one-line
+// hand-patch for the same thing. Rather than keep patching call sites, this copies
+// data-final into any card still showing the placeholder, and is called at the end
+// of every render path -- so a stale placeholder cannot survive a completed render
+// no matter which view built it or what the flag says.
+let _revealPending=false;   // true only for the initial load-in animation
+function _fillKpiPlaceholders(){
+  // No-op while the load-in reveal is still running, or it would paint the final
+  // numbers a moment before the count-up animates them.
+  if(_revealPending) return;
+  document.querySelectorAll('#kpi-row-1 .kpi-value, #kpi-row-2 .kpi-value').forEach(el=>{
+    const fin=el.getAttribute('data-final');
+    if(fin!=null && fin!=='' && el.textContent.trim()==='—' && fin.trim()!=='—') el.textContent=fin;
+  });
+}
+
 function kpi(label,value,opts){
   opts=opts||{};
   const el=document.createElement('div'); el.className='kpi-card';
@@ -2160,6 +2185,7 @@ function render(){
   renderWLOS();
   document.getElementById('footer').textContent='Skinuva Ads Tracking · Live from Google Sheets · '+new Date().toLocaleDateString();
   buildTicker();
+  _fillKpiPlaceholders();
 }
 
 function renderEracleaTrend(){
@@ -3748,10 +3774,16 @@ async function init(){
     document.getElementById('loading').style.display='none';
     document.getElementById('dashboard').style.display='block';
     document.getElementById('agents-section').style.display='block';
+    _revealPending=true;   // suppress the placeholder backfill during the count-up
     render();
     startRefreshTimer();
     document.getElementById('audio-btn').style.display='flex';
-    revealKpisSequentially().then(()=>{ initialLoadDone=true; });
+    // Once the reveal is done, flush any card it couldn't reach -- if the user
+    // switched month or applied a date range mid-animation, renderRange/renderAll
+    // replaced the cards it was walking and those replacements never got animated.
+    revealKpisSequentially().then(()=>{
+      initialLoadDone=true; _revealPending=false; _fillKpiPlaceholders();
+    }).catch(()=>{ initialLoadDone=true; _revealPending=false; _fillKpiPlaceholders(); });
     loadMarketTicker();
     // Auto-load agents from cache or run fresh if data changed
     initAgents();
@@ -4478,6 +4510,7 @@ function renderRange(){
   renderWLOS();
   document.getElementById('footer').textContent='Skinuva Ads Tracking · Date Range: '+rangeStart+' → '+rangeEnd;
   buildTicker();
+  _fillKpiPlaceholders();
 }
 
 // Also restore month-tabs opacity when leaving range mode (called by clearRange → render)
