@@ -4136,6 +4136,29 @@ function _rangeMonthCoverage(s,e){
   return {aligned: startsOnFirst && (endsOnLast||endIsCurMonth), months};
 }
 
+// The comparison period for an aligned range: the same NUMBER of whole calendar
+// months immediately before it. July -> June; June+July -> April+May; and an MTD
+// range in August -> all of July, which is exactly what the monthly view compares
+// against, so "Last Month" reads identically in both.
+//
+// Deliberately whole months rather than an equal-length day window. The prior period
+// has to be aligned too, otherwise computeRangeMetrics would exclude Walmart/Shopify/
+// Sheet channels from it and we'd be comparing an all-channel figure against an
+// Amazon+Google-only one -- a comparison that looks precise and is meaningless.
+function _priorRangeFor(cov){
+  const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const pad=n=>String(n).padStart(2,'0');
+  const lastDay=(y,m)=>new Date(y,m,0).getDate();
+  const first=cov.months[0]; if(!first) return null;
+  const [fmName,fyStr]=first.split(' ');
+  const fm=MO.indexOf(fmName)+1, fy=Number(fyStr);
+  if(fm<1||!fy) return null;
+  const n=cov.months.length;
+  let sy=fy, sm=fm-n; while(sm<1){sm+=12;sy--;}
+  let ey=fy, em=fm-1; if(em<1){em=12;ey--;}
+  return {s:`${sy}-${pad(sm)}-01`, e:`${ey}-${pad(em)}-${pad(lastDay(ey,em))}`};
+}
+
 function computeRangeMetrics(s,e){
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
   let a={spend:0,adSales:0,totalSales:0,orders:0,clicks:0,impressions:0};
@@ -4270,15 +4293,33 @@ function renderRange(){
   // brand-filtered revenue only exists per calendar month, and the per-day archive
   // figure is account-wide. Better an honest dash than a 55%-inflated number.
   const _tsSub=m.aligned?'Amazon + Walmart + Shopify':'needs whole calendar months';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:pct(m.acos)},
-   {l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:_tsSub},
-   {l:'TACOS',v:m.tacos!=null?pct(m.tacos):'—',sub:_tsSub}]
-    .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
+  // Prior period, so an aligned range carries the same prev:/MoM figures the monthly
+  // view shows. Only for aligned ranges -- see _priorRangeFor for why.
+  const _pr=m.aligned?_priorRangeFor(m):null;
+  const P=_pr?computeRangeMetrics(_pr.s,_pr.e):null;
+  // inv: lower is better, so the arrow colour flips (ACOS, TACOS, CPC).
+  const _k=(l,v,key,fmtFn,inv,sub)=>{
+    const o={sub:sub||null};
+    if(P&&P[key]!=null){ o.prev=fmtFn(P[key]); o.mom=momPct(m[key],P[key]); if(inv)o.inv=true; }
+    return kpi(l,v,o);
+  };
+  const _d=v=>fmt(v,'$',0);
+  r1.appendChild(_k('Ad Spend',rd2(m.adSpend),'adSpend',_d,false));
+  r1.appendChild(_k('Ad Sales',rd2(m.adSales),'adSales',_d,false));
+  r1.appendChild(_k('CVR',m.cvr!=null?m.cvr.toFixed(2)+'%':'—','cvr',pct,false));
+  r1.appendChild(_k('ACOS',pct(m.acos),'acos',pct,true));
+  r1.appendChild(_k('Total Sales',m.totalSales!=null?rd2(m.totalSales):'—','totalSales',_d,false,_tsSub));
+  r1.appendChild(_k('TACOS',m.tacos!=null?pct(m.tacos):'—','tacos',pct,true,_tsSub));
 
   // KPI Row 2
   const r2=document.getElementById('kpi-row-2'); r2.innerHTML='';
-  [{l:'Impressions',v:fmt(m.impressions,'',0)},{l:'Clicks',v:fmt(m.clicks,'',0)},{l:'CTR',v:pct(m.ctr)},{l:'CPC',v:m.cpc!=null?'$'+m.cpc.toFixed(2):'—'},{l:'Orders',v:m.orders!=null?m.orders.toLocaleString():'—'},{l:'AOV',v:m.aov!=null?'$'+m.aov.toFixed(2):'—'}]
-    .forEach(x=>r2.appendChild(kpi(x.l,x.v,{})));
+  const _n=v=>fmt(v,'',0), _c=v=>'$'+Number(v).toFixed(2);
+  r2.appendChild(_k('Impressions',fmt(m.impressions,'',0),'impressions',_n,false));
+  r2.appendChild(_k('Clicks',fmt(m.clicks,'',0),'clicks',_n,false));
+  r2.appendChild(_k('CTR',pct(m.ctr),'ctr',pct,false));
+  r2.appendChild(_k('CPC',m.cpc!=null?'$'+m.cpc.toFixed(2):'—','cpc',_c,true));
+  r2.appendChild(_k('Orders',m.orders!=null?m.orders.toLocaleString():'—','orders',v=>Math.round(v).toLocaleString(),false));
+  r2.appendChild(_k('AOV',m.aov!=null?'$'+m.aov.toFixed(2):'—','aov',_c,false));
 
   // Spend bar chart
   const chData=m.channels.filter(c=>c.adSpend>0&&c.channel!=='Total Paid Media');
@@ -4324,7 +4365,24 @@ function renderRange(){
   document.getElementById('table-sub').textContent=rangeStart+' → '+rangeEnd;
   const tbody=document.getElementById('channel-tbody'); tbody.innerHTML='';
   const fDol=v=>'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),fPct=v=>(Math.round(v*100)/100)+'%',fNum=v=>Number(v).toLocaleString(),fCpc=v=>'$'+v.toFixed(2);
+  // Same prev:/MoM treatment as the monthly table, from the prior-period metrics.
+  const _pch=P?P.channels:null;
+  const _findPrev=name=>_pch?_pch.find(x=>x.channel===name):null;
+  const momLine=(cur,prv,fmtFn,inv)=>{
+    if(cur==null||prv==null) return '';
+    let h=`<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">prev: ${fmtFn(prv)}</div>`;
+    if(prv!==0){
+      const p=((cur-prv)/Math.abs(prv)*100).toFixed(0);
+      if(Number(p)!==0){
+        const pos=inv?Number(p)<0:Number(p)>0, neg=inv?Number(p)>0:Number(p)<0;
+        const col=pos?'#4ade80':neg?'#ff6b6b':'rgba(255,255,255,0.4)';
+        h+=`<div style="font-size:10px;font-weight:600;color:${col};">${Number(p)>0?'▲':'▼'} ${Math.abs(p)}%</div>`;
+      }
+    }
+    return h;
+  };
   m.channels.forEach(c=>{
+    const p=_findPrev(c.channel);
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
     if(isTotal) tr.style.cssText='border-top:2px solid rgba(255,255,255,0.15);font-weight:700;';
@@ -4334,17 +4392,17 @@ function renderRange(){
     const ordD=c.orders!=null?Math.round(c.orders):null;
     const tStyle=isTotal?'font-weight:700;color:#fff;':'';
     tr.innerHTML=`<td style="${tStyle}">${isTotal?'<span style="color:rgba(255,255,255,0.9);font-weight:700;">Total Paid Media</span>':'<span class="dot" style="background:'+col+'"></span><span style="color:'+col+'">'+c.channel+'</span>'}</td>
-      <td style="${tStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}</td>
-      <td style="${tStyle}">${c.adSales!=null?fDol(c.adSales):'—'}</td>
-      <td style="${tStyle}" class="${ac}">${acD!=null?acD+'%':'N/A'}</td>
-      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.totalSales!=null?fDol(c.totalSales):'—')}</td>
-      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.tacos!=null?fPct(c.tacos):'—')}</td>
-      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}</td>
-      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}</td>
-      <td style="${tStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}</td>
-      <td style="${tStyle}">${ordD!=null?fNum(ordD):'—'}</td>
-      <td style="${tStyle}">${c.aov!=null?fCpc(c.aov):'—'}</td>
-      <td style="${tStyle}">${c.cvr!=null?c.cvr+'%':'—'}</td>`;
+      <td style="${tStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}${momLine(c.adSpend,p&&p.adSpend,fDol,false)}</td>
+      <td style="${tStyle}">${c.adSales!=null?fDol(c.adSales):'—'}${momLine(c.adSales,p&&p.adSales,fDol,false)}</td>
+      <td style="${tStyle}" class="${ac}">${acD!=null?acD+'%':'N/A'}${momLine(acD,p&&p.adSales>0?p.acos:null,fPct,true)}</td>
+      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.totalSales!=null?fDol(c.totalSales):'—')+momLine(c.totalSales,p&&p.totalSales,fDol,false)}</td>
+      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.tacos!=null?fPct(c.tacos):'—')+momLine(c.tacos,p&&p.tacos,fPct,true)}</td>
+      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}${momLine(c.impressions,p&&p.impressions,fNum,false)}</td>
+      <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}${momLine(c.clicks,p&&p.clicks,fNum,false)}</td>
+      <td style="${tStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}${momLine(c.cpc,p&&p.cpc,fCpc,true)}</td>
+      <td style="${tStyle}">${ordD!=null?fNum(ordD):'—'}${momLine(ordD,p&&p.orders!=null?Math.round(p.orders):null,fNum,false)}</td>
+      <td style="${tStyle}">${c.aov!=null?fCpc(c.aov):'—'}${momLine(c.aov,p&&p.aov,fCpc,false)}</td>
+      <td style="${tStyle}">${c.cvr!=null?c.cvr+'%':'—'}${momLine(c.cvr,p&&p.cvr,fPct,false)}</td>`;
     tbody.appendChild(tr);
   });
   // Shopify + bottom Total Sales, mirroring the monthly table so the two views are
@@ -4356,7 +4414,7 @@ function renderRange(){
     str.innerHTML=`<td><span class="dot" style="background:#96BF48"></span><span style="color:#96BF48;font-weight:700;">Shopify — Store Sales</span>
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · whole months only</div></td>
       ${_dash}${_dash}${_dash}
-      <td style="font-weight:700;color:#96BF48;">${fDol(m.shopify)}
+      <td style="font-weight:700;color:#96BF48;">${fDol(m.shopify)}${momLine(m.shopify,P&&P.shopify,fDol,false)}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">not ad-attributed</div></td>
       ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
     tbody.appendChild(str);
@@ -4366,11 +4424,11 @@ function renderRange(){
     gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
     gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${(m.marketplaceTotal||0)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
-      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}
+      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}${momLine(m.adSpend,P&&P.adSpend,fDol,false)}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
       ${_dash}${_dash}
-      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(m.totalSales)}</td>
-      <td style="font-weight:700;color:#fff;">${m.tacos!=null?fPct(m.tacos):'—'}</td>
+      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(m.totalSales)}${momLine(m.totalSales,P&&P.totalSales,fDol,false)}</td>
+      <td style="font-weight:700;color:#fff;">${m.tacos!=null?fPct(m.tacos):'—'}${momLine(m.tacos,P&&P.tacos,fPct,true)}</td>
       ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
     tbody.appendChild(gtr);
   }
