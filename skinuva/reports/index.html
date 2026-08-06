@@ -998,12 +998,41 @@ function _canonChannel(ch){
 // fetch_shopify_sales.py from the "Total sales by sales channel" report with
 // Draft Orders excluded); manual_totals.json is the fallback for months
 // predating that integration or when a fetch failed.
+// DTC / store revenue for a month, in order of trustworthiness:
+//   1. shopify_sales.json  (the Shopify Admin API, exact, excludes Draft Orders)
+//   2. manual_totals.json  (the old hand-entered override)
+//   3. the Google Sheet's "Website Sales" channel row
+//
+// Step 3 matters for March-May 2026, which predate the Shopify API integration.
+// For those months the Sheet's "Website Sales" line is the ONLY record of DTC
+// revenue, and the channel table filters that row out -- so without this fallback
+// the Total Sales column lost $50-56K a month (April $55,969.95, March
+// $50,832.43) and TACOS looked far better than it was. The API value is preferred
+// wherever it exists because the Sheet's row went stale once the integration
+// landed (June reads $6,771.16 there vs the API's true $40,856.74).
+function _websiteSalesFromSheet(monthLabel){
+  if(!monthLabel||typeof DATA==='undefined'||!DATA.channels) return null;
+  const rows=DATA.channels[monthLabel];
+  if(!rows) return null;
+  const canon=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
+  const r=rows.find(c=>canon(c.channel)==='websitesales');
+  return (r&&r.totalSales!=null&&r.totalSales>0)?r.totalSales:null;
+}
 function _shopifySalesFor(monthLabel){
   if(!monthLabel) return null;
   const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
   if(sm&&sm.shopify!=null) return sm.shopify;
   const mt=(typeof MANUAL_TOTALS!=='undefined'&&MANUAL_TOTALS)?MANUAL_TOTALS[monthLabel]:null;
   if(mt&&mt.shopify!=null) return mt.shopify;
+  return _websiteSalesFromSheet(monthLabel);
+}
+// Which of the three sources the figure came from, for the row's sub-label.
+function _shopifySourceFor(monthLabel){
+  const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
+  if(sm&&sm.shopify!=null) return 'Shopify API · excl. Draft Orders';
+  const mt=(typeof MANUAL_TOTALS!=='undefined'&&MANUAL_TOTALS)?MANUAL_TOTALS[monthLabel]:null;
+  if(mt&&mt.shopify!=null) return 'manual entry';
+  if(_websiteSalesFromSheet(monthLabel)!=null) return 'Sheet · Website Sales row';
   return null;
 }
 // Walmart lives in skinuva_monthly.json / manual_totals.json, NOT on the
@@ -1816,7 +1845,15 @@ function render(){
   function buildChannelRows(monthKey, era){
     const src=DATA.channels[monthKey]||[];
     const r2=(n,d=2)=>n==null?null:Math.round(n*Math.pow(10,d))/Math.pow(10,d);
-    let rows=src.filter(c=>c.channel!=='Total Paid Media');
+    // "Website Sales" is dropped, not just hidden. It is the Sheet's DTC revenue
+    // line -- not an ad channel -- and it is already surfaced by the Shopify row,
+    // which falls back to exactly this figure for pre-API months. Leaving it in
+    // the array meant its totalSales landed in the Total Paid Media subtotal AND
+    // again in the Shopify row, double-counting ~$51-56K for March-May: the very
+    // bug this function exists to fix, re-entering through a different door.
+    // It has no spend/clicks/orders, so it never contributed to any other total.
+    const canonCh=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
+    let rows=src.filter(c=>c.channel!=='Total Paid Media'&&canonCh(c.channel)!=='websitesales');
     if(era&&((era.spend||0)>0||(era.adSales||0)>0)){
       let sawAmazon=false;
       rows=rows.map(c=>{
@@ -2020,7 +2057,7 @@ function render(){
     // Shopify revenue belongs in the Total Sales column now that one exists.
     // No TACOS: there is no Shopify ad spend to divide by.
     str.innerHTML=`<td><span class="dot" style="background:#96BF48"></span><span style="color:#96BF48;font-weight:700;">Shopify — Store Sales</span>
-        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · excl. Draft Orders</div></td>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · ${_shopifySourceFor(selectedMonth)||'source unknown'}</div></td>
       ${_dash}${_dash}${_dash}
       <td style="font-weight:700;color:#96BF48;">${fDol(_shopNow)}${momLine(_shopNow,_shopPrev,fDol,false,_shopFc)}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">not ad-attributed</div></td>
@@ -4369,8 +4406,17 @@ function injectJuneApiData(){
   //      portfolio-wide number masquerading as this brand's)
   const _smCurTotal=(_smCur.amazon&&_smCur.amazon.totalSales!=null)?_smCur.amazon.totalSales:null;
   const amzTotalSales=_mt.amazonTotal!=null?_mt.amazonTotal:(_smCurTotal!=null?_smCurTotal:0);
-  const walmartSales=_mt.walmart||0;
-  const shopifySales=_mt.shopify||0;
+  // Resolved through the shared helpers, NOT straight off manual_totals.
+  // These used to read `_mt.walmart` / `_mt.shopify` only. manual_totals.json
+  // stopped being maintained once fetch_shopify_sales.py and walmart_revenue.json
+  // took over, so both silently evaluated to 0 -- and because this is the
+  // CURRENT-month injector, the Total Sales and TACOS KPI cards dropped every
+  // dollar of DTC revenue for the live month. August 2026 read $16.0K instead of
+  // $24.9K and TACOS 26.6% instead of 17.2%. Completed months were unaffected
+  // (they get combinedTotalSales from the Python pipeline, which does include
+  // Shopify) which is exactly why this went unnoticed.
+  const walmartSales=_walmartSalesFor(_currentMonthLabel());
+  const shopifySales=_shopifySalesFor(_currentMonthLabel())||0;
   const combinedTotalSales=rd(amzTotalSales+walmartSales+shopifySales);
   const amzAcos=amzSales>0?rd(amzSpend/amzSales*100):null;
   const amzCpc=amzClicks>0?rd(amzSpend/amzClicks):null;
