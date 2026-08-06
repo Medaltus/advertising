@@ -1823,7 +1823,11 @@ function render(){
     if(x.ip) o.prev=pv!=null?pct(pv):null;
     else if(x.dl) o.prev=pv!=null?'$'+pv.toFixed(2):null;
     else if(x.ord) o.prev=pv!=null?Math.round(pv).toLocaleString():null;
-    else o.prev=pv!=null?fmt(pv,x.px||'$',x.dc||0):null;
+    // x.px!=null, not x.px||'$' -- Impressions and Clicks set px:'' to suppress the
+    // currency symbol, but '' is falsy so the fallback fired anyway and their prev:
+    // line read "$3.2M" / "$14.0K". The value above it never had a $, so the card
+    // contradicted itself.
+    else o.prev=pv!=null?fmt(pv,x.px!=null?x.px:'$',x.dc||0):null;
     if(!ip) o.mom=momPct(md[x.k],pv);
     const fval=f(x.k); if(fval!=null){
       if(x.ip) o.fFmt=pct(fval);
@@ -4266,7 +4270,16 @@ function computeRangeMetrics(s,e){
     impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,
     aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,
     channels:[amzCh,gCh,...monthlyChs,totCh],rows,
-    aligned:cov.aligned,months:cov.months,shopify:shopTotal,marketplaceTotal:mktTotal};
+    aligned:cov.aligned,months:cov.months,shopify:shopTotal,marketplaceTotal:mktTotal,
+    // Unrounded rates, for computing MoM. The fields above are rounded to 2dp for
+    // display, and deriving a percentage change from those loses real precision at
+    // small magnitudes: CTR 0.50432% rounds to 0.5 and 0.44022% to 0.44, turning a
+    // true +14.6% into +13.6%. The monthly view compares raw values, so without this
+    // the same month showed different MoM figures in the two views.
+    _raw:{adSpend:tS,adSales:tAs,acos:tAs>0?tS/tAs*100:null,totalSales:grandTotal,
+      tacos:(grandTotal!=null&&grandTotal>0)?tS/grandTotal*100:null,
+      impressions:tI,clicks:tC,ctr:tI>0?tC/tI*100:null,cpc:tC>0?tS/tC:null,
+      orders:tO,aov:tO>0?tAs/tO:null,cvr:tC>0?tO/tC*100:null}};
 }
 
 function renderRange(){
@@ -4297,18 +4310,26 @@ function renderRange(){
   // view shows. Only for aligned ranges -- see _priorRangeFor for why.
   const _pr=m.aligned?_priorRangeFor(m):null;
   const P=_pr?computeRangeMetrics(_pr.s,_pr.e):null;
-  // inv: lower is better, so the arrow colour flips (ACOS, TACOS, CPC).
+  // Formatters mirror renderAll's KPI descriptors exactly, so the same month reads
+  // identically whether reached by date range or by the month dropdown. MoM comes
+  // from _raw (unrounded) for the same reason the monthly view uses md/prev directly.
   const _k=(l,v,key,fmtFn,inv,sub)=>{
     const o={sub:sub||null};
-    if(P&&P[key]!=null){ o.prev=fmtFn(P[key]); o.mom=momPct(m[key],P[key]); if(inv)o.inv=true; }
+    if(P&&P[key]!=null){
+      o.prev=fmtFn(P[key]);
+      const cv=(m._raw&&m._raw[key]!=null)?m._raw[key]:m[key];
+      const pv=(P._raw&&P._raw[key]!=null)?P._raw[key]:P[key];
+      o.mom=momPct(cv,pv);
+      if(inv)o.inv=true;
+    }
     return kpi(l,v,o);
   };
-  const _d=v=>fmt(v,'$',0);
-  r1.appendChild(_k('Ad Spend',rd2(m.adSpend),'adSpend',_d,false));
-  r1.appendChild(_k('Ad Sales',rd2(m.adSales),'adSales',_d,false));
-  r1.appendChild(_k('CVR',m.cvr!=null?m.cvr.toFixed(2)+'%':'—','cvr',pct,false));
+  const _pc2=v=>v!=null?Number(v).toFixed(2)+'%':'—';
+  r1.appendChild(_k('Ad Spend',fmt(m.adSpend),'adSpend',fmt,false));
+  r1.appendChild(_k('Ad Sales',fmt(m.adSales),'adSales',fmt,false));
+  r1.appendChild(_k('CVR',m.cvr!=null?m.cvr.toFixed(2)+'%':'—','cvr',_pc2,false));
   r1.appendChild(_k('ACOS',pct(m.acos),'acos',pct,true));
-  r1.appendChild(_k('Total Sales',m.totalSales!=null?rd2(m.totalSales):'—','totalSales',_d,false,_tsSub));
+  r1.appendChild(_k('Total Sales',m.totalSales!=null?fmt(m.totalSales):'—','totalSales',fmt,false,_tsSub));
   r1.appendChild(_k('TACOS',m.tacos!=null?pct(m.tacos):'—','tacos',pct,true,_tsSub));
 
   // KPI Row 2
@@ -4318,7 +4339,7 @@ function renderRange(){
   r2.appendChild(_k('Clicks',fmt(m.clicks,'',0),'clicks',_n,false));
   r2.appendChild(_k('CTR',pct(m.ctr),'ctr',pct,false));
   r2.appendChild(_k('CPC',m.cpc!=null?'$'+m.cpc.toFixed(2):'—','cpc',_c,true));
-  r2.appendChild(_k('Orders',m.orders!=null?m.orders.toLocaleString():'—','orders',v=>Math.round(v).toLocaleString(),false));
+  r2.appendChild(_k('Orders',m.orders!=null?Math.round(m.orders).toLocaleString():'—','orders',v=>Math.round(v).toLocaleString(),false));
   r2.appendChild(_k('AOV',m.aov!=null?'$'+m.aov.toFixed(2):'—','aov',_c,false));
 
   // Spend bar chart
