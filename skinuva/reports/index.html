@@ -4110,6 +4110,32 @@ function clearRange(){
   render();
 }
 
+// Which calendar months a range covers, and whether it covers them WHOLE.
+//
+// This matters because the two data sources have different granularity. Amazon and
+// Google are archived per day, so any arbitrary range is exact. Walmart, Shopify and
+// the Sheet channels (Meta/Reddit/TikTok/Pinterest) exist only as monthly figures --
+// there is no daily breakdown to slice. So:
+//   whole-month range  -> the monthly figure IS the answer for that range; include it
+//   partial range      -> it is not, and pro-rating it would be inventing data; omit
+//
+// "Whole" allows the in-progress month to end early: the monthly Walmart/Shopify
+// figures for the current month are themselves month-to-date, so an MTD range lines
+// up with them. That makes MTD and Last Month both give a complete table.
+function _rangeMonthCoverage(s,e){
+  const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const [sy,sm,sd]=s.split('-').map(Number), [ey,em,ed]=e.split('-').map(Number);
+  const lastDay=(y,m)=>new Date(y,m,0).getDate();
+  const now=new Date(), cy=now.getFullYear(), cm=now.getMonth()+1;
+  const startsOnFirst = sd===1;
+  const endsOnLast    = ed===lastDay(ey,em);
+  const endIsCurMonth = (ey===cy&&em===cm);
+  const months=[];
+  let y=sy,m=sm;
+  while(y<ey||(y===ey&&m<=em)){ months.push(MO[m-1]+' '+y); m++; if(m>12){m=1;y++;} }
+  return {aligned: startsOnFirst && (endsOnLast||endIsCurMonth), months};
+}
+
 function computeRangeMetrics(s,e){
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
   let a={spend:0,adSales:0,totalSales:0,orders:0,clicks:0,impressions:0};
@@ -4124,13 +4150,94 @@ function computeRangeMetrics(s,e){
     g.clicks+=gd.clicks||0; g.impressions+=gd.impressions||0;
     rows.push({date:d,amz:am,ggl:gd});
   });
-  const amzCh={channel:'Amazon',adSpend:rd(a.spend),adSales:rd(a.adSales),acos:a.adSales>0?rd(a.spend/a.adSales*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(a.spend/a.totalSales*100):null,impressions:a.impressions,clicks:a.clicks,ctr:a.impressions>0?rd(a.clicks/a.impressions*100):null,cpc:a.clicks>0?rd(a.spend/a.clicks):null,orders:a.orders,aov:a.orders>0?rd(a.adSales/a.orders):null,cvr:a.clicks>0?rd(a.orders/a.clicks*100):null};
+  // In 'All (Ozlee)' the range view previously showed Skinuva only, silently
+  // disagreeing with the monthly view for the same dates. eraclea has its own daily
+  // archive, so fold it into Amazon here exactly as the monthly view does.
+  if(selectedOzleeBrand==='All'&&ERACLEA_DAILY){
+    Object.entries(ERACLEA_DAILY).forEach(([d,row])=>{
+      if(d<s||d>e) return; const em=row.amazon||{};
+      a.spend+=em.spend||0; a.adSales+=em.adSales||0; a.orders+=em.orders||0;
+      a.clicks+=em.clicks||0; a.impressions+=em.impressions||0;
+    });
+  }
+
+  const cov=_rangeMonthCoverage(s,e);
+
+  // Amazon total sales comes from the MONTHLY brand-filtered figure, never from the
+  // archive. The archive's per-day amazon.totalSales is the whole Amazon account
+  // across every Medaltus brand -- fetch_ads_data.py stamps the account-wide number
+  // onto each brand's rows. Summing it gave July 2026 $204,210.86 against Skinuva's
+  // true $132,174.03: revenue overstated 55% and TACOS understated to match (11.9%
+  // shown vs 13.7% actual). Spend/clicks/orders in the archive ARE brand-specific,
+  // so only this one field was wrong. Same bug as the monthly view had; it lived on
+  // here because renderRange has its own aggregation path.
+  let amzTotal=null;
+  if(cov.aligned){
+    let t=0, any=false;
+    cov.months.forEach(mk=>{
+      const sa=((SKINUVA_MONTHLY[mk]||{}).amazon)||{};
+      if(sa.totalSales!=null){t+=sa.totalSales;any=true;}
+      if(selectedOzleeBrand==='All'){
+        const ea=((ERACLEA_MONTHLY[mk]||{}).amazon)||{};
+        if(ea.totalSales!=null) t+=ea.totalSales;
+      }
+    });
+    if(any) amzTotal=rd(t);
+  }
+
+  const amzCh={channel:'Amazon',adSpend:rd(a.spend),adSales:rd(a.adSales),acos:a.adSales>0?rd(a.spend/a.adSales*100):null,totalSales:amzTotal,tacos:amzTotal>0?rd(a.spend/amzTotal*100):null,impressions:a.impressions,clicks:a.clicks,ctr:a.impressions>0?rd(a.clicks/a.impressions*100):null,cpc:a.clicks>0?rd(a.spend/a.clicks):null,orders:a.orders,aov:a.orders>0?rd(a.adSales/a.orders):null,cvr:a.clicks>0?rd(a.orders/a.clicks*100):null};
   const gCh={channel:'Google',adSpend:rd(g.spend),adSales:rd(g.adSales),acos:g.adSales>0?rd(g.spend/g.adSales*100):null,totalSales:null,tacos:null,impressions:g.impressions,clicks:g.clicks,ctr:g.impressions>0?rd(g.clicks/g.impressions*100):null,cpc:g.clicks>0?rd(g.spend/g.clicks):null,orders:Math.round(g.conversions),aov:null,cvr:null};
-  const allChs=[amzCh,gCh];
+
+  // Monthly-only channels (Walmart + the Sheet's Meta/Reddit/TikTok/Pinterest),
+  // summed across every whole month the range covers. Amazon and Google are skipped
+  // because the daily archive above is the better source for them.
+  const monthlyChs=[];
+  let shopTotal=null;
+  if(cov.aligned){
+    const agg={};
+    cov.months.forEach(mk=>{
+      (DATA.channels[mk]||[]).forEach(c=>{
+        if(c.channel==='Total Paid Media'||c.channel==='Amazon'||c.channel==='Google') return;
+        if(_isWebsiteSalesLabel(c.channel)) return;
+        const k=c.channel;
+        if(!agg[k]) agg[k]={channel:k,adSpend:0,adSales:0,orders:0,clicks:0,impressions:0,totalSales:null};
+        agg[k].adSpend+=c.adSpend||0; agg[k].adSales+=c.adSales||0; agg[k].orders+=c.orders||0;
+        agg[k].clicks+=c.clicks||0; agg[k].impressions+=c.impressions||0;
+        if(c.totalSales!=null) agg[k].totalSales=(agg[k].totalSales||0)+c.totalSales;
+      });
+      const sv=_shopifySalesFor(mk);
+      if(sv!=null) shopTotal=(shopTotal||0)+sv;
+    });
+    Object.values(agg).forEach(c=>{
+      // Drop rows with nothing in them, same rule as the monthly table.
+      if(!(c.adSpend>0||c.adSales>0||c.orders>0||c.impressions>0||c.clicks>0||c.totalSales>0)) return;
+      monthlyChs.push({channel:c.channel,adSpend:rd(c.adSpend),adSales:rd(c.adSales),
+        acos:c.adSales>0?rd(c.adSpend/c.adSales*100):null,
+        totalSales:c.totalSales!=null?rd(c.totalSales):null,
+        tacos:(c.totalSales!=null&&c.totalSales>0)?rd(c.adSpend/c.totalSales*100):null,
+        impressions:c.impressions,clicks:c.clicks,
+        ctr:c.impressions>0?rd(c.clicks/c.impressions*100):null,
+        cpc:c.clicks>0?rd(c.adSpend/c.clicks):null,orders:c.orders,
+        aov:c.orders>0?rd(c.adSales/c.orders):null,
+        cvr:c.clicks>0?rd(c.orders/c.clicks*100):null});
+    });
+    monthlyChs.sort((x,y)=>(y.adSpend||0)-(x.adSpend||0));
+  }
+
+  const allChs=[amzCh,gCh,...monthlyChs];
   const tS=rd(allChs.reduce((s,c)=>s+(c.adSpend||0),0)),tAs=rd(allChs.reduce((s,c)=>s+(c.adSales||0),0));
   const tO=allChs.reduce((s,c)=>s+(c.orders||0),0),tI=allChs.reduce((s,c)=>s+(c.impressions||0),0),tC=allChs.reduce((s,c)=>s+(c.clicks||0),0);
-  const totCh={channel:'Total Paid Media',adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(tS/a.totalSales*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null};
-  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:rd(a.totalSales),tacos:a.totalSales>0?rd(tS/a.totalSales*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,channels:[amzCh,gCh,totCh],rows};
+  // Marketplace revenue only -- Shopify is its own row, as in the monthly view.
+  const anyTs=allChs.some(c=>c.totalSales!=null);
+  const mktTotal=(anyTs&&amzTotal!=null)?rd(allChs.reduce((s,c)=>s+(c.totalSales||0),0)):null;
+  const grandTotal=mktTotal!=null?rd(mktTotal+(shopTotal||0)):null;
+  const totCh={channel:'Total Paid Media',adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:mktTotal,tacos:(mktTotal!=null&&mktTotal>0)?rd(tS/mktTotal*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null};
+  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,
+    totalSales:grandTotal,tacos:(grandTotal!=null&&grandTotal>0)?rd(tS/grandTotal*100):null,
+    impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,
+    aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,
+    channels:[amzCh,gCh,...monthlyChs,totCh],rows,
+    aligned:cov.aligned,months:cov.months,shopify:shopTotal,marketplaceTotal:mktTotal};
 }
 
 function renderRange(){
@@ -4145,14 +4252,21 @@ function renderRange(){
   const rd2=v=>v!=null?'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
 
   // Subtitle
-  document.getElementById('subtitle').textContent='Date Range View: Amazon & Google · '+rangeStart+' → '+rangeEnd;
+  document.getElementById('subtitle').textContent='Date Range View: '+
+    (m.aligned?'all channels':'Amazon & Google only (partial month)')+' · '+rangeStart+' → '+rangeEnd;
   // Dim month tabs
   const tb=document.getElementById('month-tabs');
   if(tb) tb.style.opacity='0.3';
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:pct(m.acos)},{l:'Total Sales',v:rd2(m.totalSales),sub:'Amazon only'},{l:'TACOS',v:pct(m.tacos),sub:'Amazon only'}]
+  // Total Sales / TACOS are blank on a partial range rather than wrong: Amazon's
+  // brand-filtered revenue only exists per calendar month, and the per-day archive
+  // figure is account-wide. Better an honest dash than a 55%-inflated number.
+  const _tsSub=m.aligned?'Amazon + Walmart + Shopify':'needs whole calendar months';
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:pct(m.acos)},
+   {l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:_tsSub},
+   {l:'TACOS',v:m.tacos!=null?pct(m.tacos):'—',sub:_tsSub}]
     .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
 
   // KPI Row 2
@@ -4217,8 +4331,8 @@ function renderRange(){
       <td style="${tStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}</td>
       <td style="${tStyle}">${c.adSales!=null?fDol(c.adSales):'—'}</td>
       <td style="${tStyle}" class="${ac}">${acD!=null?acD+'%':'N/A'}</td>
-      <td style="${tStyle}">${c.totalSales!=null?fDol(c.totalSales):'—'}</td>
-      <td style="${tStyle}">${c.tacos!=null?fPct(c.tacos):'—'}</td>
+      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.totalSales!=null?fDol(c.totalSales):'—')}</td>
+      <td style="${tStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.tacos!=null?fPct(c.tacos):'—')}</td>
       <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}</td>
       <td style="${tStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}</td>
       <td style="${tStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}</td>
@@ -4227,9 +4341,39 @@ function renderRange(){
       <td style="${tStyle}">${c.cvr!=null?c.cvr+'%':'—'}</td>`;
     tbody.appendChild(tr);
   });
-  const noteRow=document.createElement('tr');
-  noteRow.innerHTML=`<td colspan="12" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">Meta, Walmart, Pinterest & other channels available in monthly view only</td>`;
-  tbody.appendChild(noteRow);
+  // Shopify + bottom Total Sales, mirroring the monthly table so the two views are
+  // laid out identically and the Total Sales column adds down the same way.
+  const _dash='<td style="color:rgba(255,255,255,0.25)">—</td>';
+  if(m.shopify!=null){
+    const str=document.createElement('tr');
+    str.style.cssText='border-top:2px solid rgba(255,255,255,0.15);';
+    str.innerHTML=`<td><span class="dot" style="background:#96BF48"></span><span style="color:#96BF48;font-weight:700;">Shopify — Store Sales</span>
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">DTC revenue · whole months only</div></td>
+      ${_dash}${_dash}${_dash}
+      <td style="font-weight:700;color:#96BF48;">${fDol(m.shopify)}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">not ad-attributed</div></td>
+      ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
+    tbody.appendChild(str);
+  }
+  if(m.totalSales!=null){
+    const gtr=document.createElement('tr');
+    gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
+    gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${(m.marketplaceTotal||0)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
+      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}
+        <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
+      ${_dash}${_dash}
+      <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(m.totalSales)}</td>
+      <td style="font-weight:700;color:#fff;">${m.tacos!=null?fPct(m.tacos):'—'}</td>
+      ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
+    tbody.appendChild(gtr);
+  }
+  // Only warn when something is actually missing, and say exactly why.
+  if(!m.aligned){
+    const noteRow=document.createElement('tr');
+    noteRow.innerHTML=`<td colspan="12" style="text-align:center;padding:10px;color:rgba(255,255,255,0.3);font-size:11px;font-style:italic;">Walmart, Shopify, Meta, Reddit, TikTok &amp; Pinterest are only recorded per calendar month, so they are excluded from a partial range — and Total Sales with them. Use whole months (or the Last Month / MTD presets) for the full picture.</td>`;
+    tbody.appendChild(noteRow);
+  }
 
   renderSearchTermInsights();
   renderPlacementPerformance();
