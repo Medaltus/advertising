@@ -1383,7 +1383,19 @@ function kill(id){if(charts[id]){charts[id].destroy();delete charts[id];}}
 // data-final into any card still showing the placeholder, and is called at the end
 // of every render path -- so a stale placeholder cannot survive a completed render
 // no matter which view built it or what the flag says.
-let _revealPending=false;   // true only for the initial load-in animation
+// True only during the initial load-in count-up. Cleared by WHICHEVER COMES FIRST of:
+// the reveal resolving, a 4s timeout, the tab becoming visible, or any second render.
+// It must never be able to stick, because everything below keys off it.
+//
+// The reveal is driven by requestAnimationFrame, which browsers throttle to a stop in
+// a background tab -- so if the dashboard is opened in a tab that isn't focused, the
+// animation stalls, its promise never resolves, and anything waiting on it waits
+// forever. That is exactly how every KPI card ended up permanently blank.
+let _revealPending=false, _renderSeq=0;
+function _endReveal(){
+  if(!_revealPending && initialLoadDone) return;
+  _revealPending=false; initialLoadDone=true; _fillKpiPlaceholders();
+}
 function _fillKpiPlaceholders(){
   // No-op while the load-in reveal is still running, or it would paint the final
   // numbers a moment before the count-up animates them.
@@ -1397,7 +1409,9 @@ function _fillKpiPlaceholders(){
 function kpi(label,value,opts){
   opts=opts||{};
   const el=document.createElement('div'); el.className='kpi-card';
-  const displayVal=initialLoadDone ? value : '—';
+  // Placeholder only while the initial reveal is genuinely mid-flight. Checking
+  // initialLoadDone as well keeps renderEracleaView's existing guard working.
+  const displayVal=(_revealPending && !initialLoadDone) ? '—' : value;
   let h=`<div class="kpi-label">${label}</div><div class="kpi-value" data-final="${value.replace(/"/g,'&quot;')}">${displayVal}</div>`;
   if(opts.sub) h+=`<div class="kpi-sub${opts.warn?' warn':''}">${opts.sub}</div>`;
   if(opts.fFmt!=null){
@@ -1708,6 +1722,8 @@ function render(){
   if(rangeMode&&rangeStart&&rangeEnd){renderRange();return;}
   if(!DATA||!DATA.monthly.length) return;
   const tb2=document.getElementById('month-tabs'); if(tb2) tb2.style.opacity='';
+  // See renderRange: past the first render the placeholder must not apply.
+  if(++_renderSeq>1) _endReveal();
   let md=DATA.monthly.find(m=>m.month===selectedMonth); if(!md) return;
   const idx=DATA.monthly.indexOf(md);
   let prev=idx>0?DATA.monthly[idx-1]:null;
@@ -3778,12 +3794,14 @@ async function init(){
     render();
     startRefreshTimer();
     document.getElementById('audio-btn').style.display='flex';
-    // Once the reveal is done, flush any card it couldn't reach -- if the user
-    // switched month or applied a date range mid-animation, renderRange/renderAll
-    // replaced the cards it was walking and those replacements never got animated.
-    revealKpisSequentially().then(()=>{
-      initialLoadDone=true; _revealPending=false; _fillKpiPlaceholders();
-    }).catch(()=>{ initialLoadDone=true; _revealPending=false; _fillKpiPlaceholders(); });
+    // Four independent ways out, because the reveal itself cannot be trusted to
+    // finish: requestAnimationFrame is throttled to a halt in a background tab, so
+    // opening the dashboard unfocused stalls the animation indefinitely.
+    revealKpisSequentially().then(_endReveal).catch(_endReveal);
+    setTimeout(_endReveal, 4000);                                  // hard safety net
+    document.addEventListener('visibilitychange',()=>{             // tab brought forward
+      if(document.visibilityState==='visible') _endReveal();
+    });
     loadMarketTicker();
     // Auto-load agents from cache or run fresh if data changed
     initAgents();
@@ -4334,6 +4352,9 @@ function renderRange(){
     if(r2) r2.innerHTML='';
     return;
   }
+  // Any render past the first is a deliberate user action, never the load-in
+  // animation, so the placeholder must not apply to the cards it builds.
+  if(++_renderSeq>1) _endReveal();
   const m=computeRangeMetrics(rangeStart,rangeEnd);
   const rd2=v=>v!=null?'$'+Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
 
