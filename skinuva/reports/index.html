@@ -1804,7 +1804,11 @@ function render(){
       const item=document.createElement('div');
       item.className='month-dd-item'+(m.month===selectedMonth?' active':'');
       item.innerHTML=`<span>${mp[0]}${m.partial?' ⏳':''}</span><span class="month-dd-year">${mp[1]||''}</span>`;
-      item.onclick=()=>{selectedMonth=m.month;menu.remove();render();};
+      // Picking a month must leave range mode. render() short-circuits to
+      // renderRange() whenever rangeMode is set, so without this the new month was
+      // stored and then ignored -- the dropdown appeared to do nothing while the
+      // page kept showing the date-range figures.
+      item.onclick=()=>{selectedMonth=m.month;menu.remove();_resetRangeUI();render();};
       menu.appendChild(item);
     });
     btn.onclick=(e)=>{
@@ -4156,11 +4160,16 @@ function _activateRange(s,e){
   render();
 }
 
-function clearRange(){
+// Tears down range mode and its UI state WITHOUT rendering, so callers that are
+// about to render anyway (picking a month from the dropdown) don't render twice.
+function _resetRangeUI(){
   rangeMode=false; rangeStart=null; rangeEnd=null;
-  document.getElementById('range-active-pill').style.display='none';
-  document.getElementById('range-clear-btn').style.display='none';
+  const pill=document.getElementById('range-active-pill'); if(pill) pill.style.display='none';
+  const clr=document.getElementById('range-clear-btn'); if(clr) clr.style.display='none';
   ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+}
+function clearRange(){
+  _resetRangeUI();
   render();
 }
 
