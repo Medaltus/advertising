@@ -4222,10 +4222,19 @@ function computeRangeMetrics(s,e){
   let shopTotal=null;
   if(cov.aligned){
     const agg={};
+    // A single-month range must reproduce that month's row EXACTLY, including the
+    // rates. Recomputing them from spend/sales looked more rigorous but made the two
+    // views disagree on the same month: Meta's ACOS read 126.62% here against the
+    // monthly view's 127% (the Sheet stores a rounded 127), and Reddit's CPC vanished
+    // because the Sheet reports a CPC with no click count to divide by. Passing the
+    // row through is what "Last Month should look like the month view" means.
+    // Multi-month ranges still aggregate, where recomputing is the only option.
+    const single=cov.months.length===1;
     cov.months.forEach(mk=>{
       (DATA.channels[mk]||[]).forEach(c=>{
         if(c.channel==='Total Paid Media'||c.channel==='Amazon'||c.channel==='Google') return;
         if(_isWebsiteSalesLabel(c.channel)) return;
+        if(single){ agg[c.channel]={...c,_verbatim:true}; return; }
         const k=c.channel;
         // Every field starts null and only becomes a number when a month actually
         // supplies one. Initialising to 0 made the Sheet's blank impression/click
@@ -4243,6 +4252,7 @@ function computeRangeMetrics(s,e){
     Object.values(agg).forEach(c=>{
       // Drop rows with nothing in them, same rule as the monthly table.
       if(!(c.adSpend>0||c.adSales>0||c.orders>0||c.impressions>0||c.clicks>0||c.totalSales>0)) return;
+      if(c._verbatim){ const {_verbatim,...row}=c; monthlyChs.push(row); return; }
       const R=v=>v!=null?rd(v):null;
       monthlyChs.push({channel:c.channel,adSpend:R(c.adSpend),adSales:R(c.adSales),
         acos:c.adSales>0?rd(c.adSpend/c.adSales*100):null,
@@ -4254,7 +4264,9 @@ function computeRangeMetrics(s,e){
         aov:c.orders>0?rd(c.adSales/c.orders):null,
         cvr:(c.clicks>0&&c.orders!=null)?rd(c.orders/c.clicks*100):null});
     });
-    monthlyChs.sort((x,y)=>(y.adSpend||0)-(x.adSpend||0));
+    // Deliberately NOT sorted. Insertion order is the Sheet's own channel order,
+    // which is what the monthly table shows -- sorting by spend here put the same
+    // month's rows in a different order in the two views.
   }
 
   const allChs=[amzCh,gCh,...monthlyChs];
@@ -4445,7 +4457,7 @@ function renderRange(){
     gtr.style.cssText='border-top:2px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.03);';
     gtr.innerHTML=`<td style="font-weight:700;color:#fff;">Total Sales
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon + Shopify${(m.marketplaceTotal||0)>0?' + Walmart':''}${selectedOzleeBrand==='All'?' + eraclea':''}</div></td>
-      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}${momLine(m.adSpend,P&&P.adSpend,fDol,false)}
+      <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}
         <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
       ${_dash}${_dash}
       <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(m.totalSales)}${momLine(m.totalSales,P&&P.totalSales,fDol,false)}</td>
