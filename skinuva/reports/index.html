@@ -1010,13 +1010,18 @@ function _canonChannel(ch){
 // $50,832.43) and TACOS looked far better than it was. The API value is preferred
 // wherever it exists because the Sheet's row went stale once the integration
 // landed (June reads $6,771.16 there vs the API's true $40,856.74).
+// Filled by parseSheet from the Sheet's "Website Sales" channel row, keyed by the
+// same resolved month label as DATA.channels. Kept separate from DATA.channels on
+// purpose: it is revenue, not an ad channel, and every paid-media subtotal on this
+// page is computed by summing channel rows.
+const SHEET_WEBSITE_SALES = {};
+function _isWebsiteSalesLabel(ch){
+  return String(ch||'').toLowerCase().replace(/[^a-z]/g,'')==='websitesales';
+}
 function _websiteSalesFromSheet(monthLabel){
-  if(!monthLabel||typeof DATA==='undefined'||!DATA.channels) return null;
-  const rows=DATA.channels[monthLabel];
-  if(!rows) return null;
-  const canon=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
-  const r=rows.find(c=>canon(c.channel)==='websitesales');
-  return (r&&r.totalSales!=null&&r.totalSales>0)?r.totalSales:null;
+  if(!monthLabel) return null;
+  const v=SHEET_WEBSITE_SALES[monthLabel];
+  return (v!=null&&v>0)?v:null;
 }
 function _shopifySalesFor(monthLabel){
   if(!monthLabel) return null;
@@ -1144,6 +1149,7 @@ function parseSheet(text, updatedDate) {
     const co=isSkinuvaCh?1:0; // channel col offset
     let tableMonth=null;
     const adRows = [];
+    const websiteSales = [];
     let totalRow = null;
     for(let i=1;i<tbl.length;i++){
       const r=tbl[i];
@@ -1154,7 +1160,18 @@ function parseSheet(text, updatedDate) {
       if(ch==='Total Paid Media'){totalRow=row;continue;}
       const _canon=_canonChannel(ch);
       if(_canon){ row.channel=_canon; adRows.push(row); }
-      else if(ch!=='Website Sales'){ console.warn('[parseSheet] Channel name "'+ch+'" not in AD_CHANNELS -- row skipped (spend/sales for this row will not appear anywhere on the dashboard)'); }
+      else if(_isWebsiteSalesLabel(ch)){
+        // Captured, not discarded. "Website Sales" is correctly kept out of
+        // AD_CHANNELS (it has no spend and is not an ad channel), but it carries
+        // the month's DTC revenue -- and for March-May 2026, before the Shopify
+        // integration, it is the ONLY record of it. Dropping it entirely meant
+        // that revenue existed nowhere on the page, so the Total Sales column was
+        // short $50-56K a month and TACOS looked better than reality.
+        // Parked in its own map rather than DATA.channels so it can never be
+        // mistaken for an ad channel or swept into a paid-media subtotal.
+        if(row.totalSales!=null&&row.totalSales>0) websiteSales.push({month:tableMonth,totalSales:row.totalSales});
+      }
+      else { console.warn('[parseSheet] Channel name "'+ch+'" not in AD_CHANNELS -- row skipped (spend/sales for this row will not appear anywhere on the dashboard)'); }
     }
     // For isSkinuvaCh tables, totalRow is optional — injectJuneApiData recalculates it anyway
     if(isSkinuvaCh){if(adRows.length===0) continue;}
@@ -1182,6 +1199,13 @@ function parseSheet(text, updatedDate) {
       if(bestD>=100) best=null;
     }
     if(totalRow) adRows.push(totalRow);
+    // Store the captured Website Sales figure under the SAME resolved month key the
+    // channel rows use, so DTC revenue and ad channels can never end up on
+    // different month labels.
+    if(best&&websiteSales.length){
+      const ws=websiteSales[websiteSales.length-1];
+      if(ws&&ws.totalSales!=null&&SHEET_WEBSITE_SALES[best]==null) SHEET_WEBSITE_SALES[best]=ws.totalSales;
+    }
     if(best){
       if(!channels[best]) channels[best]=adRows; // first match wins, no overwriting
     } else if(adRows.length){
