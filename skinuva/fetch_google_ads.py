@@ -132,19 +132,57 @@ def date_range(lookback_days: int):
     return start.isoformat(), end.isoformat()
 
 
+def history_start(months_back: int):
+    """
+    First day of the calendar month `months_back` months before the current one.
+
+    WHY: Google restates conversion value retroactively — a conversion recorded
+    in August can be attributed back to a July click days later. The rolling
+    lookback freezes each day the moment it scrolls out of the window, so those
+    late conversions were never picked up and completed months stayed
+    understated. July was short by $1,002.88 (2.55%) against the Google Ads UI
+    while SPEND matched to 3 cents, which is the signature of exactly this.
+
+    Re-querying whole calendar months lets merge_daily_archive() overwrite the
+    stale days and correct_monthly_from_archive() recompute the month.
+
+    This range is used ONLY for the extended `daily_history` block. `timeline`
+    and `campaigns` stay scoped to the rolling lookback, because the dashboard's
+    "Past 31 Days" view returns the whole timeline unfiltered and the campaign
+    table scales campaign figures by a whole-window ratio — widening either
+    would silently corrupt both.
+    """
+    end = date.today() - timedelta(days=1)
+    m, y = end.month, end.year
+    for _ in range(max(0, months_back)):
+        m -= 1
+        if m == 0:
+            m, y = 12, y - 1
+    return date(y, m, 1)
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--days", type=int, default=31,
                         help="Lookback days (default 31 to match Amazon)")
+    parser.add_argument("--months-back", type=int, default=2,
+                        help="Also re-query this many completed calendar months so "
+                             "Google's retroactive conversion-value restatements are "
+                             "picked up (default 2). Feeds daily_history only.")
     args = parser.parse_args()
 
-    start, end = date_range(args.days)
+    lb_start, end = date_range(args.days)
+    # Query the wider of the two ranges; rows are split afterwards.
+    hist_start = min(date.fromisoformat(lb_start), history_start(args.months_back)).isoformat()
+    start = hist_start
 
     print(f"\n{'═'*60}")
     print(f"  Google Ads Fetcher  |  Skinuva  |  lookback={args.days}d")
-    print(f"  Date range: {start} → {end}")
+    print(f"  Query range:     {start} → {end}")
+    print(f"  timeline/campaigns scoped to: {lb_start} → {end}")
+    print(f"  daily_history (archive refresh): {hist_start} → {end}")
     print(f"{'═'*60}\n")
 
     access_token = get_access_token()
@@ -174,6 +212,7 @@ def main():
     print(f"  ✓ {len(rows)} campaign-day rows")
 
     by_date, by_campaign, budgets, campaigns_daily = {}, {}, {}, []
+    by_date_all = {}   # full query range, for daily_history / archive refresh only
 
     for r in rows:
         seg  = r.get("segments", {})
@@ -190,7 +229,12 @@ def main():
         conv  = float(met.get("conversions", 0) or 0)
         rev   = float(met.get("conversionsValue", 0) or 0)
 
-        if d and cid:
+        # Rows older than the rolling lookback exist only to refresh daily_history.
+        # They must NOT reach campaigns_daily/by_campaign or the campaign table's
+        # ratio scaling breaks, nor the 31-day timeline the dashboard renders.
+        in_lookback = (d >= lb_start) if d else False
+
+        if d and cid and in_lookback:
             campaigns_daily.append({
                 "date": d, "id": cid, "name": cname,
                 "type": camp.get("advertisingChannelType", ""),
@@ -200,6 +244,17 @@ def main():
             })
 
         if d:
+            if d not in by_date_all:
+                by_date_all[d] = {"date": d, "impressions": 0, "clicks": 0,
+                                  "spend": 0.0, "sales": 0.0, "conversions": 0.0}
+            a = by_date_all[d]
+            a["impressions"] += imp
+            a["clicks"]      += clk
+            a["spend"]       += spd
+            a["sales"]       += rev
+            a["conversions"] += conv
+
+        if d and in_lookback:
             if d not in by_date:
                 by_date[d] = {"date": d, "impressions": 0, "clicks": 0,
                                "spend": 0.0, "sales": 0.0, "conversions": 0.0}
@@ -231,6 +286,19 @@ def main():
                     "state":       camp.get("status", "").lower(),
                     "dailyBudget": micros(budget_micros),
                 }
+
+    # Extended per-day history (full query range) for archive refresh only.
+    daily_history = []
+    for d in sorted(by_date_all):
+        a = by_date_all[d]
+        daily_history.append({
+            "date":        d,
+            "impressions": a["impressions"],
+            "clicks":      a["clicks"],
+            "spend":       round(a["spend"], 2),
+            "sales":       round(a["sales"], 2),
+            "conversions": round(a["conversions"], 2),
+        })
 
     campaigns = []
     for c in by_campaign.values():
@@ -362,6 +430,12 @@ def main():
         "currency":      "USD",
         "summary":       summary,
         "timeline":      timeline,
+        # Extended per-day history covering completed calendar months, used ONLY by
+        # generate_skinuva_supplement.build_daily_archive() to refresh archive days
+        # that have scrolled out of the rolling lookback. The dashboard reads
+        # `timeline`, never this, so its "Past 31 Days" view is unaffected.
+        "daily_history":     daily_history,
+        "history_range":     {"since": hist_start, "until": end},
         "campaigns":        campaigns[:50],
         "campaigns_daily":  campaigns_daily,
         "pacing":           pacing,

@@ -202,11 +202,19 @@ def build_daily_archive(supplement: dict, google_path: Path) -> dict:
             'impressions': int(row.get('impressions', 0) or 0),
         }
 
-    # Google daily rows
+    # Google daily rows.
+    # Prefer `daily_history` — it covers completed calendar months, not just the
+    # rolling lookback, so days that scrolled out of the window get REFRESHED with
+    # Google's current values rather than staying frozen at whatever was attributed
+    # when they last fell inside it. Google restates conversion value retroactively,
+    # and that freezing left July understated by $1,002.88 (2.55%) versus the
+    # Google Ads UI while spend matched to 3 cents.
+    # Falls back to `timeline` for older files that predate the field.
     if google_path.exists():
         try:
             gdata = json.loads(google_path.read_text())
-            for row in gdata.get('timeline', []):
+            _grows = gdata.get('daily_history') or gdata.get('timeline', [])
+            for row in _grows:
                 d = row.get('date')
                 if not d:
                     continue
