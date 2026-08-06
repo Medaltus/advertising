@@ -1139,11 +1139,14 @@ function parseSheet(text, updatedDate) {
       const nmT=_nmM(tableMonth);
       const foundM=monthly.find(m=>m.month===tableMonth||_nmM(m.month)===nmT);
       if(foundM){best=foundM.month;}
-      else{
-        // Fallback: current month may not be in monthly totals yet — store under canonical label
-        const _now=new Date(),_MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
-        const curLbl=_MO[_now.getMonth()]+' '+_now.getFullYear();
-        if(nmT===_nmM(curLbl)) best=curLbl;
+      else if(/^(January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/.test(nmT)){
+        // Accept any valid "Month YYYY" label, even when that month has no row in
+        // Monthly Totals. Previously this only fell back to the CURRENT month, so a
+        // channel table whose Monthly Totals row was blank got silently discarded
+        // the moment the calendar rolled over — taking Meta/Reddit/TikTok and every
+        // other Sheet-only channel with it. Amazon/Google/Walmart survive because
+        // they're re-injected from the APIs; the Sheet-only channels just vanished.
+        best=nmT;
       }
     } else {
       for(const m of monthly){const d=Math.abs((m.adSpend||0)-((totalRow&&totalRow.adSpend)||0));if(d<bestD){bestD=d;best=m.month;}}
