@@ -1924,6 +1924,11 @@ function render(){
     // instead of publishing a Walmart-only figure -- ~$1k presented as the entire
     // business, with a TACOS in the thousands of percent. Blank is honest; a wrong
     // number that looks plausible is not.
+    // NOTE: the Total Paid Media row's totalSales/tacos are deliberately rendered
+    // blank in the table -- a paid-media subtotal of total-business revenue reads as
+    // if ads drove all of it. The value is still computed here because the bottom
+    // Total Sales row and the KPI cross-check both depend on it. Do not remove it
+    // as dead code.
     const amzRow=rows.find(c=>c.channel==='Amazon');
     const tsUnknown=!!(amzRow&&amzRow.totalSales==null);
     const anyTs=rows.some(c=>c.totalSales!=null);
@@ -2052,8 +2057,8 @@ function render(){
       <td style="${totalStyle}">${c.adSpend!=null?fDol(c.adSpend):'—'}${momLine(c.adSpend,p&&p.adSpend,fDol,false,fSpend)}</td>
       <td style="${totalStyle}">${c.adSales!=null?fDol(c.adSales):'—'}${momLine(c.adSales,p&&p.adSales,fDol,false,fSales)}</td>
       <td style="${totalStyle}" class="${ac}">${acosDisplay!=null?acosDisplay+'%':'N/A'}${momLine(acosDisplay,p&&p.adSales>0?p.acos:null,fPct,true)}</td>
-      <td style="${totalStyle}">${c.totalSales!=null?fDol(c.totalSales):'—'}${momLine(c.totalSales,p&&p.totalSales,fDol,false,chFv(c.totalSales))}</td>
-      <td style="${totalStyle}">${c.tacos!=null?fPct(c.tacos):'—'}${momLine(c.tacos,p&&p.tacos,fPct,true)}</td>
+      <td style="${totalStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.totalSales!=null?fDol(c.totalSales):'—')+momLine(c.totalSales,p&&p.totalSales,fDol,false,chFv(c.totalSales))}</td>
+      <td style="${totalStyle}${isTotal?'color:rgba(255,255,255,0.25);':''}">${isTotal?'—':(c.tacos!=null?fPct(c.tacos):'—')+momLine(c.tacos,p&&p.tacos,fPct,true)}</td>
       <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.impressions!=null?fNum(c.impressions):'—'}${momLine(c.impressions,p&&p.impressions,fNum,false,fImps)}</td>
       <td style="${totalStyle}color:rgba(255,255,255,${isTotal?'0.9':'0.6'})">${c.clicks!=null?fNum(c.clicks):'—'}${momLine(c.clicks,p&&p.clicks,fNum,false,fClicks)}</td>
       <td style="${totalStyle}">${c.cpc!=null?fCpc(c.cpc):'—'}${momLine(c.cpc,p&&p.cpc,fCpc,true)}</td>
