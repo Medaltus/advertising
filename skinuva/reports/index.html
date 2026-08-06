@@ -1857,7 +1857,15 @@ function render(){
   // Linear forecast helper: volume metrics scale with days, rate metrics stay as-is
   const _de=md.daysElapsed, _dm=md.daysInMonth;
   const chFv=(val)=>ip&&_de&&val!=null?Math.round(val/_de*_dm*100)/100:null;
-  allCh.forEach(c=>{
+  // Hide channels with nothing at all in them. A blank row in the Sheet (e.g. an
+  // OpenAI line kept as a placeholder) otherwise renders as a full row of dashes.
+  // Deliberately checks spend AND sales AND orders AND impressions AND clicks, so
+  // a channel with $0 spend but real sales or traffic still shows — only genuinely
+  // empty rows disappear. Total Paid Media always renders, even when the Sheet's
+  // total cells are blank, because the API injectors compute it.
+  allCh.filter(c=>c.channel==='Total Paid Media'
+      || (c.adSpend>0)||(c.adSales>0)||(c.orders>0)||(c.impressions>0)||(c.clicks>0)
+  ).forEach(c=>{
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
     const col=CHANNEL_COLORS[c.channel]||(isTotal?'rgba(255,255,255,0.7)':'#666');
