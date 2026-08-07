@@ -189,39 +189,31 @@
     },
     "range": {
       "since": "2026-07-01",
-      "until": "2026-08-04"
+      "until": "2026-08-06"
     },
     "profileId": "224591",
-    "source": "helium10-walmart",
-    "fetched_at": "2026-08-05T14:05:50Z"
+    "fetched_at": "2026-08-07T14:05:42Z",
+    "source": "helium10-walmart"
   },
   "August 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 44.86,
+        "spend": 52.58,
         "adSales": 0,
         "orders": 0,
-        "clicks": 23,
-        "impressions": 46389
+        "clicks": 27,
+        "impressions": 58291
       }
     },
     "campaigns": {
       "Skinuva": [
         {
-          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 34.1,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 15,
-          "impressions": 43672
-        },
-        {
           "name": "Skinuva - SB - M - video 3.26 v1",
-          "spend": 8.97,
+          "spend": 9.78,
           "adSales": 0,
           "orders": 0,
-          "clicks": 7,
-          "impressions": 2423
+          "clicks": 8,
+          "impressions": 3083
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
@@ -229,16 +221,24 @@
           "adSales": 0,
           "orders": 0,
           "clicks": 1,
-          "impressions": 294
+          "impressions": 371
+        },
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
+          "spend": 41.01,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 18,
+          "impressions": 54837
         }
       ]
     },
     "range": {
       "since": "2026-07-01",
-      "until": "2026-08-05"
+      "until": "2026-08-06"
     },
     "profileId": "224591",
-    "fetched_at": "2026-08-06T14:07:21Z",
+    "fetched_at": "2026-08-07T14:05:42Z",
     "source": "helium10-walmart"
   }
 }
