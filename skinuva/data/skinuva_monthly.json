@@ -3,11 +3,11 @@
     "amazon": {
       "spend": 17298.03,
       "adSales": 79831.56,
-      "totalSales": null,
+      "totalSales": 159976.5,
       "orders": 1046,
       "clicks": 7171,
       "impressions": 1795111,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 10376.58,
@@ -18,17 +18,17 @@
     },
     "shopify": 40856.74,
     "walmart": 1750.0,
-    "combinedTotalSales": null,
+    "combinedTotalSales": 202583.24,
     "fetched_at": "2026-08-01T08:16:43Z"
   },
   "July 2026": {
     "amazon": {
       "spend": 14254.75,
       "adSales": 55436.14,
-      "totalSales": 132129.03,
+      "totalSales": 131999.03,
       "orders": 699,
       "clicks": 6261,
-      "impressions": 1326419,
+      "impressions": 1326406,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -40,29 +40,29 @@
     },
     "shopify": 50039.42,
     "walmart": 1059.99,
-    "combinedTotalSales": 183228.44,
-    "fetched_at": "2026-08-09T14:16:02Z"
+    "combinedTotalSales": 183098.44,
+    "fetched_at": "2026-08-10T07:18:11Z"
   },
   "August 2026": {
     "amazon": {
-      "spend": 3501.11,
-      "adSales": 10074.69,
-      "totalSales": 28055.2,
-      "orders": 128,
-      "clicks": 1203,
-      "impressions": 208255,
+      "spend": 3866.82,
+      "adSales": 11067.89,
+      "totalSales": 31479.48,
+      "orders": 142,
+      "clicks": 1350,
+      "impressions": 238309,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 2769.49,
-      "adSales": 7526.65,
-      "conversions": 53,
-      "clicks": 1319,
-      "impressions": 247372
+      "spend": 2769.3,
+      "adSales": 7830.98,
+      "conversions": 55,
+      "clicks": 1318,
+      "impressions": 247521
     },
-    "shopify": 12527.84,
+    "shopify": 15065.25,
     "walmart": 0.0,
-    "combinedTotalSales": 40583.04,
-    "fetched_at": "2026-08-09T14:16:02Z"
+    "combinedTotalSales": 46544.73,
+    "fetched_at": "2026-08-10T07:18:11Z"
   }
 }
