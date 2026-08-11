@@ -344,6 +344,12 @@ def correct_monthly_from_archive(monthly: dict, daily: dict, today_month_str: st
 
 TOTAL_SALES_SOURCE_OK = 'sp-api-brand-filtered'
 
+# How long after a month ends we keep re-fetching it, so Amazon's late returns and
+# refunds still land. Past this the figure is treated as settled and frozen, which
+# keeps the daily SP-API report quota for the months that actually still move.
+# 30 days covers Amazon's standard return window with room to spare.
+RESTATEMENT_GRACE_DAYS = 30
+
 
 def _invalidate_total_sales(entry: dict, mk: str, brand_name: str, reason: str,
                             existing: dict) -> None:
@@ -475,6 +481,39 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
         else:
             end = datetime(year, month_num, days_in_month).date()
             expected_days = days_in_month
+
+        # ── Freeze settled months: don't re-request what we already have ──────
+        #
+        # Every run was submitting a fresh SP-API report for EVERY month in the file.
+        # Those reports are quota-limited per account, the Medaltus pipeline burns
+        # part of that quota earlier in the same workflow, and Amazon answers the
+        # overflow with 429 QuotaExceeded. Confirmed in run 31500966243: both June
+        # and July failed with QuotaExceeded on createReport.
+        #
+        # A completed month's revenue stops moving once Amazon finishes settling
+        # returns and refunds, so re-fetching it forever buys nothing and costs the
+        # quota that the months we DO need are competing for. Past the grace window
+        # we reuse the stored brand-filtered figure and skip the call entirely.
+        #
+        # Only ever skips when there is already a good brand-filtered value to reuse
+        # — a month that never fetched successfully keeps being retried.
+        prev_amz_f = ((existing.get(mk) or {}).get('amazon') or {}) if existing else {}
+        prev_src_f = str(prev_amz_f.get('totalSalesSource') or '')
+        prev_val_f = prev_amz_f.get('totalSales')
+        settled_days = (today - end).days
+        if (mk != today_month_str
+                and prev_val_f is not None
+                and prev_src_f.startswith(TOTAL_SALES_SOURCE_OK)
+                and settled_days > RESTATEMENT_GRACE_DAYS):
+            amz_f = entry.setdefault('amazon', {})
+            amz_f['totalSales'] = prev_val_f
+            amz_f['totalSalesSource'] = prev_src_f
+            shopify_f = float(entry.get('shopify', 0) or 0)
+            walmart_f = float(entry.get('walmart', 0) or 0)
+            entry['combinedTotalSales'] = round(prev_val_f + shopify_f + walmart_f, 2)
+            print(f"  ⏭  [{mk}] {brand_name}: settled {settled_days}d ago — reusing "
+                  f"stored ${prev_val_f:,.2f}, no SP-API call")
+            continue
 
         covered = len(days_covered.get(mk, set()))
         coverage = covered / expected_days if expected_days else 0
