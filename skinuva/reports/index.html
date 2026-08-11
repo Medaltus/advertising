@@ -4586,13 +4586,28 @@ function injectWalmartRevenueOnlyRows(){
     if(tot==null||!(Number(tot)>0)) return;
     if(!DATA.monthly.some(m=>m.month===mk)) return;   // month not on the dashboard
     let chs=DATA.channels[mk]; if(!chs) chs=DATA.channels[mk]=[];
-    const existing=chs.find(c=>c.channel==='Walmart');
-    if(existing&&existing.adSpend>0) return;          // real ad data already present
-    const entry={channel:'Walmart',adSpend:null,adSales:null,acos:null,
-      totalSales:rd(Number(tot)),tacos:null,impressions:null,clicks:null,
-      ctr:null,cpc:null,orders:null,aov:null,cvr:null,_revenueOnly:true};
     const i=chs.findIndex(c=>c.channel==='Walmart');
-    if(i>=0) chs[i]=entry; else chs.push(entry);
+    const v=rd(Number(tot));
+    if(i>=0){
+      // A Walmart row already exists (Sheet ad data, or Helium 10). Keep its ad
+      // metrics but take REVENUE from walmart_revenue.json, which is the dedicated
+      // Newderm Walmart sheet and the source the live months already use.
+      //
+      // The two disagree: for March 2026 the Skinuva Sheet's Walmart row says
+      // $1,350.00 while the Newderm sheet says $1,250.00. Leaving the Sheet figure
+      // in place made the Total Sales column miss by exactly that $100 difference,
+      // because combinedTotalSales is built from the Newderm number. One source for
+      // Walmart revenue, everywhere.
+      const c=chs[i];
+      if(c.totalSales==null||Math.abs((c.totalSales||0)-v)>0.01){
+        c.totalSales=v;
+        c.tacos=(c.adSpend>0&&v>0)?rd(c.adSpend/v*100):null;
+      }
+      return;
+    }
+    chs.push({channel:'Walmart',adSpend:null,adSales:null,acos:null,
+      totalSales:v,tacos:null,impressions:null,clicks:null,
+      ctr:null,cpc:null,orders:null,aov:null,cvr:null,_revenueOnly:true});
   });
 }
 
