@@ -355,13 +355,14 @@
   },
   "March 2026": {
     "amazon": {
-      "spend": 324.09,
-      "adSales": 704.2,
-      "orders": 11,
-      "clicks": 210,
-      "impressions": 34044,
-      "totalSales": null,
-      "totalSalesSource": "unavailable (archive covers only 0/31 expected days (0%))"
+      "spend": 283.32,
+      "adSales": null,
+      "orders": null,
+      "clicks": null,
+      "impressions": null,
+      "totalSales": 2127.18,
+      "totalSalesSource": "helium10-asin-attributed (historical backfill)",
+      "spendSource": "helium10-asin-attributed (historical backfill)"
     },
     "google": {
       "spend": 0.0,
@@ -370,20 +371,22 @@
       "clicks": 0,
       "impressions": 0
     },
-    "shopify": 0.0,
-    "walmart": 0.0,
+    "shopify": 50832.43,
+    "walmart": 1250.0,
     "fetched_at": "backfill",
-    "combinedTotalSales": null
+    "combinedTotalSales": 54209.61,
+    "backfilled": true
   },
   "April 2026": {
     "amazon": {
-      "spend": 227.78,
-      "adSales": 952.33,
-      "orders": 12,
-      "clicks": 143,
-      "impressions": 37258,
-      "totalSales": null,
-      "totalSalesSource": "unavailable (archive covers only 0/30 expected days (0%))"
+      "spend": 152.19,
+      "adSales": null,
+      "orders": null,
+      "clicks": null,
+      "impressions": null,
+      "totalSales": 2157.32,
+      "totalSalesSource": "helium10-asin-attributed (historical backfill)",
+      "spendSource": "helium10-asin-attributed (historical backfill)"
     },
     "google": {
       "spend": 0.0,
@@ -392,20 +395,22 @@
       "clicks": 0,
       "impressions": 0
     },
-    "shopify": 0.0,
-    "walmart": 0.0,
+    "shopify": 55969.95,
+    "walmart": 1355.0,
     "fetched_at": "backfill",
-    "combinedTotalSales": null
+    "combinedTotalSales": 59482.27,
+    "backfilled": true
   },
   "May 2026": {
     "amazon": {
-      "spend": 241.78,
-      "adSales": 292.36,
-      "totalSales": null,
-      "orders": 8,
-      "clicks": 200,
-      "impressions": 50880,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "spend": 234.71,
+      "adSales": null,
+      "totalSales": 1401.32,
+      "orders": null,
+      "clicks": null,
+      "impressions": null,
+      "totalSalesSource": "helium10-asin-attributed (historical backfill)",
+      "spendSource": "helium10-asin-attributed (historical backfill)"
     },
     "google": {
       "spend": 0.0,
@@ -414,10 +419,11 @@
       "clicks": 0,
       "impressions": 0
     },
-    "shopify": 0.0,
-    "walmart": 0.0,
+    "shopify": 51054.29,
+    "walmart": 1595.0,
     "fetched_at": "backfill",
-    "combinedTotalSales": null
+    "combinedTotalSales": 54050.61,
+    "backfilled": true
   },
   "June 2026": {
     "amazon": {

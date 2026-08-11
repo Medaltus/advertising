@@ -4678,9 +4678,15 @@ function injectHistoricalApiData(){
     };
 
     // ── Google channel ──
+    // If the monthly JSON has no Google figures for this month, keep whatever the
+    // Sheet already supplied rather than replacing it with an empty row. This block
+    // ASSIGNS DATA.channels[mk], so without the fallback, adding a month to
+    // skinuva_monthly.json that the Google backfill hasn't reached yet would delete
+    // that month's Google row outright — losing data by adding data.
+    const _sheetG=(DATA.channels[mk]||[]).find(c=>c.channel==='Google');
     const gSpend=g.spend||0, gSales=g.adSales||0, gConv=g.conversions||0;
     const gClicks=g.clicks||0, gImps=g.impressions||0;
-    const gCh={
+    const gCh=(gSpend<=0&&_sheetG&&(_sheetG.adSpend>0||_sheetG.adSales>0)) ? _sheetG : {
       channel:'Google',
       adSpend:rd(gSpend), adSales:rd(gSales),
       acos:gSales>0?rd(gSpend/gSales*100):null,
