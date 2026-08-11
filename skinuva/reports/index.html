@@ -3787,6 +3787,10 @@ async function init(){
     injectWalmartAdsData();
     injectHistoricalApiData();
     injectJuneApiData();
+    // Last: injectHistorical/injectJune both ASSIGN DATA.channels[mk], so anything
+    // added before them can be overwritten. This only fills months that still have
+    // no Walmart row, so it can't clobber real ad data.
+    injectWalmartRevenueOnlyRows();
     renderAmazonSection('month');
     renderGoogleSection('month');
     if(selectedOzleeBrand==='Skinuva') renderGeoHeatmap();
@@ -4556,6 +4560,31 @@ const _origRenderSubtitle=null; // placeholder — logic is inline in render()
 // totalSales bug. Attribution is done upstream by campaign-name matching, the
 // same convention fetch_ads_data.py uses for Amazon.
 // Falls back to leaving the Sheet's row untouched when there's no API figure.
+// Walmart revenue exists in the Newderm sheet back to April 2024, but Helium 10 only
+// has Walmart ADS from May 2026. For the older months that means revenue with no
+// campaign data — and if no Walmart row is created at all, that revenue sits inside
+// combinedTotalSales while being invisible in the table, so the Total Sales column
+// stops adding down and the KPI cross-check warns. This adds a revenue-only Walmart
+// row (spend/clicks/orders left null, exactly like the Shopify row) for any month
+// that has Walmart revenue but no Walmart ad spend.
+function injectWalmartRevenueOnlyRows(){
+  if(!DATA||!WALMART_REVENUE) return;
+  const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  Object.entries(WALMART_REVENUE).forEach(([mk,rev])=>{
+    const tot=(rev||{}).total;
+    if(tot==null||!(Number(tot)>0)) return;
+    if(!DATA.monthly.some(m=>m.month===mk)) return;   // month not on the dashboard
+    let chs=DATA.channels[mk]; if(!chs) chs=DATA.channels[mk]=[];
+    const existing=chs.find(c=>c.channel==='Walmart');
+    if(existing&&existing.adSpend>0) return;          // real ad data already present
+    const entry={channel:'Walmart',adSpend:null,adSales:null,acos:null,
+      totalSales:rd(Number(tot)),tacos:null,impressions:null,clicks:null,
+      ctr:null,cpc:null,orders:null,aov:null,cvr:null,_revenueOnly:true};
+    const i=chs.findIndex(c=>c.channel==='Walmart');
+    if(i>=0) chs[i]=entry; else chs.push(entry);
+  });
+}
+
 function injectWalmartAdsData(){
   if(!DATA||!WALMART_ADS||!Object.keys(WALMART_ADS).length) return;
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);

@@ -344,6 +344,26 @@ def correct_monthly_from_archive(monthly: dict, daily: dict, today_month_str: st
 
 TOTAL_SALES_SOURCE_OK = 'sp-api-brand-filtered'
 
+# Source markers we accept as a trustworthy per-brand revenue figure — i.e. anything
+# genuinely filtered to this brand's ASINs. Used both to freeze settled months and to
+# retain a value when a fetch fails.
+#
+# 'helium10-asin-attributed' covers the Jan 2025 – Feb 2026 history, which Helium 10
+# supplied per ASIN. It has to be listed here or the backfilled months would look
+# untrusted: the pipeline would re-request all 14 from SP-API on every run — which is
+# exactly the quota exhaustion that was wiping June — and then null them when that
+# failed. Verified against SP-API on the overlap: June 2026 and eraclea June matched
+# to the cent, so the two sources agree.
+#
+# Still deliberately excludes the portfolio-wide timeline figure, which is the one
+# number that must never be resurrected as a brand's revenue.
+TRUSTED_TOTAL_SALES_SOURCES = (TOTAL_SALES_SOURCE_OK, 'helium10-asin-attributed')
+
+
+def _is_trusted_total_sales(src) -> bool:
+    s = str(src or '')
+    return any(s.startswith(p) for p in TRUSTED_TOTAL_SALES_SOURCES)
+
 # How long after a month ends we keep re-fetching it, so Amazon's late returns and
 # refunds still land. Past this the figure is treated as settled and frozen, which
 # keeps the daily SP-API report quota for the months that actually still move.
@@ -385,8 +405,7 @@ def _invalidate_total_sales(entry: dict, mk: str, brand_name: str, reason: str,
     # Still deliberately refuses to resurrect anything NOT from a brand-filtered
     # fetch -- the whole point is never to show a portfolio-wide figure as this
     # brand's -- which is why this tests the marker rather than just "is not None".
-    prev_src = str(prev_amz.get('totalSalesSource') or '')
-    if (prev_src.startswith(TOTAL_SALES_SOURCE_OK)
+    if (_is_trusted_total_sales(prev_amz.get('totalSalesSource'))
             and prev_amz.get('totalSales') is not None):
         amz['totalSales'] = prev_amz['totalSales']
         amz['totalSalesSource'] = f'{TOTAL_SALES_SOURCE_OK} (retained: {reason})'
@@ -503,7 +522,7 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
         settled_days = (today - end).days
         if (mk != today_month_str
                 and prev_val_f is not None
-                and prev_src_f.startswith(TOTAL_SALES_SOURCE_OK)
+                and _is_trusted_total_sales(prev_src_f)
                 and settled_days > RESTATEMENT_GRACE_DAYS):
             amz_f = entry.setdefault('amazon', {})
             amz_f['totalSales'] = prev_val_f
