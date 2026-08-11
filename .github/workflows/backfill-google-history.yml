@@ -1,0 +1,69 @@
+name: Backfill Google Ads History
+
+# Manual only — no schedule. This is a one-off repair/backfill job, not part of the
+# daily refresh. Run it from the Actions tab when you want historical Google months
+# filled in; it skips any month that already has data, so re-running is harmless.
+on:
+  workflow_dispatch:
+    inputs:
+      from_month:
+        description: 'First month to backfill (YYYY-MM)'
+        required: false
+        default: '2025-01'
+      to_month:
+        description: 'Last month (YYYY-MM). Blank = last complete month.'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Fetch and report without writing anything'
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python dependencies
+        run: pip install requests
+
+      # Identical to the morning refresh: config.json is written from the secret and
+      # never committed. CONFIGJSON is not edited here — only read.
+      - name: Write config.json
+        env:
+          CONFIG_JSON: ${{ secrets.CONFIGJSON }}
+        run: echo "$CONFIG_JSON" > config.json
+
+      - name: Backfill Google Ads history
+        run: |
+          ARGS="--from '${{ inputs.from_month }}'"
+          if [ -n "${{ inputs.to_month }}" ]; then ARGS="$ARGS --to '${{ inputs.to_month }}'"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          echo "Running: python3 skinuva/backfill_google_history.py $ARGS"
+          eval python3 skinuva/backfill_google_history.py $ARGS
+
+      - name: Show what changed
+        run: git --no-pager diff --stat -- skinuva/data/skinuva_monthly.json || true
+
+      - name: Commit and push
+        if: ${{ inputs.dry_run != true }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase --autostash
+          if git diff --quiet -- skinuva/data/skinuva_monthly.json; then
+            echo "No changes — every requested month already had Google data."
+            exit 0
+          fi
+          git add skinuva/data/skinuva_monthly.json
+          git commit -m "chore: backfill Google Ads history [skip ci]"
+          git push
