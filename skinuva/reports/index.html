@@ -2078,8 +2078,14 @@ function render(){
   // a channel with $0 spend but real sales or traffic still shows — only genuinely
   // empty rows disappear. Total Paid Media always renders, even when the Sheet's
   // total cells are blank, because the API injectors compute it.
+  // totalSales counts as activity too. Without it a revenue-only row was dropped from
+  // the DISPLAY while still counting toward the subtotal, so the Total Sales column
+  // silently stopped adding down -- Walmart's revenue for the pre-2026 months
+  // (January 2025 $160, September 2025 $2,704.99) was in the bottom line with no row
+  // to explain it.
   allCh.filter(c=>c.channel==='Total Paid Media'
       || (c.adSpend>0)||(c.adSales>0)||(c.orders>0)||(c.impressions>0)||(c.clicks>0)
+      || (c.totalSales>0)
   ).forEach(c=>{
     const isTotal=c.channel==='Total Paid Media';
     const tr=document.createElement('tr');
