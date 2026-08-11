@@ -3,11 +3,11 @@
     "amazon": {
       "spend": 17298.03,
       "adSales": 79831.56,
-      "totalSales": null,
+      "totalSales": 159976.5,
       "orders": 1046,
       "clicks": 7171,
       "impressions": 1795111,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "totalSalesSource": "sp-api-brand-filtered (retained: restored from last successful fetch)"
     },
     "google": {
       "spend": 10376.58,
@@ -18,7 +18,7 @@
     },
     "shopify": 40856.74,
     "walmart": 1750.0,
-    "combinedTotalSales": null,
+    "combinedTotalSales": 202583.24,
     "fetched_at": "2026-08-01T08:16:43Z"
   },
   "July 2026": {

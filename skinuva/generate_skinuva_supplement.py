@@ -367,10 +367,23 @@ def _invalidate_total_sales(entry: dict, mk: str, brand_name: str, reason: str,
     prev_amz = prev.get('amazon') or {}
     amz = entry.setdefault('amazon', {})
 
-    if (prev_amz.get('totalSalesSource') == TOTAL_SALES_SOURCE_OK
+    # startswith, not ==, and the retained value keeps a marker that also starts with
+    # TOTAL_SALES_SOURCE_OK. Without that this was a ONE-WAY RATCHET: the first
+    # failure stamped 'unavailable (...)', and every later failure then saw a
+    # non-matching marker in `existing` and nulled again, so the month could only ever
+    # be restored by a fetch that happened to succeed. June 2026's SP-API fetch fails
+    # roughly one run in three, so it flip-flopped between $159,976.50 and blank for a
+    # week (verified across 14 commits) and was blank whenever two failures landed in
+    # a row. Retention now chains across consecutive failures.
+    #
+    # Still deliberately refuses to resurrect anything NOT from a brand-filtered
+    # fetch -- the whole point is never to show a portfolio-wide figure as this
+    # brand's -- which is why this tests the marker rather than just "is not None".
+    prev_src = str(prev_amz.get('totalSalesSource') or '')
+    if (prev_src.startswith(TOTAL_SALES_SOURCE_OK)
             and prev_amz.get('totalSales') is not None):
         amz['totalSales'] = prev_amz['totalSales']
-        amz['totalSalesSource'] = TOTAL_SALES_SOURCE_OK
+        amz['totalSalesSource'] = f'{TOTAL_SALES_SOURCE_OK} (retained: {reason})'
         shopify = float(entry.get('shopify', 0) or 0)
         walmart = float(entry.get('walmart', 0) or 0)
         entry['combinedTotalSales'] = round(amz['totalSales'] + shopify + walmart, 2)

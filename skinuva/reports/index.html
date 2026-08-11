@@ -4616,13 +4616,19 @@ function injectHistoricalApiData(){
 
     // ── Amazon channel ──
     const amzSpend=a.spend||0, amzSales=a.adSales||0, amzOrders=a.orders||0;
-    const amzClicks=a.clicks||0, amzImps=a.impressions||0, amzTotal=a.totalSales||0;
+    // amzTotal must stay null when revenue is unknown. `a.totalSales||0` turned a
+    // failed SP-API fetch into a hard $0.00 in the Amazon row -- June 2026 read
+    // "$0.00" for total sales against $17,298 of spend, which reads as "we sold
+    // nothing" rather than "this number is missing". Unknown and zero are not the
+    // same claim, and only one of them is ever true here.
+    const amzClicks=a.clicks||0, amzImps=a.impressions||0;
+    const amzTotal=(a.totalSales!=null)?a.totalSales:null;
     const amzCh={
       channel:'Amazon',
       adSpend:rd(amzSpend), adSales:rd(amzSales),
       acos:amzSales>0?rd(amzSpend/amzSales*100):null,
-      totalSales:rd(amzTotal),
-      tacos:amzTotal>0?rd(amzSpend/amzTotal*100):null,
+      totalSales:amzTotal!=null?rd(amzTotal):null,
+      tacos:(amzTotal!=null&&amzTotal>0)?rd(amzSpend/amzTotal*100):null,
       impressions:amzImps, clicks:amzClicks,
       ctr:amzImps>0?rd(amzClicks/amzImps*100):null,
       cpc:amzClicks>0?rd(amzSpend/amzClicks):null,
