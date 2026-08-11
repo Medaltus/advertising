@@ -1927,7 +1927,12 @@ function render(){
     // It has no spend/clicks/orders, so it never contributed to any other total.
     const canonCh=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
     let rows=src.filter(c=>c.channel!=='Total Paid Media'&&canonCh(c.channel)!=='websitesales');
-    if(era&&((era.spend||0)>0||(era.adSales||0)>0)){
+    // totalSales counts as presence, not just ad activity. eraclea ran no Amazon ads
+    // before July 2025 but was still selling -- January 2025 was $3,075.40 -- and a
+    // spend/adSales-only test skipped those months, so the Amazon row showed Skinuva
+    // alone while the KPI cards (which add eraclea unconditionally) counted it. That
+    // is the $136.0K card against a $132,945.67 table.
+    if(era&&((era.spend||0)>0||(era.adSales||0)>0||(era.totalSales||0)>0)){
       let sawAmazon=false;
       rows=rows.map(c=>{
         if(c.channel!=='Amazon') return c;
