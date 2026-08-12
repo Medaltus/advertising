@@ -383,21 +383,20 @@
   },
   "May 2026": {
     "amazon": {
-      "spend": 12917.72,
-      "adSales": null,
+      "spend": 13882.31,
+      "adSales": 72664.97,
       "totalSales": 151383.39,
-      "orders": null,
-      "clicks": null,
-      "impressions": null,
-      "totalSalesSource": "helium10-asin-attributed (historical backfill)",
-      "spendSource": "helium10-asin-attributed (historical backfill)"
+      "orders": 902,
+      "clicks": 5449,
+      "impressions": 1336571,
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": null,
-      "adSales": null,
-      "conversions": null,
-      "clicks": null,
-      "impressions": null
+      "spend": 3846.21,
+      "adSales": 22183.13,
+      "conversions": 118,
+      "clicks": 2398,
+      "impressions": 299110
     },
     "shopify": 51054.29,
     "walmart": 1595.0,
@@ -412,7 +411,7 @@
       "orders": 1046,
       "clicks": 7171,
       "impressions": 1795111,
-      "totalSalesSource": "sp-api-brand-filtered (retained: restored from last successful fetch)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 10376.58,
@@ -433,7 +432,7 @@
       "totalSales": 131999.03,
       "orders": 699,
       "clicks": 6261,
-      "impressions": 1326399,
+      "impressions": 1326398,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -446,28 +445,28 @@
     "shopify": 50039.42,
     "walmart": 1059.99,
     "combinedTotalSales": 183098.44,
-    "fetched_at": "2026-08-11T14:48:15Z"
+    "fetched_at": "2026-08-12T07:24:01Z"
   },
   "August 2026": {
     "amazon": {
-      "spend": 4260.39,
-      "adSales": 13421.87,
-      "totalSales": 31479.48,
-      "orders": 169,
-      "clicks": 1504,
-      "impressions": 264617,
+      "spend": 4712.78,
+      "adSales": 15276.86,
+      "totalSales": 40285.82,
+      "orders": 191,
+      "clicks": 1665,
+      "impressions": 293532,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 3436.74,
+      "spend": 3437.72,
       "adSales": 11593.1,
       "conversions": 81,
-      "clicks": 1649,
-      "impressions": 300711
+      "clicks": 1652,
+      "impressions": 300804
     },
-    "shopify": 16927.37,
+    "shopify": 18278.87,
     "walmart": 0.0,
-    "combinedTotalSales": 48406.85,
-    "fetched_at": "2026-08-11T14:48:15Z"
+    "combinedTotalSales": 58564.69,
+    "fetched_at": "2026-08-12T07:24:01Z"
   }
 }
