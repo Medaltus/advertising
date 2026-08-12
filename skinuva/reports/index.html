@@ -4287,7 +4287,7 @@ function computeRangeMetrics(s,e){
   }
 
   const amzCh={channel:'Amazon',adSpend:rd(a.spend),adSales:rd(a.adSales),acos:a.adSales>0?rd(a.spend/a.adSales*100):null,totalSales:amzTotal,tacos:amzTotal>0?rd(a.spend/amzTotal*100):null,impressions:a.impressions,clicks:a.clicks,ctr:a.impressions>0?rd(a.clicks/a.impressions*100):null,cpc:a.clicks>0?rd(a.spend/a.clicks):null,orders:a.orders,aov:a.orders>0?rd(a.adSales/a.orders):null,cvr:a.clicks>0?rd(a.orders/a.clicks*100):null};
-  const gCh={channel:'Google',adSpend:rd(g.spend),adSales:rd(g.adSales),acos:g.adSales>0?rd(g.spend/g.adSales*100):null,totalSales:null,tacos:null,impressions:g.impressions,clicks:g.clicks,ctr:g.impressions>0?rd(g.clicks/g.impressions*100):null,cpc:g.clicks>0?rd(g.spend/g.clicks):null,orders:Math.round(g.conversions),aov:null,cvr:null};
+  const gCh={channel:'Google',adSpend:rd(g.spend),adSales:rd(g.adSales),acos:g.adSales>0?rd(g.spend/g.adSales*100):null,totalSales:null,tacos:null,impressions:g.impressions,clicks:g.clicks,ctr:g.impressions>0?rd(g.clicks/g.impressions*100):null,cpc:g.clicks>0?rd(g.spend/g.clicks):null,orders:Math.round(g.conversions),aov:Math.round(g.conversions)>0?rd(g.adSales/Math.round(g.conversions)):null,cvr:g.clicks>0?rd(Math.round(g.conversions)/g.clicks*100):null};
 
   // Monthly-only channels (Walmart + the Sheet's Meta/Reddit/TikTok/Pinterest),
   // summed across every whole month the range covers. Amazon and Google are skipped
@@ -4709,7 +4709,16 @@ function injectHistoricalApiData(){
       impressions:gImps, clicks:gClicks,
       ctr:gImps>0?rd(gClicks/gImps*100):null,
       cpc:gClicks>0?rd(gSpend/gClicks):null,
-      orders:Math.round(gConv), aov:null, cvr:null,
+      // Google's AOV and CVR were hardcoded null while its Orders WERE populated and
+      // WERE counted into Total Paid Media. That made the subtotal unreconcilable
+      // from the visible rows -- July 2026 showed Amazon AOV $79.34 and Walmart
+      // $75.00 above a Total Paid Media AOV of $100.27, higher than either, because
+      // Google's implied $158.58 was hidden. Both are computable from conversions
+      // and clicks, and use the same rounded Orders shown in the row so the numbers
+      // can be reproduced by eye.
+      orders:Math.round(gConv),
+      aov:Math.round(gConv)>0?rd(gSales/Math.round(gConv)):null,
+      cvr:gClicks>0?rd(Math.round(gConv)/gClicks*100):null,
     };
 
     // Keep other channels already in DATA (Meta, Walmart, Pinterest, etc. from sheet)
@@ -4842,7 +4851,7 @@ function injectJuneApiData(){
 
   // ── API channel entries ──
   const amzCh={channel:'Amazon',adSpend:rd(amzSpend),adSales:rd(amzSales),acos:amzAcos,totalSales:rd(amzTotalSales),tacos:amzTotalSales>0?rd(amzSpend/amzTotalSales*100):null,impressions:amzImps,clicks:amzClicks,ctr:amzCtr,cpc:amzCpc,orders:amzOrders,aov:amzAov,cvr:amzCvr};
-  const gCh={channel:'Google',adSpend:rd(gSpend),adSales:rd(gSales),acos:gAcos,totalSales:null,tacos:null,impressions:gImps,clicks:gClicks,ctr:gCtr,cpc:gCpc,orders:Math.round(gConv),aov:null,cvr:null};
+  const gCh={channel:'Google',adSpend:rd(gSpend),adSales:rd(gSales),acos:gAcos,totalSales:null,tacos:null,impressions:gImps,clicks:gClicks,ctr:gCtr,cpc:gCpc,orders:Math.round(gConv),aov:Math.round(gConv)>0?rd(gSales/Math.round(gConv)):null,cvr:gClicks>0?rd(Math.round(gConv)/gClicks*100):null};
 
   // ── Combined totals: API channels + other sheet channels ──
   const allChs=[amzCh, gCh, ...sheetChs];
