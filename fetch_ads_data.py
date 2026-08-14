@@ -155,6 +155,13 @@ def filter_profiles(profiles: list, cfg: dict) -> list:
 
 # Per-ad-product report configs.
 # SB uses different column names from SP: cost/purchases/salesAmount instead of spend/purchases7d/sales7d.
+# Report submissions that failed this run. Printed as ::error annotations at the end
+# and made to fail the process, because a silent submission failure means a whole ad
+# product vanishes from both dashboards while the workflow still reports success --
+# which is exactly how Sponsored Display went missing on every brand.
+REPORT_FAILURES: list = []
+
+
 AD_PRODUCT_CONFIGS = [
     {
         "adProduct":    "SPONSORED_PRODUCTS",
@@ -185,9 +192,18 @@ AD_PRODUCT_CONFIGS = [
     {
         "adProduct":    "SPONSORED_DISPLAY",
         "reportTypeId": "sdCampaigns",
+        # NO campaignBudgetType here — Amazon rejects it for Sponsored Display:
+        #   400 "configuration columns includes invalid values: (campaignBudgetType)"
+        # SP and SB still accept it, so it is deliberately left in those two configs
+        # rather than removed globally.
+        #
+        # The whole SD report submission was failing on that one column, so every
+        # Sponsored Display campaign — spend, sales and purchases, across every brand
+        # on both dashboards — was silently missing. The run still reported success
+        # because submission errors were only printed, never surfaced.
         "columns": [
             "date", "campaignId", "campaignName", "campaignStatus",
-            "campaignBudgetAmount", "campaignBudgetType",
+            "campaignBudgetAmount",
             "impressions", "clicks", "cost", "purchases", "sales",
         ],
         # Rename SD columns to the names build_brand_data expects (same as SB).
@@ -886,6 +902,7 @@ def main():
                         time.sleep(wait)
                     else:
                         print(f"  ✗ {ap_cfg['adProduct']} submission failed: {e}")
+                        REPORT_FAILURES.append(f"{ap_cfg['adProduct']} ({ap_cfg['reportTypeId']}): {e}")
                         break
             if report_id:
                 pending.append((profile, ap_cfg, report_id, hdrs, single_brand, currency))
@@ -897,6 +914,7 @@ def main():
             pending_st.append((profile, st_id, hdrs, single_brand, currency))
         except Exception as e:
             print(f"  ✗ spSearchTerm submission failed: {e}")
+            REPORT_FAILURES.append(f"spSearchTerm: {e}")
 
         # Also submit ASIN report for this profile
         time.sleep(5)
@@ -905,6 +923,7 @@ def main():
             pending_asin.append((profile, asin_id, hdrs, single_brand, currency))
         except Exception as e:
             print(f"  ✗ spAdvertisedProduct submission failed: {e}")
+            REPORT_FAILURES.append(f"spAdvertisedProduct: {e}")
 
         # Also submit placement report for this profile
         time.sleep(5)
@@ -913,6 +932,7 @@ def main():
             pending_placement.append((profile, placement_id, hdrs, single_brand, currency))
         except Exception as e:
             print(f"  ✗ Placement report submission failed: {e}")
+            REPORT_FAILURES.append(f"placement: {e}")
 
         time.sleep(5)   # small gap between profiles
 
@@ -1121,6 +1141,37 @@ def main():
           f"sales=${p['sales']:,.0f}, acos={p['acos']}%")
     print(f"{'═'*60}")
     print(f"\n  Open dashboard.html in your browser to see your data.\n")
+
+    # A failed report submission silently removes an entire ad product from both
+    # dashboards. Sponsored Display was missing for months this way while every run
+    # reported success, so these are surfaced as GitHub Actions annotations and made
+    # to fail the step. The data that DID fetch has already been written above, so
+    # failing here loses nothing — it just stops the loss going unnoticed.
+    # Deliberately does NOT exit nonzero here. This step has no continue-on-error, so
+    # failing now would abort the job and skip every downstream step — the supplements,
+    # Google, Shopify and the commit — turning a partial data loss into a total one.
+    # Instead the failures are recorded for verify_data_freshness.py, which runs last
+    # and AFTER the commit: everything that did fetch is saved, and then the run goes
+    # red so the gap cannot pass unnoticed.
+    marker = Path(args.config).parent / "data" / "report_failures.json"
+    try:
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        if REPORT_FAILURES:
+            marker.write_text(json.dumps({
+                "fetched_at": date.today().isoformat(),
+                "failures": REPORT_FAILURES,
+            }, indent=2))
+            print(f"\n{'═'*60}")
+            print(f"  {len(REPORT_FAILURES)} report submission(s) FAILED — data is incomplete")
+            for f in REPORT_FAILURES:
+                print(f"  ✗ {f}")
+            print(f"  recorded in {marker} — the freshness check will fail this run")
+            print(f"{'═'*60}")
+        elif marker.exists():
+            marker.unlink()      # previous run's failures are resolved
+            print("  ✓ all report submissions succeeded (cleared previous failure marker)")
+    except Exception as e:
+        print(f"  ⚠ could not write failure marker: {e}")
 
 
 if __name__ == "__main__":

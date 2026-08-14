@@ -145,6 +145,23 @@ def main():
     print(f"  {'status':8} {'dataset':26} detail")
     print("  " + "-" * 88)
 
+    # Report submissions that failed during the Amazon Ads fetch. That step cannot
+    # exit nonzero itself — it has no continue-on-error, so aborting there would skip
+    # every downstream step and turn a partial loss into a total one. It records the
+    # failures instead and they are raised here, after the commit, so whatever did
+    # fetch is saved and the run still goes red.
+    #
+    # This exists because Sponsored Display was rejected by Amazon for months
+    # (400: invalid column campaignBudgetType) and every run reported success while
+    # SD spend and sales were missing from both dashboards.
+    report_failures = []
+    rf_path = Path('data/report_failures.json')
+    if rf_path.exists():
+        try:
+            report_failures = (json.loads(rf_path.read_text()) or {}).get('failures', [])
+        except Exception as e:
+            report_failures = [f'unreadable report_failures.json: {e}']
+
     problems = []
     for path, label in TRACKED:
         status, detail = inspect(path, now, args.max_age_hours, args.max_lag_days, run_start)
@@ -156,9 +173,24 @@ def main():
             problems.append((label, path, status, detail))
 
     print()
-    if not problems:
+    if report_failures:
+        print(f"  {len(report_failures)} Amazon Ads report submission(s) failed this run:")
+        for f in report_failures:
+            print(f"    - {f}")
+            print(f"::error title=Amazon Ads report submission failed::{f}"
+                  f" — that ad product is MISSING from both dashboards")
+        print()
+
+    if not problems and not report_failures:
         print(f"All {len(TRACKED)} datasets refreshed.")
         return 0
+
+    if not problems and report_failures:
+        print(f"All {len(TRACKED)} datasets refreshed, but an ad product is incomplete.")
+        if args.warn_only:
+            print("(--warn-only: not failing the run)")
+            return 0
+        return 1
 
     for label, path, status, detail in problems:
         # GitHub Actions annotation so it surfaces on the run summary, not just the log
