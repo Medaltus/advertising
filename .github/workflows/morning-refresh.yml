@@ -42,6 +42,24 @@ jobs:
               if b not in c['brands']:
                   c['brands'].append(b)
 
+          # Amazon Ads profiles are per marketplace. Only the US ones were listed, so
+          # the Canada campaigns (Skinuva - SP - Scar/Brite - Auto - CANADA 7.26) were
+          # invisible on the dashboard. Merged here rather than added to CONFIGJSON,
+          # which is write-only — editing it would mean re-pasting every Amazon and
+          # Google credential from scratch.
+          #   257626120209879 = NewDerm [CA]
+          extra_profiles = [257626120209879]
+          pids = c.setdefault('profile_ids', [])
+          for pid in extra_profiles:
+              if pid not in pids and str(pid) not in [str(x) for x in pids]:
+                  pids.append(pid)
+                  print('added profile_id:', pid)
+
+          # Fallback FX rate, used only if the live lookup is unreachable. Without a
+          # rate the CA profile is dropped entirely rather than having CAD summed into
+          # USD totals, so this is what keeps Canada visible if the FX host is down.
+          c.setdefault('fx_rates', {}).setdefault('CAD', 0.73)
+
           # Shopify credentials live in their OWN secret, merged in here rather
           # than being added to CONFIGJSON. GitHub secrets are write-only: you
           # cannot read an existing value back, so editing CONFIGJSON would mean

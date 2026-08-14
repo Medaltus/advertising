@@ -151,6 +151,69 @@ def filter_profiles(profiles: list, cfg: dict) -> list:
     return filtered
 
 
+
+# ── Currency ───────────────────────────────────────────────────────────────────
+# Amazon reports each profile in that profile's own currency and does no conversion.
+# Before multi-marketplace support there was only one profile per account and every
+# one of them was USD, so nothing here converted anything. Adding a CAD profile means
+# unconverted amounts would be summed into USD totals as if they were the same unit.
+#
+# Rates resolve config first, then a live lookup, and if neither works the profile's
+# data is DROPPED and the run is failed. Silently mixing currencies would corrupt
+# every total on both dashboards in a way that looks completely plausible.
+_FX_CACHE: dict = {}
+
+def fx_to_usd(cfg: dict, currency: str) -> float:
+    """Multiplier converting `currency` into USD. Returns None if unresolvable."""
+    cur = (currency or "USD").upper()
+    if cur == "USD":
+        return 1.0
+    if cur in _FX_CACHE:
+        return _FX_CACHE[cur]
+
+    rate = None
+    cfg_rate = (cfg.get("fx_rates") or {}).get(cur)
+    if cfg_rate:
+        try:
+            rate = float(cfg_rate)
+            print(f"  ✓ FX {cur}→USD = {rate} (from config fx_rates)")
+        except (TypeError, ValueError):
+            rate = None
+
+    if rate is None:
+        try:
+            r = requests.get("https://open.er-api.com/v6/latest/" + cur, timeout=15)
+            if r.ok:
+                v = (r.json().get("rates") or {}).get("USD")
+                if v:
+                    rate = float(v)
+                    print(f"  ✓ FX {cur}→USD = {rate} (live)")
+        except Exception as e:
+            print(f"  ⚠ FX lookup for {cur} failed: {e}")
+
+    if rate is None:
+        print(f"  ✗ No {cur}→USD rate available — that profile's data will be DROPPED "
+              f"rather than mixed into USD totals. Set fx_rates.{cur} in config.json.")
+        REPORT_FAILURES.append(
+            f"currency: no {cur}->USD rate; profile data dropped to avoid mixing currencies")
+    _FX_CACHE[cur] = rate
+    return rate
+
+
+# Monetary fields present on campaign / search-term / ASIN / placement rows.
+_MONEY_FIELDS = ("cost", "spend", "sales", "sales7d", "salesAmount",
+                 "campaignBudgetAmount")
+
+def convert_row_currency(row: dict, rate: float) -> dict:
+    if rate == 1.0:
+        return row
+    for f in _MONEY_FIELDS:
+        v = row.get(f)
+        if isinstance(v, (int, float)):
+            row[f] = round(v * rate, 4)
+    return row
+
+
 # ── Reporting v3 ───────────────────────────────────────────────────────────────
 
 # Per-ad-product report configs.
@@ -381,6 +444,13 @@ def build_placement_data_for_brand(placement_rows: list, brand_name: str, brands
                                     single_brand: bool) -> dict:
     """Aggregate placement rows for one brand. Returns dict keyed by placement type."""
     def matches(r):
+        # _brand is stamped at collection time for rows from single-brand profiles.
+        # It has to be checked first: records from every profile are now pooled before
+        # aggregation, so "this profile is single-brand" is a property of the ROW, not
+        # of the call.
+        tag = r.get("_brand")
+        if tag is not None:
+            return tag == brand_name
         if single_brand:
             return True
         return identify_brand(r.get("campaignName", ""), brands) == brand_name
@@ -429,6 +499,13 @@ def build_asin_data_for_brand(asin_rows: list, brand_name: str, brands: list,
                                single_brand: bool) -> list:
     """Aggregate ASIN rows for one brand. Returns list sorted by spend (top 100)."""
     def matches(r):
+        # _brand is stamped at collection time for rows from single-brand profiles.
+        # It has to be checked first: records from every profile are now pooled before
+        # aggregation, so "this profile is single-brand" is a property of the ROW, not
+        # of the call.
+        tag = r.get("_brand")
+        if tag is not None:
+            return tag == brand_name
         if single_brand:
             return True
         return identify_brand(r.get("campaignName", ""), brands) == brand_name
@@ -474,6 +551,13 @@ def build_search_terms_for_brand(st_rows: list, brand_name: str, brands: list,
                                   single_brand: bool) -> list:
     """Aggregate search term rows for one brand. Returns list sorted by spend (top 200)."""
     def matches(r):
+        # _brand is stamped at collection time for rows from single-brand profiles.
+        # It has to be checked first: records from every profile are now pooled before
+        # aggregation, so "this profile is single-brand" is a property of the ROW, not
+        # of the call.
+        tag = r.get("_brand")
+        if tag is not None:
+            return tag == brand_name
         if single_brand:
             return True
         return identify_brand(r.get("campaignName", ""), brands) == brand_name
@@ -651,6 +735,13 @@ def build_brand_data(records: list, brand_name: str, brands: list,
     """Aggregate campaign records for one brand into summary + timeline."""
 
     def matches(r):
+        # _brand is stamped at collection time for rows from single-brand profiles.
+        # It has to be checked first: records from every profile are now pooled before
+        # aggregation, so "this profile is single-brand" is a property of the ROW, not
+        # of the call.
+        tag = r.get("_brand")
+        if tag is not None:
+            return tag == brand_name
         if single_brand:
             return True
         return identify_brand(r.get("campaignName", ""), brands) == brand_name
@@ -1004,6 +1095,22 @@ def main():
         pid = profile.get("profileId")
         placement_profile_records.setdefault(pid, []).extend(downloaded.get(report_id, []))
 
+    # ── Phase 3a: pool every profile's rows into one currency-normalised set ────
+    #
+    # This used to aggregate per profile and then do brand_outputs[brand] = bdata,
+    # which OVERWRITES rather than merges. With one profile per brand that was
+    # invisible; the moment a brand exists in two profiles — Skinuva runs in both
+    # NewDerm (US) and NewDerm [CA] — whichever profile was processed second would
+    # silently replace the other, swapping ~$25,000 of US spend for a few dollars of
+    # Canadian. Pooling the raw rows and aggregating once is both the fix and the
+    # thing that makes multi-marketplace work at all.
+    #
+    # Rows are converted to USD here, at the boundary, so nothing downstream has to
+    # know about currency. A profile whose rate cannot be resolved is dropped whole
+    # rather than mixed in.
+    all_records, all_st, all_asin, all_placement = [], [], [], []
+    contributing = {}                      # brand-agnostic: profile name → row count
+
     for profile in profiles:
         profile_id   = profile.get("profileId")
         profile_name = get_profile_name(profile) or str(profile_id)
@@ -1013,26 +1120,53 @@ def main():
         records    = profile_records.get(profile_id, [])
         st_records = st_profile_records.get(profile_id, [])
 
-        print(f"━━ {profile_name} ━━")
+        print(f"━━ {profile_name} ━━  ({currency})")
         if not records:
             print(f"  → Skipping (no data)\n")
             continue
-        print(f"  ✓ Combined: {len(records)} campaign-day rows, {len(st_records)} search-term rows")
 
-        # Split into brands
-        target_brands = [single_brand] if single_brand else brands
+        rate = fx_to_usd(cfg, currency)
+        if rate is None:
+            print(f"  ✗ DROPPED {len(records)} rows — unresolved {currency}→USD rate\n")
+            continue
+
+        def _prep(rows):
+            out = []
+            for r in rows:
+                r = convert_row_currency(dict(r), rate)
+                if single_brand:
+                    r["_brand"] = single_brand
+                r["_profile"] = profile_name
+                out.append(r)
+            return out
+
+        all_records   += _prep(records)
+        all_st        += _prep(st_records)
+        all_asin      += _prep(asin_profile_records.get(profile_id, []))
+        all_placement += _prep(placement_profile_records.get(profile_id, []))
+        contributing[profile_name] = len(records)
+        print(f"  ✓ {len(records)} campaign-day rows, {len(st_records)} search-term rows"
+              f"{'' if rate == 1.0 else f' — converted {currency}→USD at {rate}'}")
+        print()
+
+    # ── Phase 3b: aggregate ONCE across the pooled rows ────────────────────────
+    if True:
+        profile_name = " + ".join(contributing) or "none"
+        # Single-brand profiles contribute brands that may not be in cfg['brands'].
+        target_brands = list(brands) + [b for b in single_brand_profiles.values()
+                                        if b and b not in brands]
 
         for brand in target_brands:
-            bdata = build_brand_data(records, brand, brands, bool(single_brand))
+            bdata = build_brand_data(all_records, brand, brands, False)
             if bdata:
                 bdata["profile"]      = profile_name
-                bdata["currency"]     = currency
+                bdata["currency"]     = "USD"
                 bdata["search_terms"] = build_search_terms_for_brand(
-                    st_records, brand, brands, bool(single_brand))
+                    all_st, brand, brands, False)
                 bdata["asins"] = build_asin_data_for_brand(
-                    asin_profile_records.get(profile_id, []), brand, brands, bool(single_brand))
+                    all_asin, brand, brands, False)
                 bdata["placements"] = build_placement_data_for_brand(
-                    placement_profile_records.get(profile_id, []), brand, brands, bool(single_brand))
+                    all_placement, brand, brands, False)
                 brand_outputs[brand] = bdata
                 s = bdata["summary"]
                 print(f"  ✓ {brand}: spend=${s['spend']:,.0f}, "
@@ -1042,10 +1176,10 @@ def main():
                 print(f"  → {brand}: no data (no matching campaigns)")
 
         # ── Detect unmatched campaigns (spend not attributed to any brand) ────
-        if not single_brand:
+        if True:
             unmatched_spend = 0.0
             unmatched_names = {}
-            for r in records:
+            for r in [x for x in all_records if x.get("_brand") is None]:
                 b = identify_brand(r.get("campaignName", ""), brands)
                 if b == "Other":
                     spd = float(r.get("cost") or r.get("spend") or 0)
