@@ -145,7 +145,7 @@
     "byBrand": {
       "Skinuva": {
         "spend": 239.49,
-        "adSales": 225,
+        "adSales": 225.0,
         "orders": 3,
         "clicks": 171,
         "impressions": 351546
@@ -170,50 +170,58 @@
           "impressions": 3725
         },
         {
-          "name": "Skinuva - SP - Auto - Bruise ARC v1",
-          "spend": 27.31,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 22,
-          "impressions": 9439
-        },
-        {
           "name": "Skinuva - SB - M - video 3.26 v1",
           "spend": 47.22,
           "adSales": 60,
           "orders": 1,
           "clicks": 33,
           "impressions": 11562
+        },
+        {
+          "name": "Skinuva - SP - Auto - Bruise ARC v1",
+          "spend": 27.31,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 22,
+          "impressions": 9439
         }
       ]
     },
     "range": {
       "since": "2026-07-01",
-      "until": "2026-08-16"
+      "until": "2026-08-17"
     },
     "profileId": "224591",
-    "fetched_at": "2026-08-17T14:07:54Z",
+    "fetched_at": "2026-08-18T14:05:58Z",
     "source": "helium10-walmart"
   },
   "August 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 161.13,
-        "adSales": 80,
+        "spend": 169.44,
+        "adSales": 80.0,
         "orders": 1,
-        "clicks": 80,
-        "impressions": 181052
+        "clicks": 83,
+        "impressions": 191073
       }
     },
     "campaigns": {
       "Skinuva": [
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
+          "spend": 127.82,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 54,
+          "impressions": 180547
+        },
         {
           "name": "Skinuva - SB - M - video 3.26 v1",
           "spend": 27.23,
           "adSales": 80,
           "orders": 1,
           "clicks": 20,
-          "impressions": 8713
+          "impressions": 9232
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
@@ -221,24 +229,16 @@
           "adSales": 0,
           "orders": 0,
           "clicks": 9,
-          "impressions": 1259
-        },
-        {
-          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 119.51,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 51,
-          "impressions": 171080
+          "impressions": 1294
         }
       ]
     },
     "range": {
       "since": "2026-07-01",
-      "until": "2026-08-16"
+      "until": "2026-08-17"
     },
     "profileId": "224591",
-    "fetched_at": "2026-08-17T14:07:54Z",
+    "fetched_at": "2026-08-18T14:05:58Z",
     "source": "helium10-walmart"
   }
 }
