@@ -1806,6 +1806,17 @@ function render(){
   // deriving it here is correct in every view.
   const cr=md.clicks>0&&md.orders!=null?md.orders/md.clicks*100:null,
         pr=prev&&prev.clicks>0&&prev.orders!=null?prev.orders/prev.clicks*100:null;
+
+  // Net TACOS for the KPI card — ad spend against revenue AFTER refunds.
+  const _refKpi     = _refundsFor(selectedMonth);
+  const _refPrevKpi = prev?_refundsFor(prev.month):null;
+  const _netTotKpi  = (md.totalSales!=null&&_refKpi!=null)?md.totalSales-_refKpi:null;
+  const _netTacosKpi=(_netTotKpi!=null&&_netTotKpi>0&&md.adSpend!=null)
+                      ?md.adSpend/_netTotKpi*100:null;
+  const _pNetTotKpi = (prev&&prev.totalSales!=null&&_refPrevKpi!=null)
+                      ?prev.totalSales-_refPrevKpi:null;
+  const _pNetTacosKpi=(_pNetTotKpi!=null&&_pNetTotKpi>0&&prev&&prev.adSpend!=null)
+                      ?prev.adSpend/_pNetTotKpi*100:null;
   const fr=ip?(()=>{const c=fv(md,'clicks'),o=fv(md,'orders');return c>0&&o!=null?o/c*100:null;})():null;
 
   // Subtitle
@@ -1859,7 +1870,21 @@ function render(){
     {l:'CVR',v:cr!=null?cr.toFixed(2)+'%':'—',pf:pr!=null?pr.toFixed(2)+'%':null,mm:momPct(cr,pr),ff:fr,ffm:fr!=null?fr.toFixed(2)+'%':null,fmm:(fr!=null&&pr!=null)?momPct(fr,pr):null,wk:'cvr'},
     {l:'ACOS',v:pct(md.acos),k:'acos',wk:'acos',inv:true},
     {l:'Total Sales',v:fmt(md.totalSales),k:'totalSales'},
-    {l:'TACOS',v:pct(md.tacos),k:'tacos',inv:true},
+    // TACOS is reported NET of refunds, matching the Net Sales row at the bottom of
+    // the Channel Breakdown. Total Sales stays gross so it still reconciles against
+    // Seller Central's Ordered Product Sales, which means this card is deliberately
+    // NOT adSpend ÷ the Total Sales card — refunds sit between them. Gross TACOS
+    // flatters efficiency by roughly 0.4pp every month, and this is the figure budgets
+    // are set from, so the truer one belongs on the card.
+    //
+    // Falls back to gross when a month has no refunds figure, with the sub-label
+    // dropped so it is never mislabelled as net when it isn't.
+    _netTacosKpi!=null
+      ? {l:'TACOS',v:pct(_netTacosKpi),
+         pf:_pNetTacosKpi!=null?pct(_pNetTacosKpi):null,
+         mm:(!ip&&_pNetTacosKpi!=null)?momPct(_netTacosKpi,_pNetTacosKpi):null,
+         inv:true, sub:'net of refunds'}
+      : {l:'TACOS',v:pct(md.tacos),k:'tacos',inv:true},
   ];
   k1.forEach(x=>{
     const o={sub:x.sub,warn:x.warn,inv:x.inv,days};
@@ -4481,7 +4506,29 @@ function renderRange(){
   r1.appendChild(_k('CVR',m.cvr!=null?m.cvr.toFixed(2)+'%':'—','cvr',_pc2,false));
   r1.appendChild(_k('ACOS',pct(m.acos),'acos',pct,true));
   r1.appendChild(_k('Total Sales',m.totalSales!=null?fmt(m.totalSales):'—','totalSales',fmt,false,_tsSub));
-  r1.appendChild(_k('TACOS',m.tacos!=null?pct(m.tacos):'—','tacos',pct,true,_tsSub));
+
+  // TACOS net of refunds, matching the monthly view's card and the Net Sales row.
+  // Computed here rather than through _k() because it isn't a field on the metrics
+  // object — and the two views must not disagree on a headline KPI again.
+  const _sumRef=(months)=>{
+    let t=null;
+    (months||[]).forEach(mk=>{ const r=_refundsFor(mk); if(r!=null) t=(t||0)+r; });
+    return t;
+  };
+  const _rRef  = m.aligned?_sumRef(m.months):null;
+  const _pRef  = (m.aligned&&_pr)?_sumRef((P&&P.months)||[]):null;
+  const _rNet  = (m.totalSales!=null&&_rRef!=null)?m.totalSales-_rRef:null;
+  const _rNetT = (_rNet!=null&&_rNet>0&&m.adSpend!=null)?m.adSpend/_rNet*100:null;
+  const _pNet  = (P&&P.totalSales!=null&&_pRef!=null)?P.totalSales-_pRef:null;
+  const _pNetT = (_pNet!=null&&_pNet>0&&P&&P.adSpend!=null)?P.adSpend/_pNet*100:null;
+
+  if(_rNetT!=null){
+    const o={sub:'net of refunds',inv:true};
+    if(_pNetT!=null){ o.prev=pct(_pNetT); o.mom=momPct(_rNetT,_pNetT); }
+    r1.appendChild(kpi('TACOS',pct(_rNetT),o));
+  } else {
+    r1.appendChild(_k('TACOS',m.tacos!=null?pct(m.tacos):'—','tacos',pct,true,_tsSub));
+  }
 
   // KPI Row 2
   const r2=document.getElementById('kpi-row-2'); r2.innerHTML='';
