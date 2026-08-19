@@ -4603,6 +4603,43 @@ function renderRange(){
       <td style="font-weight:700;color:#fff;">${m.tacos!=null?fPct(m.tacos):'—'}${momLine(m.tacos,P&&P.tacos,fPct,true)}</td>
       ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
     tbody.appendChild(gtr);
+
+    // Refunds + Net Sales, matching the monthly view. Without these the same month
+    // reached by date range showed a gross-only table while the dropdown showed
+    // Refunds and Net TACOS — the exact divergence between the two views that was
+    // deliberately eliminated earlier. Only for whole-month ranges: refunds are
+    // recorded monthly, so a partial range has no honest figure.
+    let _rangeRef=null;
+    if(m.aligned){
+      (m.months||[]).forEach(mk=>{
+        const r=_refundsFor(mk);
+        if(r!=null) _rangeRef=(_rangeRef||0)+r;
+      });
+    }
+    if(_rangeRef!=null&&_rangeRef>0){
+      const _netTs=m.totalSales-_rangeRef;
+      const _netTacos=(m.adSpend!=null&&_netTs>0)?m.adSpend/_netTs*100:null;
+      const rtr=document.createElement('tr');
+      rtr.innerHTML=`<td style="color:#ff6b6b;font-weight:600;">Refunds
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon · by refund date</div></td>
+        ${_dash}${_dash}${_dash}
+        <td style="color:#ff6b6b;font-weight:600;">−${fDol(_rangeRef)}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">${fPct(_rangeRef/m.totalSales*100)} of total</div></td>
+        ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
+      tbody.appendChild(rtr);
+      const ntr=document.createElement('tr');
+      ntr.style.cssText='border-top:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.02);';
+      ntr.innerHTML=`<td style="font-weight:700;color:#fff;">Net Sales
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">after refunds</div></td>
+        <td style="font-weight:700;color:rgba(255,255,255,0.9);">${fDol(m.adSpend)}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
+        ${_dash}${_dash}
+        <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(_netTs)}</td>
+        <td style="font-weight:700;color:#fff;">${_netTacos!=null?fPct(_netTacos):'—'}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">net TACOS</div></td>
+        ${_dash}${_dash}${_dash}${_dash}${_dash}${_dash}`;
+      tbody.appendChild(ntr);
+    }
   }
   // Only warn when something is actually missing, and say exactly why.
   if(!m.aligned){
