@@ -1817,6 +1817,16 @@ function render(){
                       ?prev.totalSales-_refPrevKpi:null;
   const _pNetTacosKpi=(_pNetTotKpi!=null&&_pNetTotKpi>0&&prev&&prev.adSpend!=null)
                       ?prev.adSpend/_pNetTotKpi*100:null;
+  // Forecast net TACOS for a partial month. Refunds scale with elapsed days the same
+  // way spend and revenue do, so the month-end projection uses a projected refund
+  // figure rather than month-to-date refunds against projected full-month sales —
+  // which would have made the forecast look better than reality.
+  const _fSpendKpi=ip?fv(md,'adSpend'):null, _fTotKpi=ip?fv(md,'totalSales'):null;
+  const _fRefKpi=(ip&&_refKpi!=null&&md.daysElapsed)
+                  ?_refKpi/md.daysElapsed*md.daysInMonth:null;
+  const _fNetTotKpi=(_fTotKpi!=null&&_fRefKpi!=null)?_fTotKpi-_fRefKpi:null;
+  const _fNetTacosKpi=(_fNetTotKpi!=null&&_fNetTotKpi>0&&_fSpendKpi!=null)
+                      ?_fSpendKpi/_fNetTotKpi*100:null;
   const fr=ip?(()=>{const c=fv(md,'clicks'),o=fv(md,'orders');return c>0&&o!=null?o/c*100:null;})():null;
 
   // Subtitle
@@ -1879,12 +1889,19 @@ function render(){
     //
     // Falls back to gross when a month has no refunds figure, with the sub-label
     // dropped so it is never mislabelled as net when it isn't.
+    // Carries pf/mm AND ff/ffm/fmm. Supplying only pf/mm dropped the whole
+    // kpi-forecast block — the forecast value, its MoM and the prev-month line — which
+    // the k:'tacos' branch had been building automatically from f('tacos'). Every
+    // other card kept it, so TACOS alone looked stripped.
     _netTacosKpi!=null
       ? {l:'TACOS',v:pct(_netTacosKpi),
          pf:_pNetTacosKpi!=null?pct(_pNetTacosKpi):null,
          mm:(!ip&&_pNetTacosKpi!=null)?momPct(_netTacosKpi,_pNetTacosKpi):null,
-         inv:true, sub:'net of refunds'}
-      : {l:'TACOS',v:pct(md.tacos),k:'tacos',inv:true},
+         ff:_fNetTacosKpi, ffm:_fNetTacosKpi!=null?pct(_fNetTacosKpi):null,
+         fmm:(_fNetTacosKpi!=null&&_pNetTacosKpi!=null)
+              ?momPct(_fNetTacosKpi,_pNetTacosKpi):null,
+         wk:'tacos', inv:true, sub:'net of refunds'}
+      : {l:'TACOS',v:pct(md.tacos),k:'tacos',wk:'tacos',inv:true},
   ];
   k1.forEach(x=>{
     const o={sub:x.sub,warn:x.warn,inv:x.inv,days};
