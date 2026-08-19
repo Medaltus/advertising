@@ -1023,6 +1023,31 @@ function _websiteSalesFromSheet(monthLabel){
   const v=SHEET_WEBSITE_SALES[monthLabel];
   return (v!=null&&v>0)?v:null;
 }
+// Amazon refunds for a month, in the selected brand view.
+//
+// Amazon's totalSales metric is orderedProductSales — measured when the order is
+// PLACED, with nothing deducted for returns. Refunds run 2-5% of it every month, so
+// the headline figure consistently overstates realised revenue and TACOS is
+// consistently flattering. These are surfaced as their own row rather than netted off
+// totalSales, so the gross number stays comparable with Seller Central and with
+// anything previously reported.
+//
+// Attributed to the month the REFUND posted, not the month of the original order, so
+// a December sale refunded in January lands in January. Net Sales is therefore
+// "sales this month minus refunds processed this month", not a restatement of the
+// same transactions.
+function _refundsFor(monthLabel){
+  if(!monthLabel) return null;
+  let total=null;
+  const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
+  if(sm&&sm.refunds!=null) total=Number(sm.refunds);
+  if(selectedOzleeBrand==='All'&&typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY){
+    const em=ERACLEA_MONTHLY[monthLabel];
+    if(em&&em.refunds!=null) total=(total||0)+Number(em.refunds);
+  }
+  return total;
+}
+
 function _shopifySalesFor(monthLabel){
   if(!monthLabel) return null;
   const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
@@ -2202,6 +2227,43 @@ function render(){
       <td style="font-weight:700;color:#fff;">${_btmTacos!=null?fPct(_btmTacos):'—'}${momLine(_btmTacos,_pTacos,fPct,true)}</td>
       ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
     tbody.appendChild(gtr);
+
+    // ── Refunds + Net Sales ──────────────────────────────────────────────────
+    // Deliberately BELOW the gross Total Sales line and deliberately not netted into
+    // it: the gross figure has to stay reconcilable against Seller Central's
+    // "Ordered Product Sales" and against every number reported before this existed.
+    // Net TACOS is the one worth acting on, since refunds are 2-5% of revenue every
+    // month and gross TACOS therefore always flatters efficiency.
+    const _ref=_refundsFor(selectedMonth);
+    if(_ref!=null&&_ref>0){
+      const _refPrev=prevMonth?_refundsFor(prevMonth):null;
+      const _netTs=_btmTs-_ref;
+      const _netTacos=(_btmSpend!=null&&_netTs>0)?_btmSpend/_netTs*100:null;
+      const _pNetTs=(_pTs!=null&&_refPrev!=null)?_pTs-_refPrev:null;
+      const _pNetTacos=(_pTpm.adSpend!=null&&_pNetTs>0)?_pTpm.adSpend/_pNetTs*100:null;
+
+      const rtr=document.createElement('tr');
+      rtr.innerHTML=`<td style="color:#ff6b6b;font-weight:600;">Refunds
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">Amazon · by refund date</div></td>
+        ${_dash2}${_dash2}${_dash2}
+        <td style="color:#ff6b6b;font-weight:600;">−${fDol(_ref)}${momLine(_ref,_refPrev,fDol,true)}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">${fPct(_ref/_btmTs*100)} of total</div></td>
+        ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
+      tbody.appendChild(rtr);
+
+      const ntr=document.createElement('tr');
+      ntr.style.cssText='border-top:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.02);';
+      ntr.innerHTML=`<td style="font-weight:700;color:#fff;">Net Sales
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">after refunds</div></td>
+        <td style="font-weight:700;color:rgba(255,255,255,0.9);">${_btmSpend!=null?fDol(_btmSpend):'—'}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">total paid media</div></td>
+        ${_dash2}${_dash2}
+        <td style="font-weight:700;color:#fff;font-size:15px;">${fDol(_netTs)}${momLine(_netTs,_pNetTs,fDol,false)}</td>
+        <td style="font-weight:700;color:#fff;">${_netTacos!=null?fPct(_netTacos):'—'}${momLine(_netTacos,_pNetTacos,fPct,true)}
+          <div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">net TACOS</div></td>
+        ${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}${_dash2}`;
+      tbody.appendChild(ntr);
+    }
   }
 
   // Amazon supplement sections — always use Skinuva as primary; eraclea appended separately in All mode
