@@ -60,6 +60,16 @@ jobs:
           # USD totals, so this is what keeps Canada visible if the FX host is down.
           c.setdefault('fx_rates', {}).setdefault('CAD', 0.73)
 
+          # Canada TOTAL SALES. Ad spend alone would measure Canadian spend against a
+          # US-only revenue denominator and overstate TACOS. Canada uses its own ASINs
+          # (B0H3CLS4XW vs B07RCJDFN4 for the same product), so it gets its own
+          # ASIN->brand map; brands still resolve off the SKU prefix (SVA0001-CA).
+          #   A2EUQ1WTGCTBG2 = amazon.ca
+          mps = c.setdefault('extra_marketplaces', [])
+          if not any((m or {}).get('id') == 'A2EUQ1WTGCTBG2' for m in mps):
+              mps.append({'id': 'A2EUQ1WTGCTBG2', 'label': 'CA', 'currency': 'CAD'})
+              print('added marketplace: CA (A2EUQ1WTGCTBG2)')
+
           # Shopify credentials live in their OWN secret, merged in here rather
           # than being added to CONFIGJSON. GitHub secrets are write-only: you
           # cannot read an existing value back, so editing CONFIGJSON would mean

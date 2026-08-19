@@ -640,6 +640,48 @@ def fetch_total_sales(cfg, lookback_days=30):
     return daily_sales, brand_sales
 
 
+# ── FX ─────────────────────────────────────────────────────────────────────────
+# SP-API reports each marketplace in that marketplace's own currency. Everything here
+# was US-only, so nothing needed converting. Canada reports CAD, and adding CAD into a
+# USD total would silently corrupt every downstream figure — TACOS, net sales, the
+# budget numbers built on them.
+#
+# Config rate first, then a live lookup. If neither resolves, the marketplace is
+# SKIPPED rather than added unconverted. A missing marketplace is visible; a
+# mis-summed one is not.
+_TS_FX_CACHE: dict = {}
+
+def ts_fx_to_usd(cfg, currency):
+    cur = (currency or "USD").upper()
+    if cur == "USD":
+        return 1.0
+    if cur in _TS_FX_CACHE:
+        return _TS_FX_CACHE[cur]
+    rate = None
+    cfg_rate = (cfg.get("fx_rates") or {}).get(cur)
+    if cfg_rate:
+        try:
+            rate = float(cfg_rate)
+            print(f"    ✓ FX {cur}→USD = {rate} (config)")
+        except (TypeError, ValueError):
+            rate = None
+    if rate is None:
+        try:
+            r = requests.get("https://open.er-api.com/v6/latest/" + cur, timeout=15)
+            if r.ok:
+                v = (r.json().get("rates") or {}).get("USD")
+                if v:
+                    rate = float(v)
+                    print(f"    ✓ FX {cur}→USD = {rate} (live)")
+        except Exception as e:
+            print(f"    ⚠ FX lookup for {cur} failed: {e}")
+    if rate is None:
+        print(f"    ✗ no {cur}→USD rate — marketplace SKIPPED rather than "
+              f"summed unconverted. Set fx_rates.{cur} in config.json.")
+    _TS_FX_CACHE[cur] = rate
+    return rate
+
+
 def fetch_brand_sales_for_period(cfg, start_str, end_str):
     """
     Fetches per-brand total sales for an explicit date range from SP-API.
@@ -661,6 +703,41 @@ def fetch_brand_sales_for_period(cfg, start_str, end_str):
         )
         for brand, amount in hol_brands.items():
             brand_sales[brand] = round(brand_sales.get(brand, 0) + amount, 2)
+
+    # ── Additional marketplaces (Canada, etc.) ────────────────────────────────
+    # Canada ad spend flows into the dashboards, so its revenue has to as well or
+    # TACOS is measured against a denominator that excludes it.
+    #
+    # Each marketplace gets its OWN ASIN→brand cache. Canada uses DIFFERENT ASINs
+    # from the US for the same products (B0H3CLS4XW vs B07RCJDFN4 for 1oz Scar
+    # Cream), so reusing the US map would leave every Canadian sale unattributed and
+    # silently discarded as "unmapped". Brands still resolve because the mapping keys
+    # off the seller SKU's 3-character prefix and CA SKUs keep it — SVA0001-CA.
+    for mp in (cfg.get("extra_marketplaces") or []):
+        mp_id  = mp.get("id")
+        label  = mp.get("label") or mp_id
+        ccy    = mp.get("currency") or "USD"
+        if not mp_id:
+            continue
+        rate = ts_fx_to_usd(cfg, ccy)
+        if rate is None:
+            continue
+        print(f"  Fetching {label} sales {start_str} → {end_str} ({ccy})…")
+        try:
+            mp_cfg = {**cfg, "marketplace_id": mp_id}
+            _, mp_brands = _fetch_one_account(
+                mp_cfg, "sp_refresh_token", start_str, end_str,
+                cache_name=f"asin_brand_cache_{label.lower()}.json",
+            )
+        except Exception as e:
+            print(f"    ⚠ {label} sales fetch failed: {e} — US totals unaffected")
+            continue
+        for brand, amount in mp_brands.items():
+            usd = round(amount * rate, 2)
+            brand_sales[brand] = round(brand_sales.get(brand, 0) + usd, 2)
+        if mp_brands:
+            print(f"    ✓ {label}: {len(mp_brands)} brand(s), "
+                  f"${round(sum(mp_brands.values()) * rate, 2):,.2f} added in USD")
 
     return brand_sales
 
