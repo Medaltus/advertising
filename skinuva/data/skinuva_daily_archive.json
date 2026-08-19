@@ -1278,7 +1278,7 @@
     "amazon": {
       "spend": 537.07,
       "adSales": 1639.98,
-      "totalSales": 7211.18,
+      "totalSales": 7211.19,
       "orders": 21,
       "clicks": 250,
       "impressions": 45567
@@ -1295,7 +1295,7 @@
     "amazon": {
       "spend": 460.22,
       "adSales": 1774.99,
-      "totalSales": 7069.04,
+      "totalSales": 7069.05,
       "orders": 23,
       "clicks": 207,
       "impressions": 44333
@@ -1363,7 +1363,7 @@
     "amazon": {
       "spend": 404.43,
       "adSales": 1555.0,
-      "totalSales": 6470.52,
+      "totalSales": 6470.53,
       "orders": 20,
       "clicks": 136,
       "impressions": 37569
@@ -1431,7 +1431,7 @@
     "amazon": {
       "spend": 394.96,
       "adSales": 1759.2,
-      "totalSales": 6511.82,
+      "totalSales": 6511.83,
       "orders": 23,
       "clicks": 158,
       "impressions": 33942
@@ -1499,7 +1499,7 @@
     "amazon": {
       "spend": 484.31,
       "adSales": 1830.0,
-      "totalSales": 6343.02,
+      "totalSales": 6343.03,
       "orders": 20,
       "clicks": 169,
       "impressions": 30498
@@ -1532,9 +1532,9 @@
   "2026-08-05": {
     "amazon": {
       "spend": 463.12,
-      "adSales": 1186.15,
-      "totalSales": 6125.49,
-      "orders": 17,
+      "adSales": 1266.15,
+      "totalSales": 6125.5,
+      "orders": 18,
       "clicks": 154,
       "impressions": 26178
     },
@@ -1601,7 +1601,7 @@
     "amazon": {
       "spend": 381.05,
       "adSales": 1239.2,
-      "totalSales": 6151.81,
+      "totalSales": 6151.82,
       "orders": 15,
       "clicks": 156,
       "impressions": 32903
@@ -1618,7 +1618,7 @@
     "amazon": {
       "spend": 403.16,
       "adSales": 2318.97,
-      "totalSales": 6687.42,
+      "totalSales": 6557.43,
       "orders": 26,
       "clicks": 160,
       "impressions": 32425
@@ -1652,7 +1652,7 @@
     "amazon": {
       "spend": 338.8,
       "adSales": 1885.16,
-      "totalSales": 6781.46,
+      "totalSales": 6781.47,
       "orders": 22,
       "clicks": 164,
       "impressions": 34355
@@ -1668,9 +1668,9 @@
   "2026-08-13": {
     "amazon": {
       "spend": 431.4,
-      "adSales": 1070.0,
+      "adSales": 1130.0,
       "totalSales": 4736.27,
-      "orders": 14,
+      "orders": 15,
       "clicks": 191,
       "impressions": 47001
     },
@@ -1685,9 +1685,9 @@
   "2026-08-14": {
     "amazon": {
       "spend": 487.12,
-      "adSales": 1972.17,
+      "adSales": 2051.37,
       "totalSales": 5866.85,
-      "orders": 24,
+      "orders": 25,
       "clicks": 203,
       "impressions": 49486
     },
@@ -1703,7 +1703,7 @@
     "amazon": {
       "spend": 359.59,
       "adSales": 1524.97,
-      "totalSales": 6297.44,
+      "totalSales": 6202.45,
       "orders": 18,
       "clicks": 146,
       "impressions": 39761
@@ -1720,34 +1720,45 @@
     "amazon": {
       "spend": 380.63,
       "adSales": 874.09,
-      "totalSales": 6064.13,
+      "totalSales": 6054.14,
       "orders": 12,
       "clicks": 194,
-      "impressions": 46005
+      "impressions": 46008
     },
     "google": {
       "spend": 415.77,
-      "adSales": 728.26,
-      "conversions": 6.0,
+      "adSales": 971.45,
+      "conversions": 8.0,
       "clicks": 165,
       "impressions": 22076
     }
   },
   "2026-08-17": {
     "amazon": {
-      "spend": 394.2,
+      "spend": 393.44,
       "adSales": 744.98,
-      "totalSales": 0.0,
+      "totalSales": 7303.16,
       "orders": 10,
-      "clicks": 191,
-      "impressions": 41539
+      "clicks": 190,
+      "impressions": 45342
     },
     "google": {
-      "spend": 332.69,
-      "adSales": 1373.88,
-      "conversions": 8.0,
-      "clicks": 169,
-      "impressions": 23167
+      "spend": 333.69,
+      "adSales": 1518.07,
+      "conversions": 9.0,
+      "clicks": 171,
+      "impressions": 23252
     }
+  },
+  "2026-08-18": {
+    "amazon": {
+      "spend": 436.68,
+      "adSales": 1244.98,
+      "totalSales": 0.0,
+      "orders": 15,
+      "clicks": 153,
+      "impressions": 40902
+    },
+    "google": {}
   }
 }
