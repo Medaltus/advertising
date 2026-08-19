@@ -93,6 +93,15 @@ jobs:
       - name: Generate api_supplement.json
         run: python3 generate_supplement.py
 
+      # Refunds use the Finances API, not the Reports API — no report quota is
+      # consumed, so this cannot contribute to the exhaustion that wiped June's
+      # total sales. continue-on-error because a refunds failure must never block
+      # the sales data; apply_refunds() preserves existing values when the file is
+      # missing, so the dashboard keeps the last good figures.
+      - name: Fetch Amazon refunds
+        run: python3 fetch_refunds.py --months 3
+        continue-on-error: true
+
       # ── Skinuva ──────────────────────────────────────────────────────────────
       # Must run BEFORE generate_skinuva_supplement.py, which reads
       # shopify_sales.json to build combinedTotalSales.
@@ -130,6 +139,7 @@ jobs:
             data/api_supplement.json
             data/medaltus_daily_archive.json
             data/medaltus_google_ads_monthly.json
+            data/refunds_by_month.json
             skinuva/data/shopify_sales.json
             skinuva/data/walmart_ads.json
             skinuva/data/walmart_revenue.json

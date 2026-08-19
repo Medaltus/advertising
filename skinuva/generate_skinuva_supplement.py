@@ -423,6 +423,43 @@ def _invalidate_total_sales(entry: dict, mk: str, brand_name: str, reason: str,
               f"portfolio-wide number)")
 
 
+def apply_refunds(monthly: dict, brand_name: str, script_dir: Path) -> int:
+    """
+    Copy per-brand refunds from data/refunds_by_month.json onto each month.
+
+    Kept as a separate step reading a separate file so a refunds fetch failure cannot
+    touch sales data. Existing values are preserved when the file has nothing for a
+    month — a partial refunds run must not blank out months that already had a figure,
+    which is how the dashboard's Refunds and Net Sales rows would silently vanish.
+    """
+    path = script_dir.parent / 'data' / 'refunds_by_month.json'
+    if not path.exists():
+        print(f"  ℹ  {path.name} not present — leaving existing refunds untouched")
+        return 0
+    try:
+        data = json.loads(path.read_text())
+    except Exception as e:
+        print(f"  ⚠  could not read {path.name}: {e} — leaving refunds untouched")
+        return 0
+
+    n = 0
+    for mk, entry in monthly.items():
+        amt = (data.get(mk) or {}).get(brand_name)
+        if amt is None:
+            continue
+        entry['refunds'] = round(float(amt), 2)
+        entry['refundsSource'] = 'sp-api-finances'
+        amz = (entry.get('amazon') or {}).get('totalSales')
+        if amz is not None:
+            entry['netAmazonSales'] = round(amz - entry['refunds'], 2)
+        comb = entry.get('combinedTotalSales')
+        if comb is not None:
+            entry['netCombinedTotalSales'] = round(comb - entry['refunds'], 2)
+        n += 1
+    print(f"  ✓ refunds applied to {n} month(s) for {brand_name}")
+    return n
+
+
 def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
                                 today_month_str: str, existing: dict = None,
                                 fetch_cache: dict = None) -> None:
@@ -801,6 +838,9 @@ def main():
     backfill_brand_total_sales(merged, merged_daily, BRAND_NAME, cfg, today_month_str,
                                existing=existing, fetch_cache=ts_fetch_cache)
 
+    print("\nApplying Amazon refunds…")
+    apply_refunds(merged, BRAND_NAME, Path(__file__).parent)
+
     monthly_path.write_text(json.dumps(merged, indent=2))
     print(f"✓ Updated {monthly_path} ({len(merged)} months: {', '.join(merged.keys())})")
 
@@ -854,6 +894,7 @@ def main():
                                    today_month_str, existing=existing_eraclea,
                                    fetch_cache=ts_fetch_cache)
 
+        apply_refunds(merged_eraclea, 'eraclea', Path(__file__).parent)
         eraclea_monthly_path.write_text(json.dumps(merged_eraclea, indent=2))
         print(f"✓ Updated {eraclea_monthly_path} ({len(merged_eraclea)} months)")
 
