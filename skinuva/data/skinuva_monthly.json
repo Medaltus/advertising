@@ -449,11 +449,15 @@
     "amazon": {
       "spend": 13882.31,
       "adSales": 72664.97,
+<<<<<<< Updated upstream
       "totalSales": 151383.39,
+=======
+      "totalSales": null,
+>>>>>>> Stashed changes
       "orders": 902,
       "clicks": 5449,
       "impressions": 1336571,
-      "totalSalesSource": "sp-api-brand-filtered"
+      "totalSalesSource": "unavailable (brand missing from SP-API response)"
     },
     "google": {
       "spend": 3846.21,
@@ -464,7 +468,11 @@
     },
     "shopify": 51054.29,
     "walmart": 1595.0,
+<<<<<<< Updated upstream
     "combinedTotalSales": 204032.68,
+=======
+    "combinedTotalSales": null,
+>>>>>>> Stashed changes
     "backfilled": true,
     "refunds": 3793.51,
     "refundsSource": "helium10-asin-attributed",
@@ -509,15 +517,20 @@
     },
     "google": {
       "spend": 9988.04,
-      "adSales": 40833.64,
-      "conversions": 257,
+      "adSales": 40956.83,
+      "conversions": 258,
       "clicks": 6047,
       "impressions": 819817
     },
     "shopify": 50039.42,
     "walmart": 1059.99,
+<<<<<<< Updated upstream
     "combinedTotalSales": 182968.44,
     "fetched_at": "2026-08-20T06:46:55Z",
+=======
+    "combinedTotalSales": 51844.37,
+    "fetched_at": "2026-08-20T14:35:43Z",
+>>>>>>> Stashed changes
     "refunds": 5935.99,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 125933.04,
@@ -525,28 +538,46 @@
   },
   "August 2026": {
     "amazon": {
+<<<<<<< Updated upstream
       "spend": 7650.18,
       "adSales": 25767.2,
       "totalSales": 69751.09,
       "orders": 322,
       "clicks": 2978,
       "impressions": 627862,
+=======
+      "spend": 8052.98,
+      "adSales": 26497.19,
+      "totalSales": 820.18,
+      "orders": 335,
+      "clicks": 3140,
+      "impressions": 669611,
+>>>>>>> Stashed changes
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 6226.19,
-      "adSales": 24245.81,
-      "conversions": 158,
-      "clicks": 2916,
-      "impressions": 502270
+      "spend": 6671.45,
+      "adSales": 25770.86,
+      "conversions": 168,
+      "clicks": 3076,
+      "impressions": 527488
     },
     "shopify": 30917.52,
     "walmart": 475.0,
+<<<<<<< Updated upstream
     "combinedTotalSales": 101143.61,
     "fetched_at": "2026-08-20T06:46:55Z",
     "refunds": 3028.27,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 66722.82,
     "netCombinedTotalSales": 98115.34
+=======
+    "combinedTotalSales": 33925.41,
+    "fetched_at": "2026-08-20T14:35:43Z",
+    "refunds": 3028.27,
+    "refundsSource": "sp-api-finances",
+    "netAmazonSales": -2208.09,
+    "netCombinedTotalSales": 30897.14
+>>>>>>> Stashed changes
   }
 }
