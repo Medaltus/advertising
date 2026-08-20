@@ -125,6 +125,45 @@ def get_sp_access_token(cfg, refresh_token_key="sp_refresh_token"):
 MAX_429_RETRIES = 6
 _BUDGET_DEADLINE = None  # epoch seconds; None = no cap
 
+# ── ASIN→brand map integrity ───────────────────────────────────────────────────
+# A brand map that silently loses ASINs is the single most dangerous failure in this
+# pipeline: unmapped sales are discarded, so revenue falls and TACOS rises, and the
+# result still looks like a normal number. June 2026 read $242.41 instead of
+# $159,976.50 this way. The map must retain at least this fraction of the previously
+# cached ASINs to be trusted; a real catalogue does not shrink by 40% overnight.
+ASIN_MAP_MIN_RETENTION = 0.6
+# Populated when a map is rejected, so the workflow's verify step can fail the run
+# instead of committing a quietly-degraded refresh.
+ASIN_MAP_FAILURES = []
+
+# Written next to the data files so verify_data_freshness.py can raise these AFTER the
+# commit step. The scripts that call into here run with continue-on-error or cannot
+# usefully abort mid-way, so recording and raising later is the only way a silent
+# degradation becomes a red run rather than a green one serving bad numbers.
+_INTEGRITY_MARKER = Path(__file__).parent / "data" / "data_integrity_failures.json"
+
+
+def record_integrity_failure(message):
+    """Append a data-integrity problem to the marker file. Never raises."""
+    ASIN_MAP_FAILURES.append(message)
+    try:
+        existing = []
+        if _INTEGRITY_MARKER.exists():
+            try:
+                blob = json.loads(_INTEGRITY_MARKER.read_text())
+                existing = blob.get("failures") or []
+            except Exception:
+                existing = []
+        if message not in existing:
+            existing.append(message)
+        _INTEGRITY_MARKER.parent.mkdir(parents=True, exist_ok=True)
+        _INTEGRITY_MARKER.write_text(json.dumps({
+            "written_at": dt.datetime.now(dt.timezone.utc).isoformat(),
+            "failures": existing,
+        }, indent=2))
+    except Exception:
+        pass
+
 
 def set_sp_api_time_budget(seconds):
     """Call once at the start of a run to cap total time spent retrying
@@ -313,6 +352,7 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
     marketplace = cfg.get("marketplace_id", "ATVPDKIKX0DER")
     sp_token    = get_sp_access_token(cfg, refresh_token_key)
     asin_brand  = {}
+    listings_ok = False   # did Source 1 (the comprehensive one) actually deliver?
 
     # ── Source 1: Merchant listings report (comprehensive) ────────────────────
     try:
@@ -400,14 +440,31 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
                     if brand:
                         asin_brand[asin] = brand
 
-            # Write ASIN→title map for use by fetch_ads_data.py
+            # Write ASIN→title map for use by fetch_ads_data.py.
+            #
+            # MERGE, never replace. This was a full overwrite keyed by nothing, which is
+            # the same defect as the asin_brand_cache incident one level down: the cache
+            # filename got parameterised per marketplace, this sibling write did not. CA
+            # uses entirely different ASINs (B0H3CLS4XW vs B07RCJDFN4), so a CA build
+            # replaced the file with a map that had zero overlap with the US ASINs
+            # fetch_ads_data.py looks up, blanking every US product title.
             if asin_title:
                 try:
                     titles_path = Path(__file__).parent / "asin_titles.json"
-                    titles_path.write_text(json.dumps(asin_title))
+                    merged = {}
+                    if titles_path.exists():
+                        try:
+                            prev = json.loads(titles_path.read_text())
+                            if isinstance(prev, dict):
+                                merged.update(prev)
+                        except Exception:
+                            pass
+                    merged.update(asin_title)
+                    titles_path.write_text(json.dumps(merged))
                 except Exception:
                     pass
 
+        listings_ok = bool(asin_brand)
         print(f"  ✓ Listings report: {len(asin_brand)} ASINs mapped from {len(lines)-1} listings")
 
     except Exception as e:
@@ -496,6 +553,51 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
         cache_name = ("asin_brand_cache.json" if refresh_token_key == "sp_refresh_token"
                       else f"asin_brand_cache_{refresh_token_key.replace('sp_refresh_token','')}.json")
     cache_path = Path(__file__).parent / cache_name
+
+    # ── Plausibility gate on the cache write ──────────────────────────────────
+    #
+    # The Canada incident was not really about a filename. The deeper problem is that a
+    # DEGRADED map is indistinguishable from a good one downstream: parse_brand_sales
+    # books whatever it can't attribute as "unmapped", prints an info line, and returns
+    # a smaller-but-plausible number. generate_skinuva_supplement then stamps it
+    # "sp-api-brand-filtered", and once the month passes RESTATEMENT_GRACE_DAYS the
+    # freeze logic treats it as settled and never re-fetches. A single timed-out
+    # listings report can therefore lock a wrong figure in permanently.
+    #
+    # Two guards, both about refusing to overwrite good state with worse state:
+    #   1. If Source 1 failed, this map only covers ASINs with ad spend. Don't cache it —
+    #      a cache write would make every later month in the run reuse it.
+    #   2. Even if Source 1 "succeeded", refuse a map that collapsed relative to the
+    #      previous cache. A real catalogue doesn't lose 40% of its ASINs overnight.
+    prev_map = {}
+    if cache_path.exists():
+        try:
+            prev_blob = json.loads(cache_path.read_text())
+            if isinstance(prev_blob, dict) and isinstance(prev_blob.get("map"), dict):
+                prev_map = prev_blob["map"]
+        except Exception:
+            prev_map = {}
+
+    degraded_reason = None
+    if not listings_ok:
+        degraded_reason = ("listings report failed — map covers advertised ASINs only "
+                           f"({len(asin_brand)} ASINs)")
+    elif prev_map and len(asin_brand) < len(prev_map) * ASIN_MAP_MIN_RETENTION:
+        degraded_reason = (f"map collapsed from {len(prev_map)} to {len(asin_brand)} ASINs "
+                           f"(< {int(ASIN_MAP_MIN_RETENTION*100)}% retained)")
+
+    if degraded_reason:
+        print(f"  ✗ ASIN→brand map looks degraded: {degraded_reason}")
+        record_integrity_failure(f"ASIN→brand map rejected for {cache_name}: {degraded_reason}")
+        if prev_map:
+            # Prefer yesterday's complete map over today's broken one. Stale-but-correct
+            # beats fresh-but-wrong; the whole reason today's outage went unnoticed is
+            # that the freshness check only ever asked "was this rewritten?".
+            print(f"  ↩ reusing previous cached map ({len(prev_map)} ASINs) instead")
+            return prev_map
+        print("  ⚠ no previous cache to fall back on — proceeding, NOT caching")
+        return asin_brand
+
     try:
         cache_path.write_text(json.dumps({
             "date":    dt.date.today().isoformat(),
@@ -645,6 +747,10 @@ def fetch_total_sales(cfg, lookback_days=30):
     elif cfg.get("hol_sp_refresh_token") and not cfg.get("hol_seller_id"):
         print(f"  ℹ  hol_sp_refresh_token found but hol_seller_id missing — skipping HOL account")
 
+    # Canada etc. Previously only fetch_brand_sales_for_period() did this, so this
+    # path measured Canadian spend against US-only revenue.
+    _add_extra_marketplaces(cfg, start_str, end_str, brand_sales, daily_sales=daily_sales)
+
     combined_total = round(sum(daily_sales.values()), 2)
     print(f"  ✓ Portfolio total: ${combined_total:,.2f} over {len(daily_sales)} days")
     print(f"  ✓ Per-brand totals: {len(brand_sales)} brands")
@@ -688,8 +794,17 @@ def ts_fx_to_usd(cfg, currency):
         except Exception as e:
             print(f"    ⚠ FX lookup for {cur} failed: {e}")
     if rate is None:
+        # Deliberately NOT cached. Caching the failure meant one network blip on
+        # open.er-api.com poisoned the lookup for the rest of the process, so every
+        # later marketplace in that currency was skipped without retrying — Canadian
+        # revenue vanished while Canadian spend stayed in the numerator, with no signal
+        # beyond a single line of log output.
         print(f"    ✗ no {cur}→USD rate — marketplace SKIPPED rather than "
               f"summed unconverted. Set fx_rates.{cur} in config.json.")
+        record_integrity_failure(
+            f"FX {cur}→USD unavailable — {cur} marketplace revenue excluded while its "
+            f"ad spend is still counted, which overstates TACOS")
+        return None
     _TS_FX_CACHE[cur] = rate
     return rate
 
@@ -716,15 +831,28 @@ def fetch_brand_sales_for_period(cfg, start_str, end_str):
         for brand, amount in hol_brands.items():
             brand_sales[brand] = round(brand_sales.get(brand, 0) + amount, 2)
 
-    # ── Additional marketplaces (Canada, etc.) ────────────────────────────────
-    # Canada ad spend flows into the dashboards, so its revenue has to as well or
-    # TACOS is measured against a denominator that excludes it.
-    #
-    # Each marketplace gets its OWN ASIN→brand cache. Canada uses DIFFERENT ASINs
-    # from the US for the same products (B0H3CLS4XW vs B07RCJDFN4 for 1oz Scar
-    # Cream), so reusing the US map would leave every Canadian sale unattributed and
-    # silently discarded as "unmapped". Brands still resolve because the mapping keys
-    # off the seller SKU's 3-character prefix and CA SKUs keep it — SVA0001-CA.
+    _add_extra_marketplaces(cfg, start_str, end_str, brand_sales)
+
+    return brand_sales
+
+
+# ── Additional marketplaces (Canada, etc.) ────────────────────────────────────
+# Canada ad spend flows into the dashboards, so its revenue has to as well or TACOS is
+# measured against a denominator that excludes it.
+#
+# Each marketplace gets its OWN ASIN→brand cache. Canada uses DIFFERENT ASINs from the
+# US for the same products (B0H3CLS4XW vs B07RCJDFN4 for 1oz Scar Cream), so reusing
+# the US map would leave every Canadian sale unattributed and silently discarded as
+# "unmapped". Brands still resolve because the mapping keys off the seller SKU's
+# 3-character prefix and CA SKUs keep it — SVA0001-CA.
+#
+# Shared by fetch_brand_sales_for_period() AND fetch_total_sales(). It lived inline in
+# the first one only, which meant the lookback path (the one feeding ads_data's
+# summary.totalSales and total_sales_by_date) counted Canadian SPEND while excluding
+# Canadian REVENUE. Skinuva's rolling TACOS came out ~1.4pp too high, and it disagreed
+# with the same dashboard's monthly figure — which reads as the data being unstable
+# rather than as a bug.
+def _add_extra_marketplaces(cfg, start_str, end_str, brand_sales, daily_sales=None):
     for mp in (cfg.get("extra_marketplaces") or []):
         mp_id  = mp.get("id")
         label  = mp.get("label") or mp_id
@@ -737,7 +865,7 @@ def fetch_brand_sales_for_period(cfg, start_str, end_str):
         print(f"  Fetching {label} sales {start_str} → {end_str} ({ccy})…")
         try:
             mp_cfg = {**cfg, "marketplace_id": mp_id}
-            _, mp_brands = _fetch_one_account(
+            mp_daily, mp_brands = _fetch_one_account(
                 mp_cfg, "sp_refresh_token", start_str, end_str,
                 cache_name=f"asin_brand_cache_{label.lower()}.json",
             )
@@ -747,11 +875,12 @@ def fetch_brand_sales_for_period(cfg, start_str, end_str):
         for brand, amount in mp_brands.items():
             usd = round(amount * rate, 2)
             brand_sales[brand] = round(brand_sales.get(brand, 0) + usd, 2)
+        if daily_sales is not None:
+            for date, amount in (mp_daily or {}).items():
+                daily_sales[date] = round(daily_sales.get(date, 0) + amount * rate, 2)
         if mp_brands:
             print(f"    ✓ {label}: {len(mp_brands)} brand(s), "
                   f"${round(sum(mp_brands.values()) * rate, 2):,.2f} added in USD")
-
-    return brand_sales
 
 
 if __name__ == "__main__":

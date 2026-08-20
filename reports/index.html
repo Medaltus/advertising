@@ -1067,10 +1067,59 @@ function parseSheet(text) {
   return { monthly, channels };
 }
 
+// ── Data loading: fail loudly, never silently ────────────────────────────────
+// A corrupt data file must not be indistinguishable from an empty one. On the Ozlee
+// dashboard a file committed with unresolved git conflict markers served HTTP 200,
+// threw on JSON.parse, got swallowed by a bare `.catch(() => ({}))`, and produced a
+// 2573.9% TACOS with nothing in the console. These helpers keep the page rendering but
+// make the failure impossible to overlook.
+const _MED_LOAD_FAILURES = [];
+
+function _loadJsonOrWarn(path, fallback, opts) {
+  return fetch(path, opts || {})
+    .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+    .then(t => {
+      if (/^(<<<<<<<|>>>>>>>)/m.test(t))
+        throw new Error('file contains unresolved git conflict markers');
+      try { return JSON.parse(t); }
+      catch (e) { throw new Error('invalid JSON — ' + e.message); }
+    })
+    .catch(e => {
+      _MED_LOAD_FAILURES.push({path, critical: true, message: String(e.message || e)});
+      console.error('[medaltus] FAILED to load ' + path + ': ' + (e.message || e)
+        + ' — figures derived from it are NOT reliable.');
+      return fallback;
+    });
+}
+
+function _showDataLoadBanner(failures) {
+  if (!failures || !failures.length) return;
+  const el = document.createElement('div');
+  el.id = 'data-load-banner';
+  el.style.cssText = 'position:sticky;top:0;z-index:9999;padding:12px 16px;font-size:13px;'
+    + 'line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,sans-serif;'
+    + 'border-bottom:1px solid #f87171;background:rgba(127,29,29,0.96);color:#fff;';
+  el.innerHTML = '<strong>⚠ Some figures on this page are NOT reliable — a data file '
+    + 'failed to load.</strong><div style="margin-top:6px;opacity:0.92;">'
+    + failures.map(f => '• <code style="font-size:12px;">'
+        + f.path.replace(/^\/data\//, '') + '</code> — '
+        + f.message.replace(/</g, '&lt;')).join('<br>')
+    + '</div><div style="margin-top:6px;opacity:0.85;">Re-deploy from a clean build '
+    + 'before using these numbers for budget decisions.</div>';
+  document.body.insertBefore(el, document.body.firstChild);
+}
+
 function computeTotals(brands) {
   const sum = (key) => brands.reduce((s, b) => s + (b[key] || 0), 0);
-  const spend = sum('spend'), adSales = sum('adSales'), totalSales = sum('totalSales');
+  const spend = sum('spend'), adSales = sum('adSales');
   const clicks = sum('clicks'), impressions = sum('impressions'), orders = sum('orders');
+  // totalSales must stay null when no brand reports revenue, and must not be published
+  // when only SOME brands do -- a partial sum understates revenue and therefore
+  // overstates TACOS, which is the number this dashboard sets budgets from. `||0`
+  // collapsed both cases into a confident "$0".
+  const tsBrands = brands.filter(b => (b.spend || 0) > 0);
+  const tsComplete = tsBrands.length > 0 && tsBrands.every(b => b.totalSales != null);
+  const totalSales = tsComplete ? tsBrands.reduce((s, b) => s + b.totalSales, 0) : null;
   return {
     spend, adSales, totalSales,
     acos: adSales > 0 ? (spend / adSales) * 100 : null,
@@ -1151,24 +1200,50 @@ function _activateRange(s,e){
   document.getElementById('range-clear-btn').style.display=''; render();
 }
 function clearRange(){
-  rangeMode=false; rangeStart=null; rangeEnd=null;
-  document.getElementById('range-active-pill').style.display='none'; document.getElementById('range-clear-btn').style.display='none';
-  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  _resetRangeUI();
   render();
+}
+
+// Tear down range mode WITHOUT rendering, for callers that are about to render
+// themselves. Picking a month from the dropdown used to set selectedMonth and then
+// call render(), which short-circuited straight back into renderRange() -- so the
+// dropdown looked functional but the page kept showing the date-range figures.
+function _resetRangeUI(){
+  rangeMode=false; rangeStart=null; rangeEnd=null;
+  const pill=document.getElementById('range-active-pill'); if(pill) pill.style.display='none';
+  const clr=document.getElementById('range-clear-btn'); if(clr) clr.style.display='none';
+  ['7','14','30','mtd','lm','90'].forEach(id=>document.getElementById('rp-'+id)?.classList.remove('rp-active'));
+  const s=document.getElementById('range-start-input'), e=document.getElementById('range-end-input');
+  if(s) s.value=''; if(e) e.value='';
+}
+
+// Fraction of a range's days a brand must actually report totalSales on before the
+// sum is publishable. The daily archive carries totalSales far more sparsely than ad
+// metrics -- as of Aug 2026 only 22 of 76 archived days have it, and June 2026 has 13
+// of 30. Summing whatever happens to be present produced HALF the real revenue and
+// therefore DOUBLE the real TACOS: June 2026 as a range read $110,297 / 21.1% against
+// the monthly view's $220,477 / 10.5%. A single populated day used to be enough to
+// mark the sum complete, so the wrong number arrived with no warning at all.
+const RANGE_TS_MIN_COVERAGE = 0.9;
+
+function _rangeDayCount(s,e){
+  const a=new Date(s+'T00:00:00Z'), b=new Date(e+'T00:00:00Z');
+  return Math.max(1, Math.round((b-a)/86400000)+1);
 }
 
 function computeRangeMetrics(s,e){
   const rd=(n,d=2)=>Math.round(n*Math.pow(10,d))/Math.pow(10,d);
   const brands={}, rows=[];
+  const rangeDays=_rangeDayCount(s,e);
   Object.entries(MEDALTUS_DAILY).sort((a,b)=>a[0].localeCompare(b[0])).forEach(([d,entry])=>{
     if(d<s||d>e) return;
     const dayBrands={};
     Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
       if(selectedBrand!=='All'&&bname!==selectedBrand) return;
-      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{},totalSales:0,hasTotalSales:false};
+      if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{},totalSales:0,tsDays:0};
       brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
       brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
-      if(brow.totalSales!=null){brands[bname].totalSales+=brow.totalSales;brands[bname].hasTotalSales=true;}
+      if(brow.totalSales!=null){brands[bname].totalSales+=brow.totalSales;brands[bname].tsDays++;}
       if(brow.campaigns){
         Object.entries(brow.campaigns).forEach(([cname,cdata])=>{
           if(!brands[bname].campaigns[cname]) brands[bname].campaigns[cname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0};
@@ -1188,13 +1263,24 @@ function computeRangeMetrics(s,e){
       impressions:c.impressions,clicks:c.clicks,orders:c.orders,
       aov:c.orders>0?rd(c.adSales/c.orders):null
     })).filter(c=>c.spend>0).sort((a,b2)=>b2.spend-a.spend);
-    const ts=b.hasTotalSales?rd(b.totalSales):null;
-    return{name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null,totalSales:ts,tacos:ts&&ts>0?rd(b.spend/ts*100):null,campaigns:campList};
+    // Publish the summed revenue only when the archive actually covers the range.
+    // Partial coverage understates revenue and overstates TACOS, and it used to do so
+    // silently -- one populated day out of thirty was enough to look complete.
+    const tsCov=b.tsDays/rangeDays;
+    const ts=(tsCov>=RANGE_TS_MIN_COVERAGE)?rd(b.totalSales):null;
+    return{name,spend:rd(b.spend),adSales:rd(b.adSales),acos:b.adSales>0?rd(b.spend/b.adSales*100):null,orders:b.orders,clicks:b.clicks,impressions:b.impressions,ctr:b.impressions>0?rd(b.clicks/b.impressions*100):null,cpc:b.clicks>0?rd(b.spend/b.clicks):null,aov:b.orders>0?rd(b.adSales/b.orders):null,totalSales:ts,tsCov:tsCov,tacos:ts&&ts>0?rd(b.spend/ts*100):null,campaigns:campList};
   }).sort((a,b)=>b.spend-a.spend);
   const tS=rd(brandList.reduce((s,b)=>s+(b.spend||0),0)),tAs=rd(brandList.reduce((s,b)=>s+(b.adSales||0),0));
   const tO=brandList.reduce((s,b)=>s+(b.orders||0),0),tI=brandList.reduce((s,b)=>s+(b.impressions||0),0),tC=brandList.reduce((s,b)=>s+(b.clicks||0),0);
-  const tTs=brandList.some(b=>b.totalSales!=null)?rd(brandList.reduce((s,b)=>s+(b.totalSales||0),0)):null;
-  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:tTs,tacos:tTs&&tTs>0?rd(tS/tTs*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
+  // `some` was the bug: one brand with revenue published a portfolio total that was
+  // missing every other brand's, so Total Sales came out low and TACOS came out high.
+  // A portfolio figure is only meaningful when every brand carrying spend also
+  // reports revenue for the range -- otherwise the honest answer is "unknown".
+  const tsBrands=brandList.filter(b=>(b.spend||0)>0);
+  const tsComplete=tsBrands.length>0&&tsBrands.every(b=>b.totalSales!=null);
+  const tTs=tsComplete?rd(tsBrands.reduce((s,b)=>s+(b.totalSales||0),0)):null;
+  const tsMissing=tsBrands.filter(b=>b.totalSales==null).map(b=>b.name);
+  return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:tTs,tacos:tTs&&tTs>0?rd(tS/tTs*100):null,tsMissing:tsMissing,rangeDays:rangeDays,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,brands:brandList,rows};
 }
 
 function renderRange(){
@@ -1214,7 +1300,15 @@ function renderRange(){
 
   // KPI Row 1
   const r1=document.getElementById('kpi-row-1'); r1.innerHTML='';
-  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:m.totalSales==null?'Run morning refresh':null},{l:'TACOS',v:m.tacos!=null?m.tacos.toFixed(1)+'%':'—',sub:m.tacos==null&&m.totalSales==null?'Run morning refresh':null}]
+  // Say WHY revenue is unavailable. "Run morning refresh" was misleading -- the refresh
+  // runs fine; the daily archive just doesn't carry totalSales for every day yet, and a
+  // blank card with no explanation is what let the partial-sum bug hide.
+  const _tsNote=m.totalSales==null
+    ? (m.tsMissing&&m.tsMissing.length
+        ? 'Incomplete daily revenue for '+(m.tsMissing.length>2?m.tsMissing.length+' brands':m.tsMissing.join(', '))+' — use monthly view'
+        : 'Incomplete daily revenue for this range — use monthly view')
+    : null;
+  [{l:'Ad Spend',v:rd2(m.adSpend)},{l:'Ad Sales',v:rd2(m.adSales)},{l:'CVR',v:m.cvr!=null?m.cvr.toFixed(2)+'%':'—'},{l:'ACOS',v:m.acos!=null?m.acos.toFixed(1)+'%':'—'},{l:'Total Sales',v:m.totalSales!=null?rd2(m.totalSales):'—',sub:_tsNote},{l:'TACOS',v:m.tacos!=null?m.tacos.toFixed(1)+'%':'—',sub:_tsNote}]
     .forEach(x=>r1.appendChild(kpi(x.l,x.v,{sub:x.sub||null})));
 
   // KPI Row 2
@@ -1252,9 +1346,15 @@ function renderRange(){
       tr.onclick = () => { selectedBrand = selectedBrand === b.name ? 'All' : b.name; render(); };
       tableEl.appendChild(tr);
     });
-    const noteRow=document.createElement('tr');
-    noteRow.innerHTML=`<td colspan="13" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">totalSales & TACOS available in monthly view only</td>`;
-    tableEl.appendChild(noteRow);
+    // The old fixed note claimed Total Sales/TACOS were unavailable here while the
+    // columns were in fact populated (and wrong). Now the columns blank themselves when
+    // coverage is short, so the note only appears when it is actually true.
+    const _blank=brandData.filter(b=>(b.spend||0)>0&&b.totalSales==null).length;
+    if(_blank){
+      const noteRow=document.createElement('tr');
+      noteRow.innerHTML=`<td colspan="13" style="text-align:center;padding:10px;color:rgba(255,255,255,0.2);font-size:11px;font-style:italic;">Total Sales &amp; TACOS blank for ${_blank} brand${_blank>1?'s':''} — daily revenue covers under ${Math.round(RANGE_TS_MIN_COVERAGE*100)}% of this range; use the monthly view</td>`;
+      tableEl.appendChild(noteRow);
+    }
   }
 
   // Daily trend chart
@@ -1572,7 +1672,8 @@ function render() {
       const item = document.createElement('div');
       item.className = 'month-dd-item' + (m.month === selectedMonth ? ' active' : '');
       item.innerHTML = `<span>${p[0]}${m.partial ? ' ⏳' : ''}</span><span class="mdi-year">${p[1] || ''}</span>`;
-      item.onclick = () => { selectedMonth = m.month; menu.remove(); render(); };
+      // Choosing a month is an explicit request for the monthly view, so leave range mode.
+      item.onclick = () => { selectedMonth = m.month; menu.remove(); _resetRangeUI(); render(); };
       menu.appendChild(item);
     });
 
@@ -2639,7 +2740,10 @@ function loadStrategyActions() {
 function getCurrentKPIsSnapshot() {
   const md = DATA && DATA.monthly.find(m => m.month === selectedMonth);
   if (!md) return {};
-  return { month: selectedMonth, adSpend: md.adSpend||0, adSales: md.adSales||0, acos: md.acos, tacos: md.tacos, orders: md.orders||0 };
+  // DATA.monthly carries `spend`, never `adSpend` -- reading md.adSpend recorded every
+  // snapshot's spend as $0, so the Strategy agent's before/after comparison was scoring
+  // its own recommendations against a zero baseline.
+  return { month: selectedMonth, adSpend: md.spend!=null?md.spend:0, adSales: md.adSales||0, acos: md.acos, tacos: md.tacos, orders: md.orders||0 };
 }
 
 function saveStrategyAction(text) {
@@ -2814,10 +2918,15 @@ async function runDashboardQC() {
   qcData += 'Selected month: ' + selectedMonth + '\n';
   if (md) {
     qcData += 'Partial: ' + (md.partial ? 'Yes (' + md.daysElapsed + '/' + md.daysInMonth + ' days)' : 'No (full month)') + '\n';
-    qcData += 'KPIs shown: Ad Spend=$' + (md.adSpend||0).toLocaleString() + ', Ad Sales=$' + (md.adSales||0).toLocaleString() + ', ACOS=' + (md.acos||0) + '%, Total Sales=$' + (md.totalSales||0).toLocaleString() + ', TACOS=' + (md.tacos||0) + '%, Orders=' + (md.orders||0) + ', CPC=$' + (md.cpc||0).toFixed(2) + ', CVR=' + (md.cvr||0) + '%, AOV=$' + (md.aov||0).toFixed(2) + '\n';
+    // md's spend field is `spend`. This panel read md.adSpend and so reported
+    // "Ad Spend=$0" to the QC agent -- the one place whose whole job is catching
+    // exactly this kind of mistake was blind to its own most important number.
+    // Total Sales stays explicitly null-checked: "unknown" must not print as $0.
+    const _qcTs = md.totalSales!=null ? '$'+md.totalSales.toLocaleString() : 'unavailable';
+    qcData += 'KPIs shown: Ad Spend=$' + (md.spend||0).toLocaleString() + ', Ad Sales=$' + (md.adSales||0).toLocaleString() + ', ACOS=' + (md.acos||0) + '%, Total Sales=' + _qcTs + ', TACOS=' + (md.tacos!=null?md.tacos:'unavailable') + '%, Orders=' + (md.orders||0) + ', CPC=$' + (md.cpc||0).toFixed(2) + ', CVR=' + (md.cvr||0) + '%, AOV=$' + (md.aov||0).toFixed(2) + '\n';
     if (md.partial) {
-      const VOLUME_KEYS = new Set(['adSpend','adSales','totalSales','impressions','clicks','orders']);
-      const fKeys = ['adSpend','adSales','totalSales','orders'];
+      const VOLUME_KEYS = new Set(['spend','adSales','totalSales','impressions','clicks','orders']);
+      const fKeys = ['spend','adSales','totalSales','orders'];
       qcData += 'Forecasts shown: ';
       fKeys.forEach(k => {
         const v = md[k];
@@ -3611,7 +3720,9 @@ function getDataHash() {
   if (!DATA || !DATA.monthly.length) return '';
   const md = DATA.monthly.find(m => m.month === selectedMonth);
   if (!md) return '';
-  return selectedMonth + '|' + md.adSpend + '|' + md.adSales + '|' + md.totalSales + '|' + md.acos + '|' + md.orders;
+  // md.adSpend is undefined, so this term was the constant string "undefined" and a
+  // spend-only change never invalidated the cached audio briefing.
+  return selectedMonth + '|' + md.spend + '|' + md.adSales + '|' + md.totalSales + '|' + md.acos + '|' + md.orders;
 }
 
 function pickVoice() {
@@ -3716,10 +3827,17 @@ async function init() {
   try {
     const [text, _supplement, _daily, _gads] = await Promise.all([
       fetch('/api/sheets').then(r => { if (!r.ok) throw new Error('Sheets API error: ' + r.status); return r.text(); }),
-      fetch('/data/api_supplement.json').then(r => r.ok ? r.json() : {}).catch(() => ({})),
-      fetch('/data/medaltus_daily_archive.json', {cache:'no-store'}).then(r => r.ok ? r.json() : {}).catch(() => ({})),
-      fetch('/data/medaltus_google_ads_monthly.json').then(r => r.ok ? r.json() : {monthly_summary:{},by_month_campaign:[]}).catch(() => ({monthly_summary:{},by_month_campaign:[]}))
+      // These used to be `.catch(() => ({}))` — a silent swallow that made a corrupt or
+      // missing file look like an empty-but-valid one. On the Ozlee dashboard that exact
+      // pattern hid a data file containing unresolved git conflict markers: it returned
+      // HTTP 200, r.json() threw, the catch replaced it with {}, and TACOS rendered as
+      // 2573.9% with no error anywhere. Same shape of bug is possible here, so the
+      // fallback still keeps the page alive but now says so, loudly.
+      _loadJsonOrWarn('/data/api_supplement.json', {}),
+      _loadJsonOrWarn('/data/medaltus_daily_archive.json', {}, {cache:'no-store'}),
+      _loadJsonOrWarn('/data/medaltus_google_ads_monthly.json', {monthly_summary:{},by_month_campaign:[]})
     ]);
+    _showDataLoadBanner(_MED_LOAD_FAILURES);
     if (_daily) MEDALTUS_DAILY = _daily;
     if (_gads) MEDALTUS_GADS_DATA = _gads;
     API_SUPPLEMENT = _supplement;

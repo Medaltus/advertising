@@ -26,7 +26,11 @@ jobs:
       # later mtime was genuinely rewritten by a script. Used by the freshness
       # check for files that carry no internal timestamp.
       - name: Mark run start
-        run: date +%s > /tmp/run_start_epoch
+        run: |
+          date +%s > /tmp/run_start_epoch
+          # Clear last run's integrity markers so the verify step only reports problems
+          # from THIS run. Neither file is committed.
+          rm -f data/data_integrity_failures.json data/report_failures.json
 
       - name: Write config.json
         env:
@@ -136,7 +140,43 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase --autostash
+
+          # `git pull --rebase --autostash` is how the dashboards got a 2573.9% TACOS.
+          #
+          # Two runs overlapping (the 06:00 and 13:00 crons, plus GitHub's 3-4h delay)
+          # meant the remote moved while this job was fetching. --autostash stashed the
+          # freshly-written data files, rebased, then popped the stash -- and the pop
+          # CONFLICTED on skinuva_monthly.json. git left conflict markers in the file,
+          # `git add` staged them, and the commit shipped them:
+          #
+          #     <<<<<<< Updated upstream
+          #           "totalSales": 151383.39,
+          #     =======
+          #           "totalSales": null,
+          #     >>>>>>> Stashed changes
+          #
+          # The file then served HTTP 200 but failed JSON.parse in the browser, the
+          # dashboard's silent `.catch(()=>{})` left Skinuva's revenue empty, and TACOS
+          # was computed by dividing the whole account's ad spend by eraclea's $1.5K.
+          # The run itself was green throughout.
+          #
+          # These files are all machine-generated and idempotent -- the next run
+          # rewrites them from the APIs -- so on conflict the right move is to keep OUR
+          # freshly-fetched version wholesale, never a line-level merge. `-X ours` does
+          # that during the stash pop, and the explicit conflict check below is the
+          # backstop: better to lose one refresh than to publish a corrupt file.
+          git pull --rebase --autostash -X ours || {
+            echo "::error::git pull --rebase --autostash failed — refusing to commit."
+            git rebase --abort 2>/dev/null || true
+            exit 1
+          }
+
+          # Belt and braces: never commit conflict markers, whatever produced them.
+          if grep -rIl --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data 2>/dev/null | grep .; then
+            echo "::error::Conflict markers found in generated data files — NOT committing."
+            grep -rIn --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data | head -20
+            exit 1
+          fi
           # Stage only files that actually exist this run.
           #
           # Several producing steps are continue-on-error, so any given output

@@ -1023,6 +1023,36 @@ function _websiteSalesFromSheet(monthLabel){
   const v=SHEET_WEBSITE_SALES[monthLabel];
   return (v!=null&&v>0)?v:null;
 }
+// Show a loud, unmissable banner when a dataset failed to load.
+//
+// The point is that a KPI computed from missing inputs must not look the same as a KPI
+// computed from real ones. Silence is what let a 2573.9% TACOS sit on screen looking
+// like a fact. Critical datasets get red and say the figures are unreliable; others get
+// amber and say what's degraded.
+function _showDataLoadBanner(failures){
+  if(!failures || !failures.length) return;
+  const critical = failures.filter(f=>f.critical);
+  const el = document.createElement('div');
+  el.id = 'data-load-banner';
+  const bad = critical.length > 0;
+  el.style.cssText = 'position:sticky;top:0;z-index:9999;padding:12px 16px;font-size:13px;'
+    + 'line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,sans-serif;'
+    + 'border-bottom:1px solid '+(bad?'#f87171':'#fbbf24')+';'
+    + 'background:'+(bad?'rgba(127,29,29,0.96)':'rgba(120,53,15,0.96)')+';color:#fff;';
+  el.innerHTML =
+    '<strong>'+(bad
+      ? '⚠ Total Sales and TACOS are NOT reliable on this page right now.'
+      : 'Some data did not load — parts of this page are incomplete.')+'</strong>'
+    + '<div style="margin-top:6px;opacity:0.92;">'
+    + failures.map(f=>'• <code style="font-size:12px;">'+f.path.replace(/^\/data\//,'')
+        + '</code> — ' + f.message.replace(/</g,'&lt;')).join('<br>')
+    + '</div>'
+    + (bad ? '<div style="margin-top:6px;opacity:0.85;">A data file is missing or corrupt, '
+        + 'so revenue is being read from an incomplete source. Re-deploy the dashboard from '
+        + 'a clean build before using these numbers for budget decisions.</div>' : '');
+  document.body.insertBefore(el, document.body.firstChild);
+}
+
 // Amazon refunds for a month, in the selected brand view.
 //
 // Amazon's totalSales metric is orderedProductSales — measured when the order is
@@ -1036,14 +1066,21 @@ function _websiteSalesFromSheet(monthLabel){
 // a December sale refunded in January lands in January. Net Sales is therefore
 // "sales this month minus refunds processed this month", not a restatement of the
 // same transactions.
+// In All view Skinuva is the dominant side (~97% of refunds). If ITS refunds are
+// unknown, the honest answer is "unknown" -- returning eraclea's figure alone would
+// publish ~$100 as the whole business's refunds, making Net Sales and Net TACOS look
+// materially better than they are. Same asymmetry rule as buildChannelRows and the
+// eraclea KPI fold: unknown on the dominant side => unknown overall.
 function _refundsFor(monthLabel){
   if(!monthLabel) return null;
-  let total=null;
   const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
-  if(sm&&sm.refunds!=null) total=Number(sm.refunds);
-  if(selectedOzleeBrand==='All'&&typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY){
+  const skRef=(sm&&sm.refunds!=null)?Number(sm.refunds):null;
+  if(selectedOzleeBrand!=='All') return skRef;
+  if(skRef==null) return null;
+  let total=skRef;
+  if(typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY){
     const em=ERACLEA_MONTHLY[monthLabel];
-    if(em&&em.refunds!=null) total=(total||0)+Number(em.refunds);
+    if(em&&em.refunds!=null) total+=Number(em.refunds);
   }
   return total;
 }
@@ -1474,6 +1511,11 @@ function buildBrandSelector(){
       selectedOzleeBrand=b.id;
       // Reset eraclea month when switching to it
       if(b.id==='eraclea') selectedEracleaMonth=null;
+      // The eraclea view has no date-range path: render() returns to renderEracleaView()
+      // BEFORE it checks rangeMode, so an active range left the range pill and Clear
+      // button on screen above a monthly view, and switching back to Skinuva/All
+      // silently dropped straight back into range mode.
+      if(b.id==='eraclea'&&typeof rangeMode!=='undefined'&&rangeMode) _resetRangeUI();
       render();
     };
     bar.appendChild(btn);
@@ -1781,13 +1823,21 @@ function render(){
     if(emd&&emd.amazon) _eraCur=emd.amazon;
     if(eprev&&eprev.amazon) _eraPrev=eprev.amazon;
     if(emd&&emd.amazon){const ea=emd.amazon;
-      const eTot=ea.totalSales||0;
-      md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0),totalSales:(md.totalSales||0)+eTot};
+      // Revenue is the one field that must NOT use `||0` here. Skinuva is ~99% of Ozlee's
+      // Amazon revenue; if its SP-API total is unknown, `(null||0)+eTot` published
+      // eraclea's ~$1.5k as the entire business's Total Sales and drove TACOS to ~1,600%.
+      // buildChannelRows already refuses this (it blanks the subtotal when Amazon's total
+      // is unknown) -- the KPI path has to refuse it too, or the card contradicts the table.
+      // Volume metrics keep `||0`: those are genuine sums where a missing side is additive.
+      const eTot=(md.totalSales!=null)?(md.totalSales+(ea.totalSales||0)):null;
+      md={...md,adSpend:(md.adSpend||0)+(ea.spend||0),adSales:(md.adSales||0)+(ea.adSales||0),orders:(md.orders||0)+(ea.orders||0),clicks:(md.clicks||0)+(ea.clicks||0),impressions:(md.impressions||0)+(ea.impressions||0),totalSales:eTot};
       md.acos=md.adSales>0?md.adSpend/md.adSales*100:null;md.tacos=md.totalSales>0?md.adSpend/md.totalSales*100:null;md.ctr=md.impressions>0?md.clicks/md.impressions*100:null;md.cpc=md.clicks>0?md.adSpend/md.clicks:null;md.aov=md.orders>0?md.adSales/md.orders:null;
     }
     if(prev&&eprev&&eprev.amazon){const ea=eprev.amazon;
-      const eTot=ea.totalSales||0;
-      prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0),totalSales:(prev.totalSales||0)+eTot};
+      // Same rule as the current month above: unknown Skinuva revenue => unknown total,
+      // never eraclea's figure alone. A wrong `prev` silently corrupts every MoM badge.
+      const eTot=(prev.totalSales!=null)?(prev.totalSales+(ea.totalSales||0)):null;
+      prev={...prev,adSpend:(prev.adSpend||0)+(ea.spend||0),adSales:(prev.adSales||0)+(ea.adSales||0),orders:(prev.orders||0)+(ea.orders||0),clicks:(prev.clicks||0)+(ea.clicks||0),impressions:(prev.impressions||0)+(ea.impressions||0),totalSales:eTot};
       prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.tacos=prev.totalSales>0?prev.adSpend/prev.totalSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?prev.adSales/prev.orders:null;
     }
   }
@@ -2401,7 +2451,39 @@ function renderTrend(){
     b.onclick=()=>{trendMode=m;renderTrend();}; tb.appendChild(b);
   });
   kill('trend');
-  const td=DATA.monthly.map(m=>({month:m.month,adSpend:m.adSpend,adSales:m.adSales,acos:m.acos,tacos:m.tacos,roas:m.adSpend>0?m.adSales/m.adSpend:0,orders:m.orders,clicks:m.clicks}));
+  // This chart used to read DATA.monthly raw, which made it wrong in two ways at once:
+  //
+  //  1. It ignored the brand selector and the eraclea fold, so in All (Ozlee) mode the
+  //     Ad Spend line's last point was Skinuva-only (~$25,090) while the Ad Spend KPI
+  //     card directly above it was eraclea-inclusive (~$25,371). Switching All <-> Skinuva
+  //     changed every card and left the chart identical.
+  //  2. Its "TACOS" series was GROSS while the card labelled "TACOS" is net of refunds.
+  //     Two elements with the same label that can never agree, by ~0.4pp every month.
+  //
+  // Both are fixed by rebuilding the series through the same steps the cards use.
+  const _foldEra = (selectedOzleeBrand==='All');
+  const td=DATA.monthly.map(m=>{
+    let adSpend=m.adSpend, adSales=m.adSales, totalSales=m.totalSales,
+        orders=m.orders, clicks=m.clicks;
+    if(_foldEra&&typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY){
+      const ea=(ERACLEA_MONTHLY[m.month]||{}).amazon;
+      if(ea){
+        adSpend=(adSpend||0)+(ea.spend||0); adSales=(adSales||0)+(ea.adSales||0);
+        orders=(orders||0)+(ea.orders||0);  clicks=(clicks||0)+(ea.clicks||0);
+        // Unknown revenue stays unknown -- never publish eraclea's figure alone.
+        totalSales=(totalSales!=null)?totalSales+(ea.totalSales||0):null;
+      }
+    }
+    const ref=_refundsFor(m.month);
+    const netTot=(totalSales!=null&&ref!=null)?totalSales-ref:null;
+    return {month:m.month,adSpend,adSales,
+      acos:(adSales>0&&adSpend!=null)?adSpend/adSales*100:null,
+      // Net, to match the TACOS card. Left as a gap rather than silently substituting
+      // gross for months with no refunds data -- a line that mixes two definitions is
+      // worse than a line with a hole in it.
+      tacos:(netTot!=null&&netTot>0&&adSpend!=null)?adSpend/netTot*100:null,
+      roas:(adSpend>0)?adSales/adSpend:0,orders,clicks};
+  });
   const base={responsive:true,maintainAspectRatio:false,
     plugins:{legend:{labels:{color:'rgba(255,255,255,0.6)',usePointStyle:true,pointStyle:'circle',font:{size:12}}},
     tooltip:{backgroundColor:'rgba(15,15,20,0.95)',bodyFont:{family:"'SF Mono','Menlo',monospace"},borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:12,cornerRadius:10}},
@@ -2422,7 +2504,8 @@ function renderTrend(){
     charts['trend']=new Chart(document.getElementById('chart-trend'),{type:'line',
       data:{labels:td.map(d=>d.month),datasets:[
         {label:'ACOS',data:td.map(d=>d.acos),borderColor:'#f59e0b',pointBackgroundColor:'#f59e0b',tension:.3,pointRadius:4,borderWidth:2.5},
-        {label:'TACOS',data:td.map(d=>d.tacos),borderColor:'#818cf8',pointBackgroundColor:'#818cf8',tension:.3,pointRadius:4,borderWidth:2.5},
+        // Labelled explicitly so it cannot be mistaken for the gross figure.
+        {label:'TACOS (net of refunds)',data:td.map(d=>d.tacos),borderColor:'#818cf8',pointBackgroundColor:'#818cf8',tension:.3,pointRadius:4,borderWidth:2.5},
         {label:'ROAS (x)',data:td.map(d=>d.roas),borderColor:'#4ade80',pointBackgroundColor:'#4ade80',tension:.3,pointRadius:4,borderWidth:2.5}
       ]},options:base});
   } else {
@@ -2439,8 +2522,20 @@ function renderTrend(){
 function renderAcos(){
   kill('acos');
   const months=DATA.monthly.map(m=>m.month);
-  const az=months.map(m=>{const c=(DATA.channels[m]||[]).find(x=>x.channel==='Amazon');return c?c.acos:null;});
-  const gz=months.map(m=>{const c=(DATA.channels[m]||[]).find(x=>x.channel==='Google');return c?c.acos:null;});
+  // Route through buildChannelRows rather than reading DATA.channels directly, so the
+  // Amazon line matches the Amazon row in the Channel Breakdown table below it. Reading
+  // the raw channel rows excluded eraclea's spend and sales in All (Ozlee) mode, so the
+  // chart and the table disagreed on the same month's Amazon ACOS.
+  const _era=m=>((selectedOzleeBrand==='All'&&typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY)
+                  ?((ERACLEA_MONTHLY[m]||{}).amazon||null):null);
+  const _row=(m,name)=>{
+    let rows;
+    try{ rows=buildChannelRows(m,_era(m)); }catch(e){ rows=DATA.channels[m]||[]; }
+    const c=(rows||[]).find(x=>x.channel===name);
+    return c?c.acos:null;
+  };
+  const az=months.map(m=>_row(m,'Amazon'));
+  const gz=months.map(m=>_row(m,'Google'));
   charts['acos']=new Chart(document.getElementById('chart-acos'),{type:'line',
     data:{labels:months,datasets:[
       {label:'Amazon ACOS',data:az,borderColor:'#a78bfa',pointBackgroundColor:'#a78bfa',tension:.3,pointRadius:5,borderWidth:2.5},
@@ -3880,21 +3975,51 @@ async function init(){
     // first/get clicked can be the stale, uncorrected one while the other is correct.
     DATA.monthly.forEach(m=>{ if(typeof m.month==='string') m.month=m.month.trim().replace(/\s+/g,' '); });
     if(!DATA.monthly.length) throw new Error('No monthly data found. The sheet format may have changed.');
-    // Load API data files then inject into monthly data
+    // Load API data files then inject into monthly data.
+    //
+    // Every one of these used to end in `.catch(()=>{})` — a silent swallow. That is how
+    // TACOS came to read 2573.9%: skinuva_monthly.json had been deployed with unresolved
+    // git conflict markers in it ("<<<<<<< Updated upstream"), so it returned HTTP 200,
+    // r.json() threw, the catch ate the error, and SKINUVA_MONTHLY stayed {}. With
+    // Skinuva's brand-filtered Total Sales missing, the Amazon row fell back to
+    // eraclea's ~$1.5K alone and divided the whole account's ad spend by it. No console
+    // error, no banner, nothing — just a number that was wrong by two orders of magnitude.
+    //
+    // Now: every failure is logged, recorded, and for the datasets the KPIs cannot be
+    // computed without, shown to the user as a banner. A dataset that fails to load must
+    // never again be indistinguishable from one that loaded and said zero.
+    const _loadFailures = [];
+    const _loadJson = (path, assign, critical) =>
+      fetch(path, {cache:'no-store'})
+        .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.text(); })
+        .then(t => {
+          if(/^(<<<<<<<|>>>>>>>)/m.test(t))
+            throw new Error('file contains unresolved git conflict markers');
+          let d;
+          try { d = JSON.parse(t); }
+          catch(e) { throw new Error('invalid JSON — '+e.message); }
+          if(d) assign(d);
+        })
+        .catch(e => {
+          _loadFailures.push({path, critical: !!critical, message: String(e.message||e)});
+          console.error('[ozlee] FAILED to load '+path+': '+(e.message||e)
+            + (critical ? ' — this dataset feeds Total Sales and TACOS, so those figures are NOT reliable.' : ''));
+        });
     await Promise.all([
-      fetch('/data/skinuva_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_AMAZON=d;}).catch(()=>{}),
-      fetch('/data/google_ads_data.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) GOOGLE_ADS_DATA=d;}).catch(()=>{}),
-      fetch('/data/manual_totals.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) MANUAL_TOTALS=d;}).catch(()=>{}),
-      fetch('/data/skinuva_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_MONTHLY=d;}).catch(()=>{}),
-      fetch('/data/skinuva_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_DAILY=d;}).catch(()=>{}),
-      fetch('/data/eraclea_supplement.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_AMAZON=d;}).catch(()=>{}),
-      fetch('/data/eraclea_monthly.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_MONTHLY=d;}).catch(()=>{}),
-      fetch('/data/eraclea_daily_archive.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_DAILY=d;}).catch(()=>{}),
-      fetch('/data/skinuva_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) SKINUVA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
-      fetch('/data/eraclea_campaigns_by_month.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) ERACLEA_CAMPAIGNS_BY_MONTH=d;}).catch(()=>{}),
-      fetch('/data/walmart_ads.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) WALMART_ADS=d;}).catch(()=>{}),
-      fetch('/data/walmart_revenue.json',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d) WALMART_REVENUE=d;}).catch(()=>{}),
+      _loadJson('/data/skinuva_supplement.json',      d=>{SKINUVA_AMAZON=d;},            true),
+      _loadJson('/data/google_ads_data.json',         d=>{GOOGLE_ADS_DATA=d;},           false),
+      _loadJson('/data/manual_totals.json',           d=>{MANUAL_TOTALS=d;},             false),
+      _loadJson('/data/skinuva_monthly.json',         d=>{SKINUVA_MONTHLY=d;},           true),
+      _loadJson('/data/skinuva_daily_archive.json',   d=>{SKINUVA_DAILY=d;},             false),
+      _loadJson('/data/eraclea_supplement.json',      d=>{ERACLEA_AMAZON=d;},            false),
+      _loadJson('/data/eraclea_monthly.json',         d=>{ERACLEA_MONTHLY=d;},           true),
+      _loadJson('/data/eraclea_daily_archive.json',   d=>{ERACLEA_DAILY=d;},             false),
+      _loadJson('/data/skinuva_campaigns_by_month.json', d=>{SKINUVA_CAMPAIGNS_BY_MONTH=d;}, false),
+      _loadJson('/data/eraclea_campaigns_by_month.json', d=>{ERACLEA_CAMPAIGNS_BY_MONTH=d;}, false),
+      _loadJson('/data/walmart_ads.json',             d=>{WALMART_ADS=d;},               false),
+      _loadJson('/data/walmart_revenue.json',         d=>{WALMART_REVENUE=d;},           false),
     ]);
+    _showDataLoadBanner(_loadFailures);
     // MUST run before the two injects below: they rebuild Total Paid Media from
     // whatever non-Amazon/Google channels are sitting in DATA.channels, so fixing
     // Walmart first means the totals pick it up automatically instead of needing
@@ -4304,18 +4429,29 @@ function clearRange(){
 // "Whole" allows the in-progress month to end early: the monthly Walmart/Shopify
 // figures for the current month are themselves month-to-date, so an MTD range lines
 // up with them. That makes MTD and Last Month both give a complete table.
+//
+// But "ends in the current month" is NOT the same as "ends today", and treating them
+// as equivalent was a real bug. With today = Aug 20, the range Aug 1 -> Aug 5 counted
+// as aligned: Amazon/Google spend came from 5 days of daily archive while Walmart,
+// Shopify, Meta and Reddit contributed their full month-TO-DATE figures. Revenue
+// covered 20 days against 5 days of spend, so Total Sales came out ~4x too high and
+// TACOS ~4x too low. The six presets never hit it; the custom date picker did.
+// The current month may therefore only end early if it ends on the most recent day
+// the monthly figures themselves cover -- i.e. today or yesterday.
 function _rangeMonthCoverage(s,e){
   const MO=['January','February','March','April','May','June','July','August','September','October','November','December'];
   const [sy,sm,sd]=s.split('-').map(Number), [ey,em,ed]=e.split('-').map(Number);
   const lastDay=(y,m)=>new Date(y,m,0).getDate();
-  const now=new Date(), cy=now.getFullYear(), cm=now.getMonth()+1;
+  const now=new Date(), cy=now.getFullYear(), cm=now.getMonth()+1, cd=now.getDate();
   const startsOnFirst = sd===1;
   const endsOnLast    = ed===lastDay(ey,em);
-  const endIsCurMonth = (ey===cy&&em===cm);
+  // Yesterday is allowed because the daily archive lags a day; anything earlier means
+  // the monthly figures cover more days than the daily ones do.
+  const endIsMonthToDate = (ey===cy&&em===cm&&ed>=cd-1);
   const months=[];
   let y=sy,m=sm;
   while(y<ey||(y===ey&&m<=em)){ months.push(MO[m-1]+' '+y); m++; if(m>12){m=1;y++;} }
-  return {aligned: startsOnFirst && (endsOnLast||endIsCurMonth), months};
+  return {aligned: startsOnFirst && (endsOnLast||endIsMonthToDate), months};
 }
 
 // The comparison period for an aligned range: the same NUMBER of whole calendar
@@ -4349,7 +4485,13 @@ function computeRangeMetrics(s,e){
   Object.entries(SKINUVA_DAILY).sort((x,y)=>x[0].localeCompare(y[0])).forEach(([d,row])=>{
     if(d<s||d>e) return;
     const am=row.amazon||{}, gd=row.google||{};
-    a.spend+=am.spend||0; a.adSales+=am.adSales||0; a.totalSales+=am.totalSales||0;
+    // NOTE: am.totalSales is deliberately NOT accumulated. The daily archive's
+    // totalSales was the whole PORTFOLIO's revenue stamped onto every brand's rows,
+    // so summing it overstated this brand by however much every other brand sold
+    // (eraclea's June archive summed to $132,850 against a true $1,224). It is now
+    // written as null upstream; range revenue comes from the brand-filtered monthly
+    // figure below (amzTotal), which is the only trustworthy source.
+    a.spend+=am.spend||0; a.adSales+=am.adSales||0;
     a.orders+=am.orders||0; a.clicks+=am.clicks||0; a.impressions+=am.impressions||0;
     g.spend+=gd.spend||0; g.adSales+=gd.adSales||0; g.conversions+=gd.conversions||0;
     g.clicks+=gd.clicks||0; g.impressions+=gd.impressions||0;

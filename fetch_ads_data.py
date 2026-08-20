@@ -1051,9 +1051,21 @@ def main():
                     print(f"  ↩  Connection reset, retrying {ap_cfg['adProduct']} ({attempt+1}/2)…")
                     time.sleep(10)
                 else:
+                    # Record it. REPORT_FAILURES was only appended to in the four
+                    # SUBMISSION handlers, so a failure during poll or download wrote an
+                    # empty row list and the run stayed green — report_failures.json was
+                    # never written, verify_data_freshness.py passed (every file DID get
+                    # rewritten), and the dashboard quietly served a month missing one ad
+                    # product's entire spend. This is reachable by construction, not just
+                    # bad luck: REPORT_POLL_TIMEOUT is 90 minutes but the access token is
+                    # minted once at submission and expires in 60, so any report that
+                    # takes over an hour returns 401 and lands right here.
                     print(f"  ✗ {ap_cfg['adProduct']} ({report_id[:8]}…) failed: {e}")
                     with dl_lock:
                         downloaded[report_id] = []
+                        REPORT_FAILURES.append(
+                            f"{ap_cfg['adProduct']} report {report_id[:8]} failed during "
+                            f"poll/download: {str(e)[:160]}")
                     return
 
     threads = [threading.Thread(target=fetch_report, args=(ap_cfg, report_id, hdrs),
@@ -1197,7 +1209,14 @@ def main():
 
     # ── Build output ───────────────────────────────────────────────────────────
 
-    brands_out = [brand_outputs[b] for b in brands if b in brand_outputs]
+    # Iterate the SAME list that was aggregated. This read `brands`, so any brand
+    # contributed only by a single-brand profile was built, logged with real spend and
+    # ACOS, then silently dropped from ads_data.js and from the portfolio totals — and
+    # it also escaped the unmatched-campaign check above, which skips _brand-tagged rows.
+    # So its spend appeared nowhere at all, not even as unattributed.
+    _out_order = list(brands) + [b for b in single_brand_profiles.values()
+                                 if b and b not in brands]
+    brands_out = [brand_outputs[b] for b in _out_order if b in brand_outputs]
 
     if not brands_out:
         print("✗ No brand data collected. Check that campaigns exist in the selected profiles.")
@@ -1225,13 +1244,21 @@ def main():
             from fetch_total_sales import fetch_total_sales as _fetch_ts
             print("\nFetching total portfolio sales from SP-API…")
             total_sales_by_date, brand_sales_period = _fetch_ts(cfg, lookback)
-            # Attach daily portfolio total sales to each brand's timeline
+            # `null`, not 0, when SP-API returned nothing for a day or a brand.
+            #
+            # These two lines used `.get(key, 0)`, which is the same mistake the rest of
+            # this codebase goes to real lengths to avoid (see _invalidate_total_sales
+            # and TRUSTED_TOTAL_SALES_SOURCES in generate_skinuva_supplement.py, and the
+            # `a.totalSales||0` comment in the dashboard). A failed fetch became a
+            # confident $0.00: the day rows landed in the daily archives as real zeros
+            # and got served to date-range queries, and a brand missing from the map
+            # rendered "$0" total sales against real spend. Absent must stay absent so
+            # the dashboard can show "—".
             for b in brands_out:
                 for row in b.get("timeline", []):
-                    row["totalSales"] = total_sales_by_date.get(row["date"], 0) or 0
-            # Attach period total sales to each brand summary
+                    row["totalSales"] = total_sales_by_date.get(row["date"])
             for b in brands_out:
-                b["summary"]["totalSales"] = brand_sales_period.get(b["name"], 0)
+                b["summary"]["totalSales"] = brand_sales_period.get(b["name"])
         except Exception as e:
             print(f"  ⚠ Total sales fetch failed (TACOS will be unavailable): {e}")
     else:

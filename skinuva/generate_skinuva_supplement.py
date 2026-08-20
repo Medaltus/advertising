@@ -196,7 +196,18 @@ def build_daily_archive(supplement: dict, google_path: Path) -> dict:
         entries[d]['amazon'] = {
             'spend':       round(float(row.get('spend', 0) or 0), 2),
             'adSales':     round(float(row.get('sales', 0) or 0), 2),
-            'totalSales':  round(float(row.get('totalSales', 0) or 0), 2),
+            # NOT written any more. The ads timeline's per-day totalSales is the WHOLE
+            # PORTFOLIO's sales (see backfill_brand_total_sales's docstring below), and
+            # storing it under a brand-scoped key made it look brand-filtered. The
+            # committed files prove the damage: eraclea's daily archive summed to
+            # $132,851.15 for June 2026 against a true $1,224.36 -- 108x -- and was
+            # byte-identical to Skinuva's on 35 consecutive days. Skinuva's own archive
+            # summed to $229,553.33 against a true $159,976.50.
+            #
+            # There is no daily brand-filtered source, so the honest value is null.
+            # Brand-level revenue lives in skinuva_monthly.json / eraclea_monthly.json,
+            # derived per calendar month by backfill_brand_total_sales().
+            'totalSales':  None,
             'orders':      int(row.get('purchases', 0) or 0),
             'clicks':      int(row.get('clicks', 0) or 0),
             'impressions': int(row.get('impressions', 0) or 0),
@@ -616,12 +627,71 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
         print(f"  ✓ [{mk}] {brand_name} totalSales (brand-filtered, {key[0]}→{key[1]}): ${total:,.2f}")
 
 
-def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path) -> dict:
+def _snapshot_covers_month(entry: dict, mk: str, label: str) -> bool:
+    """
+    Does this Shopify/Walmart snapshot actually cover the whole calendar month?
+
+    These files carry a `range: {since, until}`, and it was read for nothing — the API
+    value won unconditionally. That is fine while a month is in progress, but the
+    snapshot then STAYS on disk after the month closes, and any later run rebuilding
+    that month overwrote the complete figure with the stale partial one while printing a
+    reassuring "using API $X" line.
+
+    Live examples in the committed data:
+      shopify_sales.json  July 2026: range ends 2026-07-28, total $46,250.76
+                          skinuva_monthly.json July 2026: $50,039.42  (-$3,788.66)
+      walmart_revenue.json July 2026: total $45.00, fetched 2026-07-29
+                          skinuva_monthly.json July 2026: $1,059.99   (-$1,014.99)
+
+    Understating revenue overstates TACOS, which is the number budgets are set from, so
+    a partial snapshot for a CLOSED month is rejected rather than trusted. In-progress
+    months are still accepted: there the month-to-date figure is the correct answer.
+    """
+    if not isinstance(entry, dict):
+        return True
+    rng = entry.get('range') or {}
+    until = rng.get('until')
+    if not until:
+        return True                      # no range metadata — nothing to check
+    try:
+        parts = mk.split(' ')
+        month_num = MONTH_NAMES.index(parts[0]) + 1
+        year = int(parts[1])
+        until_d = datetime.strptime(str(until)[:10], '%Y-%m-%d').date()
+    except Exception:
+        return True
+    today = datetime.now().date()
+    if (year, month_num) >= (today.year, today.month):
+        return True                      # in progress: month-to-date is correct
+    last_day = calendar.monthrange(year, month_num)[1]
+    if until_d.day >= last_day and until_d.month == month_num and until_d.year == year:
+        return True
+    print(f"  ⚠  [{mk}] {label}: snapshot only covers through {until_d} but the month "
+          f"closed on day {last_day} — REJECTED so a partial figure cannot overwrite "
+          f"the complete one. Re-run the {label} fetch to refresh it.")
+    return False
+
+
+def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path,
+                          include_dtc: bool = True) -> dict:
     """
     Aggregate Amazon + Google timeline data by calendar month.
     Returns a dict keyed by month label (e.g. 'June 2026') with per-channel totals.
     This is merged with the existing skinuva_monthly.json so historical months
     outside the current lookback window are never lost.
+
+    include_dtc — whether this brand HAS a Shopify store and a Walmart listing.
+    False for eraclea, which is Amazon-only.
+
+    Why this parameter has to exist: the eraclea call site passes deliberately-absent
+    sentinel paths (`_no_manual.json`, `_no_google.json`) to suppress Skinuva's inputs,
+    but shopify_path and walmart_path were re-derived from `manual_path.parent` — still
+    `skinuva/data/` — so the sentinel had no effect on them. eraclea therefore inherited
+    SKINUVA's Shopify and Walmart revenue verbatim: June 2026 recorded
+    combinedTotalSales $43,831.10 against $1,224.36 of actual Amazon sales, 35x
+    overstated, and apply_refunds() then published netCombinedTotalSales from it. Same
+    class of bug as the ASIN cache: a path recomputed from a variable the caller
+    believed it had overridden.
     """
 
     # ── Aggregate Amazon timeline by month ──────────────────────────────────
@@ -677,7 +747,7 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
     # Walmart stays manual; there's no API for it here.
     shopify_api = {}
     shopify_path = manual_path.parent / 'shopify_sales.json'
-    if shopify_path.exists():
+    if include_dtc and shopify_path.exists():
         try:
             shopify_api = json.loads(shopify_path.read_text())
         except Exception:
@@ -689,7 +759,7 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
     # cover so nothing drops to zero.
     walmart_sheet = {}
     walmart_path = manual_path.parent / 'walmart_revenue.json'
-    if walmart_path.exists():
+    if include_dtc and walmart_path.exists():
         try:
             walmart_sheet = json.loads(walmart_path.read_text())
         except Exception:
@@ -702,7 +772,7 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
         g  = ggl[mk]
         mt = manual.get(mk, {})
         _api_shop = (shopify_api.get(mk) or {}).get('total')
-        if _api_shop is not None:
+        if _api_shop is not None and _snapshot_covers_month(shopify_api.get(mk), mk, 'Shopify'):
             shopify = float(_api_shop)
             _manual_shop = mt.get('shopify')
             if _manual_shop is not None and abs(float(_manual_shop) - shopify) > max(1.0, shopify * 0.01):
@@ -712,7 +782,7 @@ def build_monthly_archive(supplement: dict, google_path: Path, manual_path: Path
         else:
             shopify = float(mt.get('shopify', 0) or 0)
         _sheet_wm = (walmart_sheet.get(mk) or {}).get('total')
-        if _sheet_wm is not None:
+        if _sheet_wm is not None and _snapshot_covers_month(walmart_sheet.get(mk), mk, 'Walmart'):
             walmart = float(_sheet_wm)
             _manual_wm = mt.get('walmart')
             if _manual_wm is not None and abs(float(_manual_wm) - walmart) > max(1.0, walmart * 0.01):
@@ -876,7 +946,11 @@ def main():
 
         # eraclea_monthly.json (Amazon-only, no Google/Shopify paths)
         eraclea_monthly_path = out_dir / 'eraclea_monthly.json'
-        eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual)
+        # include_dtc=False — eraclea is Amazon-only. The sentinel paths alone did NOT
+        # suppress Shopify/Walmart (they were re-derived from manual_path.parent), so
+        # eraclea was inheriting Skinuva's DTC revenue.
+        eraclea_new_monthly = build_monthly_archive(eraclea_supplement, no_google, no_manual,
+                                                   include_dtc=False)
         existing_eraclea = {}
         if eraclea_monthly_path.exists():
             try:

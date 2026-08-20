@@ -102,9 +102,17 @@ def fetch_refund_events(cfg, start: date, end: date) -> list:
         if next_token:
             qs = f"NextToken={requests.utils.quote(next_token, safe='')}"
         else:
-            qs = (f"MaxResultsPerPage=100"
-                  f"&PostedAfter={start.isoformat()}T00:00:00Z"
-                  f"&PostedBefore={(end + timedelta(days=1)).isoformat()}T00:00:00Z")
+            # RFC3986-encode the values. SigV4 signs the CANONICAL query string, which
+            # requires ':' in these ISO timestamps to appear as %3A -- and
+            # sigv4_headers() does no encoding of its own (every other call site in this
+            # codebase passes qs=""). Sending raw colons produces a signature mismatch,
+            # i.e. a 403 on every run, while apply_refunds() quietly preserves the last
+            # good values so the dashboard looks fine and the numbers never move.
+            # Keys stay in alphabetical order, which SigV4 also requires.
+            _q = lambda v: requests.utils.quote(str(v), safe='')
+            qs = ("MaxResultsPerPage=100"
+                  f"&PostedAfter={_q(start.isoformat() + 'T00:00:00Z')}"
+                  f"&PostedBefore={_q((end + timedelta(days=1)).isoformat() + 'T00:00:00Z')}")
         token = get_sp_access_token(cfg, "sp_refresh_token")
         resp = _request_with_backoff(
             "GET",
@@ -152,6 +160,10 @@ def main():
     for _ in range(args.months - 1):
         start = (start - timedelta(days=1)).replace(day=1)
     end = today - timedelta(days=1)
+    # On the 1st of a month, `end` is the last day of the PREVIOUS month while `start` is
+    # today, so the window is inverted and empty. Step back one more month.
+    if start > end:
+        start = (start - timedelta(days=1)).replace(day=1)
 
     print(f"\n{'═'*62}")
     print(f"  Amazon refunds — {month_key(start)} → {month_key(end)}")
@@ -178,15 +190,27 @@ def main():
             if amt == 0:
                 continue
             brand = brand_for_sku(adj.get('SellerSKU'))
-            # Refunds arrive as negative principal; store the magnitude.
+            # Refunds arrive as NEGATIVE principal, so negate to get a positive refund.
+            #
+            # This was abs(), which is wrong: refund REVERSALS (chargeback reversals,
+            # returnless-refund corrections) post as POSITIVE principal, and abs() added
+            # them as extra refunds instead of netting them off. A $50 refund that
+            # reverses the following week reported $100 of refunds against a true $0,
+            # understating Net Sales and overstating Net TACOS.
             if brand:
-                by_month[mk][brand] += abs(amt)
+                by_month[mk][brand] += -amt
             else:
-                unmapped[mk] += abs(amt)
+                unmapped[mk] += -amt
 
     if not by_month:
-        print("\n  no refunds found in range — nothing written")
-        return 0
+        # Not success. Refunds run 2-5% of revenue EVERY month, so a clean empty result
+        # across a multi-month window means the request or the parse is broken, not that
+        # nobody returned anything. Returning 0 here made a broken pull look fine while
+        # apply_refunds() preserved the previous values, so the dashboard kept showing
+        # stale refunds that never moved.
+        print(f"\n  ✗ no refund events found across {args.months} month(s) — treating as "
+              f"a FAILED pull, not a genuine zero. Nothing written; existing values kept.")
+        return 1
 
     print(f"\n  {'month':16}{'brand':16}{'refunds':>12}")
     print("  " + "-" * 44)
@@ -208,8 +232,18 @@ def main():
             existing = json.loads(OUT_PATH.read_text())
         except Exception:
             existing = {}
+    # Write an explicit 0.00 for tracked brands with no refund events this month.
+    #
+    # Previously a brand-month with genuinely zero refunds got no key at all, which the
+    # dashboard cannot distinguish from "we never fetched this" — so it fell back to
+    # GROSS TACOS for that month while its neighbours showed NET, and the trend line
+    # silently mixed two different metrics. The pull succeeded, so absence is a real zero.
+    _tracked = sorted(set(ABBREV_TO_BRAND.values()))
     for mk, brands in by_month.items():
-        existing[mk] = {b: round(v, 2) for b, v in brands.items()}
+        row = {b: round(v, 2) for b, v in brands.items()}
+        for b in _tracked:
+            row.setdefault(b, 0.0)
+        existing[mk] = row
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(existing, indent=2))
     print(f"\n  ✓ wrote {OUT_PATH} ({len(existing)} months)")
