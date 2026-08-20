@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-19T14:55:30Z",
+  "fetched_at": "2026-08-20T08:21:58Z",
   "monthly_summary": {
     "July 2025": {
       "impressions": 26,
@@ -132,14 +132,14 @@
       "cpl": null
     },
     "August 2026": {
-      "impressions": 4815,
-      "clicks": 94,
-      "spend": 30.69,
+      "impressions": 5214,
+      "clicks": 105,
+      "spend": 42.08,
       "conversions": 1,
       "revenue": 1.0,
-      "cpc": 0.33,
-      "ctr": 0.0195,
-      "cpl": 30.69
+      "cpc": 0.4,
+      "ctr": 0.0201,
+      "cpl": 42.08
     }
   },
   "by_month_campaign": [
@@ -778,27 +778,13 @@
       "campaign_id": "24021948373",
       "campaign_name": "Medaltus Google - Lead Generation - PMAX 3PL - 7.26 v1",
       "type": "PERFORMANCE_MAX",
-      "impressions": 294,
-      "clicks": 14,
-      "spend": 16.4,
+      "impressions": 457,
+      "clicks": 18,
+      "spend": 22.98,
       "conversions": 0,
       "revenue": 0.0,
-      "cpc": 1.17,
-      "ctr": 0.0476,
-      "cpl": null
-    },
-    {
-      "month": "August 2026",
-      "campaign_id": "24021914386",
-      "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v1",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 3961,
-      "clicks": 70,
-      "spend": 7.57,
-      "conversions": 0,
-      "revenue": 0.0,
-      "cpc": 0.11,
-      "ctr": 0.0177,
+      "cpc": 1.28,
+      "ctr": 0.0394,
       "cpl": null
     },
     {
@@ -806,14 +792,28 @@
       "campaign_id": "24012550440",
       "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v2",
       "type": "PERFORMANCE_MAX",
-      "impressions": 560,
-      "clicks": 10,
-      "spend": 6.72,
+      "impressions": 621,
+      "clicks": 13,
+      "spend": 11.33,
       "conversions": 1,
       "revenue": 1.0,
-      "cpc": 0.67,
+      "cpc": 0.87,
+      "ctr": 0.0209,
+      "cpl": 11.33
+    },
+    {
+      "month": "August 2026",
+      "campaign_id": "24021914386",
+      "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v1",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 4136,
+      "clicks": 74,
+      "spend": 7.77,
+      "conversions": 0,
+      "revenue": 0.0,
+      "cpc": 0.1,
       "ctr": 0.0179,
-      "cpl": 6.72
+      "cpl": null
     }
   ]
 }
