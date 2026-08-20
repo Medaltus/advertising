@@ -489,18 +489,18 @@
     "backfilled": true,
     "refunds": 330.82,
     "refundsSource": "helium10-asin-attributed",
-    "netAmazonSales": 1070.5,
-    "netCombinedTotalSales": 53719.79
+    "netAmazonSales": 684.11,
+    "netCombinedTotalSales": 53333.4
   },
   "June 2026": {
     "amazon": {
       "spend": 223.18,
       "adSales": 634.93,
-      "totalSales": null,
+      "totalSales": 1224.36,
       "orders": 14,
       "clicks": 178,
       "impressions": 46834,
-      "totalSalesSource": "unavailable (brand missing from SP-API response)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 0.0,
@@ -511,12 +511,12 @@
     },
     "shopify": 40856.74,
     "walmart": 1750.0,
-    "combinedTotalSales": null,
+    "combinedTotalSales": 43831.1,
     "fetched_at": "2026-07-31T16:03:07Z",
     "refunds": 55.99,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 1175.09,
-    "netCombinedTotalSales": 43781.83
+    "netAmazonSales": 1168.37,
+    "netCombinedTotalSales": 43775.11
   },
   "July 2026": {
     "amazon": {

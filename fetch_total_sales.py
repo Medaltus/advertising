@@ -300,7 +300,8 @@ def _ads_api_headers(access_token, client_id, profile_id):
     }
 
 
-def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_token"):
+def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_token",
+                        cache_name=None):
     """
     Builds a comprehensive ASIN→brand map using two sources:
     1. GET_MERCHANT_LISTINGS_ALL_DATA (all active listings, brand from title)
@@ -483,8 +484,17 @@ def build_asin_brand_map(cfg, start_str, end_str, refresh_token_key="sp_refresh_
         print(f"  ⚠ Ads supplement failed: {e}")
 
     print(f"  ✓ Final ASIN→brand map: {len(asin_brand)} ASINs → {len(set(asin_brand.values()))} brands")
-    # Cache the map — use a separate file per account token
-    cache_name = "asin_brand_cache.json" if refresh_token_key == "sp_refresh_token" else f"asin_brand_cache_{refresh_token_key.replace('sp_refresh_token','')}.json"
+    # Cache the map — one file per (account token, MARKETPLACE).
+    #
+    # This used to derive the name from refresh_token_key alone, ignoring the
+    # cache_name the caller passed in. Canada uses the same refresh token as the US,
+    # so the Canadian map was written straight over asin_brand_cache.json. Every
+    # subsequent US month then loaded a CA-only map, failed to attribute a single US
+    # ASIN, discarded it all as "unmapped", and total sales collapsed — June 2026 went
+    # from $159,976.50 to $242.41 on both dashboards.
+    if not cache_name:
+        cache_name = ("asin_brand_cache.json" if refresh_token_key == "sp_refresh_token"
+                      else f"asin_brand_cache_{refresh_token_key.replace('sp_refresh_token','')}.json")
     cache_path = Path(__file__).parent / cache_name
     try:
         cache_path.write_text(json.dumps({
@@ -575,7 +585,9 @@ def _fetch_one_account(cfg, refresh_token_key, start_str, end_str,
                 except Exception:
                     pass
             if asin_brand_map is None:
-                asin_brand_map = build_asin_brand_map(cfg, start_str, end_str, refresh_token_key)
+                asin_brand_map = build_asin_brand_map(
+                    cfg, start_str, end_str, refresh_token_key,
+                    cache_name=cache_name)
 
         excluded_brands = set(cfg.get("excluded_brands", [])) if not default_brand else set()
         brand_sales, excluded_period_sales = parse_brand_sales(
