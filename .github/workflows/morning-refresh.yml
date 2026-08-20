@@ -160,31 +160,24 @@ jobs:
           # was computed by dividing the whole account's ad spend by eraclea's $1.5K.
           # The run itself was green throughout.
           #
-          # These files are all machine-generated and idempotent -- the next run
-          # rewrites them from the APIs -- so on conflict the right move is to keep OUR
-          # freshly-fetched version wholesale, never a line-level merge. `-X ours` does
-          # that during the stash pop, and the explicit conflict check below is the
-          # backstop: better to lose one refresh than to publish a corrupt file.
-          git pull --rebase --autostash -X ours || {
-            echo "::error::git pull --rebase --autostash failed — refusing to commit."
-            git rebase --abort 2>/dev/null || true
-            exit 1
-          }
-
-          # Belt and braces: never commit conflict markers, whatever produced them.
-          if grep -rIl --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data 2>/dev/null | grep .; then
-            echo "::error::Conflict markers found in generated data files — NOT committing."
-            grep -rIn --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data | head -20
-            exit 1
-          fi
-          # Stage only files that actually exist this run.
+          # TESTED FIXES THAT DID NOT WORK, so nobody re-tries them:
+          #   * `-X ours` does NOT apply to the autostash pop. Reproduced in a scratch
+          #     repo: the pop still wrote conflict markers.
+          #   * `git pull ... || exit 1` never fires. git pull EXITS 0 even when it
+          #     prints "Applying autostash resulted in conflicts."
           #
-          # Several producing steps are continue-on-error, so any given output
-          # can legitimately be absent -- shopify_sales.json in particular isn't
-          # written until Shopify credentials are configured. `git add` on a
-          # missing pathspec exits 128, and because this step has no
-          # continue-on-error that failed the entire run at the very END, after
-          # ~50 minutes of successful fetching, silently discarding the refresh.
+          # So no merge is attempted at all. These files are machine-generated and
+          # idempotent, so a line-level merge between two runs is never meaningful --
+          # whichever run finishes last should simply publish the files it generated,
+          # and leave every other file at the remote's newest state.
+          #
+          #   1. snapshot the files THIS run produced
+          #   2. hard-reset to the remote tip (so files we did NOT regenerate keep the
+          #      other run's newer values instead of being reverted)
+          #   3. restore our snapshot over the top
+          #
+          # No three-way merge happens anywhere, so conflict markers are structurally
+          # impossible rather than merely guarded against.
           DATA_FILES="
             data/api_supplement.json
             data/medaltus_daily_archive.json
@@ -201,6 +194,71 @@ jobs:
             skinuva/data/eraclea_monthly.json
             skinuva/data/eraclea_daily_archive.json
           "
+          # Snapshot ONLY the files this run actually rewrote.
+          #
+          # Snapshotting all of DATA_FILES is wrong and was caught in testing: several
+          # producing steps are continue-on-error, so on any given run some of these
+          # files are untouched and still hold the values from this job's (already
+          # stale) checkout. Restoring those over the remote tip REVERTED the
+          # overlapping run's newer data -- silently losing a refresh, which is the
+          # same shape of bug as the one being fixed here.
+          #
+          # `git status --porcelain` against the checked-out HEAD is the precise
+          # signal: modified or newly created means a script wrote it this run.
+          CHANGED=$(git status --porcelain -- $DATA_FILES | sed 's/^...//' | tr -d '"')
+          if [ -z "$CHANGED" ]; then
+            echo "No data files changed this run — nothing to commit."
+            exit 0
+          fi
+          echo "Files rewritten this run:"; for f in $CHANGED; do echo "  $f"; done
+
+          SNAP=$(mktemp -d)
+          for f in $CHANGED; do
+            [ -f "$f" ] || continue
+            mkdir -p "$SNAP/$(dirname "$f")"
+            cp "$f" "$SNAP/$f"
+          done
+
+          git fetch origin "${GITHUB_REF_NAME}" || { echo "::error::fetch failed"; exit 1; }
+          git reset --hard "origin/${GITHUB_REF_NAME}" || { echo "::error::reset failed"; exit 1; }
+
+          for f in $CHANGED; do
+            if [ -f "$SNAP/$f" ]; then
+              mkdir -p "$(dirname "$f")"
+              cp "$SNAP/$f" "$f"
+            fi
+          done
+          rm -rf "$SNAP"
+
+          # Backstop. Should now be unreachable, but this is the check whose absence
+          # let a corrupt file reach production for hours, so it stays.
+          if grep -rIl --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data 2>/dev/null | grep .; then
+            echo "::error::Conflict markers found in generated data files — NOT committing."
+            grep -rIn --include="*.json" -e '^<<<<<<< ' -e '^>>>>>>> ' data skinuva/data | head -20
+            exit 1
+          fi
+          # Every generated file must be valid JSON before it is allowed anywhere near
+          # a commit. A file that fails to parse silently blanks whatever the dashboard
+          # derives from it.
+          for f in $DATA_FILES; do
+            [ -f "$f" ] || continue
+            python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$f" || {
+              echo "::error file=$f::invalid JSON — refusing to commit"; exit 1; }
+          done
+
+          # Stage only files that actually exist this run.
+          #
+          # Several producing steps are continue-on-error, so any given output
+          # can legitimately be absent -- shopify_sales.json in particular isn't
+          # written until Shopify credentials are configured. `git add` on a
+          # missing pathspec exits 128, and because this step has no
+          # continue-on-error that failed the entire run at the very END, after
+          # ~50 minutes of successful fetching, silently discarding the refresh.
+          #
+          # Reuses the single DATA_FILES list defined above. It used to be declared a
+          # second time here; two copies of the same list is a slow-motion bug, because
+          # adding a file to one and not the other silently stops it being snapshotted
+          # or silently stops it being committed.
           for f in $DATA_FILES; do
             if [ -f "$f" ]; then
               git add "$f"
