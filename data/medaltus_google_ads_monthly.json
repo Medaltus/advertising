@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-08-20T16:16:07Z",
+  "fetched_at": "2026-08-21T07:19:48Z",
   "monthly_summary": {
     "July 2025": {
       "impressions": 26,
@@ -132,14 +132,14 @@
       "cpl": null
     },
     "August 2026": {
-      "impressions": 5217,
-      "clicks": 105,
-      "spend": 42.08,
+      "impressions": 5620,
+      "clicks": 115,
+      "spend": 60.59,
       "conversions": 1,
       "revenue": 1.0,
-      "cpc": 0.4,
-      "ctr": 0.0201,
-      "cpl": 42.08
+      "cpc": 0.53,
+      "ctr": 0.0205,
+      "cpl": 60.59
     }
   },
   "by_month_campaign": [
@@ -778,13 +778,27 @@
       "campaign_id": "24021948373",
       "campaign_name": "Medaltus Google - Lead Generation - PMAX 3PL - 7.26 v1",
       "type": "PERFORMANCE_MAX",
-      "impressions": 460,
-      "clicks": 18,
-      "spend": 22.98,
+      "impressions": 560,
+      "clicks": 20,
+      "spend": 31.89,
       "conversions": 0,
       "revenue": 0.0,
-      "cpc": 1.28,
-      "ctr": 0.0391,
+      "cpc": 1.59,
+      "ctr": 0.0357,
+      "cpl": null
+    },
+    {
+      "month": "August 2026",
+      "campaign_id": "24021914386",
+      "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v1",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 4385,
+      "clicks": 80,
+      "spend": 17.21,
+      "conversions": 0,
+      "revenue": 0.0,
+      "cpc": 0.22,
+      "ctr": 0.0182,
       "cpl": null
     },
     {
@@ -792,28 +806,14 @@
       "campaign_id": "24012550440",
       "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v2",
       "type": "PERFORMANCE_MAX",
-      "impressions": 621,
-      "clicks": 13,
-      "spend": 11.33,
+      "impressions": 675,
+      "clicks": 15,
+      "spend": 11.49,
       "conversions": 1,
       "revenue": 1.0,
-      "cpc": 0.87,
-      "ctr": 0.0209,
-      "cpl": 11.33
-    },
-    {
-      "month": "August 2026",
-      "campaign_id": "24021914386",
-      "campaign_name": "Medaltus Google - Lead Generation - PMAX eComm - 7.26 v1",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 4136,
-      "clicks": 74,
-      "spend": 7.77,
-      "conversions": 0,
-      "revenue": 0.0,
-      "cpc": 0.1,
-      "ctr": 0.0179,
-      "cpl": null
+      "cpc": 0.77,
+      "ctr": 0.0222,
+      "cpl": 11.49
     }
   ]
 }
