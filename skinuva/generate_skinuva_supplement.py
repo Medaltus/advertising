@@ -454,20 +454,44 @@ def apply_refunds(monthly: dict, brand_name: str, script_dir: Path) -> int:
         return 0
 
     n = 0
+    stale = 0
     for mk, entry in monthly.items():
         amt = (data.get(mk) or {}).get(brand_name)
-        if amt is None:
+        if amt is not None:
+            entry['refunds'] = round(float(amt), 2)
+            entry['refundsSource'] = 'sp-api-finances'
+            n += 1
+
+        # Recompute the NET fields on EVERY month, not only the ones the refunds file
+        # covered this run.
+        #
+        # This used to `continue` when the refunds file had no entry for the month, which
+        # left netAmazonSales frozen against a totalSales that had since been re-fetched.
+        # Caught in production by verify_data_freshness.py: eraclea May 2026 carried
+        # netAmazonSales $684.11 while totalSales was $1,401.32 and refunds $330.82 --
+        # the net had been computed against an older $1,014.93 and never revisited.
+        # refunds_by_month.json only holds the last 3 months by design, so every older
+        # month was permanently exposed to this.
+        refunds = entry.get('refunds')
+        if refunds is None:
             continue
-        entry['refunds'] = round(float(amt), 2)
-        entry['refundsSource'] = 'sp-api-finances'
         amz = (entry.get('amazon') or {}).get('totalSales')
-        if amz is not None:
-            entry['netAmazonSales'] = round(amz - entry['refunds'], 2)
+        want_amz = round(amz - refunds, 2) if amz is not None else None
+        if want_amz is None:
+            entry.pop('netAmazonSales', None)
+        else:
+            if entry.get('netAmazonSales') != want_amz and amt is None:
+                stale += 1
+            entry['netAmazonSales'] = want_amz
         comb = entry.get('combinedTotalSales')
-        if comb is not None:
-            entry['netCombinedTotalSales'] = round(comb - entry['refunds'], 2)
-        n += 1
-    print(f"  ✓ refunds applied to {n} month(s) for {brand_name}")
+        want_comb = round(comb - refunds, 2) if comb is not None else None
+        if want_comb is None:
+            entry.pop('netCombinedTotalSales', None)
+        else:
+            entry['netCombinedTotalSales'] = want_comb
+
+    print(f"  ✓ refunds applied to {n} month(s) for {brand_name}"
+          + (f"; corrected {stale} stale net figure(s) in older months" if stale else ""))
     return n
 
 
