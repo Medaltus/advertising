@@ -102,12 +102,19 @@ def fetch_refund_events(cfg, start: date, end: date) -> list:
         if next_token:
             qs = f"NextToken={requests.utils.quote(next_token, safe='')}"
         else:
-            # RFC3986-encode the values. SigV4 signs the CANONICAL query string, which
-            # requires ':' in these ISO timestamps to appear as %3A -- and
-            # sigv4_headers() does no encoding of its own (every other call site in this
-            # codebase passes qs=""). Sending raw colons produces a signature mismatch,
-            # i.e. a 403 on every run, while apply_refunds() quietly preserves the last
-            # good values so the dashboard looks fine and the numbers never move.
+            # RFC3986-encode the values, because SigV4's canonical query string wants
+            # ':' as %3A and sigv4_headers() does no encoding of its own.
+            #
+            # CORRECTION: an earlier version of this comment claimed the unencoded form
+            # produced a 403 on every run. That was wrong -- the evidence says otherwise.
+            # data/refunds_by_month.json was written by this script with real refunds for
+            # nine brands across three months, so the original unencoded version worked.
+            # SP-API no longer requires AWS SigV4 (only the LWA access token), so the
+            # signature is not what gates these calls.
+            #
+            # The encoding is kept because it is what the spec asks for and it is
+            # consistent (the same string is signed and sent), but it fixed nothing.
+            # Flagging it rather than quietly leaving a false rationale in the code.
             # Keys stay in alphabetical order, which SigV4 also requires.
             _q = lambda v: requests.utils.quote(str(v), safe='')
             qs = ("MaxResultsPerPage=100"
