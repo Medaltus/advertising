@@ -674,6 +674,17 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
         <div class="audio-spinner"></div>
         <span style="font-size:11px;font-weight:600;color:rgba(129,140,248,0.8);letter-spacing:0.5px;">Executive Summary</span>
       </button>
+      <!-- Amazon visibility toggle. Sits beside Executive Summary but is ALWAYS visible:
+           the audio button above hides itself on completed months (display:none unless
+           the month is partial), and this control must not disappear with it. -->
+      <button id="amazon-toggle-btn" onclick="toggleAmazonData()" title="Amazon excluded — click to include Amazon spend, sales and sections"
+              style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;
+                     background:linear-gradient(135deg,rgba(255,153,0,0.14),rgba(255,153,0,0.05));
+                     border:1px solid rgba(255,153,0,0.25);color:rgba(255,153,0,0.85);
+                     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;">
+        <span style="font-size:13px;line-height:1;">&#10098;a&#10099;</span>
+        <span class="amz-toggle-label">With Amazon Data</span>
+      </button>
       <div class="refresh-timer" id="refresh-timer" style="display:none;">
         <div class="refresh-ring-wrap">
           <svg class="refresh-ring-bg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
@@ -1073,6 +1084,11 @@ function _showDataLoadBanner(failures){
 // eraclea KPI fold: unknown on the dominant side => unknown overall.
 function _refundsFor(monthLabel){
   if(!monthLabel) return null;
+  // These are Amazon refunds (SP-API Finances). In non-Amazon mode there is no Amazon
+  // revenue to net them against, so returning them would subtract Amazon returns from
+  // Shopify + Walmart revenue. Null makes the Net Sales row hide and the TACOS card
+  // fall back to its gross definition, which is the correct figure for this view.
+  if(!showAmazonData) return null;
   const sm=(typeof SKINUVA_MONTHLY!=='undefined'&&SKINUVA_MONTHLY)?SKINUVA_MONTHLY[monthLabel]:null;
   const skRef=(sm&&sm.refunds!=null)?Number(sm.refunds):null;
   if(selectedOzleeBrand!=='All') return skRef;
@@ -1388,6 +1404,80 @@ Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', san
 let DATA=null, selectedMonth=null, trendMode='spend_vs_sales', charts={}, initialLoadDone=false;
 let ERACLEA_AMAZON=null, ERACLEA_MONTHLY={}, ERACLEA_DAILY={};
 let selectedOzleeBrand='All', selectedEracleaMonth=null;
+
+// ── Amazon visibility ────────────────────────────────────────────────────────
+// Amazon dominates this account (~72% of revenue, ~57% of ad spend), so it drowns
+// out Google, Walmart and Shopify in every blended figure. Default view therefore
+// EXCLUDES Amazon entirely -- spend, ad sales, revenue and all Amazon-sourced
+// sections -- so the rest of the business can actually be read. The "With Amazon
+// Data" button restores the full picture.
+//
+// Deliberately NOT persisted to localStorage. Which mode you are in changes what
+// every number on the page means, and a remembered toggle is exactly how someone
+// ends up reading a non-Amazon TACOS as if it were the whole business. It resets
+// to off on every load, and the button's active state is always visible.
+let showAmazonData = false;
+
+// Sections whose data comes from the Amazon Ads supplement. Hidden in non-Amazon
+// mode. Google Ads Live API and US Geographic are Google-sourced and stay visible.
+const AMAZON_SECTION_IDS = [
+  'amazon-api-section',    // Amazon — Live API Data
+  'search-terms-section',  // Search Term Insights (ACTIVE_SUPPLEMENT)
+  'asin-section',          // Product / ASIN Performance (ACTIVE_SUPPLEMENT)
+  'placement-section',     // Placement Performance (ACTIVE_SUPPLEMENT)
+  'dow-section',           // Day-of-Week Performance (ACTIVE_SUPPLEMENT)
+];
+
+function toggleAmazonData(){
+  showAmazonData = !showAmazonData;
+  // eraclea is Amazon-only. Leaving it selected while Amazon is hidden would show a
+  // brand with nothing in it, so fall back to All.
+  if(!showAmazonData && selectedOzleeBrand==='eraclea') selectedOzleeBrand='All';
+  syncAmazonToggleButton();
+  render();
+}
+
+function syncAmazonToggleButton(){
+  const b=document.getElementById('amazon-toggle-btn');
+  if(!b) return;
+  b.classList.toggle('active', showAmazonData);
+  // Filled when Amazon is included, outlined when excluded, so the mode is obvious at
+  // a glance. Which mode you are in changes what every number means, so this must not
+  // be subtle.
+  if(showAmazonData){
+    b.style.background='linear-gradient(135deg,rgba(255,153,0,0.42),rgba(255,153,0,0.2))';
+    b.style.borderColor='rgba(255,153,0,0.7)';
+    b.style.color='#ffb84d';
+  } else {
+    b.style.background='linear-gradient(135deg,rgba(255,153,0,0.14),rgba(255,153,0,0.05))';
+    b.style.borderColor='rgba(255,153,0,0.25)';
+    b.style.color='rgba(255,153,0,0.85)';
+  }
+  const lbl=b.querySelector('.amz-toggle-label');
+  if(lbl) lbl.textContent = showAmazonData ? 'Amazon Data: ON' : 'With Amazon Data';
+  b.title = showAmazonData
+    ? 'Amazon included — click to hide Amazon and see the rest of the business on its own'
+    : 'Amazon excluded — click to include Amazon spend, sales and sections';
+}
+
+// Applies the section show/hide. Called from render() so it survives every re-render.
+function applyAmazonVisibility(){
+  AMAZON_SECTION_IDS.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(showAmazonData){
+      // Restore only the ones this page shows by default. asin/placement/geo ship
+      // with display:none in the markup and are revealed by their own renderers
+      // when they have data, so blanking the inline style is right -- forcing
+      // 'block' here would show an empty panel for a month with no data.
+      el.style.display='';
+    } else {
+      el.style.display='none';
+    }
+  });
+  const banner=document.getElementById('amazon-hidden-note');
+  if(banner) banner.style.display = showAmazonData ? 'none' : '';
+}
 let ACTIVE_SUPPLEMENT=null;
 
 function buildMergedSupplement(s1,s2){
@@ -1592,6 +1682,38 @@ function computeOzleeWoW(tab){
 
 function renderEracleaView(){
   buildBrandSelector();
+  // eraclea sells on Amazon only, so with Amazon excluded there is genuinely nothing
+  // to show. Say so explicitly rather than rendering a page of zeroes and dashes,
+  // which would read as "eraclea has collapsed" instead of "this view hides Amazon".
+  if(!showAmazonData){
+    ['kpi-row-1','kpi-row-2','charts-row-1','trend-row','acos-row','channels-card',
+     'google-api-section','wlos-section','agents-section','geo-section','range-bar',
+     ...AMAZON_SECTION_IDS
+    ].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='none';});
+    let note=document.getElementById('eraclea-amazon-note');
+    if(!note){
+      note=document.createElement('div');
+      note.id='eraclea-amazon-note';
+      note.className='chart-card glass';
+      note.style.cssText='margin-bottom:24px;padding:40px 32px;text-align:center;';
+      const anchor=document.getElementById('kpi-row-1');
+      if(anchor&&anchor.parentNode) anchor.parentNode.insertBefore(note,anchor);
+      else document.body.appendChild(note);
+    }
+    note.style.display='';
+    note.innerHTML='<div style="font-size:15px;font-weight:600;color:rgba(255,255,255,0.85);margin-bottom:10px;">'
+      + 'eraclea sells on Amazon only</div>'
+      + '<div style="font-size:13px;line-height:1.6;color:rgba(255,255,255,0.5);max-width:520px;margin:0 auto;">'
+      + 'This dashboard is currently excluding Amazon, so there is nothing for eraclea to show. '
+      + 'Switch on <strong style="color:rgba(255,153,0,0.9);">With Amazon Data</strong> at the top right '
+      + 'to see eraclea\'s spend, sales and TACOS.</div>';
+    document.getElementById('subtitle').textContent='eraclea · Amazon excluded';
+    const tb=document.getElementById('month-tabs'); if(tb) tb.style.opacity='0.3';
+    return;
+  }
+  const _eraNote=document.getElementById('eraclea-amazon-note');
+  if(_eraNote) _eraNote.style.display='none';
+  ['kpi-row-1','kpi-row-2'].forEach(id=>{const el=document.getElementById(id); if(el) el.style.display='';});
   // Ensure KPI animation guard doesn't suppress eraclea values
   if(!initialLoadDone) initialLoadDone=true;
   // Build month list from ERACLEA_MONTHLY + inject current from ERACLEA_AMAZON
@@ -1778,8 +1900,130 @@ function renderEracleaView(){
   renderEracleaTrend();
 }
 
+// ── Channel rows, reconciled ────────────────────────────────────────────────
+// buildChannelRows() returns a NON-MUTATING copy of DATA.channels[month] with two
+// corrections. DATA.channels is deliberately left untouched: renderAll runs on
+// every month/brand switch, so mutating it would compound eraclea in twice, three
+// times, ... on successive renders.
+//
+// 1. In 'All' view, eraclea's Amazon spend/sales/orders/clicks/impressions/totalSales
+//    are folded INTO the Amazon row. eraclea is a brand, not a channel, and its
+//    spend genuinely IS Amazon spend -- so it belongs in the Amazon line rather
+//    than a row of its own. Without this, md (KPI cards) and the Total Sales row
+//    included eraclea while every channel row and the Total Paid Media subtotal
+//    did not.
+//
+// 2. Total Paid Media is rebuilt from the channel rows instead of trusting the
+//    value the API injectors wrote. Its Total Sales column was being set to
+//    combinedTotalSales, which ALREADY CONTAINS Shopify -- and Shopify is then
+//    rendered as its own row directly beneath. So the Total Sales column
+//    double-counted Shopify and could not be added down: July 2026 read
+//    $132,174.03 + $1,059.99 (channels) then $183,273.44 (subtotal) then
+//    $50,039.42 (Shopify). Total Paid Media's Total Sales is now strictly the sum
+//    of the marketplace total sales in the rows above it (Amazon + Walmart), so
+//    subtotal + Shopify == the Total Sales bottom line, exactly.
+function buildChannelRows(monthKey, era){
+  const src=DATA.channels[monthKey]||[];
+  const r2=(n,d=2)=>n==null?null:Math.round(n*Math.pow(10,d))/Math.pow(10,d);
+  // Non-Amazon mode: drop the Amazon row entirely and ignore `era`.
+  //
+  // eraclea is an Amazon-only brand, so folding it in would smuggle Amazon spend and
+  // revenue back into a view whose whole purpose is to exclude them. Returning early
+  // here (rather than filtering afterwards) means Total Paid Media is rebuilt from
+  // Google + Walmart + the Sheet channels only, and its Total Sales is Walmart's
+  // marketplace revenue -- so the column still adds down to the bottom line.
+  if(!showAmazonData){
+    era = null;
+  }
+  // "Website Sales" is dropped, not just hidden. It is the Sheet's DTC revenue
+  // line -- not an ad channel -- and it is already surfaced by the Shopify row,
+  // which falls back to exactly this figure for pre-API months. Leaving it in
+  // the array meant its totalSales landed in the Total Paid Media subtotal AND
+  // again in the Shopify row, double-counting ~$51-56K for March-May: the very
+  // bug this function exists to fix, re-entering through a different door.
+  // It has no spend/clicks/orders, so it never contributed to any other total.
+  const canonCh=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
+  let rows=src.filter(c=>c.channel!=='Total Paid Media'&&canonCh(c.channel)!=='websitesales');
+  if(!showAmazonData) rows=rows.filter(c=>canonCh(c.channel)!=='amazon');
+  // totalSales counts as presence, not just ad activity. eraclea ran no Amazon ads
+  // before July 2025 but was still selling -- January 2025 was $3,075.40 -- and a
+  // spend/adSales-only test skipped those months, so the Amazon row showed Skinuva
+  // alone while the KPI cards (which add eraclea unconditionally) counted it. That
+  // is the $136.0K card against a $132,945.67 table.
+  if(era&&((era.spend||0)>0||(era.adSales||0)>0||(era.totalSales||0)>0)){
+    let sawAmazon=false;
+    rows=rows.map(c=>{
+      if(c.channel!=='Amazon') return c;
+      sawAmazon=true;
+      const spend=(c.adSpend||0)+(era.spend||0);
+      const sales=(c.adSales||0)+(era.adSales||0);
+      const orders=(c.orders||0)+(era.orders||0);
+      const clicks=(c.clicks||0)+(era.clicks||0);
+      const imps=(c.impressions||0)+(era.impressions||0);
+      // null totalSales means "unknown", not zero, and the two sides are NOT
+      // interchangeable. Skinuva is the overwhelming majority of Amazon revenue,
+      // so a missing eraclea figure is a rounding-level omission -- but if
+      // Skinuva's own SP-API fetch failed, the row is genuinely unknown and must
+      // stay blank. Summing "at least one side present" would have published
+      // eraclea's ~$1.5k alone under the Amazon label and dragged TACOS to ~85%.
+      const ts=c.totalSales!=null?(c.totalSales+(era.totalSales||0)):null;
+      return {...c, adSpend:r2(spend), adSales:r2(sales), orders, clicks, impressions:imps,
+        acos:sales>0?r2(spend/sales*100):null,
+        totalSales:ts!=null?r2(ts):null,
+        tacos:(ts!=null&&ts>0)?r2(spend/ts*100):null,
+        ctr:imps>0?r2(clicks/imps*100):null,
+        cpc:clicks>0?r2(spend/clicks):null,
+        aov:orders>0?r2(sales/orders):null,
+        cvr:clicks>0?r2(orders/clicks*100):null};
+    });
+    // Defensive: if a month has eraclea data but no Amazon row at all, eraclea's
+    // spend would vanish from the table while still sitting in the KPI cards.
+    if(!sawAmazon) rows=rows.concat([{channel:'Amazon',adSpend:r2(era.spend||0),adSales:r2(era.adSales||0),
+      orders:era.orders||0,clicks:era.clicks||0,impressions:era.impressions||0,
+      acos:(era.adSales||0)>0?r2((era.spend||0)/era.adSales*100):null,
+      totalSales:era.totalSales!=null?r2(era.totalSales):null,
+      tacos:(era.totalSales||0)>0?r2((era.spend||0)/era.totalSales*100):null}]);
+  }
+  const sum=k=>rows.reduce((s,c)=>s+(c[k]||0),0);
+  const tSpend=r2(sum('adSpend')), tSales=r2(sum('adSales'));
+  const tOrders=sum('orders'), tClicks=sum('clicks'), tImps=sum('impressions');
+  // Marketplace total sales only -- Shopify is a separate row below and must not
+  // be counted here or the column stops adding up.
+  //
+  // Amazon is the dominant revenue source and the only one whose fetch realistically
+  // fails (June 2026 sat at "unavailable (SP-API fetch failed)" for a while). If its
+  // totalSales is unknown then the whole column is unknown, so blank the subtotal
+  // instead of publishing a Walmart-only figure -- ~$1k presented as the entire
+  // business, with a TACOS in the thousands of percent. Blank is honest; a wrong
+  // number that looks plausible is not.
+  // NOTE: the Total Paid Media row's totalSales/tacos are deliberately rendered
+  // blank in the table -- a paid-media subtotal of total-business revenue reads as
+  // if ads drove all of it. The value is still computed here because the bottom
+  // Total Sales row and the KPI cross-check both depend on it. Do not remove it
+  // as dead code.
+  const amzRow=rows.find(c=>c.channel==='Amazon');
+  const tsUnknown=!!(amzRow&&amzRow.totalSales==null);
+  const anyTs=rows.some(c=>c.totalSales!=null);
+  const tTotal=(anyTs&&!tsUnknown)?r2(sum('totalSales')):null;
+  const total={channel:'Total Paid Media',adSpend:tSpend,adSales:tSales,
+    orders:tOrders,clicks:tClicks,impressions:tImps,
+    acos:tSales>0?r2(tSpend/tSales*100):null,
+    totalSales:tTotal,
+    tacos:(tTotal!=null&&tTotal>0)?r2(tSpend/tTotal*100):null,
+    ctr:tImps>0?r2(tClicks/tImps*100):null,
+    cpc:tClicks>0?r2(tSpend/tClicks):null,
+    aov:tOrders>0?r2(tSales/tOrders):null,
+    cvr:tClicks>0?r2(tOrders/tClicks*100):null};
+  return rows.concat([total]);
+}
+
 function render(){
   buildBrandSelector();
+  // Before any early return. render() bails out for the eraclea view and for range
+  // mode, so calling this further down would leave the Amazon sections on screen in
+  // exactly the paths where a reader is least likely to notice.
+  syncAmazonToggleButton();
+  applyAmazonVisibility();
   if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
   // Restore sections that eraclea view may have hidden
   ['google-api-section','wlos-section','charts-row-1','trend-row','acos-row','channels-card'].forEach(id=>{const el=document.getElementById(id);if(el) el.style.display='';});
@@ -1801,7 +2045,10 @@ function render(){
   // disagreed with the KPI cards and with the Total Sales row by exactly eraclea's
   // spend -- $25,089.92 vs $25,370.69 in July 2026.
   let _eraCur=null, _eraPrev=null;
-  if(selectedOzleeBrand==='All'){
+  // eraclea is Amazon-only, so in non-Amazon mode it contributes nothing and must not
+  // be folded into md/prev. Skipping the whole block leaves _eraCur/_eraPrev null,
+  // which is exactly what buildChannelRows also does in this mode.
+  if(selectedOzleeBrand==='All' && showAmazonData){
     // For current partial month use live ERACLEA_AMAZON timeline (more up-to-date than monthly JSON)
     let emd=ERACLEA_MONTHLY[selectedMonth];
     if(md.partial && ERACLEA_AMAZON && ERACLEA_AMAZON.timeline){
@@ -1841,8 +2088,42 @@ function render(){
       prev.acos=prev.adSales>0?prev.adSpend/prev.adSales*100:null;prev.tacos=prev.totalSales>0?prev.adSpend/prev.totalSales*100:null;prev.ctr=prev.impressions>0?prev.clicks/prev.impressions*100:null;prev.cpc=prev.clicks>0?prev.adSpend/prev.clicks:null;prev.aov=prev.orders>0?prev.adSales/prev.orders:null;
     }
   }
+  // ── Non-Amazon mode: rebuild md/prev with Amazon removed ───────────────────
+  //
+  // md comes from the Sheet and is blended across every channel, so it cannot simply
+  // be filtered. It is rebuilt from the channel rows that buildChannelRows already
+  // returns for this mode (Google + Walmart + any Sheet channels, Amazon dropped),
+  // which guarantees the KPI cards and the Channel Breakdown agree by construction --
+  // they are now literally the same numbers.
+  //
+  // Revenue becomes Walmart marketplace revenue + Shopify DTC. Amazon revenue leaves
+  // with Amazon spend; keeping it would produce a TACOS of ~5% that means nothing.
+  // partial/daysElapsed/daysInMonth are preserved so the forecast block still works.
+  if(!showAmazonData){
+    const _nonAmz=(monthKey)=>{
+      const rows=buildChannelRows(monthKey,null);
+      const tpm=rows.find(c=>c.channel==='Total Paid Media')||{};
+      const wm=_walmartSalesFor(monthKey);
+      const sh=_shopifySalesFor(monthKey);
+      // Unknown stays unknown: if neither revenue source is available the card shows
+      // "—" rather than a confident zero.
+      const ts=(wm!=null||sh!=null)?((wm||0)+(sh||0)):null;
+      const spend=tpm.adSpend!=null?tpm.adSpend:null;
+      return {
+        adSpend:spend, adSales:tpm.adSales, orders:tpm.orders, clicks:tpm.clicks,
+        impressions:tpm.impressions, totalSales:ts,
+        acos:(tpm.adSales>0&&spend!=null)?spend/tpm.adSales*100:null,
+        tacos:(ts!=null&&ts>0&&spend!=null)?spend/ts*100:null,
+        ctr:tpm.ctr, cpc:tpm.cpc, aov:tpm.aov,
+      };
+    };
+    md={...md, ..._nonAmz(md.month)};
+    if(prev) prev={...prev, ..._nonAmz(prev.month)};
+  }
+
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
   const f=k=>ip?fv(md,k):null;
+  applyAmazonVisibility();
 
   // AI Agents only show on current (partial) month
   const agentsSec=document.getElementById('agents-section');
@@ -1881,7 +2162,11 @@ function render(){
 
   // Subtitle
   const ms=DATA.monthly.map(m=>m.month.replace(/\s\d{4}$/,'')), yr=DATA.monthly[0].month.split(' ')[1];
-  document.getElementById('subtitle').textContent=`Live from Google Sheets · Data from ${ms[0]}–${ms[ms.length-1]} ${yr}`;
+  // The mode is stated in the subtitle as well as on the button. Someone screenshotting
+  // a KPI card needs the caption to say which basis the numbers are on.
+  document.getElementById('subtitle').textContent=
+    `Live from Google Sheets · Data from ${ms[0]}–${ms[ms.length-1]} ${yr}`
+    + (showAmazonData ? '' : ' · Amazon EXCLUDED (Google + Walmart + Shopify only)');
 
   // Month dropdown
   (function buildMonthDropdown(){
@@ -2010,111 +2295,10 @@ function render(){
     r2.appendChild(kpi(x.l,x.v,o));
   });
 
-  // ── Channel rows, reconciled ────────────────────────────────────────────────
-  // buildChannelRows() returns a NON-MUTATING copy of DATA.channels[month] with two
-  // corrections. DATA.channels is deliberately left untouched: renderAll runs on
-  // every month/brand switch, so mutating it would compound eraclea in twice, three
-  // times, ... on successive renders.
-  //
-  // 1. In 'All' view, eraclea's Amazon spend/sales/orders/clicks/impressions/totalSales
-  //    are folded INTO the Amazon row. eraclea is a brand, not a channel, and its
-  //    spend genuinely IS Amazon spend -- so it belongs in the Amazon line rather
-  //    than a row of its own. Without this, md (KPI cards) and the Total Sales row
-  //    included eraclea while every channel row and the Total Paid Media subtotal
-  //    did not.
-  //
-  // 2. Total Paid Media is rebuilt from the channel rows instead of trusting the
-  //    value the API injectors wrote. Its Total Sales column was being set to
-  //    combinedTotalSales, which ALREADY CONTAINS Shopify -- and Shopify is then
-  //    rendered as its own row directly beneath. So the Total Sales column
-  //    double-counted Shopify and could not be added down: July 2026 read
-  //    $132,174.03 + $1,059.99 (channels) then $183,273.44 (subtotal) then
-  //    $50,039.42 (Shopify). Total Paid Media's Total Sales is now strictly the sum
-  //    of the marketplace total sales in the rows above it (Amazon + Walmart), so
-  //    subtotal + Shopify == the Total Sales bottom line, exactly.
-  function buildChannelRows(monthKey, era){
-    const src=DATA.channels[monthKey]||[];
-    const r2=(n,d=2)=>n==null?null:Math.round(n*Math.pow(10,d))/Math.pow(10,d);
-    // "Website Sales" is dropped, not just hidden. It is the Sheet's DTC revenue
-    // line -- not an ad channel -- and it is already surfaced by the Shopify row,
-    // which falls back to exactly this figure for pre-API months. Leaving it in
-    // the array meant its totalSales landed in the Total Paid Media subtotal AND
-    // again in the Shopify row, double-counting ~$51-56K for March-May: the very
-    // bug this function exists to fix, re-entering through a different door.
-    // It has no spend/clicks/orders, so it never contributed to any other total.
-    const canonCh=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
-    let rows=src.filter(c=>c.channel!=='Total Paid Media'&&canonCh(c.channel)!=='websitesales');
-    // totalSales counts as presence, not just ad activity. eraclea ran no Amazon ads
-    // before July 2025 but was still selling -- January 2025 was $3,075.40 -- and a
-    // spend/adSales-only test skipped those months, so the Amazon row showed Skinuva
-    // alone while the KPI cards (which add eraclea unconditionally) counted it. That
-    // is the $136.0K card against a $132,945.67 table.
-    if(era&&((era.spend||0)>0||(era.adSales||0)>0||(era.totalSales||0)>0)){
-      let sawAmazon=false;
-      rows=rows.map(c=>{
-        if(c.channel!=='Amazon') return c;
-        sawAmazon=true;
-        const spend=(c.adSpend||0)+(era.spend||0);
-        const sales=(c.adSales||0)+(era.adSales||0);
-        const orders=(c.orders||0)+(era.orders||0);
-        const clicks=(c.clicks||0)+(era.clicks||0);
-        const imps=(c.impressions||0)+(era.impressions||0);
-        // null totalSales means "unknown", not zero, and the two sides are NOT
-        // interchangeable. Skinuva is the overwhelming majority of Amazon revenue,
-        // so a missing eraclea figure is a rounding-level omission -- but if
-        // Skinuva's own SP-API fetch failed, the row is genuinely unknown and must
-        // stay blank. Summing "at least one side present" would have published
-        // eraclea's ~$1.5k alone under the Amazon label and dragged TACOS to ~85%.
-        const ts=c.totalSales!=null?(c.totalSales+(era.totalSales||0)):null;
-        return {...c, adSpend:r2(spend), adSales:r2(sales), orders, clicks, impressions:imps,
-          acos:sales>0?r2(spend/sales*100):null,
-          totalSales:ts!=null?r2(ts):null,
-          tacos:(ts!=null&&ts>0)?r2(spend/ts*100):null,
-          ctr:imps>0?r2(clicks/imps*100):null,
-          cpc:clicks>0?r2(spend/clicks):null,
-          aov:orders>0?r2(sales/orders):null,
-          cvr:clicks>0?r2(orders/clicks*100):null};
-      });
-      // Defensive: if a month has eraclea data but no Amazon row at all, eraclea's
-      // spend would vanish from the table while still sitting in the KPI cards.
-      if(!sawAmazon) rows=rows.concat([{channel:'Amazon',adSpend:r2(era.spend||0),adSales:r2(era.adSales||0),
-        orders:era.orders||0,clicks:era.clicks||0,impressions:era.impressions||0,
-        acos:(era.adSales||0)>0?r2((era.spend||0)/era.adSales*100):null,
-        totalSales:era.totalSales!=null?r2(era.totalSales):null,
-        tacos:(era.totalSales||0)>0?r2((era.spend||0)/era.totalSales*100):null}]);
-    }
-    const sum=k=>rows.reduce((s,c)=>s+(c[k]||0),0);
-    const tSpend=r2(sum('adSpend')), tSales=r2(sum('adSales'));
-    const tOrders=sum('orders'), tClicks=sum('clicks'), tImps=sum('impressions');
-    // Marketplace total sales only -- Shopify is a separate row below and must not
-    // be counted here or the column stops adding up.
-    //
-    // Amazon is the dominant revenue source and the only one whose fetch realistically
-    // fails (June 2026 sat at "unavailable (SP-API fetch failed)" for a while). If its
-    // totalSales is unknown then the whole column is unknown, so blank the subtotal
-    // instead of publishing a Walmart-only figure -- ~$1k presented as the entire
-    // business, with a TACOS in the thousands of percent. Blank is honest; a wrong
-    // number that looks plausible is not.
-    // NOTE: the Total Paid Media row's totalSales/tacos are deliberately rendered
-    // blank in the table -- a paid-media subtotal of total-business revenue reads as
-    // if ads drove all of it. The value is still computed here because the bottom
-    // Total Sales row and the KPI cross-check both depend on it. Do not remove it
-    // as dead code.
-    const amzRow=rows.find(c=>c.channel==='Amazon');
-    const tsUnknown=!!(amzRow&&amzRow.totalSales==null);
-    const anyTs=rows.some(c=>c.totalSales!=null);
-    const tTotal=(anyTs&&!tsUnknown)?r2(sum('totalSales')):null;
-    const total={channel:'Total Paid Media',adSpend:tSpend,adSales:tSales,
-      orders:tOrders,clicks:tClicks,impressions:tImps,
-      acos:tSales>0?r2(tSpend/tSales*100):null,
-      totalSales:tTotal,
-      tacos:(tTotal!=null&&tTotal>0)?r2(tSpend/tTotal*100):null,
-      ctr:tImps>0?r2(tClicks/tImps*100):null,
-      cpc:tClicks>0?r2(tSpend/tClicks):null,
-      aov:tOrders>0?r2(tSales/tOrders):null,
-      cvr:tClicks>0?r2(tOrders/tClicks*100):null};
-    return rows.concat([total]);
-  }
+  // buildChannelRows() is defined at top level (above render) so renderAcos and
+  // the non-Amazon aggregate can use it too. It used to live here, nested inside
+  // render(), which meant renderAcos's call silently fell through to its
+  // try/catch fallback and the ACOS chart never got the corrected rows.
   const curCh=buildChannelRows(selectedMonth,_eraCur);
   const curTotalRow=curCh.find(c=>c.channel==='Total Paid Media')||{};
 
@@ -2461,8 +2645,27 @@ function renderTrend(){
   //     Two elements with the same label that can never agree, by ~0.4pp every month.
   //
   // Both are fixed by rebuilding the series through the same steps the cards use.
-  const _foldEra = (selectedOzleeBrand==='All');
+  // Non-Amazon mode: build the series from the non-Amazon channel rows so the chart
+  // matches the cards. Folding eraclea (Amazon-only) is also skipped.
+  const _foldEra = (selectedOzleeBrand==='All') && showAmazonData;
+  // Series label reflects the mode, so a reader can never mistake one TACOS
+  // definition for the other. Net-of-refunds only exists when Amazon is included,
+  // because refunds are Amazon-only.
+  const _tacosLabel = showAmazonData ? 'TACOS (net of refunds)' : 'TACOS (excl. Amazon)';
   const td=DATA.monthly.map(m=>{
+    // Non-Amazon mode: source the series from the same non-Amazon channel rows the
+    // KPI cards use, so chart and cards agree by construction.
+    if(!showAmazonData){
+      const rows=buildChannelRows(m.month,null);
+      const tpm=rows.find(c=>c.channel==='Total Paid Media')||{};
+      const wm=_walmartSalesFor(m.month), sh=_shopifySalesFor(m.month);
+      const ts=(wm!=null||sh!=null)?((wm||0)+(sh||0)):null;
+      const spend=tpm.adSpend||0, sales=tpm.adSales||0;
+      return {month:m.month, adSpend:spend, adSales:sales, totalSales:ts,
+        acos:sales>0?spend/sales*100:null,
+        tacos:(ts!=null&&ts>0)?spend/ts*100:null,
+        roas:spend>0?sales/spend:0, orders:tpm.orders||0, clicks:tpm.clicks||0};
+    }
     let adSpend=m.adSpend, adSales=m.adSales, totalSales=m.totalSales,
         orders=m.orders, clicks=m.clicks;
     if(_foldEra&&typeof ERACLEA_MONTHLY!=='undefined'&&ERACLEA_MONTHLY){
@@ -2505,7 +2708,7 @@ function renderTrend(){
       data:{labels:td.map(d=>d.month),datasets:[
         {label:'ACOS',data:td.map(d=>d.acos),borderColor:'#f59e0b',pointBackgroundColor:'#f59e0b',tension:.3,pointRadius:4,borderWidth:2.5},
         // Labelled explicitly so it cannot be mistaken for the gross figure.
-        {label:'TACOS (net of refunds)',data:td.map(d=>d.tacos),borderColor:'#818cf8',pointBackgroundColor:'#818cf8',tension:.3,pointRadius:4,borderWidth:2.5},
+        {label:_tacosLabel,data:td.map(d=>d.tacos),borderColor:'#818cf8',pointBackgroundColor:'#818cf8',tension:.3,pointRadius:4,borderWidth:2.5},
         {label:'ROAS (x)',data:td.map(d=>d.roas),borderColor:'#4ade80',pointBackgroundColor:'#4ade80',tension:.3,pointRadius:4,borderWidth:2.5}
       ]},options:base});
   } else {
@@ -4491,8 +4694,13 @@ function computeRangeMetrics(s,e){
     // (eraclea's June archive summed to $132,850 against a true $1,224). It is now
     // written as null upstream; range revenue comes from the brand-filtered monthly
     // figure below (amzTotal), which is the only trustworthy source.
-    a.spend+=am.spend||0; a.adSales+=am.adSales||0;
-    a.orders+=am.orders||0; a.clicks+=am.clicks||0; a.impressions+=am.impressions||0;
+    // Skip Amazon entirely in non-Amazon mode, so a date range is on the same basis
+    // as the monthly view. Without this the range view would silently reintroduce the
+    // Amazon spend the rest of the page is excluding.
+    if(showAmazonData){
+      a.spend+=am.spend||0; a.adSales+=am.adSales||0;
+      a.orders+=am.orders||0; a.clicks+=am.clicks||0; a.impressions+=am.impressions||0;
+    }
     g.spend+=gd.spend||0; g.adSales+=gd.adSales||0; g.conversions+=gd.conversions||0;
     g.clicks+=gd.clicks||0; g.impressions+=gd.impressions||0;
     rows.push({date:d,amz:am,ggl:gd});
@@ -4500,7 +4708,9 @@ function computeRangeMetrics(s,e){
   // In 'All (Ozlee)' the range view previously showed Skinuva only, silently
   // disagreeing with the monthly view for the same dates. eraclea has its own daily
   // archive, so fold it into Amazon here exactly as the monthly view does.
-  if(selectedOzleeBrand==='All'&&ERACLEA_DAILY){
+  // eraclea is Amazon-only, so skip it in non-Amazon mode for the same reason the
+  // monthly view does.
+  if(selectedOzleeBrand==='All'&&ERACLEA_DAILY&&showAmazonData){
     Object.entries(ERACLEA_DAILY).forEach(([d,row])=>{
       if(d<s||d>e) return; const em=row.amazon||{};
       a.spend+=em.spend||0; a.adSales+=em.adSales||0; a.orders+=em.orders||0;
@@ -4519,7 +4729,7 @@ function computeRangeMetrics(s,e){
   // so only this one field was wrong. Same bug as the monthly view had; it lived on
   // here because renderRange has its own aggregation path.
   let amzTotal=null;
-  if(cov.aligned){
+  if(cov.aligned && showAmazonData){
     let t=0, any=false;
     cov.months.forEach(mk=>{
       const sa=((SKINUVA_MONTHLY[mk]||{}).amazon)||{};
@@ -4589,19 +4799,27 @@ function computeRangeMetrics(s,e){
     // month's rows in a different order in the two views.
   }
 
-  const allChs=[amzCh,gCh,...monthlyChs];
+  // Amazon is dropped from the channel list in non-Amazon mode, so every total below
+  // (spend, ad sales, marketplace revenue, TACOS) is computed without it.
+  const allChs=showAmazonData?[amzCh,gCh,...monthlyChs]:[gCh,...monthlyChs];
   const tS=rd(allChs.reduce((s,c)=>s+(c.adSpend||0),0)),tAs=rd(allChs.reduce((s,c)=>s+(c.adSales||0),0));
   const tO=allChs.reduce((s,c)=>s+(c.orders||0),0),tI=allChs.reduce((s,c)=>s+(c.impressions||0),0),tC=allChs.reduce((s,c)=>s+(c.clicks||0),0);
   // Marketplace revenue only -- Shopify is its own row, as in the monthly view.
   const anyTs=allChs.some(c=>c.totalSales!=null);
-  const mktTotal=(anyTs&&amzTotal!=null)?rd(allChs.reduce((s,c)=>s+(c.totalSales||0),0)):null;
+  // With Amazon included, its revenue gates the whole column (it is the dominant and
+  // only failure-prone source). Without Amazon, the marketplace total is Walmart's
+  // alone, so gate on that being present instead of on amzTotal, which is null here
+  // by design -- otherwise the column would blank for every range.
+  const mktTotal=showAmazonData
+    ? ((anyTs&&amzTotal!=null)?rd(allChs.reduce((s,c)=>s+(c.totalSales||0),0)):null)
+    : (anyTs?rd(allChs.reduce((s,c)=>s+(c.totalSales||0),0)):null);
   const grandTotal=mktTotal!=null?rd(mktTotal+(shopTotal||0)):null;
   const totCh={channel:'Total Paid Media',adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,totalSales:mktTotal,tacos:(mktTotal!=null&&mktTotal>0)?rd(tS/mktTotal*100):null,impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null};
   return{adSpend:tS,adSales:tAs,acos:tAs>0?rd(tS/tAs*100):null,
     totalSales:grandTotal,tacos:(grandTotal!=null&&grandTotal>0)?rd(tS/grandTotal*100):null,
     impressions:tI,clicks:tC,ctr:tI>0?rd(tC/tI*100):null,cpc:tC>0?rd(tS/tC):null,orders:tO,
     aov:tO>0?rd(tAs/tO):null,cvr:tC>0?rd(tO/tC*100):null,
-    channels:[amzCh,gCh,...monthlyChs,totCh],rows,
+    channels:showAmazonData?[amzCh,gCh,...monthlyChs,totCh]:[gCh,...monthlyChs,totCh],rows,
     aligned:cov.aligned,months:cov.months,shopify:shopTotal,marketplaceTotal:mktTotal,
     // Unrounded rates, for computing MoM. The fields above are rounded to 2dp for
     // display, and deriving a percentage change from those loses real precision at
