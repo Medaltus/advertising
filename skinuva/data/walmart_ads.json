@@ -170,50 +170,58 @@
           "impressions": 3725
         },
         {
-          "name": "Skinuva - SP - Auto - Bruise ARC v1",
-          "spend": 27.31,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 22,
-          "impressions": 9439
-        },
-        {
           "name": "Skinuva - SB - M - video 3.26 v1",
           "spend": 47.22,
           "adSales": 60,
           "orders": 1,
           "clicks": 33,
           "impressions": 11562
+        },
+        {
+          "name": "Skinuva - SP - Auto - Bruise ARC v1",
+          "spend": 27.31,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 22,
+          "impressions": 9439
         }
       ]
     },
     "range": {
       "since": "2026-07-01",
-      "until": "2026-08-24"
+      "until": "2026-07-31"
     },
     "profileId": "224591",
-    "fetched_at": "2026-08-25T14:06:05Z",
+    "fetched_at": "2026-08-26T14:05:14Z",
     "source": "helium10-walmart"
   },
   "August 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 244.68,
+        "spend": 251.34,
         "adSales": 80.0,
         "orders": 1,
-        "clicks": 127,
-        "impressions": 268473
+        "clicks": 130,
+        "impressions": 278930
       }
     },
     "campaigns": {
       "Skinuva": [
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
+          "spend": 184.6,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 84,
+          "impressions": 263957
+        },
         {
           "name": "Skinuva - SB - M - video 3.26 v1",
           "spend": 36.24,
           "adSales": 80,
           "orders": 1,
           "clicks": 29,
-          "impressions": 12148
+          "impressions": 12493
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
@@ -221,24 +229,16 @@
           "adSales": 0,
           "orders": 0,
           "clicks": 17,
-          "impressions": 2281
-        },
-        {
-          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 177.94,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 81,
-          "impressions": 254044
+          "impressions": 2480
         }
       ]
     },
     "range": {
-      "since": "2026-07-01",
-      "until": "2026-08-24"
+      "since": "2026-08-01",
+      "until": "2026-08-25"
     },
     "profileId": "224591",
-    "fetched_at": "2026-08-25T14:06:05Z",
+    "fetched_at": "2026-08-26T14:05:14Z",
     "source": "helium10-walmart"
   }
 }
