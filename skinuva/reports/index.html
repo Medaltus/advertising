@@ -643,6 +643,16 @@ tbody tr:hover { background: rgba(129,140,248,0.04); }
 .range-clear{padding:5px 11px;border-radius:7px;background:rgba(255,100,100,0.1);border:1px solid rgba(255,100,100,0.2);color:rgba(255,120,120,0.7);font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s;}
 .range-clear:hover{background:rgba(255,100,100,0.2);}
 .range-active-pill{font-size:11px;color:#a78bfa;background:rgba(129,140,248,0.12);border:1px solid rgba(129,140,248,0.25);border-radius:6px;padding:4px 10px;}
+/* ── Amazon-excluded mode ──────────────────────────────────────────────────
+   Set by applyAmazonVisibility() as a single class on <body>. These sections are
+   all sourced from the Amazon Ads supplement, and each has its own renderer that
+   sets an inline `display` later in render() -- so !important here is load-bearing,
+   not defensive: without it the renderers win and the sections reappear. */
+body.hide-amazon #amazon-api-section,
+body.hide-amazon #search-terms-section,
+body.hide-amazon #asin-section,
+body.hide-amazon #placement-section,
+body.hide-amazon #dow-section { display: none !important; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
@@ -1460,23 +1470,18 @@ function syncAmazonToggleButton(){
     : 'Amazon excluded — click to include Amazon spend, sales and sections';
 }
 
-// Applies the section show/hide. Called from render() so it survives every re-render.
+// Applies the section show/hide via a single class on <body>.
+//
+// Deliberately CSS, not inline styles. The first version set el.style.display='none'
+// from render(), which silently lost: renderSearchTermInsights, the ASIN renderer, the
+// placement renderer and the day-of-week renderer all run LATER in render() and set
+// their own `display=''`, so four of the five sections came straight back. Verified on
+// the live page -- only amazon-api-section actually stayed hidden.
+//
+// A body class with `!important` cannot be undone by a later inline style, so the
+// order in which the renderers happen to run no longer matters.
 function applyAmazonVisibility(){
-  AMAZON_SECTION_IDS.forEach(id=>{
-    const el=document.getElementById(id);
-    if(!el) return;
-    if(showAmazonData){
-      // Restore only the ones this page shows by default. asin/placement/geo ship
-      // with display:none in the markup and are revealed by their own renderers
-      // when they have data, so blanking the inline style is right -- forcing
-      // 'block' here would show an empty panel for a month with no data.
-      el.style.display='';
-    } else {
-      el.style.display='none';
-    }
-  });
-  const banner=document.getElementById('amazon-hidden-note');
-  if(banner) banner.style.display = showAmazonData ? 'none' : '';
+  document.body.classList.toggle('hide-amazon', !showAmazonData);
 }
 let ACTIVE_SUPPLEMENT=null;
 
