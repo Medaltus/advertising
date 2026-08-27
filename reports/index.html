@@ -1711,13 +1711,55 @@ function render() {
   const fCvr = ip ? (() => { const c = f('clicks'), o = f('orders'); return c > 0 && o != null ? o/c*100 : null; })() : null;
   const accent = selectedBrand !== 'All' ? BRAND_COLORS[selectedBrand] : null;
 
+  // ── Net TACOS: ad spend against revenue AFTER refunds ──────────────────────
+  // Works for the portfolio and for a single brand, because generate_supplement.py
+  // writes `refunds`/`netTotalSales` at both levels. Null refunds means UNKNOWN, not
+  // zero — in that case the card falls back to gross rather than implying no returns.
+  const _refKpi  = bdata.refunds != null ? bdata.refunds : null;
+  const _pRefKpi = (prevBdata && prevBdata.refunds != null) ? prevBdata.refunds : null;
+  const _netTotKpi = (bdata.totalSales != null && _refKpi != null)
+                     ? bdata.totalSales - _refKpi : null;
+  const _netTacosKpi = (_netTotKpi != null && _netTotKpi > 0 && bdata.spend != null)
+                       ? bdata.spend / _netTotKpi * 100 : null;
+  const _pNetTotKpi = (prevBdata && prevBdata.totalSales != null && _pRefKpi != null)
+                      ? prevBdata.totalSales - _pRefKpi : null;
+  const _pNetTacosKpi = (_pNetTotKpi != null && _pNetTotKpi > 0 && prevBdata && prevBdata.spend != null)
+                        ? prevBdata.spend / _pNetTotKpi * 100 : null;
+  // Forecast net TACOS for a partial month. Refunds scale with elapsed days the same
+  // way spend and revenue do, so the projection uses PROJECTED refunds — using
+  // month-to-date refunds against projected full-month sales would make the forecast
+  // look better than reality.
+  const _fSpendKpi = ip ? f('spend') : null;
+  const _fTotKpi   = ip ? f('totalSales') : null;
+  const _fRefKpi   = (ip && _refKpi != null && md.daysElapsed)
+                     ? _refKpi / md.daysElapsed * md.daysInMonth : null;
+  const _fNetTotKpi = (_fTotKpi != null && _fRefKpi != null) ? _fTotKpi - _fRefKpi : null;
+  const _fNetTacosKpi = (_fNetTotKpi != null && _fNetTotKpi > 0 && _fSpendKpi != null)
+                        ? _fSpendKpi / _fNetTotKpi * 100 : null;
+
   const k1 = [
     { l: 'Ad Spend', v: fmt(bdata.spend), k: 'spend', wk: 'spend', sub: ip ? 'Month in progress' : null, warn: ip },
     { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales', wk: 'adSales' },
     { l: 'CVR', v: cvr != null ? cvr.toFixed(2) + '%' : '—', pf: prevCvr != null ? prevCvr.toFixed(2) + '%' : null, mm: momPct(cvr, prevCvr), ff: fCvr, ffm: fCvr != null ? fCvr.toFixed(2) + '%' : null, fmm: (fCvr != null && prevCvr != null) ? momPct(fCvr, prevCvr) : null, wk: 'cvr' },
     { l: 'ACOS', v: pct(bdata.acos), k: 'acos', wk: 'acos', inv: true },
     { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales', wk: 'totalSales' },
-    { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', wk: 'tacos', inv: true },
+    // TACOS is reported NET of refunds when we have them, matching the Net Sales row
+    // at the bottom of the Channel Breakdown. Gross TACOS always flatters efficiency
+    // because refunds are 2-5% of revenue every month.
+    //
+    // Routed through pf/mm/ff rather than k:'tacos' so the value can come from the
+    // net figure — but ff/ffm/fmm are supplied explicitly, because the k:'tacos'
+    // branch is what normally builds the forecast block, and dropping it would leave
+    // this one card visibly stripped of the forecast every other card has.
+    (_netTacosKpi != null
+      ? { l: 'TACOS', v: pct(_netTacosKpi),
+          pf: _pNetTacosKpi != null ? pct(_pNetTacosKpi) : null,
+          mm: (!ip && _pNetTacosKpi != null) ? momPct(_netTacosKpi, _pNetTacosKpi) : null,
+          ff: _fNetTacosKpi, ffm: _fNetTacosKpi != null ? pct(_fNetTacosKpi) : null,
+          fmm: (_fNetTacosKpi != null && _pNetTacosKpi != null)
+                ? momPct(_fNetTacosKpi, _pNetTacosKpi) : null,
+          wk: 'tacos', inv: true, sub: 'net of refunds' }
+      : { l: 'TACOS', v: pct(bdata.tacos), k: 'tacos', wk: 'tacos', inv: true }),
   ];
   k1.forEach(x => {
     const o = { sub: x.sub, warn: x.warn, inv: x.inv, days, accent };
@@ -1809,6 +1851,10 @@ function getBrandData(md, brand) {
       spend: md.spend, adSales: md.adSales, acos: md.acos, totalSales: md.totalSales,
       tacos: md.tacos, impressions: md.impressions, clicks: md.clicks, ctr: md.ctr,
       cpc: md.cpc, cr: md.cr, orders: md.orders, aov: md.aov != null ? md.aov : (md.orders > 0 && md.adSales > 0 ? md.adSales / md.orders : null),
+      // Refunds + net sales must be forwarded explicitly. This function builds a NEW
+      // object rather than spreading, so any field not listed here is silently dropped
+      // and the net TACOS card would fall back to gross with no indication why.
+      refunds: md.refunds, netTotalSales: md.netTotalSales, netTacos: md.netTacos,
     };
   }
   const b = md.brands.find(b => b.name === brand);
@@ -1817,6 +1863,7 @@ function getBrandData(md, brand) {
     spend: b.spend, adSales: b.adSales, acos: b.acos, totalSales: b.totalSales,
     tacos: b.tacos, impressions: b.impressions, clicks: b.clicks, ctr: b.ctr,
     cpc: b.cpc, cr: b.cr, orders: b.orders, aov: b.aov != null ? b.aov : (b.orders > 0 && b.adSales > 0 ? b.adSales / b.orders : null),
+    refunds: b.refunds, netTotalSales: b.netTotalSales, netTacos: b.netTacos,
   };
 }
 
@@ -2177,6 +2224,58 @@ function renderTable(md, prev) {
     '<td>—</td>' +
     '<td>—</td>';
   tbody.appendChild(totalRow);
+
+  // ── Refunds + Net Sales ────────────────────────────────────────────────────
+  //
+  // totalSales is SP-API orderedProductSales: measured when the order is PLACED,
+  // with nothing deducted for returns. Refunds run 2-5% of revenue every month, so
+  // the PORTFOLIO row above consistently overstates realised revenue and its TACOS
+  // reads better than reality. Ozlee has shown this for a while; Medaltus never did.
+  //
+  // Shown as their own rows rather than netted into totalSales, so the gross figure
+  // stays comparable with Seller Central and with anything previously reported.
+  //
+  // Refunds are attributed to the month they POSTED, not the month of the original
+  // order — so this is "sales this month minus refunds processed this month", not a
+  // restatement of the same transactions.
+  if (md.refunds != null) {
+    const netTs = md.netTotalSales != null ? md.netTotalSales
+                : (md.totalSales != null ? md.totalSales - md.refunds : null);
+    const netTacos = (netTs != null && netTs > 0 && md.spend != null)
+                     ? md.spend / netTs * 100 : null;
+    const pRef  = prev ? prev.refunds : null;
+    const pNet  = prev && prev.netTotalSales != null ? prev.netTotalSales
+                : (prev && prev.totalSales != null && pRef != null ? prev.totalSales - pRef : null);
+    const pNetTacos = (pNet != null && pNet > 0 && prev && prev.spend != null)
+                      ? prev.spend / pNet * 100 : null;
+    const refPct = (md.totalSales != null && md.totalSales > 0)
+                   ? (md.refunds / md.totalSales * 100) : null;
+
+    const refRow = document.createElement('tr');
+    refRow.style.cssText = 'background:rgba(255,107,107,0.04);cursor:default;';
+    refRow.innerHTML =
+      '<td style="font-weight:600;color:rgba(255,107,107,0.75);font-size:11px;">REFUNDS'
+      + (refPct != null ? '<div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:400;">'
+         + refPct.toFixed(1) + '% of gross</div>' : '') + '</td>' +
+      '<td>—</td><td>—</td><td>—</td>' +
+      // inv:true — a smaller refund figure is the good direction
+      '<td style="color:rgba(255,107,107,0.9);">' + cell(md.refunds, null, pRef, fDol, true) + '</td>' +
+      '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>';
+    tbody.appendChild(refRow);
+
+    const netRow = document.createElement('tr');
+    netRow.style.cssText = 'border-top:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);cursor:default;';
+    netRow.innerHTML =
+      '<td style="font-weight:700;letter-spacing:0.5px;color:rgba(255,255,255,0.55);font-size:11px;text-transform:uppercase;">NET SALES'
+      + '<div style="font-size:10px;color:rgba(255,255,255,0.3);font-weight:400;text-transform:none;">after refunds</div></td>' +
+      '<td>' + fDol(md.spend) + '</td>' +
+      '<td>—</td><td>—</td>' +
+      '<td style="font-weight:700;color:#fff;">' + cell(netTs, null, pNet, fDol, false) + '</td>' +
+      '<td style="font-weight:700;color:#fff;">' + cell(netTacos, null, pNetTacos, fPct, true) +
+      '<div style="font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px;">net TACOS</div></td>' +
+      '<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>';
+    tbody.appendChild(netRow);
+  }
 }
 
 // ── Campaigns by Brand ──

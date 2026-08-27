@@ -557,6 +557,84 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict, existing: dict = None) -> 
         entry['totalSales'] = round(t_total, 2) if t_total else None
         entry['tacos']      = acos_pct(entry['spend'], entry['totalSales'])
 
+        apply_refunds_to_entry(entry, mk)
+
+
+_REFUNDS_CACHE = {}
+
+
+def _load_refunds():
+    """data/refunds_by_month.json -> {month: {brand: amount}}. Cached, never raises."""
+    if _REFUNDS_CACHE:
+        return _REFUNDS_CACHE
+    path = Path(__file__).parent / 'data' / 'refunds_by_month.json'
+    data = {}
+    if path.exists():
+        try:
+            data = json.loads(path.read_text()) or {}
+        except Exception as e:
+            print(f"  ⚠  could not read refunds_by_month.json: {e}")
+            data = {}
+    _REFUNDS_CACHE['_'] = data
+    return _REFUNDS_CACHE
+
+
+def apply_refunds_to_entry(entry: dict, mk: str) -> None:
+    """
+    Attach Amazon refunds and net sales to one month, per brand and portfolio-wide.
+
+    totalSales is SP-API orderedProductSales — measured when the order is PLACED, with
+    nothing deducted for returns. Refunds run 2-5% of revenue every month, so the
+    headline figure overstates realised revenue and TACOS reads better than reality.
+    The Ozlee dashboard has surfaced this for a while; Medaltus never had it, even
+    though refunds_by_month.json already carries every Medaltus brand (August 2026:
+    dearcloud $570, The Creme Shop $414, evolis $299, ...).
+
+    Written as separate fields rather than netted into totalSales, so the gross number
+    stays comparable with Seller Central and with anything previously reported.
+
+    Attributed to the month the REFUND POSTED, not the month of the original order —
+    a December sale refunded in January lands in January. So net sales means "sales
+    this month minus refunds processed this month", not a restatement.
+
+    A month with no refunds entry is left with refunds=None (unknown), NOT 0. The
+    dashboard then falls back to gross rather than claiming zero returns.
+    """
+    all_refunds = (_load_refunds() or {}).get('_') or {}
+    month_refunds = all_refunds.get(mk)
+    if not month_refunds:
+        return
+
+    total_ref = 0.0
+    any_brand = False
+    for b in entry['brands']:
+        amt = month_refunds.get(b['name'])
+        if amt is None:
+            continue
+        amt = round(float(amt), 2)
+        b['refunds'] = amt
+        b['refundsSource'] = 'sp-api-finances'
+        ts = b.get('totalSales')
+        b['netTotalSales'] = round(ts - amt, 2) if ts is not None else None
+        b['netTacos'] = (acos_pct(b['spend'], b['netTotalSales'])
+                         if b.get('netTotalSales') else None)
+        total_ref += amt
+        any_brand = True
+
+    if not any_brand:
+        return
+    entry['refunds'] = round(total_ref, 2)
+    entry['refundsSource'] = 'sp-api-finances'
+    ts = entry.get('totalSales')
+    entry['netTotalSales'] = round(ts - total_ref, 2) if ts is not None else None
+    entry['netTacos'] = (acos_pct(entry['spend'], entry['netTotalSales'])
+                         if entry.get('netTotalSales') else None)
+    print(f"  ✓ [{mk}] refunds ${total_ref:,.2f} applied "
+          f"({sum(1 for b in entry['brands'] if 'refunds' in b)} brands) — "
+          f"net sales ${entry['netTotalSales']:,.2f}"
+          if entry.get('netTotalSales') is not None else
+          f"  ✓ [{mk}] refunds ${total_ref:,.2f} applied (totalSales unknown)")
+
 
 def fetch_daily_brand_sales(cfg: dict, dates: list) -> dict:
     """

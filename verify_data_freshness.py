@@ -234,9 +234,38 @@ def check_plausibility(now):
     if p.exists():
         try:
             sup = json.loads(p.read_text())
-            for entry in (sup.get('monthly') or []):
+            _months = sup.get('monthly')
+            if not isinstance(_months, list):
+                # api_supplement.json is month-keyed at the top level.
+                _months = [dict(v, month=k) for k, v in sup.items() if isinstance(v, dict)]
+            for entry in _months:
                 mk = entry.get('month') or '?'
                 brands = entry.get('brands') or []
+
+                # Refunds arithmetic, now that Medaltus carries them too.
+                ts, ref = entry.get('totalSales'), entry.get('refunds')
+                net = entry.get('netTotalSales')
+                if all(isinstance(x, (int, float)) for x in (ts, ref, net)):
+                    if abs((ts - ref) - net) > 0.05:
+                        problems.append(
+                            f'Medaltus supplement {mk}: netTotalSales ${net:,.2f} != '
+                            f'totalSales ${ts:,.2f} - refunds ${ref:,.2f}')
+                if isinstance(ref, (int, float)) and isinstance(ts, (int, float)) and ts > 0:
+                    if ref < 0:
+                        problems.append(f'Medaltus supplement {mk}: refunds are negative (${ref:,.2f})')
+                    elif ref / ts > MAX_REFUND_RATE and ts >= REFUND_RATE_MIN_REVENUE:
+                        problems.append(
+                            f'Medaltus supplement {mk}: refunds ${ref:,.2f} are '
+                            f'{ref/ts*100:.1f}% of ${ts:,.2f} revenue — above the '
+                            f'{MAX_REFUND_RATE*100:.0f}% sanity limit')
+                # Brand refunds must sum to the portfolio figure.
+                if isinstance(ref, (int, float)):
+                    bsum = sum(float(b['refunds']) for b in brands
+                               if isinstance(b.get('refunds'), (int, float)))
+                    if bsum and abs(bsum - ref) > max(0.05, abs(ref) * 0.005):
+                        problems.append(
+                            f'Medaltus supplement {mk}: refunds total ${ref:,.2f} != '
+                            f'sum of brand refunds ${bsum:,.2f}')
                 for field in ('spend', 'adSales'):
                     tot = entry.get(field)
                     if not isinstance(tot, (int, float)):
