@@ -22,6 +22,7 @@ import json
 import re
 import sys
 import time
+import unicodedata   # accent-stripping for branded search-term detection
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, date, timedelta
@@ -109,12 +110,110 @@ def build_daily_archive(data: dict) -> dict:
     return entries
 
 
-def build_search_term_insights(search_terms: list) -> dict:
+# ── Branded search terms ──────────────────────────────────────────────────────
+# Top Performing and Opportunities are prospecting columns: their job is to surface
+# NON-branded terms worth targeting. Own-brand terms crowd them out and tell you
+# nothing you didn't know -- Skinuva's Top Performing was 8 of 10 branded
+# ("skinuva scar cream", "skinuva", "skinuva scar gel", ...), leaving two ASIN rows.
+#
+# Filtering happens BEFORE the top-10 trim, so the columns are refilled with the next
+# best non-branded terms rather than just being left short.
+#
+# Only the brand's OWN names are filtered. Competitor terms ("arnicare bruise pills",
+# "amica bruise pills") are deliberately kept -- those are conquesting targets and
+# often the most valuable rows in the list. ASIN rows are kept too.
+#
+# Aliases exist because real queries are messy. Observed in live data:
+#   spaced      "skin uva scar cream for eyelids"   -> skinuva
+#   accented    "clöud café bt21 matcha latte"      -> cloud cafe
+#   reordered   "cafe cloud cold brew"              -> cloud cafe
+#   reversed    "scar cream skinuva"                -> skinuva
+#   misspelled  "bjord collagen"                    -> just bjorn
+#   sub-brand   "skinuva brite"                     -> skinuva
+BRAND_QUERY_ALIASES = {
+    'Skinuva':        ['skinuva', 'skin uva', 'skinuva brite', 'skinuvabrite'],
+    'eraclea':        ['eraclea', 'eraclia', 'erakleia'],
+    'Cloud Cafe':     ['cloud cafe', 'cloud café', 'cloud coffee', 'cafe cloud'],
+    'Just Bjorn':     ['just bjorn', 'bjorn', 'bjord', 'bjorne'],
+    'The Creme Shop': ['creme shop', 'cremeshop', 'the creme shop'],
+    'dearcloud':      ['dearcloud', 'dear cloud'],
+    'evolis':         ['evolis'],
+    'Hillside':       ['hillside'],
+    'HighOnLove':     ['highonlove', 'high on love'],
+    'MiGuard':        ['miguard', 'mi guard'],
+    'PB & Jay':       ['pb & jay', 'pb and jay', 'pbjay', 'pb jay'],
+    'Amala':          ['amala'],
+    'Collagelee':     ['collagelee', 'collagelée'],
+    'Skinside':       ['skinside', 'skin side'],
+    'Cosmette':       ['cosmette'],
+    'Beautility':     ['beautility'],
+}
+
+
+def _norm_query(s):
+    """
+    Lowercase, strip accents, drop everything that isn't a letter or digit.
+
+    Collapsing separators is what makes 'skin uva' and 'clöud café' match 'skinuva'
+    and 'cloudcafe' -- the two most common ways a branded query fails a naive
+    substring test.
+    """
+    s = unicodedata.normalize('NFKD', str(s or '').lower())
+    s = ''.join(c for c in s if not unicodedata.combining(c))
+    return re.sub(r'[^a-z0-9]', '', s)
+
+
+def _brand_tokens(alias):
+    return [t for t in re.split(r'[^a-z0-9]+', _strip_accents_lower(alias)) if t]
+
+
+def _strip_accents_lower(s):
+    s = unicodedata.normalize('NFKD', str(s or '').lower())
+    return ''.join(c for c in s if not unicodedata.combining(c))
+
+
+def is_branded_query(query, brand_name) -> bool:
+    """
+    True when `query` contains the brand's own name in any of its observed forms.
+
+    Two tests, both needed:
+      1. Normalised substring — catches exact, reversed, spaced and accented forms.
+      2. All-tokens-present (any order) — catches reordering, e.g. 'cafe cloud cold
+         brew' against 'cloud cafe', which substring matching misses.
+
+    Requiring ALL of a multi-word brand's tokens is what keeps this from firing on
+    generic queries: 'cloud' or 'cafe' alone is not enough, so 'collagen coffee
+    creamer' and 'sugar free latte' stay in the list.
+    """
+    aliases = BRAND_QUERY_ALIASES.get(brand_name)
+    if not aliases:
+        # Unknown brand: fall back to its own name so a newly-onboarded brand still
+        # gets filtered rather than silently reverting to the old behaviour.
+        aliases = [brand_name]
+    nq = _norm_query(query)
+    if not nq:
+        return False
+    q_tokens = set(t for t in re.split(r'[^a-z0-9]+', _strip_accents_lower(query)) if t)
+    for alias in aliases:
+        na = _norm_query(alias)
+        if na and na in nq:
+            return True
+        a_tokens = _brand_tokens(alias)
+        if len(a_tokens) > 1 and set(a_tokens).issubset(q_tokens):
+            return True
+    return False
+
+
+def build_search_term_insights(search_terms: list, brand_name: str = None) -> dict:
     """
     Categorize a brand's search terms into 3 buckets, top 10 each.
     - top_performing:  ACOS < 40%, spend >= $5, sales > 0  → sorted by sales desc
     - wasted_spend:    spend >= $5, sales == 0 or ACOS > 100% → sorted by spend desc
     - opportunities:   CVR > 3%, spend < $30, sales > 0    → sorted by cvr desc
+
+    `brand_name` enables own-brand filtering on top_performing and opportunities —
+    see BRAND_QUERY_ALIASES. wasted_spend and cpc_changes are NOT filtered: branded
+    spend with no sales, or a branded CPC spiking, is exactly what you want to see.
     """
     top, wasted, opps = [], [], []
 
@@ -130,6 +229,18 @@ def build_search_term_insights(search_terms: list) -> dict:
             wasted.append(t)
         if cvr > 0.03 and spend < 30 and sales > 0:
             opps.append(t)
+
+    # Drop own-brand terms from the two prospecting buckets, BEFORE the top-10 trim,
+    # so the columns refill with the next best non-branded terms instead of coming out
+    # short. wasted_spend and cpc_changes are left alone on purpose.
+    if brand_name:
+        _t0, _o0 = len(top), len(opps)
+        top  = [t for t in top  if not is_branded_query(t.get('query'), brand_name)]
+        opps = [t for t in opps if not is_branded_query(t.get('query'), brand_name)]
+        _td, _od = _t0 - len(top), _o0 - len(opps)
+        if _td or _od:
+            print(f"    ℹ  {brand_name}: filtered {_td} branded from top_performing, "
+                  f"{_od} from opportunities ({len(top)}/{len(opps)} non-branded remain)")
 
     top.sort(key=lambda x: x.get('sales', 0) or 0, reverse=True)
     wasted.sort(key=lambda x: x.get('spend', 0) or 0, reverse=True)
@@ -323,7 +434,9 @@ def build_supplement(data: dict) -> dict:
                 'momAcos':           None,
                 'momTacos':          None,
                 'campaigns':         brand_campaigns,
-                'searchTermInsights': build_search_term_insights(search_terms) if mk == latest_month else None,
+                # brand name passed so own-brand terms can be filtered out of the
+                # prospecting buckets (see BRAND_QUERY_ALIASES).
+                'searchTermInsights': build_search_term_insights(search_terms, name) if mk == latest_month else None,
                 'productInsights':    build_asin_insights(asins) if mk == latest_month else None,
                 'placementInsights': build_placement_insights(placements) if mk == latest_month else None,
             })
