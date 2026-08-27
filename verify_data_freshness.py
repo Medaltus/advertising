@@ -264,13 +264,24 @@ TRACKED = [
     ('skinuva/data/eraclea_monthly.json',         'eraclea monthly'),
     ('skinuva/data/eraclea_daily_archive.json',   'eraclea daily archive'),
     ('skinuva/data/shopify_sales.json',           'Shopify sales'),
-    # Added after an audit found these were produced by the workflow but tracked by
-    # nothing, so they sat 22-28 days stale while the files around them refreshed
-    # hourly. walmart_revenue.json in particular had July 2026 frozen at a $45.00
-    # single-order snapshot against a true $1,059.99.
-    ('skinuva/data/walmart_revenue.json',         'Walmart revenue'),
-    ('skinuva/data/walmart_ads.json',             'Walmart ads'),
     ('data/refunds_by_month.json',                'Amazon refunds'),
+]
+
+# Files this workflow does NOT produce, tracked with their own allowance.
+#
+# I added the two Walmart files to TRACKED above and turned every run red for six
+# days. They ARE refreshed daily -- but by a SEPARATE "Walmart data refresh"
+# workflow on its own schedule, so by the time morning-refresh's verify step runs
+# their fetched_at is naturally older than the 8h window meant for files this run
+# just wrote. Twelve datasets reported ok on every one of those failures and no value
+# was ever implausible; the data was fine and the alarm was mine.
+#
+# Still tracked, because a Walmart workflow that genuinely stops needs to surface --
+# just with a window that matches its daily cadence plus slack, instead of one that
+# guarantees a false positive.
+EXTERNAL_TRACKED = [
+    ('skinuva/data/walmart_revenue.json', 'Walmart revenue', 36.0),
+    ('skinuva/data/walmart_ads.json',     'Walmart ads',     36.0),
 ]
 
 # Files allowed to be absent without failing (not yet configured, etc).
@@ -393,12 +404,17 @@ def main():
         report_failures.append(f)
 
     problems = []
-    for path, label in TRACKED:
-        status, detail = inspect(path, now, args.max_age_hours, args.max_lag_days, run_start)
+    # Files this workflow produces: strict window. Then files owned by other
+    # workflows, each with its own allowance.
+    checklist = ([(p, l, args.max_age_hours) for p, l in TRACKED]
+                 + [(p, l, mx) for p, l, mx in EXTERNAL_TRACKED])
+    for path, label, max_age in checklist:
+        status, detail = inspect(path, now, max_age, args.max_lag_days, run_start)
         if status == 'MISSING' and path in OPTIONAL_IF_MISSING:
             status, detail = 'SKIP', detail + ' (optional)'
         mark = {'PASS': 'ok', 'SKIP': '--'}.get(status, status)
-        print(f"  {mark:8} {label:26} {detail}")
+        note = '' if max_age == args.max_age_hours else f'  [external, {max_age:.0f}h allowance]'
+        print(f"  {mark:8} {label:26} {detail}{note}")
         if status in ('STALE', 'MISSING', 'UNKNOWN'):
             problems.append((label, path, status, detail))
 
@@ -424,14 +440,14 @@ def main():
         print()
 
     if not problems and not report_failures and not implausible:
-        print(f"All {len(TRACKED)} datasets refreshed, and every value looks plausible.")
+        print(f"All {len(checklist)} datasets refreshed, and every value looks plausible.")
         return 0
 
     if not problems and (report_failures or implausible):
         if report_failures:
-            print(f"All {len(TRACKED)} datasets refreshed, but an ad product is incomplete.")
+            print(f"All {len(checklist)} datasets refreshed, but an ad product is incomplete.")
         if implausible:
-            print(f"All {len(TRACKED)} datasets refreshed, but {len(implausible)} value(s) "
+            print(f"All {len(checklist)} datasets refreshed, but {len(implausible)} value(s) "
                   f"cannot be right. Fresh is not the same as correct.")
         if args.warn_only:
             print("(--warn-only: not failing the run)")
@@ -441,7 +457,7 @@ def main():
     for label, path, status, detail in problems:
         # GitHub Actions annotation so it surfaces on the run summary, not just the log
         print(f"::error file={path}::{label} did not refresh — {detail}")
-    print(f"\n{len(problems)} of {len(TRACKED)} datasets did NOT refresh:")
+    print(f"\n{len(problems)} of {len(checklist)} datasets did NOT refresh:")
     for label, path, status, detail in problems:
         print(f"  - {label} ({status}): {detail}")
     print("\nThe data that DID refresh has already been committed by the previous")
