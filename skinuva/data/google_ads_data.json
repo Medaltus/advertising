@@ -1,9 +1,9 @@
 {
-  "fetched_at": "2026-08-31T13:21:38Z",
+  "fetched_at": "2026-08-31T20:12:24Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 784694,
+    "impressions": 784692,
     "clicks": 4744,
     "spend": 10102.77,
     "sales": 37557.54,
@@ -316,7 +316,7 @@
     },
     {
       "date": "2026-08-30",
-      "impressions": 20475,
+      "impressions": 20473,
       "clicks": 119,
       "spend": 257.23,
       "sales": 0.0,
@@ -1048,7 +1048,7 @@
     },
     {
       "date": "2026-08-30",
-      "impressions": 20475,
+      "impressions": 20473,
       "clicks": 119,
       "spend": 257.23,
       "sales": 0.0,
@@ -1129,7 +1129,7 @@
       "id": "23944321916",
       "name": "PMax: Skinuva Smart Shopping CANADA",
       "type": "PERFORMANCE_MAX",
-      "impressions": 102426,
+      "impressions": 102424,
       "clicks": 840,
       "spend": 990.41,
       "sales": 3276.38,
@@ -4721,7 +4721,7 @@
       "id": "23944321916",
       "name": "PMax: Skinuva Smart Shopping CANADA",
       "type": "PERFORMANCE_MAX",
-      "impressions": 1621,
+      "impressions": 1619,
       "clicks": 18,
       "spend": 24.07,
       "sales": 0.0,
@@ -4763,20 +4763,20 @@
   ],
   "pacing": [
     {
+      "id": "24018309787",
+      "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
+      "state": "enabled",
+      "dailyBudget": 100.0,
+      "recentSpend": 63.66,
+      "pacingPct": 63.7
+    },
+    {
       "id": "18209518057",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
       "state": "enabled",
       "dailyBudget": 80.0,
       "recentSpend": 604.49,
       "pacingPct": 755.6
-    },
-    {
-      "id": "24018309787",
-      "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
-      "state": "enabled",
-      "dailyBudget": 80.0,
-      "recentSpend": 63.66,
-      "pacingPct": 79.6
     },
     {
       "id": "23613752580",
@@ -4798,9 +4798,9 @@
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
       "state": "enabled",
-      "dailyBudget": 25.0,
+      "dailyBudget": 20.0,
       "recentSpend": 94.04,
-      "pacingPct": 376.2
+      "pacingPct": 470.2
     },
     {
       "id": "23939195988",
