@@ -11,6 +11,7 @@ Usage:
 
 import json
 import time
+import random   # jitter on 429 backoff, so parallel profiles don't retry in lockstep
 import gzip
 import argparse
 import sys
@@ -45,6 +46,13 @@ REGION_URLS = {
 # Amazon v3 reports can take 10–30 minutes — be patient.
 REPORT_POLL_INTERVAL = 30    # seconds between status checks
 REPORT_POLL_TIMEOUT  = 5400  # 90 minutes max
+
+# Gap between report submissions. Was a flat 5s, which fires 8 reports per profile
+# inside a minute — that is what drove sustained throttling: run #176 logged 61 HTTP
+# 429s and lost three Sponsored Brands reports outright. A couple of extra minutes
+# per run is far cheaper than an ad product going missing from the dashboards, which
+# understates spend and flatters ACOS/TACOS.
+SUBMIT_GAP_SECONDS = 12
 
 # ── Auth ───────────────────────────────────────────────────────────────────────
 
@@ -967,6 +975,51 @@ def main():
     # pending_placement: list of (profile, report_id, hdrs, single_brand, currency)
     pending_placement = []
 
+    # ── Report submission with real 429 handling ───────────────────────────────
+    #
+    # The Amazon Ads reporting API throttles hard, and this pipeline submits a lot:
+    # 5 ad-product configs + search term + ASIN + placement, per profile. Run #176
+    # logged 61 HTTP 429s and lost three Sponsored Brands submissions outright.
+    #
+    # What was wrong:
+    #   * Campaign reports retried 3x with a flat 30s/60s wait. Once the quota is
+    #     actually spent, a minute is not enough.
+    #   * Search term, ASIN and placement submissions had NO retry at all — a single
+    #     429 dropped them straight into REPORT_FAILURES.
+    #
+    # Now every submission goes through one helper: exponential backoff with jitter,
+    # honouring Retry-After when Amazon sends it. A dropped ad product means that
+    # product's spend and sales are simply missing from the dashboards, which
+    # understates spend and flatters ACOS/TACOS — worth waiting minutes to avoid.
+    def _submit_with_retry(label, fn, attempts=5):
+        for attempt in range(attempts):
+            try:
+                return fn()
+            except Exception as e:
+                resp = getattr(e, 'response', None)
+                code = getattr(resp, 'status_code', None)
+                throttled = (code == 429) or ('429' in str(e))
+                if not throttled or attempt == attempts - 1:
+                    print(f"  ✗ {label} submission failed: {e}")
+                    REPORT_FAILURES.append(f"{label}: {e}")
+                    return None
+                # Amazon's Retry-After beats our guess when present.
+                wait = None
+                if resp is not None:
+                    ra = (resp.headers or {}).get('Retry-After')
+                    if ra:
+                        try:
+                            wait = float(ra)
+                        except (TypeError, ValueError):
+                            wait = None
+                if wait is None:
+                    wait = min(300, 30 * (2 ** attempt))      # 30, 60, 120, 240
+                wait += random.uniform(0, 5)                   # jitter: profiles desync
+                print(f"  ⏸  {label} rate limited (429) — retry "
+                      f"{attempt + 1}/{attempts - 1} in {wait:.0f}s…")
+                time.sleep(wait)
+        return None
+
     for profile in profiles:
         profile_id   = profile.get("profileId")
         profile_name = get_profile_name(profile) or str(profile_id)
@@ -979,53 +1032,34 @@ def main():
 
         for idx_cfg, ap_cfg in enumerate(AD_PRODUCT_CONFIGS):
             if idx_cfg > 0:
-                time.sleep(5)   # brief gap between submissions to avoid 429
-            report_id = None
-            for attempt in range(3):
-                try:
-                    report_id = submit_campaign_report(
-                        urls["api"], hdrs, start, end, ap_cfg["adProduct"])
-                    break
-                except Exception as e:
-                    if "429" in str(e) and attempt < 2:
-                        wait = 30 * (attempt + 1)
-                        print(f"  ⏸  Rate limited — retrying in {wait}s…")
-                        time.sleep(wait)
-                    else:
-                        print(f"  ✗ {ap_cfg['adProduct']} submission failed: {e}")
-                        REPORT_FAILURES.append(f"{ap_cfg['adProduct']} ({ap_cfg['reportTypeId']}): {e}")
-                        break
+                time.sleep(SUBMIT_GAP_SECONDS)
+            report_id = _submit_with_retry(
+                f"{ap_cfg['adProduct']} ({ap_cfg['reportTypeId']})",
+                lambda a=ap_cfg: submit_campaign_report(
+                    urls["api"], hdrs, start, end, a["adProduct"]))
             if report_id:
                 pending.append((profile, ap_cfg, report_id, hdrs, single_brand, currency))
 
-        # Also submit search term report for this profile
-        time.sleep(5)
-        try:
-            st_id = submit_search_term_report(urls["api"], hdrs, start, end)
+        # These three had no retry at all before — one 429 and the report was gone.
+        time.sleep(SUBMIT_GAP_SECONDS)
+        st_id = _submit_with_retry(
+            "spSearchTerm", lambda: submit_search_term_report(urls["api"], hdrs, start, end))
+        if st_id:
             pending_st.append((profile, st_id, hdrs, single_brand, currency))
-        except Exception as e:
-            print(f"  ✗ spSearchTerm submission failed: {e}")
-            REPORT_FAILURES.append(f"spSearchTerm: {e}")
 
-        # Also submit ASIN report for this profile
-        time.sleep(5)
-        try:
-            asin_id = submit_asin_report(urls["api"], hdrs, start, end)
+        time.sleep(SUBMIT_GAP_SECONDS)
+        asin_id = _submit_with_retry(
+            "spAdvertisedProduct", lambda: submit_asin_report(urls["api"], hdrs, start, end))
+        if asin_id:
             pending_asin.append((profile, asin_id, hdrs, single_brand, currency))
-        except Exception as e:
-            print(f"  ✗ spAdvertisedProduct submission failed: {e}")
-            REPORT_FAILURES.append(f"spAdvertisedProduct: {e}")
 
-        # Also submit placement report for this profile
-        time.sleep(5)
-        try:
-            placement_id = submit_placement_report(urls["api"], hdrs, start, end)
+        time.sleep(SUBMIT_GAP_SECONDS)
+        placement_id = _submit_with_retry(
+            "placement", lambda: submit_placement_report(urls["api"], hdrs, start, end))
+        if placement_id:
             pending_placement.append((profile, placement_id, hdrs, single_brand, currency))
-        except Exception as e:
-            print(f"  ✗ Placement report submission failed: {e}")
-            REPORT_FAILURES.append(f"placement: {e}")
 
-        time.sleep(5)   # small gap between profiles
+        time.sleep(SUBMIT_GAP_SECONDS * 2)   # larger gap between profiles
 
     print(f"\n✓ {len(pending)} campaign + {len(pending_st)} search-term + {len(pending_asin)} ASIN + {len(pending_placement)} placement reports submitted — polling all simultaneously…\n")
 
