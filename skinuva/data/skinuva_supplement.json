@@ -1,31 +1,20 @@
 {
-  "fetched_at": "2026-09-01T17:54:48Z",
+  "fetched_at": "2026-09-02T10:58:57Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 1175271,
-    "clicks": 4871,
-    "spend": 12234.8,
-    "sales": 43956.82,
-    "purchases": 547,
+    "impressions": 1177158,
+    "clicks": 4875,
+    "spend": 12094.27,
+    "sales": 44127.42,
+    "purchases": 550,
     "ctr": 0.0041,
-    "cpc": 2.5118,
-    "acos": 27.83,
-    "roas": 3.59,
-    "totalSales": 126229.94
+    "cpc": 2.4809,
+    "acos": 27.41,
+    "roas": 3.65,
+    "totalSales": 123810.54
   },
   "timeline": [
-    {
-      "date": "2026-08-01",
-      "impressions": 29561,
-      "clicks": 156,
-      "spend": 522.01,
-      "sales": 1049.4,
-      "purchases": 15,
-      "acos": 49.74,
-      "roas": 2.01,
-      "totalSales": 4831.87
-    },
     {
       "date": "2026-08-02",
       "impressions": 38604,
@@ -83,7 +72,7 @@
     },
     {
       "date": "2026-08-07",
-      "impressions": 26024,
+      "impressions": 26023,
       "clicks": 127,
       "spend": 331.41,
       "sales": 1264.97,
@@ -171,7 +160,7 @@
     },
     {
       "date": "2026-08-15",
-      "impressions": 39705,
+      "impressions": 39704,
       "clicks": 144,
       "spend": 352.02,
       "sales": 1524.97,
@@ -226,13 +215,13 @@
     },
     {
       "date": "2026-08-20",
-      "impressions": 39735,
-      "clicks": 171,
-      "spend": 420.01,
+      "impressions": 39731,
+      "clicks": 170,
+      "spend": 416.93,
       "sales": 1143.7,
       "purchases": 14,
-      "acos": 36.72,
-      "roas": 2.72,
+      "acos": 36.45,
+      "roas": 2.74,
       "totalSales": 5889.57
     },
     {
@@ -266,18 +255,18 @@
       "purchases": 24,
       "acos": 22.51,
       "roas": 4.44,
-      "totalSales": 7376.95
+      "totalSales": 7321.95
     },
     {
       "date": "2026-08-24",
       "impressions": 49511,
       "clicks": 175,
       "spend": 350.75,
-      "sales": 1768.93,
-      "purchases": 22,
-      "acos": 19.83,
-      "roas": 5.04,
-      "totalSales": 6822.07
+      "sales": 1873.93,
+      "purchases": 23,
+      "acos": 18.72,
+      "roas": 5.34,
+      "totalSales": 6717.07
     },
     {
       "date": "2026-08-25",
@@ -299,7 +288,7 @@
       "purchases": 22,
       "acos": 18.69,
       "roas": 5.35,
-      "totalSales": 6333.6
+      "totalSales": 6321.6
     },
     {
       "date": "2026-08-27",
@@ -317,43 +306,54 @@
       "impressions": 40943,
       "clicks": 111,
       "spend": 273.14,
-      "sales": 884.0,
-      "purchases": 11,
-      "acos": 30.9,
-      "roas": 3.24,
-      "totalSales": 4762.37
+      "sales": 924.0,
+      "purchases": 12,
+      "acos": 29.56,
+      "roas": 3.38,
+      "totalSales": 4722.42
     },
     {
       "date": "2026-08-29",
       "impressions": 38664,
       "clicks": 131,
       "spend": 348.04,
-      "sales": 1029.39,
-      "purchases": 13,
-      "acos": 33.81,
-      "roas": 2.96,
-      "totalSales": 5355.33
+      "sales": 1089.39,
+      "purchases": 14,
+      "acos": 31.95,
+      "roas": 3.13,
+      "totalSales": 5315.38
     },
     {
       "date": "2026-08-30",
-      "impressions": 42013,
+      "impressions": 42018,
       "clicks": 128,
       "spend": 328.03,
-      "sales": 1080.0,
-      "purchases": 13,
-      "acos": 30.37,
-      "roas": 3.29,
+      "sales": 1140.0,
+      "purchases": 14,
+      "acos": 28.77,
+      "roas": 3.48,
       "totalSales": 6162.79
     },
     {
       "date": "2026-08-31",
-      "impressions": 43711,
-      "clicks": 150,
-      "spend": 333.21,
+      "impressions": 43290,
+      "clicks": 151,
+      "spend": 336.11,
       "sales": 1199.98,
       "purchases": 17,
-      "acos": 27.77,
-      "roas": 3.6,
+      "acos": 28.01,
+      "roas": 3.57,
+      "totalSales": 5423.5
+    },
+    {
+      "date": "2026-09-01",
+      "impressions": 31870,
+      "clicks": 160,
+      "spend": 381.66,
+      "sales": 955.0,
+      "purchases": 14,
+      "acos": 39.96,
+      "roas": 2.5,
       "totalSales": null
     }
   ],
@@ -361,254 +361,254 @@
     {
       "id": 323998374938641,
       "name": "Skinuva - SVA0010 - M - SP - Exact - Audience_High Purchase Intent",
-      "impressions": 39035,
-      "clicks": 855,
-      "spend": 1929.06,
-      "sales": 19279.72,
-      "purchases": 231,
-      "ctr": 0.0219,
-      "cpc": 2.2562,
-      "acos": 10.01,
-      "roas": 9.99
+      "impressions": 39004,
+      "clicks": 867,
+      "spend": 1907.85,
+      "sales": 19609.72,
+      "purchases": 235,
+      "ctr": 0.0222,
+      "cpc": 2.2005,
+      "acos": 9.73,
+      "roas": 10.28
     },
     {
       "id": 136712096276255,
       "name": "Skinuva Scar+ - SP - Manual - Product Targeted",
-      "impressions": 109581,
-      "clicks": 461,
-      "spend": 1294.24,
-      "sales": 4843.35,
-      "purchases": 56,
+      "impressions": 107820,
+      "clicks": 456,
+      "spend": 1232.1,
+      "sales": 4678.95,
+      "purchases": 54,
       "ctr": 0.0042,
-      "cpc": 2.8075,
-      "acos": 26.72,
-      "roas": 3.74
+      "cpc": 2.702,
+      "acos": 26.33,
+      "roas": 3.8
     },
     {
       "id": 517833975216797,
       "name": "Skinuva - SP - Scar - M Non-Branded - Phrase - Audience_HighPurchaseIntent",
-      "impressions": 88346,
-      "clicks": 240,
-      "spend": 979.79,
+      "impressions": 85833,
+      "clicks": 231,
+      "spend": 935.05,
       "sales": 1225.0,
       "purchases": 13,
       "ctr": 0.0027,
-      "cpc": 4.0825,
-      "acos": 79.98,
-      "roas": 1.25
+      "cpc": 4.0478,
+      "acos": 76.33,
+      "roas": 1.31
     },
     {
       "id": 167954968501330,
       "name": "Skinuva - SB - M - Scar/Scar+ - Store 6.26",
-      "impressions": 245059,
-      "clicks": 301,
-      "spend": 836.02,
-      "sales": 3750.99,
+      "impressions": 253414,
+      "clicks": 314,
+      "spend": 881.07,
+      "sales": 3690.99,
       "purchases": 43,
       "ctr": 0.0012,
-      "cpc": 2.7775,
-      "acos": 22.29,
-      "roas": 4.49
+      "cpc": 2.806,
+      "acos": 23.87,
+      "roas": 4.19
     },
     {
       "id": 39685185894180,
       "name": "Skinuva Brite - SB - Auto 1.26",
-      "impressions": 23845,
-      "clicks": 481,
-      "spend": 829.64,
+      "impressions": 23063,
+      "clicks": 472,
+      "spend": 810.29,
       "sales": 799.9,
       "purchases": 10,
-      "ctr": 0.0202,
-      "cpc": 1.7248,
-      "acos": 103.72,
-      "roas": 0.96
+      "ctr": 0.0205,
+      "cpc": 1.7167,
+      "acos": 101.3,
+      "roas": 0.99
     },
     {
       "id": 361085379482418,
       "name": "Skinuva Brite - SP - Auto",
-      "impressions": 79425,
-      "clicks": 304,
-      "spend": 798.72,
+      "impressions": 78978,
+      "clicks": 299,
+      "spend": 779.34,
       "sales": 2238.01,
       "purchases": 25,
       "ctr": 0.0038,
-      "cpc": 2.6274,
-      "acos": 35.69,
-      "roas": 2.8
+      "cpc": 2.6065,
+      "acos": 34.82,
+      "roas": 2.87
     },
     {
       "id": 518107798403243,
       "name": "Skinuva - SP - Scar - M Non-Branded - Exact - Audience_HighPurchaseIntent",
-      "impressions": 67255,
-      "clicks": 162,
-      "spend": 698.16,
-      "sales": 1425.0,
-      "purchases": 16,
+      "impressions": 67578,
+      "clicks": 163,
+      "spend": 697.52,
+      "sales": 1485.0,
+      "purchases": 17,
       "ctr": 0.0024,
-      "cpc": 4.3096,
-      "acos": 48.99,
-      "roas": 2.04
+      "cpc": 4.2793,
+      "acos": 46.97,
+      "roas": 2.13
     },
     {
       "id": 406203289932613,
       "name": "Skinuva - SP - Scar - Competitor Targeting",
-      "impressions": 52749,
-      "clicks": 292,
-      "spend": 645.34,
+      "impressions": 52993,
+      "clicks": 293,
+      "spend": 645.77,
       "sales": 1387.9,
       "purchases": 12,
       "ctr": 0.0055,
-      "cpc": 2.2101,
-      "acos": 46.5,
+      "cpc": 2.204,
+      "acos": 46.53,
       "roas": 2.15
     },
     {
       "id": 17828482994536,
       "name": "Skinuva Bruise - SP - M 6.26",
-      "impressions": 89573,
-      "clicks": 157,
-      "spend": 548.93,
-      "sales": 945.0,
-      "purchases": 21,
+      "impressions": 87334,
+      "clicks": 158,
+      "spend": 550.42,
+      "sales": 905.0,
+      "purchases": 22,
       "ctr": 0.0018,
-      "cpc": 3.4964,
-      "acos": 58.09,
-      "roas": 1.72
+      "cpc": 3.4837,
+      "acos": 60.82,
+      "roas": 1.64
     },
     {
       "id": 162664212305184,
       "name": "Skinuva",
-      "impressions": 86012,
-      "clicks": 314,
-      "spend": 517.1,
-      "sales": 795.0,
-      "purchases": 10,
-      "ctr": 0.0037,
-      "cpc": 1.6468,
-      "acos": 65.04,
-      "roas": 1.54
+      "impressions": 88231,
+      "clicks": 320,
+      "spend": 526.45,
+      "sales": 885.0,
+      "purchases": 11,
+      "ctr": 0.0036,
+      "cpc": 1.6452,
+      "acos": 59.49,
+      "roas": 1.68
     },
     {
       "id": 220529032320588,
       "name": "Skinuva - SB - M - Scar - NB - 3.26",
-      "impressions": 16473,
-      "clicks": 167,
-      "spend": 503.13,
+      "impressions": 15829,
+      "clicks": 160,
+      "spend": 478.76,
       "sales": 260.0,
       "purchases": 4,
       "ctr": 0.0101,
-      "cpc": 3.0128,
-      "acos": 193.51,
-      "roas": 0.52
+      "cpc": 2.9922,
+      "acos": 184.14,
+      "roas": 0.54
     },
     {
       "id": 3742606196226,
       "name": "Skinuva - SP - Scar - Auto - CANADA 7.26",
-      "impressions": 40614,
-      "clicks": 187,
-      "spend": 327.31,
+      "impressions": 40278,
+      "clicks": 189,
+      "spend": 332.6,
       "sales": 542.51,
       "purchases": 7,
-      "ctr": 0.0046,
-      "cpc": 1.7503,
-      "acos": 60.33,
-      "roas": 1.66
+      "ctr": 0.0047,
+      "cpc": 1.7598,
+      "acos": 61.31,
+      "roas": 1.63
     },
     {
       "id": 457413881444169,
       "name": "Skinuva Bruise ARC - SP - Product",
-      "impressions": 13304,
-      "clicks": 153,
-      "spend": 325.45,
-      "sales": 1460.0,
-      "purchases": 27,
-      "ctr": 0.0115,
-      "cpc": 2.1271,
-      "acos": 22.29,
-      "roas": 4.49
+      "impressions": 13281,
+      "clicks": 151,
+      "spend": 321.27,
+      "sales": 1435.0,
+      "purchases": 26,
+      "ctr": 0.0114,
+      "cpc": 2.1276,
+      "acos": 22.39,
+      "roas": 4.47
     },
     {
       "id": 484416431108290,
       "name": "Skinuva - SP - Scar - M - Product - Audience_HighPurchaseIntent",
-      "impressions": 18041,
-      "clicks": 85,
-      "spend": 316.82,
+      "impressions": 17529,
+      "clicks": 84,
+      "spend": 317.75,
       "sales": 980.95,
       "purchases": 8,
-      "ctr": 0.0047,
-      "cpc": 3.7273,
-      "acos": 32.3,
-      "roas": 3.1
+      "ctr": 0.0048,
+      "cpc": 3.7827,
+      "acos": 32.39,
+      "roas": 3.09
     },
     {
       "id": 547810297868558,
       "name": "Skinuva Bruise ARC - SP - Exact Match - Audience_High Purchase Intent",
-      "impressions": 11208,
-      "clicks": 88,
-      "spend": 289.53,
-      "sales": 880.0,
-      "purchases": 17,
-      "ctr": 0.0079,
-      "cpc": 3.2901,
-      "acos": 32.9,
-      "roas": 3.04
+      "impressions": 11509,
+      "clicks": 87,
+      "spend": 272.09,
+      "sales": 800.0,
+      "purchases": 16,
+      "ctr": 0.0076,
+      "cpc": 3.1275,
+      "acos": 34.01,
+      "roas": 2.94
     },
     {
       "id": 461070044768139,
       "name": "Skinuva - SD - A - Scar v1",
-      "impressions": 57548,
-      "clicks": 99,
-      "spend": 214.22,
+      "impressions": 56209,
+      "clicks": 98,
+      "spend": 214.29,
       "sales": 300.0,
       "purchases": 4,
       "ctr": 0.0017,
-      "cpc": 2.1638,
-      "acos": 71.41,
+      "cpc": 2.1866,
+      "acos": 71.43,
       "roas": 1.4
     },
     {
       "id": 371261826693385,
       "name": "Skinuva v2",
-      "impressions": 24921,
-      "clicks": 98,
-      "spend": 198.78,
+      "impressions": 24632,
+      "clicks": 96,
+      "spend": 195.5,
       "sales": 620.0,
       "purchases": 7,
       "ctr": 0.0039,
-      "cpc": 2.0284,
-      "acos": 32.06,
-      "roas": 3.12
+      "cpc": 2.0365,
+      "acos": 31.53,
+      "roas": 3.17
     },
     {
       "id": 388293394499092,
       "name": "Skinuva Brite - SP - Product",
-      "impressions": 8616,
-      "clicks": 50,
-      "spend": 187.76,
+      "impressions": 8689,
+      "clicks": 51,
+      "spend": 190.42,
       "sales": 607.98,
       "purchases": 6,
-      "ctr": 0.0058,
-      "cpc": 3.7552,
-      "acos": 30.88,
-      "roas": 3.24
+      "ctr": 0.0059,
+      "cpc": 3.7337,
+      "acos": 31.32,
+      "roas": 3.19
     },
     {
       "id": 196378975034114,
       "name": "Skinuva Bruise - SP - Auto",
-      "impressions": 23340,
-      "clicks": 89,
-      "spend": 143.82,
+      "impressions": 23827,
+      "clicks": 98,
+      "spend": 156.96,
       "sales": 225.0,
       "purchases": 4,
-      "ctr": 0.0038,
-      "cpc": 1.616,
-      "acos": 63.92,
-      "roas": 1.56
+      "ctr": 0.0041,
+      "cpc": 1.6016,
+      "acos": 69.76,
+      "roas": 1.43
     },
     {
       "id": 8590466904033,
       "name": "Skinuva Bruise - SP - Manual NB HERO KWs 4.26",
-      "impressions": 31661,
+      "impressions": 31177,
       "clicks": 69,
       "spend": 130.84,
       "sales": 160.0,
@@ -619,87 +619,87 @@
       "roas": 1.22
     },
     {
-      "id": 210728859605274,
-      "name": "Skinuva Bruise - SP - Competitor Product",
-      "impressions": 9333,
-      "clicks": 44,
-      "spend": 127.22,
-      "sales": 120.0,
+      "id": 519230732254229,
+      "name": "Skinuva - SB - M - Scar+ - v1",
+      "impressions": 2458,
+      "clicks": 36,
+      "spend": 125.93,
+      "sales": 205.0,
       "purchases": 3,
-      "ctr": 0.0047,
-      "cpc": 2.8914,
-      "acos": 106.02,
-      "roas": 0.94
+      "ctr": 0.0146,
+      "cpc": 3.4981,
+      "acos": 61.43,
+      "roas": 1.63
     },
     {
       "id": 425153213345413,
       "name": "Skinuva Bruise ARC - SP - Phrase Match - Audience_High Purchase Intent",
-      "impressions": 5910,
+      "impressions": 6077,
       "clicks": 52,
-      "spend": 126.02,
-      "sales": 710.0,
-      "purchases": 14,
-      "ctr": 0.0088,
-      "cpc": 2.4235,
-      "acos": 17.75,
-      "roas": 5.63
+      "spend": 122.5,
+      "sales": 665.0,
+      "purchases": 13,
+      "ctr": 0.0086,
+      "cpc": 2.3558,
+      "acos": 18.42,
+      "roas": 5.43
     },
     {
-      "id": 519230732254229,
-      "name": "Skinuva - SB - M - Scar+ - v1",
-      "impressions": 2428,
-      "clicks": 35,
-      "spend": 121.82,
-      "sales": 165.0,
+      "id": 210728859605274,
+      "name": "Skinuva Bruise - SP - Competitor Product",
+      "impressions": 9270,
+      "clicks": 42,
+      "spend": 122.12,
+      "sales": 80.0,
       "purchases": 2,
-      "ctr": 0.0144,
-      "cpc": 3.4806,
-      "acos": 73.83,
-      "roas": 1.35
+      "ctr": 0.0045,
+      "cpc": 2.9076,
+      "acos": 152.65,
+      "roas": 0.66
     },
     {
       "id": 122012372566532,
       "name": "Skinuva - SP - M - NB Scar HERO CLINICAL 8.26",
-      "impressions": 7535,
-      "clicks": 15,
-      "spend": 58.74,
-      "sales": 70.0,
-      "purchases": 1,
-      "ctr": 0.002,
-      "cpc": 3.916,
-      "acos": 83.91,
-      "roas": 1.19
+      "impressions": 8615,
+      "clicks": 19,
+      "spend": 72.52,
+      "sales": 175.0,
+      "purchases": 2,
+      "ctr": 0.0022,
+      "cpc": 3.8168,
+      "acos": 41.44,
+      "roas": 2.41
     },
     {
       "id": 258496712306781,
       "name": "Skinuva - SP - Brite - Auto - CANADA 7.26",
-      "impressions": 21378,
-      "clicks": 62,
-      "spend": 50.63,
+      "impressions": 21946,
+      "clicks": 63,
+      "spend": 51.98,
       "sales": 165.52,
       "purchases": 2,
       "ctr": 0.0029,
-      "cpc": 0.8166,
-      "acos": 30.59,
-      "roas": 3.27
+      "cpc": 0.8251,
+      "acos": 31.4,
+      "roas": 3.18
     },
     {
       "id": 555498797323580,
       "name": "Skinuva - SB - M - Bruise ARC- v1",
-      "impressions": 1252,
-      "clicks": 10,
-      "spend": 31.32,
+      "impressions": 762,
+      "clicks": 6,
+      "spend": 18.5,
       "sales": 0.0,
       "purchases": 0,
-      "ctr": 0.008,
-      "cpc": 3.132,
+      "ctr": 0.0079,
+      "cpc": 3.0833,
       "acos": null,
       "roas": 0.0
     },
     {
       "id": 11656615028207,
       "name": "Skinuva Bruise - SB - Auto 5.26",
-      "impressions": 770,
+      "impressions": 761,
       "clicks": 1,
       "spend": 4.38,
       "sales": 0.0,
@@ -738,7 +738,7 @@
     {
       "id": 362147717828189,
       "name": "Skinuva - SB - Stretch - Pregnancy",
-      "impressions": 43,
+      "impressions": 45,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -768,120 +768,120 @@
       "name": "Skinuva - SVA0010 - M - SP - Exact - Audience_High Purchase Intent",
       "state": "enabled",
       "dailyBudget": 250.0,
-      "recentSpend": 62.23,
-      "pacingPct": 24.9
+      "recentSpend": 61.54,
+      "pacingPct": 24.6
     },
     {
       "id": 167954968501330,
       "name": "Skinuva - SB - M - Scar/Scar+ - Store 6.26",
       "state": "enabled",
       "dailyBudget": 60.0,
-      "recentSpend": 26.97,
-      "pacingPct": 44.9
+      "recentSpend": 28.42,
+      "pacingPct": 47.4
     },
     {
       "id": 136712096276255,
       "name": "Skinuva Scar+ - SP - Manual - Product Targeted",
       "state": "enabled",
       "dailyBudget": 50.0,
-      "recentSpend": 41.75,
-      "pacingPct": 83.5
+      "recentSpend": 39.75,
+      "pacingPct": 79.5
     },
     {
       "id": 196378975034114,
       "name": "Skinuva Bruise - SP - Auto",
       "state": "enabled",
       "dailyBudget": 40.0,
-      "recentSpend": 4.64,
-      "pacingPct": 11.6
+      "recentSpend": 5.06,
+      "pacingPct": 12.7
     },
     {
       "id": 425153213345413,
       "name": "Skinuva Bruise ARC - SP - Phrase Match - Audience_High Purchase Intent",
       "state": "enabled",
       "dailyBudget": 35.0,
-      "recentSpend": 4.07,
-      "pacingPct": 11.6
+      "recentSpend": 3.95,
+      "pacingPct": 11.3
     },
     {
       "id": 361085379482418,
       "name": "Skinuva Brite - SP - Auto",
       "state": "enabled",
       "dailyBudget": 30.0,
-      "recentSpend": 25.77,
-      "pacingPct": 85.9
+      "recentSpend": 25.14,
+      "pacingPct": 83.8
     },
     {
       "id": 3742606196226,
       "name": "Skinuva - SP - Scar - Auto - CANADA 7.26",
       "state": "enabled",
       "dailyBudget": 29.2,
-      "recentSpend": 10.56,
-      "pacingPct": 36.2
+      "recentSpend": 10.73,
+      "pacingPct": 36.7
     },
     {
       "id": 17828482994536,
       "name": "Skinuva Bruise - SP - M 6.26",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 17.71,
-      "pacingPct": 88.5
+      "recentSpend": 17.76,
+      "pacingPct": 88.8
     },
     {
       "id": 517833975216797,
       "name": "Skinuva - SP - Scar - M Non-Branded - Phrase - Audience_HighPurchaseIntent",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 31.61,
-      "pacingPct": 158.0
+      "recentSpend": 30.16,
+      "pacingPct": 150.8
     },
     {
       "id": 220529032320588,
       "name": "Skinuva - SB - M - Scar - NB - 3.26",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 16.23,
-      "pacingPct": 81.2
+      "recentSpend": 15.44,
+      "pacingPct": 77.2
     },
     {
       "id": 457413881444169,
       "name": "Skinuva Bruise ARC - SP - Product",
       "state": "enabled",
       "dailyBudget": 15.0,
-      "recentSpend": 10.5,
-      "pacingPct": 70.0
+      "recentSpend": 10.36,
+      "pacingPct": 69.1
     },
     {
       "id": 388293394499092,
       "name": "Skinuva Brite - SP - Product",
       "state": "enabled",
       "dailyBudget": 15.0,
-      "recentSpend": 6.06,
-      "pacingPct": 40.4
+      "recentSpend": 6.14,
+      "pacingPct": 41.0
     },
     {
       "id": 122012372566532,
       "name": "Skinuva - SP - M - NB Scar HERO CLINICAL 8.26",
       "state": "enabled",
       "dailyBudget": 13.0,
-      "recentSpend": 1.89,
-      "pacingPct": 14.6
+      "recentSpend": 2.34,
+      "pacingPct": 18.0
     },
     {
       "id": 258496712306781,
       "name": "Skinuva - SP - Brite - Auto - CANADA 7.26",
       "state": "enabled",
       "dailyBudget": 10.95,
-      "recentSpend": 1.63,
-      "pacingPct": 14.9
+      "recentSpend": 1.68,
+      "pacingPct": 15.3
     },
     {
       "id": 162664212305184,
       "name": "Skinuva",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 16.68,
-      "pacingPct": 166.8
+      "recentSpend": 16.98,
+      "pacingPct": 169.8
     },
     {
       "id": 8590466904033,
@@ -896,48 +896,48 @@
       "name": "Skinuva v2",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 6.41,
-      "pacingPct": 64.1
+      "recentSpend": 6.31,
+      "pacingPct": 63.1
     },
     {
       "id": 547810297868558,
       "name": "Skinuva Bruise ARC - SP - Exact Match - Audience_High Purchase Intent",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 9.34,
-      "pacingPct": 93.4
+      "recentSpend": 8.78,
+      "pacingPct": 87.8
     },
     {
       "id": 484416431108290,
       "name": "Skinuva - SP - Scar - M - Product - Audience_HighPurchaseIntent",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 10.22,
-      "pacingPct": 102.2
+      "recentSpend": 10.25,
+      "pacingPct": 102.5
     },
     {
       "id": 518107798403243,
       "name": "Skinuva - SP - Scar - M Non-Branded - Exact - Audience_HighPurchaseIntent",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 22.52,
-      "pacingPct": 225.2
+      "recentSpend": 22.5,
+      "pacingPct": 225.0
     },
     {
       "id": 406203289932613,
       "name": "Skinuva - SP - Scar - Competitor Targeting",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 20.82,
-      "pacingPct": 208.2
+      "recentSpend": 20.83,
+      "pacingPct": 208.3
     },
     {
       "id": 39685185894180,
       "name": "Skinuva Brite - SB - Auto 1.26",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 26.76,
-      "pacingPct": 267.6
+      "recentSpend": 26.14,
+      "pacingPct": 261.4
     },
     {
       "id": 17305291776220,
@@ -960,16 +960,16 @@
       "name": "Skinuva - SB - M - Scar+ - v1",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 3.93,
-      "pacingPct": 39.3
+      "recentSpend": 4.06,
+      "pacingPct": 40.6
     },
     {
       "id": 555498797323580,
       "name": "Skinuva - SB - M - Bruise ARC- v1",
       "state": "enabled",
       "dailyBudget": 10.0,
-      "recentSpend": 1.01,
-      "pacingPct": 10.1
+      "recentSpend": 0.6,
+      "pacingPct": 6.0
     },
     {
       "id": 109566531540277,
@@ -984,8 +984,8 @@
       "name": "Skinuva Bruise - SP - Competitor Product",
       "state": "enabled",
       "dailyBudget": 6.0,
-      "recentSpend": 4.1,
-      "pacingPct": 68.4
+      "recentSpend": 3.94,
+      "pacingPct": 65.7
     },
     {
       "id": 421029899919297,
@@ -1009,26 +1009,18 @@
       "state": "enabled",
       "dailyBudget": 5.0,
       "recentSpend": 6.91,
-      "pacingPct": 138.2
+      "pacingPct": 138.3
     }
   ],
   "search_terms": [
     {
       "query": "scar cream",
-      "impressions": 89404,
-      "clicks": 309,
-      "spend": 1207.78,
-      "sales": 2645.0,
-      "purchases": 29,
+      "impressions": 87725,
+      "clicks": 305,
+      "spend": 1150.29,
+      "sales": 2705.0,
+      "purchases": 30,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 3816,
-          "clicks": 14,
-          "spend": 80.21,
-          "sales": 0.0,
-          "cpc": 5.7293
-        },
         {
           "date": "2026-08-02",
           "impressions": 2752,
@@ -1071,7 +1063,7 @@
         },
         {
           "date": "2026-08-07",
-          "impressions": 2685,
+          "impressions": 2684,
           "clicks": 4,
           "spend": 12.74,
           "sales": 0.0,
@@ -1250,12 +1242,12 @@
           "impressions": 994,
           "clicks": 12,
           "spend": 28.99,
-          "sales": 0.0,
+          "sales": 60.0,
           "cpc": 2.4158
         },
         {
           "date": "2026-08-30",
-          "impressions": 1897,
+          "impressions": 1893,
           "clicks": 11,
           "spend": 31.78,
           "sales": 80.0,
@@ -1263,34 +1255,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 1380,
+          "impressions": 1341,
           "clicks": 11,
           "spend": 28.13,
           "sales": 60.0,
           "cpc": 2.5573
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 2181,
+          "clicks": 10,
+          "spend": 22.72,
+          "sales": 0.0,
+          "cpc": 2.272
         }
       ],
-      "acos": 45.66,
-      "cvr": 0.0939,
+      "acos": 42.52,
+      "cvr": 0.0984,
       "ctr": 0.0035,
-      "cpc": 3.9087
+      "cpc": 3.7714
     },
     {
       "query": "skinuva scar cream",
-      "impressions": 20653,
-      "clicks": 514,
-      "spend": 1166.66,
-      "sales": 11393.57,
-      "purchases": 136,
+      "impressions": 20739,
+      "clicks": 522,
+      "spend": 1141.14,
+      "sales": 11578.57,
+      "purchases": 138,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 281,
-          "clicks": 10,
-          "spend": 53.15,
-          "sales": 200.0,
-          "cpc": 5.315
-        },
         {
           "date": "2026-08-02",
           "impressions": 429,
@@ -1472,7 +1464,7 @@
           "impressions": 1103,
           "clicks": 18,
           "spend": 20.89,
-          "sales": 165.0,
+          "sales": 270.0,
           "cpc": 1.1606
         },
         {
@@ -1520,39 +1512,39 @@
           "impressions": 217,
           "clicks": 18,
           "spend": 37.25,
-          "sales": 535.0,
+          "sales": 595.0,
           "cpc": 2.0694
         },
         {
           "date": "2026-08-31",
-          "impressions": 331,
+          "impressions": 349,
           "clicks": 16,
           "spend": 25.0,
           "sales": 340.0,
           "cpc": 1.5625
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 349,
+          "clicks": 18,
+          "spend": 27.63,
+          "sales": 220.0,
+          "cpc": 1.535
         }
       ],
-      "acos": 10.24,
-      "cvr": 0.2646,
-      "ctr": 0.0249,
-      "cpc": 2.2698
+      "acos": 9.86,
+      "cvr": 0.2644,
+      "ctr": 0.0252,
+      "cpc": 2.1861
     },
     {
       "query": "b0d3fwrqcy",
-      "impressions": 28744,
-      "clicks": 211,
-      "spend": 479.34,
+      "impressions": 28411,
+      "clicks": 208,
+      "spend": 473.54,
       "sales": 813.7,
       "purchases": 7,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 623,
-          "clicks": 9,
-          "spend": 21.02,
-          "sales": 0.0,
-          "cpc": 2.3356
-        },
         {
           "date": "2026-08-02",
           "impressions": 2444,
@@ -1715,7 +1707,7 @@
         },
         {
           "date": "2026-08-22",
-          "impressions": 1285,
+          "impressions": 1283,
           "clicks": 6,
           "spend": 14.23,
           "sales": 0.0,
@@ -1787,34 +1779,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 1297,
+          "impressions": 990,
           "clicks": 5,
           "spend": 11.29,
           "sales": 0.0,
           "cpc": 2.258
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 599,
+          "clicks": 6,
+          "spend": 15.22,
+          "sales": 0.0,
+          "cpc": 2.5367
         }
       ],
-      "acos": 58.91,
-      "cvr": 0.0332,
+      "acos": 58.2,
+      "cvr": 0.0337,
       "ctr": 0.0073,
-      "cpc": 2.2718
+      "cpc": 2.2766
     },
     {
       "query": "skinuva scar gel",
-      "impressions": 8636,
-      "clicks": 158,
-      "spend": 439.3,
-      "sales": 3218.8,
-      "purchases": 42,
+      "impressions": 8593,
+      "clicks": 164,
+      "spend": 460.98,
+      "sales": 3323.8,
+      "purchases": 43,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 265,
-          "clicks": 3,
-          "spend": 3.82,
-          "sales": 0.0,
-          "cpc": 1.2733
-        },
         {
           "date": "2026-08-02",
           "impressions": 359,
@@ -2049,34 +2041,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 206,
+          "impressions": 198,
           "clicks": 5,
           "spend": 8.99,
           "sales": 160.0,
           "cpc": 1.798
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 230,
+          "clicks": 9,
+          "spend": 25.5,
+          "sales": 105.0,
+          "cpc": 2.8333
         }
       ],
-      "acos": 13.65,
-      "cvr": 0.2658,
-      "ctr": 0.0183,
-      "cpc": 2.7804
+      "acos": 13.87,
+      "cvr": 0.2622,
+      "ctr": 0.0191,
+      "cpc": 2.8109
     },
     {
       "query": "skinuva",
-      "impressions": 15098,
-      "clicks": 243,
-      "spend": 396.82,
-      "sales": 4349.34,
-      "purchases": 54,
+      "impressions": 15036,
+      "clicks": 240,
+      "spend": 374.02,
+      "sales": 4269.34,
+      "purchases": 53,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 394,
-          "clicks": 9,
-          "spend": 33.37,
-          "sales": 140.0,
-          "cpc": 3.7078
-        },
         {
           "date": "2026-08-02",
           "impressions": 720,
@@ -2311,34 +2303,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 178,
+          "impressions": 271,
           "clicks": 4,
           "spend": 2.33,
           "sales": 70.0,
           "cpc": 0.5825
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 239,
+          "clicks": 6,
+          "spend": 10.57,
+          "sales": 60.0,
+          "cpc": 1.7617
         }
       ],
-      "acos": 9.12,
-      "cvr": 0.2222,
-      "ctr": 0.0161,
-      "cpc": 1.633
+      "acos": 8.76,
+      "cvr": 0.2208,
+      "ctr": 0.016,
+      "cpc": 1.5584
     },
     {
       "query": "b07rcjdfn4",
-      "impressions": 12337,
-      "clicks": 95,
-      "spend": 365.64,
-      "sales": 1045.95,
-      "purchases": 11,
+      "impressions": 11989,
+      "clicks": 92,
+      "spend": 352.45,
+      "sales": 940.95,
+      "purchases": 10,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 597,
-          "clicks": 6,
-          "spend": 25.79,
-          "sales": 105.0,
-          "cpc": 4.2983
-        },
         {
           "date": "2026-08-02",
           "impressions": 796,
@@ -2557,34 +2549,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 658,
+          "impressions": 640,
           "clicks": 2,
           "spend": 9.9,
           "sales": 0.0,
           "cpc": 4.95
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 267,
+          "clicks": 3,
+          "spend": 12.6,
+          "sales": 0.0,
+          "cpc": 4.2
         }
       ],
-      "acos": 34.96,
-      "cvr": 0.1158,
+      "acos": 37.46,
+      "cvr": 0.1087,
       "ctr": 0.0077,
-      "cpc": 3.8488
+      "cpc": 3.831
     },
     {
       "query": "scar gel",
-      "impressions": 24447,
-      "clicks": 76,
-      "spend": 325.66,
+      "impressions": 24584,
+      "clicks": 74,
+      "spend": 317.89,
       "sales": 375.0,
       "purchases": 4,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 216,
-          "clicks": 4,
-          "spend": 16.96,
-          "sales": 0.0,
-          "cpc": 4.24
-        },
         {
           "date": "2026-08-02",
           "impressions": 158,
@@ -2800,29 +2792,29 @@
           "spend": 15.21,
           "sales": 0.0,
           "cpc": 3.8025
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 353,
+          "clicks": 2,
+          "spend": 9.19,
+          "sales": 0.0,
+          "cpc": 4.595
         }
       ],
-      "acos": 86.84,
-      "cvr": 0.0526,
-      "ctr": 0.0031,
-      "cpc": 4.285
+      "acos": 84.77,
+      "cvr": 0.0541,
+      "ctr": 0.003,
+      "cpc": 4.2958
     },
     {
       "query": "skinuva bruise cream",
-      "impressions": 3333,
+      "impressions": 3383,
       "clicks": 51,
-      "spend": 191.17,
-      "sales": 945.0,
-      "purchases": 17,
+      "spend": 178.14,
+      "sales": 820.0,
+      "purchases": 15,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 92,
-          "clicks": 4,
-          "spend": 24.85,
-          "sales": 125.0,
-          "cpc": 6.2125
-        },
         {
           "date": "2026-08-02",
           "impressions": 128,
@@ -3001,23 +2993,31 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 1,
+          "impressions": 67,
           "clicks": 1,
           "spend": 0.78,
           "sales": 45.0,
           "cpc": 0.78
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 76,
+          "clicks": 4,
+          "spend": 11.82,
+          "sales": 0.0,
+          "cpc": 2.955
         }
       ],
-      "acos": 20.23,
-      "cvr": 0.3333,
-      "ctr": 0.0153,
-      "cpc": 3.7484
+      "acos": 21.72,
+      "cvr": 0.2941,
+      "ctr": 0.0151,
+      "cpc": 3.4929
     },
     {
       "query": "b0861cgwlf",
-      "impressions": 4953,
-      "clicks": 44,
-      "spend": 152.61,
+      "impressions": 4973,
+      "clicks": 45,
+      "spend": 155.27,
       "sales": 607.98,
       "purchases": 6,
       "daily": [
@@ -3164,29 +3164,29 @@
           "spend": 5.95,
           "sales": 0.0,
           "cpc": 5.95
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 20,
+          "clicks": 1,
+          "spend": 2.66,
+          "sales": 0.0,
+          "cpc": 2.66
         }
       ],
-      "acos": 25.1,
-      "cvr": 0.1364,
-      "ctr": 0.0089,
-      "cpc": 3.4684
+      "acos": 25.54,
+      "cvr": 0.1333,
+      "ctr": 0.009,
+      "cpc": 3.4504
     },
     {
       "query": "skinuva bruise",
-      "impressions": 4596,
+      "impressions": 4756,
       "clicks": 57,
-      "spend": 144.34,
+      "spend": 138.41,
       "sales": 290.0,
       "purchases": 7,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 128,
-          "clicks": 2,
-          "spend": 10.85,
-          "sales": 0.0,
-          "cpc": 5.425
-        },
         {
           "date": "2026-08-03",
           "impressions": 477,
@@ -3357,374 +3357,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 96,
+          "impressions": 354,
           "clicks": 4,
           "spend": 4.38,
           "sales": 0.0,
           "cpc": 1.095
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 30,
+          "clicks": 2,
+          "spend": 4.92,
+          "sales": 0.0,
+          "cpc": 2.46
         }
       ],
-      "acos": 49.77,
+      "acos": 47.73,
       "cvr": 0.1228,
-      "ctr": 0.0124,
-      "cpc": 2.5323
-    },
-    {
-      "query": "silicone scar gel",
-      "impressions": 8847,
-      "clicks": 35,
-      "spend": 130.34,
-      "sales": 303.95,
-      "purchases": 3,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 456,
-          "clicks": 2,
-          "spend": 6.48,
-          "sales": 0.0,
-          "cpc": 3.24
-        },
-        {
-          "date": "2026-08-02",
-          "impressions": 684,
-          "clicks": 1,
-          "spend": 5.69,
-          "sales": 0.0,
-          "cpc": 5.69
-        },
-        {
-          "date": "2026-08-03",
-          "impressions": 701,
-          "clicks": 1,
-          "spend": 5.07,
-          "sales": 0.0,
-          "cpc": 5.07
-        },
-        {
-          "date": "2026-08-04",
-          "impressions": 244,
-          "clicks": 3,
-          "spend": 8.2,
-          "sales": 0.0,
-          "cpc": 2.7333
-        },
-        {
-          "date": "2026-08-05",
-          "impressions": 568,
-          "clicks": 2,
-          "spend": 12.27,
-          "sales": 0.0,
-          "cpc": 6.135
-        },
-        {
-          "date": "2026-08-07",
-          "impressions": 432,
-          "clicks": 1,
-          "spend": 5.17,
-          "sales": 130.0,
-          "cpc": 5.17
-        },
-        {
-          "date": "2026-08-08",
-          "impressions": 650,
-          "clicks": 3,
-          "spend": 15.79,
-          "sales": 0.0,
-          "cpc": 5.2633
-        },
-        {
-          "date": "2026-08-10",
-          "impressions": 470,
-          "clicks": 4,
-          "spend": 18.17,
-          "sales": 70.0,
-          "cpc": 4.5425
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 648,
-          "clicks": 1,
-          "spend": 4.25,
-          "sales": 0.0,
-          "cpc": 4.25
-        },
-        {
-          "date": "2026-08-15",
-          "impressions": 928,
-          "clicks": 1,
-          "spend": 3.42,
-          "sales": 0.0,
-          "cpc": 3.42
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 544,
-          "clicks": 2,
-          "spend": 7.37,
-          "sales": 0.0,
-          "cpc": 3.685
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 637,
-          "clicks": 3,
-          "spend": 9.64,
-          "sales": 0.0,
-          "cpc": 3.2133
-        },
-        {
-          "date": "2026-08-22",
-          "impressions": 3,
-          "clicks": 1,
-          "spend": 1.09,
-          "sales": 0.0,
-          "cpc": 1.09
-        },
-        {
-          "date": "2026-08-23",
-          "impressions": 559,
-          "clicks": 1,
-          "spend": 3.97,
-          "sales": 0.0,
-          "cpc": 3.97
-        },
-        {
-          "date": "2026-08-24",
-          "impressions": 119,
-          "clicks": 1,
-          "spend": 2.0,
-          "sales": 103.95,
-          "cpc": 2.0
-        },
-        {
-          "date": "2026-08-25",
-          "impressions": 236,
-          "clicks": 2,
-          "spend": 6.95,
-          "sales": 0.0,
-          "cpc": 3.475
-        },
-        {
-          "date": "2026-08-26",
-          "impressions": 434,
-          "clicks": 3,
-          "spend": 8.51,
-          "sales": 0.0,
-          "cpc": 2.8367
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 226,
-          "clicks": 1,
-          "spend": 2.1,
-          "sales": 0.0,
-          "cpc": 2.1
-        },
-        {
-          "date": "2026-08-31",
-          "impressions": 308,
-          "clicks": 2,
-          "spend": 4.2,
-          "sales": 0.0,
-          "cpc": 2.1
-        }
-      ],
-      "acos": 42.88,
-      "cvr": 0.0857,
-      "ctr": 0.004,
-      "cpc": 3.724
-    },
-    {
-      "query": "skinuva bruise capsules",
-      "impressions": 2440,
-      "clicks": 37,
-      "spend": 127.17,
-      "sales": 860.0,
-      "purchases": 17,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 147,
-          "clicks": 2,
-          "spend": 7.8,
-          "sales": 120.0,
-          "cpc": 3.9
-        },
-        {
-          "date": "2026-08-02",
-          "impressions": 228,
-          "clicks": 2,
-          "spend": 1.57,
-          "sales": 40.0,
-          "cpc": 0.785
-        },
-        {
-          "date": "2026-08-03",
-          "impressions": 175,
-          "clicks": 1,
-          "spend": 1.01,
-          "sales": 40.0,
-          "cpc": 1.01
-        },
-        {
-          "date": "2026-08-04",
-          "impressions": 94,
-          "clicks": 1,
-          "spend": 1.68,
-          "sales": 40.0,
-          "cpc": 1.68
-        },
-        {
-          "date": "2026-08-07",
-          "impressions": 150,
-          "clicks": 3,
-          "spend": 12.8,
-          "sales": 0.0,
-          "cpc": 4.2667
-        },
-        {
-          "date": "2026-08-08",
-          "impressions": 219,
-          "clicks": 2,
-          "spend": 5.93,
-          "sales": 0.0,
-          "cpc": 2.965
-        },
-        {
-          "date": "2026-08-09",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 0.9,
-          "sales": 75.0,
-          "cpc": 0.9
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 60,
-          "clicks": 2,
-          "spend": 1.11,
-          "sales": 85.0,
-          "cpc": 0.555
-        },
-        {
-          "date": "2026-08-13",
-          "impressions": 46,
-          "clicks": 1,
-          "spend": 0.51,
-          "sales": 0.0,
-          "cpc": 0.51
-        },
-        {
-          "date": "2026-08-15",
-          "impressions": 227,
-          "clicks": 2,
-          "spend": 2.35,
-          "sales": 75.0,
-          "cpc": 1.175
-        },
-        {
-          "date": "2026-08-16",
-          "impressions": 245,
-          "clicks": 2,
-          "spend": 3.33,
-          "sales": 40.0,
-          "cpc": 1.665
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 99,
-          "clicks": 1,
-          "spend": 12.58,
-          "sales": 0.0,
-          "cpc": 12.58
-        },
-        {
-          "date": "2026-08-19",
-          "impressions": 23,
-          "clicks": 2,
-          "spend": 9.6,
-          "sales": 85.0,
-          "cpc": 4.8
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 392,
-          "clicks": 3,
-          "spend": 15.67,
-          "sales": 0.0,
-          "cpc": 5.2233
-        },
-        {
-          "date": "2026-08-24",
-          "impressions": 21,
-          "clicks": 2,
-          "spend": 14.96,
-          "sales": 40.0,
-          "cpc": 7.48
-        },
-        {
-          "date": "2026-08-26",
-          "impressions": 23,
-          "clicks": 1,
-          "spend": 7.67,
-          "sales": 60.0,
-          "cpc": 7.67
-        },
-        {
-          "date": "2026-08-27",
-          "impressions": 44,
-          "clicks": 2,
-          "spend": 3.22,
-          "sales": 40.0,
-          "cpc": 1.61
-        },
-        {
-          "date": "2026-08-28",
-          "impressions": 56,
-          "clicks": 2,
-          "spend": 3.02,
-          "sales": 80.0,
-          "cpc": 1.51
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 51,
-          "clicks": 4,
-          "spend": 19.38,
-          "sales": 40.0,
-          "cpc": 4.845
-        },
-        {
-          "date": "2026-08-30",
-          "impressions": 138,
-          "clicks": 1,
-          "spend": 2.08,
-          "sales": 0.0,
-          "cpc": 2.08
-        }
-      ],
-      "acos": 14.79,
-      "cvr": 0.4595,
-      "ctr": 0.0152,
-      "cpc": 3.437
+      "ctr": 0.012,
+      "cpc": 2.4282
     },
     {
       "query": "skinuva scar",
-      "impressions": 5041,
-      "clicks": 79,
-      "spend": 117.6,
-      "sales": 1078.99,
-      "purchases": 11,
+      "impressions": 5023,
+      "clicks": 82,
+      "spend": 126.69,
+      "sales": 1198.99,
+      "purchases": 13,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 52,
-          "clicks": 2,
-          "spend": 1.38,
-          "sales": 0.0,
-          "cpc": 0.69
-        },
         {
           "date": "2026-08-02",
           "impressions": 74,
@@ -3932,29 +3592,353 @@
           "spend": 2.0,
           "sales": 0.0,
           "cpc": 2.0
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 34,
+          "clicks": 5,
+          "spend": 10.47,
+          "sales": 120.0,
+          "cpc": 2.094
         }
       ],
-      "acos": 10.9,
-      "cvr": 0.1392,
-      "ctr": 0.0157,
-      "cpc": 1.4886
+      "acos": 10.57,
+      "cvr": 0.1585,
+      "ctr": 0.0163,
+      "cpc": 1.545
+    },
+    {
+      "query": "silicone scar gel",
+      "impressions": 8388,
+      "clicks": 33,
+      "spend": 123.86,
+      "sales": 303.95,
+      "purchases": 3,
+      "daily": [
+        {
+          "date": "2026-08-02",
+          "impressions": 684,
+          "clicks": 1,
+          "spend": 5.69,
+          "sales": 0.0,
+          "cpc": 5.69
+        },
+        {
+          "date": "2026-08-03",
+          "impressions": 701,
+          "clicks": 1,
+          "spend": 5.07,
+          "sales": 0.0,
+          "cpc": 5.07
+        },
+        {
+          "date": "2026-08-04",
+          "impressions": 244,
+          "clicks": 3,
+          "spend": 8.2,
+          "sales": 0.0,
+          "cpc": 2.7333
+        },
+        {
+          "date": "2026-08-05",
+          "impressions": 568,
+          "clicks": 2,
+          "spend": 12.27,
+          "sales": 0.0,
+          "cpc": 6.135
+        },
+        {
+          "date": "2026-08-07",
+          "impressions": 432,
+          "clicks": 1,
+          "spend": 5.17,
+          "sales": 130.0,
+          "cpc": 5.17
+        },
+        {
+          "date": "2026-08-08",
+          "impressions": 650,
+          "clicks": 3,
+          "spend": 15.79,
+          "sales": 0.0,
+          "cpc": 5.2633
+        },
+        {
+          "date": "2026-08-10",
+          "impressions": 470,
+          "clicks": 4,
+          "spend": 18.17,
+          "sales": 70.0,
+          "cpc": 4.5425
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 648,
+          "clicks": 1,
+          "spend": 4.25,
+          "sales": 0.0,
+          "cpc": 4.25
+        },
+        {
+          "date": "2026-08-15",
+          "impressions": 928,
+          "clicks": 1,
+          "spend": 3.42,
+          "sales": 0.0,
+          "cpc": 3.42
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 544,
+          "clicks": 2,
+          "spend": 7.37,
+          "sales": 0.0,
+          "cpc": 3.685
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 637,
+          "clicks": 3,
+          "spend": 9.64,
+          "sales": 0.0,
+          "cpc": 3.2133
+        },
+        {
+          "date": "2026-08-22",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 1.09,
+          "sales": 0.0,
+          "cpc": 1.09
+        },
+        {
+          "date": "2026-08-23",
+          "impressions": 559,
+          "clicks": 1,
+          "spend": 3.97,
+          "sales": 0.0,
+          "cpc": 3.97
+        },
+        {
+          "date": "2026-08-24",
+          "impressions": 119,
+          "clicks": 1,
+          "spend": 2.0,
+          "sales": 103.95,
+          "cpc": 2.0
+        },
+        {
+          "date": "2026-08-25",
+          "impressions": 236,
+          "clicks": 2,
+          "spend": 6.95,
+          "sales": 0.0,
+          "cpc": 3.475
+        },
+        {
+          "date": "2026-08-26",
+          "impressions": 434,
+          "clicks": 3,
+          "spend": 8.51,
+          "sales": 0.0,
+          "cpc": 2.8367
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 226,
+          "clicks": 1,
+          "spend": 2.1,
+          "sales": 0.0,
+          "cpc": 2.1
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 305,
+          "clicks": 2,
+          "spend": 4.2,
+          "sales": 0.0,
+          "cpc": 2.1
+        }
+      ],
+      "acos": 40.75,
+      "cvr": 0.0909,
+      "ctr": 0.0039,
+      "cpc": 3.7533
+    },
+    {
+      "query": "skinuva bruise capsules",
+      "impressions": 2293,
+      "clicks": 35,
+      "spend": 119.37,
+      "sales": 780.0,
+      "purchases": 17,
+      "daily": [
+        {
+          "date": "2026-08-02",
+          "impressions": 228,
+          "clicks": 2,
+          "spend": 1.57,
+          "sales": 40.0,
+          "cpc": 0.785
+        },
+        {
+          "date": "2026-08-03",
+          "impressions": 175,
+          "clicks": 1,
+          "spend": 1.01,
+          "sales": 40.0,
+          "cpc": 1.01
+        },
+        {
+          "date": "2026-08-04",
+          "impressions": 94,
+          "clicks": 1,
+          "spend": 1.68,
+          "sales": 40.0,
+          "cpc": 1.68
+        },
+        {
+          "date": "2026-08-07",
+          "impressions": 150,
+          "clicks": 3,
+          "spend": 12.8,
+          "sales": 0.0,
+          "cpc": 4.2667
+        },
+        {
+          "date": "2026-08-08",
+          "impressions": 219,
+          "clicks": 2,
+          "spend": 5.93,
+          "sales": 0.0,
+          "cpc": 2.965
+        },
+        {
+          "date": "2026-08-09",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 0.9,
+          "sales": 75.0,
+          "cpc": 0.9
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 60,
+          "clicks": 2,
+          "spend": 1.11,
+          "sales": 85.0,
+          "cpc": 0.555
+        },
+        {
+          "date": "2026-08-13",
+          "impressions": 46,
+          "clicks": 1,
+          "spend": 0.51,
+          "sales": 0.0,
+          "cpc": 0.51
+        },
+        {
+          "date": "2026-08-15",
+          "impressions": 227,
+          "clicks": 2,
+          "spend": 2.35,
+          "sales": 75.0,
+          "cpc": 1.175
+        },
+        {
+          "date": "2026-08-16",
+          "impressions": 245,
+          "clicks": 2,
+          "spend": 3.33,
+          "sales": 40.0,
+          "cpc": 1.665
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 99,
+          "clicks": 1,
+          "spend": 12.58,
+          "sales": 0.0,
+          "cpc": 12.58
+        },
+        {
+          "date": "2026-08-19",
+          "impressions": 23,
+          "clicks": 2,
+          "spend": 9.6,
+          "sales": 85.0,
+          "cpc": 4.8
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 392,
+          "clicks": 3,
+          "spend": 15.67,
+          "sales": 0.0,
+          "cpc": 5.2233
+        },
+        {
+          "date": "2026-08-24",
+          "impressions": 21,
+          "clicks": 2,
+          "spend": 14.96,
+          "sales": 40.0,
+          "cpc": 7.48
+        },
+        {
+          "date": "2026-08-26",
+          "impressions": 23,
+          "clicks": 1,
+          "spend": 7.67,
+          "sales": 60.0,
+          "cpc": 7.67
+        },
+        {
+          "date": "2026-08-27",
+          "impressions": 44,
+          "clicks": 2,
+          "spend": 3.22,
+          "sales": 40.0,
+          "cpc": 1.61
+        },
+        {
+          "date": "2026-08-28",
+          "impressions": 56,
+          "clicks": 2,
+          "spend": 3.02,
+          "sales": 120.0,
+          "cpc": 1.51
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 51,
+          "clicks": 4,
+          "spend": 19.38,
+          "sales": 40.0,
+          "cpc": 4.845
+        },
+        {
+          "date": "2026-08-30",
+          "impressions": 138,
+          "clicks": 1,
+          "spend": 2.08,
+          "sales": 0.0,
+          "cpc": 2.08
+        }
+      ],
+      "acos": 15.3,
+      "cvr": 0.4857,
+      "ctr": 0.0153,
+      "cpc": 3.4106
     },
     {
       "query": "b0f45btsb7",
-      "impressions": 3285,
+      "impressions": 3323,
       "clicks": 54,
-      "spend": 114.91,
-      "sales": 690.0,
+      "spend": 118.17,
+      "sales": 725.0,
       "purchases": 12,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 51,
-          "clicks": 1,
-          "spend": 1.92,
-          "sales": 40.0,
-          "cpc": 1.92
-        },
         {
           "date": "2026-08-04",
           "impressions": 44,
@@ -4117,34 +4101,192 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 101,
+          "impressions": 90,
           "clicks": 2,
           "spend": 6.61,
           "sales": 0.0,
           "cpc": 3.305
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 100,
+          "clicks": 1,
+          "spend": 5.18,
+          "sales": 75.0,
+          "cpc": 5.18
         }
       ],
-      "acos": 16.65,
+      "acos": 16.3,
       "cvr": 0.2222,
-      "ctr": 0.0164,
-      "cpc": 2.128
+      "ctr": 0.0163,
+      "cpc": 2.1883
+    },
+    {
+      "query": "scar cream for surgical scars",
+      "impressions": 6368,
+      "clicks": 36,
+      "spend": 107.74,
+      "sales": 150.0,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-08-03",
+          "impressions": 69,
+          "clicks": 3,
+          "spend": 11.92,
+          "sales": 0.0,
+          "cpc": 3.9733
+        },
+        {
+          "date": "2026-08-04",
+          "impressions": 65,
+          "clicks": 3,
+          "spend": 7.91,
+          "sales": 0.0,
+          "cpc": 2.6367
+        },
+        {
+          "date": "2026-08-06",
+          "impressions": 147,
+          "clicks": 3,
+          "spend": 8.76,
+          "sales": 0.0,
+          "cpc": 2.92
+        },
+        {
+          "date": "2026-08-07",
+          "impressions": 17,
+          "clicks": 1,
+          "spend": 4.6,
+          "sales": 0.0,
+          "cpc": 4.6
+        },
+        {
+          "date": "2026-08-09",
+          "impressions": 69,
+          "clicks": 1,
+          "spend": 3.79,
+          "sales": 0.0,
+          "cpc": 3.79
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 141,
+          "clicks": 2,
+          "spend": 5.0,
+          "sales": 80.0,
+          "cpc": 2.5
+        },
+        {
+          "date": "2026-08-13",
+          "impressions": 156,
+          "clicks": 1,
+          "spend": 2.5,
+          "sales": 0.0,
+          "cpc": 2.5
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 41,
+          "clicks": 1,
+          "spend": 3.81,
+          "sales": 0.0,
+          "cpc": 3.81
+        },
+        {
+          "date": "2026-08-18",
+          "impressions": 61,
+          "clicks": 1,
+          "spend": 3.3,
+          "sales": 0.0,
+          "cpc": 3.3
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 61,
+          "clicks": 1,
+          "spend": 3.46,
+          "sales": 0.0,
+          "cpc": 3.46
+        },
+        {
+          "date": "2026-08-22",
+          "impressions": 142,
+          "clicks": 1,
+          "spend": 3.46,
+          "sales": 0.0,
+          "cpc": 3.46
+        },
+        {
+          "date": "2026-08-24",
+          "impressions": 372,
+          "clicks": 2,
+          "spend": 3.79,
+          "sales": 0.0,
+          "cpc": 1.895
+        },
+        {
+          "date": "2026-08-27",
+          "impressions": 17,
+          "clicks": 1,
+          "spend": 1.75,
+          "sales": 0.0,
+          "cpc": 1.75
+        },
+        {
+          "date": "2026-08-28",
+          "impressions": 29,
+          "clicks": 1,
+          "spend": 1.75,
+          "sales": 0.0,
+          "cpc": 1.75
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 914,
+          "clicks": 2,
+          "spend": 6.75,
+          "sales": 70.0,
+          "cpc": 3.375
+        },
+        {
+          "date": "2026-08-30",
+          "impressions": 1535,
+          "clicks": 5,
+          "spend": 16.12,
+          "sales": 0.0,
+          "cpc": 3.224
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 1437,
+          "clicks": 4,
+          "spend": 11.37,
+          "sales": 0.0,
+          "cpc": 2.8425
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 1095,
+          "clicks": 3,
+          "spend": 7.7,
+          "sales": 0.0,
+          "cpc": 2.5667
+        }
+      ],
+      "acos": 71.83,
+      "cvr": 0.0556,
+      "ctr": 0.0057,
+      "cpc": 2.9928
     },
     {
       "query": "b099x664q6",
-      "impressions": 1602,
-      "clicks": 40,
-      "spend": 113.73,
+      "impressions": 1552,
+      "clicks": 38,
+      "spend": 106.95,
       "sales": 440.0,
       "purchases": 9,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 70,
-          "clicks": 3,
-          "spend": 10.51,
-          "sales": 0.0,
-          "cpc": 3.5033
-        },
         {
           "date": "2026-08-02",
           "impressions": 240,
@@ -4291,184 +4433,34 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 26,
+          "impressions": 24,
           "clicks": 1,
           "spend": 2.09,
           "sales": 125.0,
           "cpc": 2.09
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 22,
+          "clicks": 1,
+          "spend": 3.73,
+          "sales": 0.0,
+          "cpc": 3.73
         }
       ],
-      "acos": 25.85,
-      "cvr": 0.225,
-      "ctr": 0.025,
-      "cpc": 2.8433
-    },
-    {
-      "query": "scar cream for surgical scars",
-      "impressions": 5322,
-      "clicks": 33,
-      "spend": 100.04,
-      "sales": 150.0,
-      "purchases": 2,
-      "daily": [
-        {
-          "date": "2026-08-03",
-          "impressions": 69,
-          "clicks": 3,
-          "spend": 11.92,
-          "sales": 0.0,
-          "cpc": 3.9733
-        },
-        {
-          "date": "2026-08-04",
-          "impressions": 65,
-          "clicks": 3,
-          "spend": 7.91,
-          "sales": 0.0,
-          "cpc": 2.6367
-        },
-        {
-          "date": "2026-08-06",
-          "impressions": 147,
-          "clicks": 3,
-          "spend": 8.76,
-          "sales": 0.0,
-          "cpc": 2.92
-        },
-        {
-          "date": "2026-08-07",
-          "impressions": 17,
-          "clicks": 1,
-          "spend": 4.6,
-          "sales": 0.0,
-          "cpc": 4.6
-        },
-        {
-          "date": "2026-08-09",
-          "impressions": 69,
-          "clicks": 1,
-          "spend": 3.79,
-          "sales": 0.0,
-          "cpc": 3.79
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 141,
-          "clicks": 2,
-          "spend": 5.0,
-          "sales": 80.0,
-          "cpc": 2.5
-        },
-        {
-          "date": "2026-08-13",
-          "impressions": 156,
-          "clicks": 1,
-          "spend": 2.5,
-          "sales": 0.0,
-          "cpc": 2.5
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 41,
-          "clicks": 1,
-          "spend": 3.81,
-          "sales": 0.0,
-          "cpc": 3.81
-        },
-        {
-          "date": "2026-08-18",
-          "impressions": 61,
-          "clicks": 1,
-          "spend": 3.3,
-          "sales": 0.0,
-          "cpc": 3.3
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 61,
-          "clicks": 1,
-          "spend": 3.46,
-          "sales": 0.0,
-          "cpc": 3.46
-        },
-        {
-          "date": "2026-08-22",
-          "impressions": 142,
-          "clicks": 1,
-          "spend": 3.46,
-          "sales": 0.0,
-          "cpc": 3.46
-        },
-        {
-          "date": "2026-08-24",
-          "impressions": 372,
-          "clicks": 2,
-          "spend": 3.79,
-          "sales": 0.0,
-          "cpc": 1.895
-        },
-        {
-          "date": "2026-08-27",
-          "impressions": 17,
-          "clicks": 1,
-          "spend": 1.75,
-          "sales": 0.0,
-          "cpc": 1.75
-        },
-        {
-          "date": "2026-08-28",
-          "impressions": 29,
-          "clicks": 1,
-          "spend": 1.75,
-          "sales": 0.0,
-          "cpc": 1.75
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 914,
-          "clicks": 2,
-          "spend": 6.75,
-          "sales": 70.0,
-          "cpc": 3.375
-        },
-        {
-          "date": "2026-08-30",
-          "impressions": 1545,
-          "clicks": 5,
-          "spend": 16.12,
-          "sales": 0.0,
-          "cpc": 3.224
-        },
-        {
-          "date": "2026-08-31",
-          "impressions": 1476,
-          "clicks": 4,
-          "spend": 11.37,
-          "sales": 0.0,
-          "cpc": 2.8425
-        }
-      ],
-      "acos": 66.69,
-      "cvr": 0.0606,
-      "ctr": 0.0062,
-      "cpc": 3.0315
+      "acos": 24.31,
+      "cvr": 0.2368,
+      "ctr": 0.0245,
+      "cpc": 2.8145
     },
     {
       "query": "arnica tablets",
-      "impressions": 7335,
+      "impressions": 7423,
       "clicks": 48,
       "spend": 78.64,
       "sales": 160.0,
       "purchases": 4,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 45,
-          "clicks": 1,
-          "spend": 3.21,
-          "sales": 0.0,
-          "cpc": 3.21
-        },
         {
           "date": "2026-08-04",
           "impressions": 57,
@@ -4604,6 +4596,14 @@
           "spend": 3.21,
           "sales": 0.0,
           "cpc": 3.21
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 133,
+          "clicks": 1,
+          "spend": 3.21,
+          "sales": 0.0,
+          "cpc": 3.21
         }
       ],
       "acos": 49.15,
@@ -4612,12 +4612,98 @@
       "cpc": 1.6383
     },
     {
+      "query": "bruise pills",
+      "impressions": 1071,
+      "clicks": 15,
+      "spend": 77.69,
+      "sales": 80.0,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-08-03",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 5.97,
+          "sales": 0.0,
+          "cpc": 5.97
+        },
+        {
+          "date": "2026-08-05",
+          "impressions": 4,
+          "clicks": 1,
+          "spend": 10.0,
+          "sales": 0.0,
+          "cpc": 10.0
+        },
+        {
+          "date": "2026-08-06",
+          "impressions": 133,
+          "clicks": 1,
+          "spend": 0.96,
+          "sales": 0.0,
+          "cpc": 0.96
+        },
+        {
+          "date": "2026-08-10",
+          "impressions": 496,
+          "clicks": 6,
+          "spend": 23.74,
+          "sales": 0.0,
+          "cpc": 3.9567
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 410,
+          "clicks": 2,
+          "spend": 0.68,
+          "sales": 0.0,
+          "cpc": 0.34
+        },
+        {
+          "date": "2026-08-14",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 11.0,
+          "sales": 40.0,
+          "cpc": 11.0
+        },
+        {
+          "date": "2026-08-15",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 11.0,
+          "sales": 40.0,
+          "cpc": 11.0
+        },
+        {
+          "date": "2026-08-23",
+          "impressions": 10,
+          "clicks": 1,
+          "spend": 7.0,
+          "sales": 0.0,
+          "cpc": 7.0
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 4,
+          "clicks": 1,
+          "spend": 7.34,
+          "sales": 0.0,
+          "cpc": 7.34
+        }
+      ],
+      "acos": 97.11,
+      "cvr": 0.1333,
+      "ctr": 0.014,
+      "cpc": 5.1793
+    },
+    {
       "query": "skinuva bruise pills",
-      "impressions": 4454,
-      "clicks": 28,
-      "spend": 70.79,
-      "sales": 0.0,
-      "purchases": 0,
+      "impressions": 4689,
+      "clicks": 29,
+      "spend": 77.48,
+      "sales": 40.0,
+      "purchases": 1,
       "daily": [
         {
           "date": "2026-08-03",
@@ -4757,95 +4843,25 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 2,
+          "impressions": 236,
           "clicks": 2,
           "spend": 3.26,
           "sales": 0.0,
           "cpc": 1.63
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 6.69,
+          "sales": 40.0,
+          "cpc": 6.69
         }
       ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0063,
-      "cpc": 2.5282
-    },
-    {
-      "query": "bruise pills",
-      "impressions": 1067,
-      "clicks": 14,
-      "spend": 70.35,
-      "sales": 80.0,
-      "purchases": 2,
-      "daily": [
-        {
-          "date": "2026-08-03",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 5.97,
-          "sales": 0.0,
-          "cpc": 5.97
-        },
-        {
-          "date": "2026-08-05",
-          "impressions": 4,
-          "clicks": 1,
-          "spend": 10.0,
-          "sales": 0.0,
-          "cpc": 10.0
-        },
-        {
-          "date": "2026-08-06",
-          "impressions": 133,
-          "clicks": 1,
-          "spend": 0.96,
-          "sales": 0.0,
-          "cpc": 0.96
-        },
-        {
-          "date": "2026-08-10",
-          "impressions": 496,
-          "clicks": 6,
-          "spend": 23.74,
-          "sales": 0.0,
-          "cpc": 3.9567
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 410,
-          "clicks": 2,
-          "spend": 0.68,
-          "sales": 0.0,
-          "cpc": 0.34
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 5,
-          "clicks": 1,
-          "spend": 11.0,
-          "sales": 40.0,
-          "cpc": 11.0
-        },
-        {
-          "date": "2026-08-15",
-          "impressions": 7,
-          "clicks": 1,
-          "spend": 11.0,
-          "sales": 40.0,
-          "cpc": 11.0
-        },
-        {
-          "date": "2026-08-23",
-          "impressions": 10,
-          "clicks": 1,
-          "spend": 7.0,
-          "sales": 0.0,
-          "cpc": 7.0
-        }
-      ],
-      "acos": 87.94,
-      "cvr": 0.1429,
-      "ctr": 0.0131,
-      "cpc": 5.025
+      "acos": 193.7,
+      "cvr": 0.0345,
+      "ctr": 0.0062,
+      "cpc": 2.6717
     },
     {
       "query": "stretch mark cream",
@@ -5092,64 +5108,10 @@
       "cpc": 2.98
     },
     {
-      "query": "arnicare bruise pills",
-      "impressions": 537,
-      "clicks": 6,
-      "spend": 48.56,
-      "sales": 40.0,
-      "purchases": 1,
-      "daily": [
-        {
-          "date": "2026-08-15",
-          "impressions": 92,
-          "clicks": 2,
-          "spend": 16.4,
-          "sales": 0.0,
-          "cpc": 8.2
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 128,
-          "clicks": 1,
-          "spend": 9.37,
-          "sales": 0.0,
-          "cpc": 9.37
-        },
-        {
-          "date": "2026-08-18",
-          "impressions": 35,
-          "clicks": 1,
-          "spend": 10.0,
-          "sales": 0.0,
-          "cpc": 10.0
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 127,
-          "clicks": 1,
-          "spend": 7.0,
-          "sales": 40.0,
-          "cpc": 7.0
-        },
-        {
-          "date": "2026-08-31",
-          "impressions": 155,
-          "clicks": 1,
-          "spend": 5.79,
-          "sales": 0.0,
-          "cpc": 5.79
-        }
-      ],
-      "acos": 121.4,
-      "cvr": 0.1667,
-      "ctr": 0.0112,
-      "cpc": 8.0933
-    },
-    {
       "query": "b00g17u5k6",
-      "impressions": 2772,
-      "clicks": 21,
-      "spend": 47.25,
+      "impressions": 3011,
+      "clicks": 23,
+      "spend": 51.22,
       "sales": 209.2,
       "purchases": 2,
       "daily": [
@@ -5288,29 +5250,83 @@
           "spend": 4.7,
           "sales": 0.0,
           "cpc": 2.35
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 239,
+          "clicks": 2,
+          "spend": 3.97,
+          "sales": 0.0,
+          "cpc": 1.985
         }
       ],
-      "acos": 22.59,
-      "cvr": 0.0952,
+      "acos": 24.48,
+      "cvr": 0.087,
       "ctr": 0.0076,
-      "cpc": 2.25
+      "cpc": 2.227
+    },
+    {
+      "query": "arnicare bruise pills",
+      "impressions": 534,
+      "clicks": 6,
+      "spend": 48.56,
+      "sales": 40.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-08-15",
+          "impressions": 92,
+          "clicks": 2,
+          "spend": 16.4,
+          "sales": 0.0,
+          "cpc": 8.2
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 128,
+          "clicks": 1,
+          "spend": 9.37,
+          "sales": 0.0,
+          "cpc": 9.37
+        },
+        {
+          "date": "2026-08-18",
+          "impressions": 35,
+          "clicks": 1,
+          "spend": 10.0,
+          "sales": 0.0,
+          "cpc": 10.0
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 127,
+          "clicks": 1,
+          "spend": 7.0,
+          "sales": 40.0,
+          "cpc": 7.0
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 152,
+          "clicks": 1,
+          "spend": 5.79,
+          "sales": 0.0,
+          "cpc": 5.79
+        }
+      ],
+      "acos": 121.4,
+      "cvr": 0.1667,
+      "ctr": 0.0112,
+      "cpc": 8.0933
     },
     {
       "query": "b07ghl7nmp",
-      "impressions": 1271,
-      "clicks": 15,
-      "spend": 43.73,
+      "impressions": 1146,
+      "clicks": 14,
+      "spend": 40.73,
       "sales": 0.0,
       "purchases": 0,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 125,
-          "clicks": 1,
-          "spend": 3.0,
-          "sales": 0.0,
-          "cpc": 3.0
-        },
         {
           "date": "2026-08-02",
           "impressions": 41,
@@ -5410,12 +5426,12 @@
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0118,
-      "cpc": 2.9153
+      "ctr": 0.0122,
+      "cpc": 2.9093
     },
     {
       "query": "silagen scar gel",
-      "impressions": 1609,
+      "impressions": 1608,
       "clicks": 12,
       "spend": 40.17,
       "sales": 185.0,
@@ -5495,7 +5511,7 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 65,
+          "impressions": 64,
           "clicks": 1,
           "spend": 1.69,
           "sales": 0.0,
@@ -5508,8 +5524,204 @@
       "cpc": 3.3475
     },
     {
+      "query": "b09fqjmlpz",
+      "impressions": 427,
+      "clicks": 15,
+      "spend": 39.51,
+      "sales": 140.0,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-08-02",
+          "impressions": 20,
+          "clicks": 1,
+          "spend": 2.3,
+          "sales": 0.0,
+          "cpc": 2.3
+        },
+        {
+          "date": "2026-08-04",
+          "impressions": 124,
+          "clicks": 1,
+          "spend": 0.9,
+          "sales": 80.0,
+          "cpc": 0.9
+        },
+        {
+          "date": "2026-08-05",
+          "impressions": 32,
+          "clicks": 2,
+          "spend": 5.04,
+          "sales": 0.0,
+          "cpc": 2.52
+        },
+        {
+          "date": "2026-08-06",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 4.2,
+          "sales": 60.0,
+          "cpc": 4.2
+        },
+        {
+          "date": "2026-08-07",
+          "impressions": 76,
+          "clicks": 2,
+          "spend": 5.57,
+          "sales": 0.0,
+          "cpc": 2.785
+        },
+        {
+          "date": "2026-08-14",
+          "impressions": 28,
+          "clicks": 1,
+          "spend": 3.07,
+          "sales": 0.0,
+          "cpc": 3.07
+        },
+        {
+          "date": "2026-08-16",
+          "impressions": 12,
+          "clicks": 1,
+          "spend": 1.5,
+          "sales": 0.0,
+          "cpc": 1.5
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 10,
+          "clicks": 1,
+          "spend": 0.49,
+          "sales": 0.0,
+          "cpc": 0.49
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 78,
+          "clicks": 1,
+          "spend": 1.92,
+          "sales": 0.0,
+          "cpc": 1.92
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 40,
+          "clicks": 4,
+          "spend": 14.52,
+          "sales": 0.0,
+          "cpc": 3.63
+        }
+      ],
+      "acos": 28.22,
+      "cvr": 0.1333,
+      "ctr": 0.0351,
+      "cpc": 2.634
+    },
+    {
+      "query": "scar treatment",
+      "impressions": 1030,
+      "clicks": 14,
+      "spend": 38.74,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-02",
+          "impressions": 14,
+          "clicks": 1,
+          "spend": 3.15,
+          "sales": 0.0,
+          "cpc": 3.15
+        },
+        {
+          "date": "2026-08-09",
+          "impressions": 75,
+          "clicks": 1,
+          "spend": 3.9,
+          "sales": 0.0,
+          "cpc": 3.9
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 1.45,
+          "sales": 0.0,
+          "cpc": 1.45
+        },
+        {
+          "date": "2026-08-14",
+          "impressions": 120,
+          "clicks": 1,
+          "spend": 0.98,
+          "sales": 0.0,
+          "cpc": 0.98
+        },
+        {
+          "date": "2026-08-15",
+          "impressions": 75,
+          "clicks": 2,
+          "spend": 7.8,
+          "sales": 0.0,
+          "cpc": 3.9
+        },
+        {
+          "date": "2026-08-16",
+          "impressions": 57,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 130,
+          "clicks": 2,
+          "spend": 6.18,
+          "sales": 0.0,
+          "cpc": 3.09
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 42,
+          "clicks": 2,
+          "spend": 9.9,
+          "sales": 0.0,
+          "cpc": 4.95
+        },
+        {
+          "date": "2026-08-27",
+          "impressions": 45,
+          "clicks": 1,
+          "spend": 0.63,
+          "sales": 0.0,
+          "cpc": 0.63
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 467,
+          "clicks": 1,
+          "spend": 0.46,
+          "sales": 0.0,
+          "cpc": 0.46
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 2.09,
+          "sales": 0.0,
+          "cpc": 2.09
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0136,
+      "cpc": 2.7671
+    },
+    {
       "query": "skin uva scar cream",
-      "impressions": 2577,
+      "impressions": 2573,
       "clicks": 22,
       "spend": 38.3,
       "sales": 130.0,
@@ -5637,7 +5849,7 @@
         },
         {
           "date": "2026-08-30",
-          "impressions": 88,
+          "impressions": 84,
           "clicks": 1,
           "spend": 1.88,
           "sales": 0.0,
@@ -5646,102 +5858,8 @@
       ],
       "acos": 29.46,
       "cvr": 0.0455,
-      "ctr": 0.0085,
+      "ctr": 0.0086,
       "cpc": 1.7409
-    },
-    {
-      "query": "scar treatment",
-      "impressions": 1027,
-      "clicks": 13,
-      "spend": 36.65,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-02",
-          "impressions": 14,
-          "clicks": 1,
-          "spend": 3.15,
-          "sales": 0.0,
-          "cpc": 3.15
-        },
-        {
-          "date": "2026-08-09",
-          "impressions": 75,
-          "clicks": 1,
-          "spend": 3.9,
-          "sales": 0.0,
-          "cpc": 3.9
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 1.45,
-          "sales": 0.0,
-          "cpc": 1.45
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 120,
-          "clicks": 1,
-          "spend": 0.98,
-          "sales": 0.0,
-          "cpc": 0.98
-        },
-        {
-          "date": "2026-08-15",
-          "impressions": 75,
-          "clicks": 2,
-          "spend": 7.8,
-          "sales": 0.0,
-          "cpc": 3.9
-        },
-        {
-          "date": "2026-08-16",
-          "impressions": 57,
-          "clicks": 1,
-          "spend": 2.2,
-          "sales": 0.0,
-          "cpc": 2.2
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 130,
-          "clicks": 2,
-          "spend": 6.18,
-          "sales": 0.0,
-          "cpc": 3.09
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 42,
-          "clicks": 2,
-          "spend": 9.9,
-          "sales": 0.0,
-          "cpc": 4.95
-        },
-        {
-          "date": "2026-08-27",
-          "impressions": 45,
-          "clicks": 1,
-          "spend": 0.63,
-          "sales": 0.0,
-          "cpc": 0.63
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 467,
-          "clicks": 1,
-          "spend": 0.46,
-          "sales": 0.0,
-          "cpc": 0.46
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0127,
-      "cpc": 2.8192
     },
     {
       "query": "b00evao59m",
@@ -5846,123 +5964,13 @@
       "cpc": 2.79
     },
     {
-      "query": "bruise cream",
-      "impressions": 2284,
-      "clicks": 40,
-      "spend": 34.5,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-05",
-          "impressions": 14,
-          "clicks": 1,
-          "spend": 4.78,
-          "sales": 0.0,
-          "cpc": 4.78
-        },
-        {
-          "date": "2026-08-08",
-          "impressions": 457,
-          "clicks": 8,
-          "spend": 4.9,
-          "sales": 0.0,
-          "cpc": 0.6125
-        },
-        {
-          "date": "2026-08-09",
-          "impressions": 747,
-          "clicks": 11,
-          "spend": 7.08,
-          "sales": 0.0,
-          "cpc": 0.6436
-        },
-        {
-          "date": "2026-08-10",
-          "impressions": 413,
-          "clicks": 7,
-          "spend": 6.0,
-          "sales": 0.0,
-          "cpc": 0.8571
-        },
-        {
-          "date": "2026-08-11",
-          "impressions": 64,
-          "clicks": 1,
-          "spend": 0.5,
-          "sales": 0.0,
-          "cpc": 0.5
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 285,
-          "clicks": 4,
-          "spend": 1.48,
-          "sales": 0.0,
-          "cpc": 0.37
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 2.5,
-          "sales": 0.0,
-          "cpc": 2.5
-        },
-        {
-          "date": "2026-08-19",
-          "impressions": 5,
-          "clicks": 1,
-          "spend": 2.0,
-          "sales": 0.0,
-          "cpc": 2.0
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 193,
-          "clicks": 4,
-          "spend": 0.56,
-          "sales": 0.0,
-          "cpc": 0.14
-        },
-        {
-          "date": "2026-08-28",
-          "impressions": 94,
-          "clicks": 1,
-          "spend": 2.2,
-          "sales": 0.0,
-          "cpc": 2.2
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 2.5,
-          "sales": 0.0,
-          "cpc": 2.5
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0175,
-      "cpc": 0.8625
-    },
-    {
       "query": "b0b23bb6cb",
-      "impressions": 4582,
-      "clicks": 32,
-      "spend": 31.39,
-      "sales": 100.0,
-      "purchases": 2,
+      "impressions": 4566,
+      "clicks": 36,
+      "spend": 36.03,
+      "sales": 40.0,
+      "purchases": 1,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 21,
-          "clicks": 1,
-          "spend": 1.28,
-          "sales": 60.0,
-          "cpc": 1.28
-        },
         {
           "date": "2026-08-02",
           "impressions": 60,
@@ -6082,12 +6090,122 @@
           "spend": 0.32,
           "sales": 0.0,
           "cpc": 0.32
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 5,
+          "clicks": 5,
+          "spend": 5.92,
+          "sales": 0.0,
+          "cpc": 1.184
         }
       ],
-      "acos": 31.39,
-      "cvr": 0.0625,
-      "ctr": 0.007,
-      "cpc": 0.9809
+      "acos": 90.08,
+      "cvr": 0.0278,
+      "ctr": 0.0079,
+      "cpc": 1.0008
+    },
+    {
+      "query": "bruise cream",
+      "impressions": 2284,
+      "clicks": 40,
+      "spend": 34.5,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-05",
+          "impressions": 14,
+          "clicks": 1,
+          "spend": 4.78,
+          "sales": 0.0,
+          "cpc": 4.78
+        },
+        {
+          "date": "2026-08-08",
+          "impressions": 457,
+          "clicks": 8,
+          "spend": 4.9,
+          "sales": 0.0,
+          "cpc": 0.6125
+        },
+        {
+          "date": "2026-08-09",
+          "impressions": 747,
+          "clicks": 11,
+          "spend": 7.08,
+          "sales": 0.0,
+          "cpc": 0.6436
+        },
+        {
+          "date": "2026-08-10",
+          "impressions": 413,
+          "clicks": 7,
+          "spend": 6.0,
+          "sales": 0.0,
+          "cpc": 0.8571
+        },
+        {
+          "date": "2026-08-11",
+          "impressions": 64,
+          "clicks": 1,
+          "spend": 0.5,
+          "sales": 0.0,
+          "cpc": 0.5
+        },
+        {
+          "date": "2026-08-12",
+          "impressions": 285,
+          "clicks": 4,
+          "spend": 1.48,
+          "sales": 0.0,
+          "cpc": 0.37
+        },
+        {
+          "date": "2026-08-14",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 2.5,
+          "sales": 0.0,
+          "cpc": 2.5
+        },
+        {
+          "date": "2026-08-19",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 2.0,
+          "sales": 0.0,
+          "cpc": 2.0
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 193,
+          "clicks": 4,
+          "spend": 0.56,
+          "sales": 0.0,
+          "cpc": 0.14
+        },
+        {
+          "date": "2026-08-28",
+          "impressions": 94,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 2.5,
+          "sales": 0.0,
+          "cpc": 2.5
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0175,
+      "cpc": 0.8625
     },
     {
       "query": "scar cream for face",
@@ -6142,92 +6260,6 @@
       "cvr": 0.1667,
       "ctr": 0.0909,
       "cpc": 4.485
-    },
-    {
-      "query": "b09fqjmlpz",
-      "impressions": 393,
-      "clicks": 11,
-      "spend": 24.99,
-      "sales": 140.0,
-      "purchases": 2,
-      "daily": [
-        {
-          "date": "2026-08-02",
-          "impressions": 20,
-          "clicks": 1,
-          "spend": 2.3,
-          "sales": 0.0,
-          "cpc": 2.3
-        },
-        {
-          "date": "2026-08-04",
-          "impressions": 124,
-          "clicks": 1,
-          "spend": 0.9,
-          "sales": 80.0,
-          "cpc": 0.9
-        },
-        {
-          "date": "2026-08-05",
-          "impressions": 32,
-          "clicks": 2,
-          "spend": 5.04,
-          "sales": 0.0,
-          "cpc": 2.52
-        },
-        {
-          "date": "2026-08-06",
-          "impressions": 7,
-          "clicks": 1,
-          "spend": 4.2,
-          "sales": 60.0,
-          "cpc": 4.2
-        },
-        {
-          "date": "2026-08-07",
-          "impressions": 76,
-          "clicks": 2,
-          "spend": 5.57,
-          "sales": 0.0,
-          "cpc": 2.785
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 28,
-          "clicks": 1,
-          "spend": 3.07,
-          "sales": 0.0,
-          "cpc": 3.07
-        },
-        {
-          "date": "2026-08-16",
-          "impressions": 12,
-          "clicks": 1,
-          "spend": 1.5,
-          "sales": 0.0,
-          "cpc": 1.5
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 10,
-          "clicks": 1,
-          "spend": 0.49,
-          "sales": 0.0,
-          "cpc": 0.49
-        },
-        {
-          "date": "2026-08-31",
-          "impressions": 84,
-          "clicks": 1,
-          "spend": 1.92,
-          "sales": 0.0,
-          "cpc": 1.92
-        }
-      ],
-      "acos": 17.85,
-      "cvr": 0.1818,
-      "ctr": 0.028,
-      "cpc": 2.2718
     },
     {
       "query": "skin nuva scar cream",
@@ -6470,6 +6502,60 @@
       "cvr": 0.125,
       "ctr": 0.0166,
       "cpc": 2.9863
+    },
+    {
+      "query": "silagen scar gel for surgical scars",
+      "impressions": 503,
+      "clicks": 6,
+      "spend": 22.64,
+      "sales": 185.0,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-08-16",
+          "impressions": 43,
+          "clicks": 2,
+          "spend": 8.5,
+          "sales": 80.0,
+          "cpc": 4.25
+        },
+        {
+          "date": "2026-08-19",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 2.1,
+          "sales": 0.0,
+          "cpc": 2.1
+        },
+        {
+          "date": "2026-08-28",
+          "impressions": 263,
+          "clicks": 1,
+          "spend": 4.74,
+          "sales": 0.0,
+          "cpc": 4.74
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 114,
+          "clicks": 1,
+          "spend": 3.65,
+          "sales": 0.0,
+          "cpc": 3.65
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 76,
+          "clicks": 1,
+          "spend": 3.65,
+          "sales": 105.0,
+          "cpc": 3.65
+        }
+      ],
+      "acos": 12.24,
+      "cvr": 0.3333,
+      "ctr": 0.0119,
+      "cpc": 3.7733
     },
     {
       "query": "anti bruise pills",
@@ -6759,20 +6845,12 @@
     },
     {
       "query": "b0b7tw96t6",
-      "impressions": 160,
+      "impressions": 176,
       "clicks": 6,
       "spend": 19.96,
-      "sales": 40.0,
-      "purchases": 1,
+      "sales": 0.0,
+      "purchases": 0,
       "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 16,
-          "clicks": 1,
-          "spend": 3.15,
-          "sales": 40.0,
-          "cpc": 3.15
-        },
         {
           "date": "2026-08-03",
           "impressions": 35,
@@ -6812,42 +6890,20 @@
           "spend": 2.86,
           "sales": 0.0,
           "cpc": 2.86
-        }
-      ],
-      "acos": 49.9,
-      "cvr": 0.1667,
-      "ctr": 0.0375,
-      "cpc": 3.3267
-    },
-    {
-      "query": "bruise pill",
-      "impressions": 22,
-      "clicks": 2,
-      "spend": 19.04,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 14,
-          "clicks": 1,
-          "spend": 10.67,
-          "sales": 0.0,
-          "cpc": 10.67
         },
         {
-          "date": "2026-08-11",
-          "impressions": 8,
+          "date": "2026-09-01",
+          "impressions": 32,
           "clicks": 1,
-          "spend": 8.37,
+          "spend": 3.15,
           "sales": 0.0,
-          "cpc": 8.37
+          "cpc": 3.15
         }
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0909,
-      "cpc": 9.52
+      "ctr": 0.0341,
+      "cpc": 3.3267
     },
     {
       "query": "advanced silicone scar gel for face & body",
@@ -6902,52 +6958,6 @@
       "cvr": 0.0,
       "ctr": 0.1471,
       "cpc": 3.802
-    },
-    {
-      "query": "silagen scar gel for surgical scars",
-      "impressions": 427,
-      "clicks": 5,
-      "spend": 18.99,
-      "sales": 80.0,
-      "purchases": 1,
-      "daily": [
-        {
-          "date": "2026-08-16",
-          "impressions": 43,
-          "clicks": 2,
-          "spend": 8.5,
-          "sales": 80.0,
-          "cpc": 4.25
-        },
-        {
-          "date": "2026-08-19",
-          "impressions": 7,
-          "clicks": 1,
-          "spend": 2.1,
-          "sales": 0.0,
-          "cpc": 2.1
-        },
-        {
-          "date": "2026-08-28",
-          "impressions": 263,
-          "clicks": 1,
-          "spend": 4.74,
-          "sales": 0.0,
-          "cpc": 4.74
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 114,
-          "clicks": 1,
-          "spend": 3.65,
-          "sales": 0.0,
-          "cpc": 3.65
-        }
-      ],
-      "acos": 23.74,
-      "cvr": 0.2,
-      "ctr": 0.0117,
-      "cpc": 3.798
     },
     {
       "query": "vitamin k cream for bruising",
@@ -7212,58 +7222,58 @@
       "cpc": 2.7733
     },
     {
-      "query": "hyperpigmentation treatment",
-      "impressions": 155,
+      "query": "scar",
+      "impressions": 101,
       "clicks": 6,
-      "spend": 16.56,
+      "spend": 16.38,
       "sales": 0.0,
       "purchases": 0,
       "daily": [
         {
-          "date": "2026-08-01",
-          "impressions": 40,
+          "date": "2026-08-11",
+          "impressions": 44,
           "clicks": 1,
-          "spend": 3.31,
+          "spend": 3.45,
           "sales": 0.0,
-          "cpc": 3.31
+          "cpc": 3.45
         },
         {
-          "date": "2026-08-03",
-          "impressions": 48,
+          "date": "2026-08-14",
+          "impressions": 2,
           "clicks": 1,
-          "spend": 2.32,
+          "spend": 2.2,
           "sales": 0.0,
-          "cpc": 2.32
+          "cpc": 2.2
         },
         {
-          "date": "2026-08-06",
-          "impressions": 19,
-          "clicks": 2,
-          "spend": 4.55,
+          "date": "2026-08-18",
+          "impressions": 20,
+          "clicks": 1,
+          "spend": 2.47,
           "sales": 0.0,
-          "cpc": 2.275
+          "cpc": 2.47
         },
         {
           "date": "2026-08-20",
-          "impressions": 19,
-          "clicks": 1,
-          "spend": 3.38,
+          "impressions": 32,
+          "clicks": 2,
+          "spend": 6.06,
           "sales": 0.0,
-          "cpc": 3.38
+          "cpc": 3.03
         },
         {
-          "date": "2026-08-31",
-          "impressions": 29,
+          "date": "2026-09-01",
+          "impressions": 3,
           "clicks": 1,
-          "spend": 3.0,
+          "spend": 2.2,
           "sales": 0.0,
-          "cpc": 3.0
+          "cpc": 2.2
         }
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0387,
-      "cpc": 2.76
+      "ctr": 0.0594,
+      "cpc": 2.73
     },
     {
       "query": "arnica",
@@ -7654,60 +7664,6 @@
       "cpc": 1.8738
     },
     {
-      "query": "b0dxvvvvpr",
-      "impressions": 66,
-      "clicks": 5,
-      "spend": 14.98,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 7,
-          "clicks": 1,
-          "spend": 1.5,
-          "sales": 0.0,
-          "cpc": 1.5
-        },
-        {
-          "date": "2026-08-08",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 1.2,
-          "sales": 0.0,
-          "cpc": 1.2
-        },
-        {
-          "date": "2026-08-09",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 5.4,
-          "sales": 0.0,
-          "cpc": 5.4
-        },
-        {
-          "date": "2026-08-15",
-          "impressions": 10,
-          "clicks": 1,
-          "spend": 1.5,
-          "sales": 0.0,
-          "cpc": 1.5
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 37,
-          "clicks": 1,
-          "spend": 5.38,
-          "sales": 0.0,
-          "cpc": 5.38
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0758,
-      "cpc": 2.996
-    },
-    {
       "query": "whitening cream for body",
       "impressions": 97,
       "clicks": 7,
@@ -7768,52 +7724,6 @@
       "cvr": 0.0,
       "ctr": 0.0722,
       "cpc": 2.1314
-    },
-    {
-      "query": "scar",
-      "impressions": 98,
-      "clicks": 5,
-      "spend": 14.18,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-11",
-          "impressions": 44,
-          "clicks": 1,
-          "spend": 3.45,
-          "sales": 0.0,
-          "cpc": 3.45
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 2.2,
-          "sales": 0.0,
-          "cpc": 2.2
-        },
-        {
-          "date": "2026-08-18",
-          "impressions": 20,
-          "clicks": 1,
-          "spend": 2.47,
-          "sales": 0.0,
-          "cpc": 2.47
-        },
-        {
-          "date": "2026-08-20",
-          "impressions": 32,
-          "clicks": 2,
-          "spend": 6.06,
-          "sales": 0.0,
-          "cpc": 3.03
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.051,
-      "cpc": 2.836
     },
     {
       "query": "sicatriquiur scar cream",
@@ -7908,8 +7818,54 @@
       "cpc": 2.2733
     },
     {
+      "query": "b0dxvvvvpr",
+      "impressions": 59,
+      "clicks": 4,
+      "spend": 13.48,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-08",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 1.2,
+          "sales": 0.0,
+          "cpc": 1.2
+        },
+        {
+          "date": "2026-08-09",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 5.4,
+          "sales": 0.0,
+          "cpc": 5.4
+        },
+        {
+          "date": "2026-08-15",
+          "impressions": 10,
+          "clicks": 1,
+          "spend": 1.5,
+          "sales": 0.0,
+          "cpc": 1.5
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 37,
+          "clicks": 1,
+          "spend": 5.38,
+          "sales": 0.0,
+          "cpc": 5.38
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0678,
+      "cpc": 3.37
+    },
+    {
       "query": "b08ss4t6zt",
-      "impressions": 300,
+      "impressions": 297,
       "clicks": 8,
       "spend": 13.45,
       "sales": 260.0,
@@ -7949,7 +7905,7 @@
         },
         {
           "date": "2026-08-22",
-          "impressions": 56,
+          "impressions": 53,
           "clicks": 1,
           "spend": 1.67,
           "sales": 0.0,
@@ -7966,8 +7922,54 @@
       ],
       "acos": 5.17,
       "cvr": 0.125,
-      "ctr": 0.0267,
+      "ctr": 0.0269,
       "cpc": 1.6812
+    },
+    {
+      "query": "hyperpigmentation treatment",
+      "impressions": 115,
+      "clicks": 5,
+      "spend": 13.25,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-03",
+          "impressions": 48,
+          "clicks": 1,
+          "spend": 2.32,
+          "sales": 0.0,
+          "cpc": 2.32
+        },
+        {
+          "date": "2026-08-06",
+          "impressions": 19,
+          "clicks": 2,
+          "spend": 4.55,
+          "sales": 0.0,
+          "cpc": 2.275
+        },
+        {
+          "date": "2026-08-20",
+          "impressions": 19,
+          "clicks": 1,
+          "spend": 3.38,
+          "sales": 0.0,
+          "cpc": 3.38
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 29,
+          "clicks": 1,
+          "spend": 3.0,
+          "sales": 0.0,
+          "cpc": 3.0
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0435,
+      "cpc": 2.65
     },
     {
       "query": "arnica cream",
@@ -8117,7 +8119,7 @@
     },
     {
       "query": "b0d1w1wsfh",
-      "impressions": 82,
+      "impressions": 80,
       "clicks": 4,
       "spend": 12.85,
       "sales": 0.0,
@@ -8141,7 +8143,7 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 3,
+          "impressions": 1,
           "clicks": 1,
           "spend": 1.5,
           "sales": 0.0,
@@ -8150,7 +8152,7 @@
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0488,
+      "ctr": 0.05,
       "cpc": 3.2125
     },
     {
@@ -8361,7 +8363,7 @@
     },
     {
       "query": "bromelain",
-      "impressions": 73,
+      "impressions": 72,
       "clicks": 5,
       "spend": 11.91,
       "sales": 40.0,
@@ -8393,7 +8395,7 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 11,
+          "impressions": 10,
           "clicks": 1,
           "spend": 2.5,
           "sales": 40.0,
@@ -8402,7 +8404,7 @@
       ],
       "acos": 29.78,
       "cvr": 0.2,
-      "ctr": 0.0685,
+      "ctr": 0.0694,
       "cpc": 2.382
     },
     {
@@ -8732,6 +8734,60 @@
       "cpc": 2.66
     },
     {
+      "query": "silicone scar sheets",
+      "impressions": 325,
+      "clicks": 5,
+      "spend": 10.5,
+      "sales": 130.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-08-09",
+          "impressions": 51,
+          "clicks": 1,
+          "spend": 2.0,
+          "sales": 130.0,
+          "cpc": 2.0
+        },
+        {
+          "date": "2026-08-27",
+          "impressions": 71,
+          "clicks": 1,
+          "spend": 2.1,
+          "sales": 0.0,
+          "cpc": 2.1
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 53,
+          "clicks": 1,
+          "spend": 2.1,
+          "sales": 0.0,
+          "cpc": 2.1
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 148,
+          "clicks": 1,
+          "spend": 2.1,
+          "sales": 0.0,
+          "cpc": 2.1
+        }
+      ],
+      "acos": 8.08,
+      "cvr": 0.2,
+      "ctr": 0.0154,
+      "cpc": 2.1
+    },
+    {
       "query": "skinuva brite scar cream",
       "impressions": 10,
       "clicks": 5,
@@ -8925,7 +8981,7 @@
     },
     {
       "query": "scar treatment for surgical scars",
-      "impressions": 267,
+      "impressions": 254,
       "clicks": 2,
       "spend": 9.44,
       "sales": 0.0,
@@ -8941,7 +8997,7 @@
         },
         {
           "date": "2026-08-31",
-          "impressions": 263,
+          "impressions": 250,
           "clicks": 1,
           "spend": 3.2,
           "sales": 0.0,
@@ -8950,7 +9006,7 @@
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0075,
+      "ctr": 0.0079,
       "cpc": 4.72
     },
     {
@@ -9064,52 +9120,6 @@
       "cvr": 1.0,
       "ctr": 0.5,
       "cpc": 9.0
-    },
-    {
-      "query": "b078l3rqdm",
-      "impressions": 212,
-      "clicks": 4,
-      "spend": 8.96,
-      "sales": 40.0,
-      "purchases": 1,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 47,
-          "clicks": 1,
-          "spend": 2.1,
-          "sales": 0.0,
-          "cpc": 2.1
-        },
-        {
-          "date": "2026-08-03",
-          "impressions": 57,
-          "clicks": 1,
-          "spend": 2.01,
-          "sales": 40.0,
-          "cpc": 2.01
-        },
-        {
-          "date": "2026-08-11",
-          "impressions": 24,
-          "clicks": 1,
-          "spend": 1.82,
-          "sales": 0.0,
-          "cpc": 1.82
-        },
-        {
-          "date": "2026-08-28",
-          "impressions": 84,
-          "clicks": 1,
-          "spend": 3.03,
-          "sales": 0.0,
-          "cpc": 3.03
-        }
-      ],
-      "acos": 22.4,
-      "cvr": 0.25,
-      "ctr": 0.0189,
-      "cpc": 2.24
     },
     {
       "query": "scar gel silicone medical grade",
@@ -9270,44 +9280,6 @@
       "cpc": 4.26
     },
     {
-      "query": "cream for white spots",
-      "impressions": 15,
-      "clicks": 3,
-      "spend": 8.51,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 8,
-          "clicks": 1,
-          "spend": 2.59,
-          "sales": 0.0,
-          "cpc": 2.59
-        },
-        {
-          "date": "2026-08-12",
-          "impressions": 1,
-          "clicks": 1,
-          "spend": 3.38,
-          "sales": 0.0,
-          "cpc": 3.38
-        },
-        {
-          "date": "2026-08-14",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 2.54,
-          "sales": 0.0,
-          "cpc": 2.54
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.2,
-      "cpc": 2.8367
-    },
-    {
       "query": "arnica and bromelain",
       "impressions": 713,
       "clicks": 6,
@@ -9408,80 +9380,26 @@
       "cpc": 2.8267
     },
     {
-      "query": "silicone scar sheets",
-      "impressions": 177,
-      "clicks": 4,
-      "spend": 8.4,
-      "sales": 130.0,
-      "purchases": 1,
-      "daily": [
-        {
-          "date": "2026-08-09",
-          "impressions": 51,
-          "clicks": 1,
-          "spend": 2.0,
-          "sales": 130.0,
-          "cpc": 2.0
-        },
-        {
-          "date": "2026-08-27",
-          "impressions": 71,
-          "clicks": 1,
-          "spend": 2.1,
-          "sales": 0.0,
-          "cpc": 2.1
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 53,
-          "clicks": 1,
-          "spend": 2.1,
-          "sales": 0.0,
-          "cpc": 2.1
-        },
-        {
-          "date": "2026-08-31",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 2.2,
-          "sales": 0.0,
-          "cpc": 2.2
-        }
-      ],
-      "acos": 6.46,
-      "cvr": 0.25,
-      "ctr": 0.0226,
-      "cpc": 2.1
-    },
-    {
-      "query": "anti scar cream",
-      "impressions": 11,
-      "clicks": 2,
-      "spend": 8.36,
+      "query": "bruise pill",
+      "impressions": 8,
+      "clicks": 1,
+      "spend": 8.37,
       "sales": 0.0,
       "purchases": 0,
       "daily": [
         {
-          "date": "2026-08-01",
-          "impressions": 9,
-          "clicks": 1,
-          "spend": 5.94,
-          "sales": 0.0,
-          "cpc": 5.94
-        },
-        {
           "date": "2026-08-11",
-          "impressions": 2,
+          "impressions": 8,
           "clicks": 1,
-          "spend": 2.42,
+          "spend": 8.37,
           "sales": 0.0,
-          "cpc": 2.42
+          "cpc": 8.37
         }
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.1818,
-      "cpc": 4.18
+      "ctr": 0.125,
+      "cpc": 8.37
     },
     {
       "query": "hyperpigmentation cream",
@@ -9512,6 +9430,44 @@
       "cvr": 0.0,
       "ctr": 0.0556,
       "cpc": 2.7833
+    },
+    {
+      "query": "cream to remove blemishes from the face",
+      "impressions": 11,
+      "clicks": 3,
+      "spend": 8.3,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-16",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 1.54,
+          "sales": 0.0,
+          "cpc": 1.54
+        },
+        {
+          "date": "2026-08-22",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 3.38,
+          "sales": 0.0,
+          "cpc": 3.38
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 3.38,
+          "sales": 0.0,
+          "cpc": 3.38
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.2727,
+      "cpc": 2.7667
     },
     {
       "query": "bruising pills",
@@ -9916,36 +9872,6 @@
       "cpc": 3.475
     },
     {
-      "query": "medical grade scar cream surgery",
-      "impressions": 10,
-      "clicks": 2,
-      "spend": 6.95,
-      "sales": 80.0,
-      "purchases": 1,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 8,
-          "clicks": 1,
-          "spend": 3.79,
-          "sales": 0.0,
-          "cpc": 3.79
-        },
-        {
-          "date": "2026-08-13",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 3.16,
-          "sales": 80.0,
-          "cpc": 3.16
-        }
-      ],
-      "acos": 8.69,
-      "cvr": 0.5,
-      "ctr": 0.2,
-      "cpc": 3.475
-    },
-    {
       "query": "si joint pain relief",
       "impressions": 105,
       "clicks": 2,
@@ -9996,6 +9922,44 @@
       "cvr": 0.0,
       "ctr": 0.5,
       "cpc": 6.9
+    },
+    {
+      "query": "b078l3rqdm",
+      "impressions": 165,
+      "clicks": 3,
+      "spend": 6.86,
+      "sales": 40.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-08-03",
+          "impressions": 57,
+          "clicks": 1,
+          "spend": 2.01,
+          "sales": 40.0,
+          "cpc": 2.01
+        },
+        {
+          "date": "2026-08-11",
+          "impressions": 24,
+          "clicks": 1,
+          "spend": 1.82,
+          "sales": 0.0,
+          "cpc": 1.82
+        },
+        {
+          "date": "2026-08-28",
+          "impressions": 84,
+          "clicks": 1,
+          "spend": 3.03,
+          "sales": 0.0,
+          "cpc": 3.03
+        }
+      ],
+      "acos": 17.15,
+      "cvr": 0.3333,
+      "ctr": 0.0182,
+      "cpc": 2.2867
     },
     {
       "query": "arnica forte",
@@ -10130,28 +10094,6 @@
       "cvr": 0.0,
       "ctr": 1.0,
       "cpc": 3.345
-    },
-    {
-      "query": "melanex 509 cream for dark spots",
-      "impressions": 40,
-      "clicks": 2,
-      "spend": 6.62,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 40,
-          "clicks": 2,
-          "spend": 6.62,
-          "sales": 0.0,
-          "cpc": 3.31
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.05,
-      "cpc": 3.31
     },
     {
       "query": "sun spot cream",
@@ -10416,60 +10358,6 @@
       "cpc": 6.39
     },
     {
-      "query": "skinova scar cream",
-      "impressions": 738,
-      "clicks": 9,
-      "spend": 6.32,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 18,
-          "clicks": 1,
-          "spend": 0.87,
-          "sales": 0.0,
-          "cpc": 0.87
-        },
-        {
-          "date": "2026-08-03",
-          "impressions": 253,
-          "clicks": 2,
-          "spend": 2.5,
-          "sales": 0.0,
-          "cpc": 1.25
-        },
-        {
-          "date": "2026-08-16",
-          "impressions": 348,
-          "clicks": 3,
-          "spend": 0.52,
-          "sales": 0.0,
-          "cpc": 0.1733
-        },
-        {
-          "date": "2026-08-17",
-          "impressions": 114,
-          "clicks": 2,
-          "spend": 1.95,
-          "sales": 0.0,
-          "cpc": 0.975
-        },
-        {
-          "date": "2026-08-29",
-          "impressions": 5,
-          "clicks": 1,
-          "spend": 0.48,
-          "sales": 0.0,
-          "cpc": 0.48
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0122,
-      "cpc": 0.7022
-    },
-    {
       "query": "skin bruise pills",
       "impressions": 3,
       "clicks": 1,
@@ -10654,28 +10542,6 @@
       "cpc": 6.21
     },
     {
-      "query": "vegan silicone scar gel",
-      "impressions": 1,
-      "clicks": 1,
-      "spend": 6.21,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-13",
-          "impressions": 1,
-          "clicks": 1,
-          "spend": 6.21,
-          "sales": 0.0,
-          "cpc": 6.21
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 1.0,
-      "cpc": 6.21
-    },
-    {
       "query": "silicone scar gel for face",
       "impressions": 7,
       "clicks": 1,
@@ -10695,6 +10561,28 @@
       "acos": null,
       "cvr": 0.0,
       "ctr": 0.1429,
+      "cpc": 6.21
+    },
+    {
+      "query": "vegan silicone scar gel",
+      "impressions": 1,
+      "clicks": 1,
+      "spend": 6.21,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-13",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 6.21,
+          "sales": 0.0,
+          "cpc": 6.21
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 1.0,
       "cpc": 6.21
     },
     {
@@ -10780,6 +10668,44 @@
       "cpc": 3.03
     },
     {
+      "query": "skin uva scar",
+      "impressions": 6,
+      "clicks": 3,
+      "spend": 6.06,
+      "sales": 90.0,
+      "purchases": 1,
+      "daily": [
+        {
+          "date": "2026-08-04",
+          "impressions": 1,
+          "clicks": 1,
+          "spend": 1.13,
+          "sales": 0.0,
+          "cpc": 1.13
+        },
+        {
+          "date": "2026-08-06",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.03,
+          "sales": 90.0,
+          "cpc": 2.03
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 2.9,
+          "sales": 0.0,
+          "cpc": 2.9
+        }
+      ],
+      "acos": 6.73,
+      "cvr": 0.3333,
+      "ctr": 0.5,
+      "cpc": 2.02
+    },
+    {
       "query": "100% silicone scar gel",
       "impressions": 7,
       "clicks": 1,
@@ -10799,28 +10725,6 @@
       "acos": null,
       "cvr": 0.0,
       "ctr": 0.1429,
-      "cpc": 6.0
-    },
-    {
-      "query": "awd medical silicone scar tape",
-      "impressions": 1,
-      "clicks": 1,
-      "spend": 6.0,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 1,
-          "clicks": 1,
-          "spend": 6.0,
-          "sales": 0.0,
-          "cpc": 6.0
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 1.0,
       "cpc": 6.0
     },
     {
@@ -10964,28 +10868,6 @@
       "cpc": 5.94
     },
     {
-      "query": "overnight scar cream intensive",
-      "impressions": 2,
-      "clicks": 1,
-      "spend": 5.94,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 5.94,
-          "sales": 0.0,
-          "cpc": 5.94
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.5,
-      "cpc": 5.94
-    },
-    {
       "query": "scar cream and oil",
       "impressions": 3,
       "clicks": 1,
@@ -11005,50 +10887,6 @@
       "acos": null,
       "cvr": 0.0,
       "ctr": 0.3333,
-      "cpc": 5.94
-    },
-    {
-      "query": "scar cream burns",
-      "impressions": 3,
-      "clicks": 1,
-      "spend": 5.94,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 3,
-          "clicks": 1,
-          "spend": 5.94,
-          "sales": 0.0,
-          "cpc": 5.94
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.3333,
-      "cpc": 5.94
-    },
-    {
-      "query": "scar cream mouth",
-      "impressions": 2,
-      "clicks": 1,
-      "spend": 5.94,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 5.94,
-          "sales": 0.0,
-          "cpc": 5.94
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.5,
       "cpc": 5.94
     },
     {
@@ -11098,34 +10936,34 @@
       "cpc": 0.592
     },
     {
-      "query": "cream to remove dark spots",
-      "impressions": 18,
+      "query": "cream for white spots",
+      "impressions": 7,
       "clicks": 2,
-      "spend": 5.91,
+      "spend": 5.92,
       "sales": 0.0,
       "purchases": 0,
       "daily": [
         {
-          "date": "2026-08-01",
-          "impressions": 15,
+          "date": "2026-08-12",
+          "impressions": 1,
           "clicks": 1,
-          "spend": 2.3,
+          "spend": 3.38,
           "sales": 0.0,
-          "cpc": 2.3
+          "cpc": 3.38
         },
         {
-          "date": "2026-08-29",
-          "impressions": 3,
+          "date": "2026-08-14",
+          "impressions": 6,
           "clicks": 1,
-          "spend": 3.61,
+          "spend": 2.54,
           "sales": 0.0,
-          "cpc": 3.61
+          "cpc": 2.54
         }
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.1111,
-      "cpc": 2.955
+      "ctr": 0.2857,
+      "cpc": 2.96
     },
     {
       "query": "bruise vitamins",
@@ -11202,34 +11040,50 @@
       "cpc": 2.76
     },
     {
-      "query": "b0g8ms5gr2",
-      "impressions": 421,
-      "clicks": 3,
-      "spend": 5.43,
+      "query": "skinova scar cream",
+      "impressions": 720,
+      "clicks": 8,
+      "spend": 5.45,
       "sales": 0.0,
       "purchases": 0,
       "daily": [
         {
-          "date": "2026-08-01",
-          "impressions": 157,
-          "clicks": 1,
-          "spend": 1.45,
+          "date": "2026-08-03",
+          "impressions": 253,
+          "clicks": 2,
+          "spend": 2.5,
           "sales": 0.0,
-          "cpc": 1.45
+          "cpc": 1.25
         },
         {
-          "date": "2026-08-12",
-          "impressions": 264,
-          "clicks": 2,
-          "spend": 3.99,
+          "date": "2026-08-16",
+          "impressions": 348,
+          "clicks": 3,
+          "spend": 0.52,
           "sales": 0.0,
-          "cpc": 1.995
+          "cpc": 0.1733
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 114,
+          "clicks": 2,
+          "spend": 1.95,
+          "sales": 0.0,
+          "cpc": 0.975
+        },
+        {
+          "date": "2026-08-29",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 0.48,
+          "sales": 0.0,
+          "cpc": 0.48
         }
       ],
       "acos": null,
       "cvr": 0.0,
-      "ctr": 0.0071,
-      "cpc": 1.81
+      "ctr": 0.0111,
+      "cpc": 0.6813
     },
     {
       "query": "scar cream boob reduction",
@@ -11814,36 +11668,6 @@
       "cpc": 4.95
     },
     {
-      "query": "cream to remove blemishes from the face",
-      "impressions": 8,
-      "clicks": 2,
-      "spend": 4.92,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-16",
-          "impressions": 6,
-          "clicks": 1,
-          "spend": 1.54,
-          "sales": 0.0,
-          "cpc": 1.54
-        },
-        {
-          "date": "2026-08-22",
-          "impressions": 2,
-          "clicks": 1,
-          "spend": 3.38,
-          "sales": 0.0,
-          "cpc": 3.38
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.25,
-      "cpc": 2.46
-    },
-    {
       "query": "knee surgery recent scar cream",
       "impressions": 3,
       "clicks": 1,
@@ -11894,28 +11718,6 @@
       "cvr": 0.0,
       "ctr": 0.25,
       "cpc": 2.455
-    },
-    {
-      "query": "scar cream mederma",
-      "impressions": 19,
-      "clicks": 1,
-      "spend": 4.91,
-      "sales": 0.0,
-      "purchases": 0,
-      "daily": [
-        {
-          "date": "2026-08-01",
-          "impressions": 19,
-          "clicks": 1,
-          "spend": 4.91,
-          "sales": 0.0,
-          "cpc": 4.91
-        }
-      ],
-      "acos": null,
-      "cvr": 0.0,
-      "ctr": 0.0526,
-      "cpc": 4.91
     },
     {
       "query": "kids scar cream",
@@ -12036,304 +11838,550 @@
       "cvr": 0.0,
       "ctr": 0.05,
       "cpc": 1.62
+    },
+    {
+      "query": "arnica skinuva bruise",
+      "impressions": 8,
+      "clicks": 2,
+      "spend": 4.85,
+      "sales": 80.0,
+      "purchases": 2,
+      "daily": [
+        {
+          "date": "2026-08-08",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 1.34,
+          "sales": 40.0,
+          "cpc": 1.34
+        },
+        {
+          "date": "2026-08-30",
+          "impressions": 3,
+          "clicks": 1,
+          "spend": 3.51,
+          "sales": 40.0,
+          "cpc": 3.51
+        }
+      ],
+      "acos": 6.06,
+      "cvr": 1.0,
+      "ctr": 0.25,
+      "cpc": 2.425
+    },
+    {
+      "query": "skinuva silicone scar gel",
+      "impressions": 12,
+      "clicks": 3,
+      "spend": 4.85,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-24",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 0.78,
+          "sales": 0.0,
+          "cpc": 0.78
+        },
+        {
+          "date": "2026-08-30",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.37,
+          "sales": 0.0,
+          "cpc": 2.37
+        },
+        {
+          "date": "2026-09-01",
+          "impressions": 5,
+          "clicks": 1,
+          "spend": 1.7,
+          "sales": 0.0,
+          "cpc": 1.7
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.25,
+      "cpc": 1.6167
+    },
+    {
+      "query": "cream for severe strias",
+      "impressions": 10,
+      "clicks": 2,
+      "spend": 4.84,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-15",
+          "impressions": 4,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        },
+        {
+          "date": "2026-08-17",
+          "impressions": 6,
+          "clicks": 1,
+          "spend": 2.64,
+          "sales": 0.0,
+          "cpc": 2.64
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.2,
+      "cpc": 2.42
+    },
+    {
+      "query": "crema para cicatrizar",
+      "impressions": 4,
+      "clicks": 2,
+      "spend": 4.84,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-07",
+          "impressions": 4,
+          "clicks": 2,
+          "spend": 4.84,
+          "sales": 0.0,
+          "cpc": 2.42
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.42
+    },
+    {
+      "query": "urea scar cream",
+      "impressions": 2,
+      "clicks": 1,
+      "spend": 4.83,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-23",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 4.83,
+          "sales": 0.0,
+          "cpc": 4.83
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 4.83
+    },
+    {
+      "query": "biocorneum advanced scar treatment",
+      "impressions": 28,
+      "clicks": 2,
+      "spend": 4.8,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-05",
+          "impressions": 18,
+          "clicks": 1,
+          "spend": 2.6,
+          "sales": 0.0,
+          "cpc": 2.6
+        },
+        {
+          "date": "2026-08-19",
+          "impressions": 10,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.0714,
+      "cpc": 2.4
+    },
+    {
+      "query": "weleda arnica",
+      "impressions": 4,
+      "clicks": 2,
+      "spend": 4.8,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-21",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.2,
+          "sales": 0.0,
+          "cpc": 2.2
+        },
+        {
+          "date": "2026-08-31",
+          "impressions": 2,
+          "clicks": 1,
+          "spend": 2.6,
+          "sales": 0.0,
+          "cpc": 2.6
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.5,
+      "cpc": 2.4
+    },
+    {
+      "query": "cjmjim scar gel made with silicone",
+      "impressions": 4,
+      "clicks": 1,
+      "spend": 4.79,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-07",
+          "impressions": 4,
+          "clicks": 1,
+          "spend": 4.79,
+          "sales": 0.0,
+          "cpc": 4.79
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.25,
+      "cpc": 4.79
+    },
+    {
+      "query": "murasaki silicone scar gel",
+      "impressions": 7,
+      "clicks": 1,
+      "spend": 4.74,
+      "sales": 0.0,
+      "purchases": 0,
+      "daily": [
+        {
+          "date": "2026-08-04",
+          "impressions": 7,
+          "clicks": 1,
+          "spend": 4.74,
+          "sales": 0.0,
+          "cpc": 4.74
+        }
+      ],
+      "acos": null,
+      "cvr": 0.0,
+      "ctr": 0.1429,
+      "cpc": 4.74
     }
   ],
   "asins": [
     {
       "asin": "B07RCYZWNH",
       "sku": "SVA0002",
-      "impressions": 135229,
-      "clicks": 427,
-      "spend": 1521.86,
-      "sales": 3516.9,
-      "purchases": 34,
-      "acos": 43.27,
+      "impressions": 135060,
+      "clicks": 429,
+      "spend": 1494.49,
+      "sales": 3576.9,
+      "purchases": 35,
+      "acos": 41.78,
       "ctr": 0.0032,
-      "cpc": 3.5641,
-      "cvr": 0.0796,
+      "cpc": 3.4837,
+      "cvr": 0.0816,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (1.7 oz)"
     },
     {
       "asin": "B0DXVVVVPR",
       "sku": "SVA0010",
-      "impressions": 104936,
-      "clicks": 493,
-      "spend": 1475.26,
+      "impressions": 103679,
+      "clicks": 487,
+      "spend": 1449.75,
       "sales": 4622.9,
       "purchases": 41,
-      "acos": 31.91,
+      "acos": 31.36,
       "ctr": 0.0047,
-      "cpc": 2.9924,
-      "cvr": 0.0832,
+      "cpc": 2.9769,
+      "cvr": 0.0842,
       "title": "Skinuva\u00ae Stretch Mark Cream (2.5 oz)"
     },
     {
       "asin": "B07RCJDFN4",
       "sku": "SVA0001-stickerless",
-      "impressions": 106896,
-      "clicks": 607,
-      "spend": 1418.12,
-      "sales": 7352.45,
-      "purchases": 82,
-      "acos": 19.29,
+      "impressions": 105978,
+      "clicks": 609,
+      "spend": 1392.79,
+      "sales": 7517.45,
+      "purchases": 84,
+      "acos": 18.53,
       "ctr": 0.0057,
-      "cpc": 2.3363,
-      "cvr": 0.1351,
+      "cpc": 2.287,
+      "cvr": 0.1379,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (1 oz)"
     },
     {
       "asin": "B09FQJMLPZ",
       "sku": "SVA0004",
-      "impressions": 58564,
-      "clicks": 634,
-      "spend": 1170.93,
-      "sales": 11665.39,
-      "purchases": 157,
-      "acos": 10.04,
-      "ctr": 0.0108,
-      "cpc": 1.8469,
-      "cvr": 0.2476,
+      "impressions": 58477,
+      "clicks": 638,
+      "spend": 1158.29,
+      "sales": 11815.99,
+      "purchases": 159,
+      "acos": 9.8,
+      "ctr": 0.0109,
+      "cpc": 1.8155,
+      "cvr": 0.2492,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (0.5 oz)"
     },
     {
       "asin": "B0B23BB6CB",
       "sku": "SVA0005",
-      "impressions": 156476,
-      "clicks": 408,
-      "spend": 1081.01,
-      "sales": 2175.0,
-      "purchases": 49,
-      "acos": 49.7,
-      "ctr": 0.0026,
-      "cpc": 2.6495,
-      "cvr": 0.1201,
+      "impressions": 154350,
+      "clicks": 412,
+      "spend": 1085.96,
+      "sales": 2055.0,
+      "purchases": 48,
+      "acos": 52.84,
+      "ctr": 0.0027,
+      "cpc": 2.6358,
+      "cvr": 0.1165,
       "title": "Skinuva\u00ae Bruise Tablets (14 Capsules)"
     },
     {
       "asin": "B0861CGWLF",
       "sku": "SVA0003-stickerless",
-      "impressions": 77998,
-      "clicks": 274,
-      "spend": 722.07,
+      "impressions": 78169,
+      "clicks": 271,
+      "spend": 709.26,
       "sales": 2622.0,
       "purchases": 29,
-      "acos": 27.54,
+      "acos": 27.05,
       "ctr": 0.0035,
-      "cpc": 2.6353,
-      "cvr": 0.1058,
+      "cpc": 2.6172,
+      "cvr": 0.107,
       "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)"
     },
     {
       "asin": "B0F45BTSB7",
       "sku": "SVA0011-SF",
-      "impressions": 21854,
-      "clicks": 223,
-      "spend": 459.62,
-      "sales": 1660.0,
-      "purchases": 32,
-      "acos": 27.69,
-      "ctr": 0.0102,
-      "cpc": 2.0611,
-      "cvr": 0.1435,
+      "impressions": 21914,
+      "clicks": 221,
+      "spend": 439.51,
+      "sales": 1475.0,
+      "purchases": 29,
+      "acos": 29.8,
+      "ctr": 0.0101,
+      "cpc": 1.9887,
+      "cvr": 0.1312,
       "title": "Skinuva\u00ae Bruise Advanced Recovery Cream (1 oz)"
-    },
-    {
-      "asin": "B0DHYLCML2",
-      "sku": "SVA0008",
-      "impressions": 12182,
-      "clicks": 37,
-      "spend": 310.95,
-      "sales": 319.98,
-      "purchases": 4,
-      "acos": 97.18,
-      "ctr": 0.003,
-      "cpc": 8.4041,
-      "cvr": 0.1081,
-      "title": "Skinuva\u00ae 24 Hour Care Kit, Scar Cream and Scar+ SPF 30 (1 oz each)"
     },
     {
       "asin": "B0D1W1WSFH",
       "sku": "SVA0003.2pk",
-      "impressions": 24233,
-      "clicks": 106,
-      "spend": 307.92,
+      "impressions": 23793,
+      "clicks": 105,
+      "spend": 304.01,
       "sales": 223.99,
       "purchases": 2,
-      "acos": 137.47,
+      "acos": 135.72,
       "ctr": 0.0044,
-      "cpc": 2.9049,
-      "cvr": 0.0189,
+      "cpc": 2.8953,
+      "cvr": 0.019,
       "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream (1 oz, 2 Pack)"
+    },
+    {
+      "asin": "B0DHYLCML2",
+      "sku": "SVA0008",
+      "impressions": 12296,
+      "clicks": 35,
+      "spend": 273.51,
+      "sales": 319.98,
+      "purchases": 4,
+      "acos": 85.48,
+      "ctr": 0.0028,
+      "cpc": 7.8146,
+      "cvr": 0.1143,
+      "title": "Skinuva\u00ae 24 Hour Care Kit, Scar Cream and Scar+ SPF 30 (1 oz each)"
     },
     {
       "asin": "B0FRVVFPM5",
       "sku": "SVA0012-SF",
-      "impressions": 20928,
-      "clicks": 107,
-      "spend": 261.09,
-      "sales": 840.0,
-      "purchases": 13,
-      "acos": 31.08,
+      "impressions": 21315,
+      "clicks": 109,
+      "spend": 259.42,
+      "sales": 915.0,
+      "purchases": 14,
+      "acos": 28.35,
       "ctr": 0.0051,
-      "cpc": 2.4401,
-      "cvr": 0.1215,
+      "cpc": 2.38,
+      "cvr": 0.1284,
       "title": "Skinuva\u00ae Bruise Recovery Duo, Bromelain Supplement and Recovery Cream"
     },
     {
       "asin": "B0BRNWSQ8H",
       "sku": "SVA0006",
-      "impressions": 11560,
+      "impressions": 11657,
       "clicks": 75,
-      "spend": 237.01,
+      "spend": 238.59,
       "sales": 1450.0,
       "purchases": 16,
-      "acos": 16.35,
-      "ctr": 0.0065,
-      "cpc": 3.1601,
+      "acos": 16.45,
+      "ctr": 0.0064,
+      "cpc": 3.1812,
       "cvr": 0.2133,
       "title": "Skinuva\u00ae Scar+ Cream SPF 30 for Face & Body (1 oz)"
     },
     {
       "asin": "B0BRNVTD7T",
       "sku": "SVA0007",
-      "impressions": 13028,
-      "clicks": 61,
-      "spend": 173.47,
-      "sales": 989.3,
-      "purchases": 11,
-      "acos": 17.53,
-      "ctr": 0.0047,
-      "cpc": 2.8438,
-      "cvr": 0.1803,
+      "impressions": 13039,
+      "clicks": 65,
+      "spend": 187.37,
+      "sales": 1094.3,
+      "purchases": 12,
+      "acos": 17.12,
+      "ctr": 0.005,
+      "cpc": 2.8826,
+      "cvr": 0.1846,
       "title": "Skinuva\u00ae Scar+ Cream SPF 30 for Face & Body (0.5 oz)"
     },
     {
       "asin": "B0HC8D1YWQ",
       "sku": "SVA0010-CA-SF",
-      "impressions": 8883,
-      "clicks": 42,
-      "spend": 94.63,
+      "impressions": 9091,
+      "clicks": 43,
+      "spend": 98.21,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
       "ctr": 0.0047,
-      "cpc": 2.2531,
+      "cpc": 2.284,
       "cvr": 0.0,
       "title": "Skinuva\u00ae Stretch Mark Cream (2.5 oz)"
     },
     {
       "asin": "B0HC3WHQDB",
       "sku": "SVA0002-CA",
-      "impressions": 9035,
-      "clicks": 53,
-      "spend": 94.53,
+      "impressions": 9432,
+      "clicks": 55,
+      "spend": 95.97,
       "sales": 108.04,
       "purchases": 1,
-      "acos": 87.5,
-      "ctr": 0.0059,
-      "cpc": 1.7836,
-      "cvr": 0.0189,
+      "acos": 88.83,
+      "ctr": 0.0058,
+      "cpc": 1.7449,
+      "cvr": 0.0182,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (1.7 oz)"
     },
     {
       "asin": "B0H3CLS4XW",
       "sku": "SVA0001.1-CA",
-      "impressions": 13123,
-      "clicks": 59,
-      "spend": 92.4,
+      "impressions": 11896,
+      "clicks": 55,
+      "spend": 87.6,
       "sales": 310.37,
       "purchases": 4,
-      "acos": 29.77,
-      "ctr": 0.0045,
-      "cpc": 1.5661,
-      "cvr": 0.0678,
+      "acos": 28.22,
+      "ctr": 0.0046,
+      "cpc": 1.5927,
+      "cvr": 0.0727,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (1 oz)"
     },
     {
       "asin": "B0DHYJLHW1",
       "sku": "SVA0009",
-      "impressions": 4850,
-      "clicks": 17,
-      "spend": 77.4,
+      "impressions": 4932,
+      "clicks": 18,
+      "spend": 79.6,
       "sales": 155.0,
       "purchases": 1,
-      "acos": 49.94,
-      "ctr": 0.0035,
-      "cpc": 4.5529,
-      "cvr": 0.0588,
+      "acos": 51.35,
+      "ctr": 0.0036,
+      "cpc": 4.4222,
+      "cvr": 0.0556,
       "title": "Skinuva\u00ae 24 Hour Care Kit, Scar Cream and Scar+ SPF 30 (0.5 oz each)"
     },
     {
       "asin": "B0HC3R3DJM",
       "sku": "SVA0004-CA-SF",
-      "impressions": 9573,
-      "clicks": 33,
-      "spend": 45.74,
+      "impressions": 9859,
+      "clicks": 36,
+      "spend": 50.82,
       "sales": 124.1,
       "purchases": 2,
-      "acos": 36.86,
-      "ctr": 0.0034,
-      "cpc": 1.3861,
-      "cvr": 0.0606,
+      "acos": 40.95,
+      "ctr": 0.0037,
+      "cpc": 1.4117,
+      "cvr": 0.0556,
       "title": "Skinuva\u00ae Scar Cream for Face & Body (0.5 oz)"
-    },
-    {
-      "asin": "B0H3CRJL78",
-      "sku": "SVA0003-CA-SF",
-      "impressions": 12252,
-      "clicks": 49,
-      "spend": 37.47,
-      "sales": 165.52,
-      "purchases": 2,
-      "acos": 22.64,
-      "ctr": 0.004,
-      "cpc": 0.7647,
-      "cvr": 0.0408,
-      "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)"
     },
     {
       "asin": "B0BBKKMYZ6",
       "sku": "YH-KCIY-8GY8",
-      "impressions": 6288,
-      "clicks": 22,
-      "spend": 37.1,
+      "impressions": 6365,
+      "clicks": 24,
+      "spend": 39.66,
       "sales": 130.0,
       "purchases": 1,
-      "acos": 28.54,
-      "ctr": 0.0035,
-      "cpc": 1.6864,
-      "cvr": 0.0455
+      "acos": 30.51,
+      "ctr": 0.0038,
+      "cpc": 1.6525,
+      "cvr": 0.0417
+    },
+    {
+      "asin": "B0H3CRJL78",
+      "sku": "SVA0003-CA-SF",
+      "impressions": 12727,
+      "clicks": 50,
+      "spend": 38.81,
+      "sales": 165.52,
+      "purchases": 2,
+      "acos": 23.45,
+      "ctr": 0.0039,
+      "cpc": 0.7762,
+      "cvr": 0.04,
+      "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)"
     },
     {
       "asin": "B08Z4K68M7",
       "sku": "SVA0001+03",
-      "impressions": 5220,
-      "clicks": 19,
-      "spend": 32.13,
+      "impressions": 5439,
+      "clicks": 18,
+      "spend": 30.14,
       "sales": 130.0,
       "purchases": 1,
-      "acos": 24.72,
-      "ctr": 0.0036,
-      "cpc": 1.6911,
-      "cvr": 0.0526
+      "acos": 23.18,
+      "ctr": 0.0033,
+      "cpc": 1.6744,
+      "cvr": 0.0556
     },
     {
       "asin": "B08Z5GGG4G",
       "sku": "SVA0002+03",
-      "impressions": 3454,
-      "clicks": 9,
-      "spend": 15.07,
+      "impressions": 3715,
+      "clicks": 10,
+      "spend": 16.61,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.0026,
-      "cpc": 1.6744,
+      "ctr": 0.0027,
+      "cpc": 1.661,
       "cvr": 0.0
     },
     {
       "asin": "B0HC87D6MH",
       "sku": "SVA0003.2pk-CA-SF",
-      "impressions": 9126,
+      "impressions": 9219,
       "clicks": 13,
       "spend": 13.16,
       "sales": 0.0,
@@ -12347,14 +12395,14 @@
     {
       "asin": "B0BXBJM2ZG",
       "sku": "SVA0003+05+06",
-      "impressions": 1602,
-      "clicks": 6,
-      "spend": 8.76,
+      "impressions": 1647,
+      "clicks": 7,
+      "spend": 10.96,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.0037,
-      "cpc": 1.46,
+      "ctr": 0.0043,
+      "cpc": 1.5657,
       "cvr": 0.0
     },
     {
@@ -12374,66 +12422,58 @@
   "placements": [
     {
       "placement": "Top of Search",
-      "impressions": 38488,
-      "clicks": 1402,
-      "spend": 3541.77,
-      "sales": 22887.96,
-      "purchases": 298,
-      "acos": 15.47,
-      "ctr": 0.0364,
-      "cpc": 2.5262,
-      "cvr": 0.2126,
-      "spendShare": 36.5
+      "impressions": 37652,
+      "clicks": 1397,
+      "spend": 3448.36,
+      "sales": 22928.56,
+      "purchases": 299,
+      "acos": 15.04,
+      "ctr": 0.0371,
+      "cpc": 2.4684,
+      "cvr": 0.214,
+      "spendShare": 36.1
     },
     {
       "placement": "Rest of Search",
-      "impressions": 434952,
-      "clicks": 1895,
-      "spend": 4363.38,
-      "sales": 12149.98,
-      "purchases": 142,
-      "acos": 35.91,
+      "impressions": 435205,
+      "clicks": 1912,
+      "spend": 4399.13,
+      "sales": 12294.98,
+      "purchases": 143,
+      "acos": 35.78,
       "ctr": 0.0044,
-      "cpc": 2.3026,
-      "cvr": 0.0749,
-      "spendShare": 45.0
+      "cpc": 2.3008,
+      "cvr": 0.0748,
+      "spendShare": 46.0
     },
     {
       "placement": "Product Pages",
-      "impressions": 352305,
-      "clicks": 479,
-      "spend": 1785.51,
-      "sales": 3568.0,
+      "impressions": 349626,
+      "clicks": 478,
+      "spend": 1709.95,
+      "sales": 3573.0,
       "purchases": 43,
-      "acos": 50.04,
+      "acos": 47.86,
       "ctr": 0.0014,
-      "cpc": 3.7276,
-      "cvr": 0.0898,
-      "spendShare": 18.4
+      "cpc": 3.5773,
+      "cvr": 0.09,
+      "spendShare": 17.9
     }
   ],
   "searchTermInsights": {
     "top_performing": [
       {
         "query": "skinuva scar cream",
-        "spend": 1166.66,
-        "sales": 11393.57,
-        "acos": 10.24,
-        "impressions": 20653,
-        "clicks": 514,
-        "ctr": 0.0249,
-        "cpc": 2.2698,
-        "purchases": 136,
-        "cvr": 0.2646,
+        "spend": 1141.14,
+        "sales": 11578.57,
+        "acos": 9.86,
+        "impressions": 20739,
+        "clicks": 522,
+        "ctr": 0.0252,
+        "cpc": 2.1861,
+        "purchases": 138,
+        "cvr": 0.2644,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 281,
-            "clicks": 10,
-            "spend": 53.15,
-            "sales": 200.0,
-            "cpc": 5.315
-          },
           {
             "date": "2026-08-02",
             "impressions": 429,
@@ -12615,7 +12655,7 @@
             "impressions": 1103,
             "clicks": 18,
             "spend": 20.89,
-            "sales": 165.0,
+            "sales": 270.0,
             "cpc": 1.1606
           },
           {
@@ -12663,39 +12703,39 @@
             "impressions": 217,
             "clicks": 18,
             "spend": 37.25,
-            "sales": 535.0,
+            "sales": 595.0,
             "cpc": 2.0694
           },
           {
             "date": "2026-08-31",
-            "impressions": 331,
+            "impressions": 349,
             "clicks": 16,
             "spend": 25.0,
             "sales": 340.0,
             "cpc": 1.5625
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 349,
+            "clicks": 18,
+            "spend": 27.63,
+            "sales": 220.0,
+            "cpc": 1.535
           }
         ]
       },
       {
         "query": "skinuva",
-        "spend": 396.82,
-        "sales": 4349.34,
-        "acos": 9.12,
-        "impressions": 15098,
-        "clicks": 243,
-        "ctr": 0.0161,
-        "cpc": 1.633,
-        "purchases": 54,
-        "cvr": 0.2222,
+        "spend": 374.02,
+        "sales": 4269.34,
+        "acos": 8.76,
+        "impressions": 15036,
+        "clicks": 240,
+        "ctr": 0.016,
+        "cpc": 1.5584,
+        "purchases": 53,
+        "cvr": 0.2208,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 394,
-            "clicks": 9,
-            "spend": 33.37,
-            "sales": 140.0,
-            "cpc": 3.7078
-          },
           {
             "date": "2026-08-02",
             "impressions": 720,
@@ -12930,34 +12970,34 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 178,
+            "impressions": 271,
             "clicks": 4,
             "spend": 2.33,
             "sales": 70.0,
             "cpc": 0.5825
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 239,
+            "clicks": 6,
+            "spend": 10.57,
+            "sales": 60.0,
+            "cpc": 1.7617
           }
         ]
       },
       {
         "query": "skinuva scar gel",
-        "spend": 439.3,
-        "sales": 3218.8,
-        "acos": 13.65,
-        "impressions": 8636,
-        "clicks": 158,
-        "ctr": 0.0183,
-        "cpc": 2.7804,
-        "purchases": 42,
-        "cvr": 0.2658,
+        "spend": 460.98,
+        "sales": 3323.8,
+        "acos": 13.87,
+        "impressions": 8593,
+        "clicks": 164,
+        "ctr": 0.0191,
+        "cpc": 2.8109,
+        "purchases": 43,
+        "cvr": 0.2622,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 265,
-            "clicks": 3,
-            "spend": 3.82,
-            "sales": 0.0,
-            "cpc": 1.2733
-          },
           {
             "date": "2026-08-02",
             "impressions": 359,
@@ -13192,34 +13232,34 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 206,
+            "impressions": 198,
             "clicks": 5,
             "spend": 8.99,
             "sales": 160.0,
             "cpc": 1.798
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 230,
+            "clicks": 9,
+            "spend": 25.5,
+            "sales": 105.0,
+            "cpc": 2.8333
           }
         ]
       },
       {
         "query": "skinuva scar",
-        "spend": 117.6,
-        "sales": 1078.99,
-        "acos": 10.9,
-        "impressions": 5041,
-        "clicks": 79,
-        "ctr": 0.0157,
-        "cpc": 1.4886,
-        "purchases": 11,
-        "cvr": 0.1392,
+        "spend": 126.69,
+        "sales": 1198.99,
+        "acos": 10.57,
+        "impressions": 5023,
+        "clicks": 82,
+        "ctr": 0.0163,
+        "cpc": 1.545,
+        "purchases": 13,
+        "cvr": 0.1585,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 52,
-            "clicks": 2,
-            "spend": 1.38,
-            "sales": 0.0,
-            "cpc": 0.69
-          },
           {
             "date": "2026-08-02",
             "impressions": 74,
@@ -13427,29 +13467,29 @@
             "spend": 2.0,
             "sales": 0.0,
             "cpc": 2.0
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 34,
+            "clicks": 5,
+            "spend": 10.47,
+            "sales": 120.0,
+            "cpc": 2.094
           }
         ]
       },
       {
         "query": "b07rcjdfn4",
-        "spend": 365.64,
-        "sales": 1045.95,
-        "acos": 34.96,
-        "impressions": 12337,
-        "clicks": 95,
+        "spend": 352.45,
+        "sales": 940.95,
+        "acos": 37.46,
+        "impressions": 11989,
+        "clicks": 92,
         "ctr": 0.0077,
-        "cpc": 3.8488,
-        "purchases": 11,
-        "cvr": 0.1158,
+        "cpc": 3.831,
+        "purchases": 10,
+        "cvr": 0.1087,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 597,
-            "clicks": 6,
-            "spend": 25.79,
-            "sales": 105.0,
-            "cpc": 4.2983
-          },
           {
             "date": "2026-08-02",
             "impressions": 796,
@@ -13668,34 +13708,34 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 658,
+            "impressions": 640,
             "clicks": 2,
             "spend": 9.9,
             "sales": 0.0,
             "cpc": 4.95
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 267,
+            "clicks": 3,
+            "spend": 12.6,
+            "sales": 0.0,
+            "cpc": 4.2
           }
         ]
       },
       {
         "query": "skinuva bruise cream",
-        "spend": 191.17,
-        "sales": 945.0,
-        "acos": 20.23,
-        "impressions": 3333,
+        "spend": 178.14,
+        "sales": 820.0,
+        "acos": 21.72,
+        "impressions": 3383,
         "clicks": 51,
-        "ctr": 0.0153,
-        "cpc": 3.7484,
-        "purchases": 17,
-        "cvr": 0.3333,
+        "ctr": 0.0151,
+        "cpc": 3.4929,
+        "purchases": 15,
+        "cvr": 0.2941,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 92,
-            "clicks": 4,
-            "spend": 24.85,
-            "sales": 125.0,
-            "cpc": 6.2125
-          },
           {
             "date": "2026-08-02",
             "impressions": 128,
@@ -13874,34 +13914,34 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 1,
+            "impressions": 67,
             "clicks": 1,
             "spend": 0.78,
             "sales": 45.0,
             "cpc": 0.78
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 76,
+            "clicks": 4,
+            "spend": 11.82,
+            "sales": 0.0,
+            "cpc": 2.955
           }
         ]
       },
       {
         "query": "skinuva bruise capsules",
-        "spend": 127.17,
-        "sales": 860.0,
-        "acos": 14.79,
-        "impressions": 2440,
-        "clicks": 37,
-        "ctr": 0.0152,
-        "cpc": 3.437,
+        "spend": 119.37,
+        "sales": 780.0,
+        "acos": 15.3,
+        "impressions": 2293,
+        "clicks": 35,
+        "ctr": 0.0153,
+        "cpc": 3.4106,
         "purchases": 17,
-        "cvr": 0.4595,
+        "cvr": 0.4857,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 147,
-            "clicks": 2,
-            "spend": 7.8,
-            "sales": 120.0,
-            "cpc": 3.9
-          },
           {
             "date": "2026-08-02",
             "impressions": 228,
@@ -14035,7 +14075,7 @@
             "impressions": 56,
             "clicks": 2,
             "spend": 3.02,
-            "sales": 80.0,
+            "sales": 120.0,
             "cpc": 1.51
           },
           {
@@ -14058,24 +14098,16 @@
       },
       {
         "query": "b0f45btsb7",
-        "spend": 114.91,
-        "sales": 690.0,
-        "acos": 16.65,
-        "impressions": 3285,
+        "spend": 118.17,
+        "sales": 725.0,
+        "acos": 16.3,
+        "impressions": 3323,
         "clicks": 54,
-        "ctr": 0.0164,
-        "cpc": 2.128,
+        "ctr": 0.0163,
+        "cpc": 2.1883,
         "purchases": 12,
         "cvr": 0.2222,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 51,
-            "clicks": 1,
-            "spend": 1.92,
-            "sales": 40.0,
-            "cpc": 1.92
-          },
           {
             "date": "2026-08-04",
             "impressions": 44,
@@ -14238,25 +14270,33 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 101,
+            "impressions": 90,
             "clicks": 2,
             "spend": 6.61,
             "sales": 0.0,
             "cpc": 3.305
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 100,
+            "clicks": 1,
+            "spend": 5.18,
+            "sales": 75.0,
+            "cpc": 5.18
           }
         ]
       },
       {
         "query": "b0861cgwlf",
-        "spend": 152.61,
+        "spend": 155.27,
         "sales": 607.98,
-        "acos": 25.1,
-        "impressions": 4953,
-        "clicks": 44,
-        "ctr": 0.0089,
-        "cpc": 3.4684,
+        "acos": 25.54,
+        "impressions": 4973,
+        "clicks": 45,
+        "ctr": 0.009,
+        "cpc": 3.4504,
         "purchases": 6,
-        "cvr": 0.1364,
+        "cvr": 0.1333,
         "daily": [
           {
             "date": "2026-08-04",
@@ -14401,6 +14441,14 @@
             "spend": 5.95,
             "sales": 0.0,
             "cpc": 5.95
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 20,
+            "clicks": 1,
+            "spend": 2.66,
+            "sales": 0.0,
+            "cpc": 2.66
           }
         ]
       },
@@ -14446,15 +14494,15 @@
     "wasted_spend": [
       {
         "query": "skinuva bruise pills",
-        "spend": 70.79,
-        "sales": 0.0,
-        "acos": null,
-        "impressions": 4454,
-        "clicks": 28,
-        "ctr": 0.0063,
-        "cpc": 2.5282,
-        "purchases": 0,
-        "cvr": 0.0,
+        "spend": 77.48,
+        "sales": 40.0,
+        "acos": 193.7,
+        "impressions": 4689,
+        "clicks": 29,
+        "ctr": 0.0062,
+        "cpc": 2.6717,
+        "purchases": 1,
+        "cvr": 0.0345,
         "daily": [
           {
             "date": "2026-08-03",
@@ -14594,11 +14642,19 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 2,
+            "impressions": 236,
             "clicks": 2,
             "spend": 3.26,
             "sales": 0.0,
             "cpc": 1.63
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 6.69,
+            "sales": 40.0,
+            "cpc": 6.69
           }
         ]
       },
@@ -14733,7 +14789,7 @@
         "spend": 48.56,
         "sales": 40.0,
         "acos": 121.4,
-        "impressions": 537,
+        "impressions": 534,
         "clicks": 6,
         "ctr": 0.0112,
         "cpc": 8.0933,
@@ -14774,7 +14830,7 @@
           },
           {
             "date": "2026-08-31",
-            "impressions": 155,
+            "impressions": 152,
             "clicks": 1,
             "spend": 5.79,
             "sales": 0.0,
@@ -14784,24 +14840,16 @@
       },
       {
         "query": "b07ghl7nmp",
-        "spend": 43.73,
+        "spend": 40.73,
         "sales": 0.0,
         "acos": null,
-        "impressions": 1271,
-        "clicks": 15,
-        "ctr": 0.0118,
-        "cpc": 2.9153,
+        "impressions": 1146,
+        "clicks": 14,
+        "ctr": 0.0122,
+        "cpc": 2.9093,
         "purchases": 0,
         "cvr": 0.0,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 125,
-            "clicks": 1,
-            "spend": 3.0,
-            "sales": 0.0,
-            "cpc": 3.0
-          },
           {
             "date": "2026-08-02",
             "impressions": 41,
@@ -14902,13 +14950,13 @@
       },
       {
         "query": "scar treatment",
-        "spend": 36.65,
+        "spend": 38.74,
         "sales": 0.0,
         "acos": null,
-        "impressions": 1027,
-        "clicks": 13,
-        "ctr": 0.0127,
-        "cpc": 2.8192,
+        "impressions": 1030,
+        "clicks": 14,
+        "ctr": 0.0136,
+        "cpc": 2.7671,
         "purchases": 0,
         "cvr": 0.0,
         "daily": [
@@ -14991,6 +15039,14 @@
             "spend": 0.46,
             "sales": 0.0,
             "cpc": 0.46
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 3,
+            "clicks": 1,
+            "spend": 2.09,
+            "sales": 0.0,
+            "cpc": 2.09
           }
         ]
       },
@@ -15475,6 +15531,36 @@
         ]
       },
       {
+        "query": "arnica skinuva bruise",
+        "spend": 4.85,
+        "sales": 80.0,
+        "acos": 6.06,
+        "impressions": 8,
+        "clicks": 2,
+        "ctr": 0.25,
+        "cpc": 2.425,
+        "purchases": 2,
+        "cvr": 1.0,
+        "daily": [
+          {
+            "date": "2026-08-08",
+            "impressions": 5,
+            "clicks": 1,
+            "spend": 1.34,
+            "sales": 40.0,
+            "cpc": 1.34
+          },
+          {
+            "date": "2026-08-30",
+            "impressions": 3,
+            "clicks": 1,
+            "spend": 3.51,
+            "sales": 40.0,
+            "cpc": 3.51
+          }
+        ]
+      },
+      {
         "query": "highly rated scar cream",
         "spend": 9.37,
         "sales": 130.0,
@@ -15515,36 +15601,6 @@
             "spend": 8.92,
             "sales": 130.0,
             "cpc": 4.46
-          }
-        ]
-      },
-      {
-        "query": "medical grade scar cream surgery",
-        "spend": 6.95,
-        "sales": 80.0,
-        "acos": 8.69,
-        "impressions": 10,
-        "clicks": 2,
-        "ctr": 0.2,
-        "cpc": 3.475,
-        "purchases": 1,
-        "cvr": 0.5,
-        "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 8,
-            "clicks": 1,
-            "spend": 3.79,
-            "sales": 0.0,
-            "cpc": 3.79
-          },
-          {
-            "date": "2026-08-13",
-            "impressions": 2,
-            "clicks": 1,
-            "spend": 3.16,
-            "sales": 80.0,
-            "cpc": 3.16
           }
         ]
       },
@@ -15633,40 +15689,56 @@
         ]
       },
       {
-        "query": "skinuva bruise advanced recovery cream",
-        "spend": 15.33,
-        "sales": 75.0,
-        "acos": 20.44,
-        "impressions": 16,
-        "clicks": 3,
-        "ctr": 0.1875,
-        "cpc": 5.11,
-        "purchases": 1,
+        "query": "silagen scar gel for surgical scars",
+        "spend": 22.64,
+        "sales": 185.0,
+        "acos": 12.24,
+        "impressions": 503,
+        "clicks": 6,
+        "ctr": 0.0119,
+        "cpc": 3.7733,
+        "purchases": 2,
         "cvr": 0.3333,
         "daily": [
           {
-            "date": "2026-08-03",
-            "impressions": 5,
-            "clicks": 1,
-            "spend": 4.67,
-            "sales": 75.0,
-            "cpc": 4.67
+            "date": "2026-08-16",
+            "impressions": 43,
+            "clicks": 2,
+            "spend": 8.5,
+            "sales": 80.0,
+            "cpc": 4.25
           },
           {
             "date": "2026-08-19",
-            "impressions": 8,
+            "impressions": 7,
             "clicks": 1,
-            "spend": 5.66,
+            "spend": 2.1,
             "sales": 0.0,
-            "cpc": 5.66
+            "cpc": 2.1
           },
           {
-            "date": "2026-08-25",
-            "impressions": 3,
+            "date": "2026-08-28",
+            "impressions": 263,
             "clicks": 1,
-            "spend": 5.0,
+            "spend": 4.74,
             "sales": 0.0,
-            "cpc": 5.0
+            "cpc": 4.74
+          },
+          {
+            "date": "2026-08-29",
+            "impressions": 114,
+            "clicks": 1,
+            "spend": 3.65,
+            "sales": 0.0,
+            "cpc": 3.65
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 76,
+            "clicks": 1,
+            "spend": 3.65,
+            "sales": 105.0,
+            "cpc": 3.65
           }
         ]
       }
@@ -15849,6 +15921,174 @@
         "cpc_change_pct": 189.9
       },
       {
+        "query": "skinuva bruise pills",
+        "spend": 77.48,
+        "sales": 40.0,
+        "acos": 193.7,
+        "impressions": 4689,
+        "clicks": 29,
+        "ctr": 0.0062,
+        "cpc": 2.6717,
+        "purchases": 1,
+        "cvr": 0.0345,
+        "daily": [
+          {
+            "date": "2026-08-03",
+            "impressions": 165,
+            "clicks": 1,
+            "spend": 4.5,
+            "sales": 0.0,
+            "cpc": 4.5
+          },
+          {
+            "date": "2026-08-04",
+            "impressions": 153,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-05",
+            "impressions": 133,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-06",
+            "impressions": 177,
+            "clicks": 2,
+            "spend": 8.31,
+            "sales": 0.0,
+            "cpc": 4.155
+          },
+          {
+            "date": "2026-08-08",
+            "impressions": 152,
+            "clicks": 1,
+            "spend": 1.98,
+            "sales": 0.0,
+            "cpc": 1.98
+          },
+          {
+            "date": "2026-08-09",
+            "impressions": 158,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-10",
+            "impressions": 160,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-11",
+            "impressions": 187,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-12",
+            "impressions": 205,
+            "clicks": 1,
+            "spend": 5.0,
+            "sales": 0.0,
+            "cpc": 5.0
+          },
+          {
+            "date": "2026-08-13",
+            "impressions": 415,
+            "clicks": 2,
+            "spend": 4.08,
+            "sales": 0.0,
+            "cpc": 2.04
+          },
+          {
+            "date": "2026-08-14",
+            "impressions": 370,
+            "clicks": 2,
+            "spend": 1.3,
+            "sales": 0.0,
+            "cpc": 0.65
+          },
+          {
+            "date": "2026-08-21",
+            "impressions": 408,
+            "clicks": 2,
+            "spend": 3.62,
+            "sales": 0.0,
+            "cpc": 1.81
+          },
+          {
+            "date": "2026-08-22",
+            "impressions": 410,
+            "clicks": 2,
+            "spend": 3.98,
+            "sales": 0.0,
+            "cpc": 1.99
+          },
+          {
+            "date": "2026-08-23",
+            "impressions": 547,
+            "clicks": 3,
+            "spend": 4.32,
+            "sales": 0.0,
+            "cpc": 1.44
+          },
+          {
+            "date": "2026-08-25",
+            "impressions": 323,
+            "clicks": 2,
+            "spend": 0.04,
+            "sales": 0.0,
+            "cpc": 0.02
+          },
+          {
+            "date": "2026-08-29",
+            "impressions": 343,
+            "clicks": 2,
+            "spend": 3.36,
+            "sales": 0.0,
+            "cpc": 1.68
+          },
+          {
+            "date": "2026-08-30",
+            "impressions": 146,
+            "clicks": 1,
+            "spend": 2.04,
+            "sales": 0.0,
+            "cpc": 2.04
+          },
+          {
+            "date": "2026-08-31",
+            "impressions": 236,
+            "clicks": 2,
+            "spend": 3.26,
+            "sales": 0.0,
+            "cpc": 1.63
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 6.69,
+            "sales": 40.0,
+            "cpc": 6.69
+          }
+        ],
+        "latest_cpc": 6.69,
+        "cpc_change_pct": 150.4
+      },
+      {
         "query": "b0frvvfpm5",
         "spend": 9.8,
         "sales": 45.0,
@@ -15913,25 +16153,209 @@
         "cpc_change_pct": 146.7
       },
       {
+        "query": "b0f45btsb7",
+        "spend": 118.17,
+        "sales": 725.0,
+        "acos": 16.3,
+        "impressions": 3323,
+        "clicks": 54,
+        "ctr": 0.0163,
+        "cpc": 2.1883,
+        "purchases": 12,
+        "cvr": 0.2222,
+        "daily": [
+          {
+            "date": "2026-08-04",
+            "impressions": 44,
+            "clicks": 1,
+            "spend": 4.18,
+            "sales": 0.0,
+            "cpc": 4.18
+          },
+          {
+            "date": "2026-08-05",
+            "impressions": 52,
+            "clicks": 1,
+            "spend": 2.14,
+            "sales": 0.0,
+            "cpc": 2.14
+          },
+          {
+            "date": "2026-08-06",
+            "impressions": 127,
+            "clicks": 1,
+            "spend": 4.01,
+            "sales": 0.0,
+            "cpc": 4.01
+          },
+          {
+            "date": "2026-08-07",
+            "impressions": 1,
+            "clicks": 1,
+            "spend": 0.06,
+            "sales": 0.0,
+            "cpc": 0.06
+          },
+          {
+            "date": "2026-08-08",
+            "impressions": 75,
+            "clicks": 1,
+            "spend": 0.61,
+            "sales": 0.0,
+            "cpc": 0.61
+          },
+          {
+            "date": "2026-08-09",
+            "impressions": 501,
+            "clicks": 9,
+            "spend": 11.57,
+            "sales": 45.0,
+            "cpc": 1.2856
+          },
+          {
+            "date": "2026-08-11",
+            "impressions": 126,
+            "clicks": 2,
+            "spend": 10.43,
+            "sales": 0.0,
+            "cpc": 5.215
+          },
+          {
+            "date": "2026-08-12",
+            "impressions": 428,
+            "clicks": 6,
+            "spend": 4.96,
+            "sales": 0.0,
+            "cpc": 0.8267
+          },
+          {
+            "date": "2026-08-13",
+            "impressions": 530,
+            "clicks": 6,
+            "spend": 5.36,
+            "sales": 45.0,
+            "cpc": 0.8933
+          },
+          {
+            "date": "2026-08-14",
+            "impressions": 340,
+            "clicks": 5,
+            "spend": 7.7,
+            "sales": 160.0,
+            "cpc": 1.54
+          },
+          {
+            "date": "2026-08-15",
+            "impressions": 83,
+            "clicks": 2,
+            "spend": 4.93,
+            "sales": 200.0,
+            "cpc": 2.465
+          },
+          {
+            "date": "2026-08-16",
+            "impressions": 85,
+            "clicks": 1,
+            "spend": 0.18,
+            "sales": 0.0,
+            "cpc": 0.18
+          },
+          {
+            "date": "2026-08-18",
+            "impressions": 48,
+            "clicks": 1,
+            "spend": 4.01,
+            "sales": 0.0,
+            "cpc": 4.01
+          },
+          {
+            "date": "2026-08-20",
+            "impressions": 94,
+            "clicks": 2,
+            "spend": 0.68,
+            "sales": 0.0,
+            "cpc": 0.34
+          },
+          {
+            "date": "2026-08-23",
+            "impressions": 201,
+            "clicks": 2,
+            "spend": 6.74,
+            "sales": 0.0,
+            "cpc": 3.37
+          },
+          {
+            "date": "2026-08-25",
+            "impressions": 50,
+            "clicks": 1,
+            "spend": 2.61,
+            "sales": 0.0,
+            "cpc": 2.61
+          },
+          {
+            "date": "2026-08-26",
+            "impressions": 88,
+            "clicks": 3,
+            "spend": 5.24,
+            "sales": 200.0,
+            "cpc": 1.7467
+          },
+          {
+            "date": "2026-08-27",
+            "impressions": 156,
+            "clicks": 2,
+            "spend": 6.69,
+            "sales": 0.0,
+            "cpc": 3.345
+          },
+          {
+            "date": "2026-08-29",
+            "impressions": 46,
+            "clicks": 3,
+            "spend": 18.27,
+            "sales": 0.0,
+            "cpc": 6.09
+          },
+          {
+            "date": "2026-08-30",
+            "impressions": 58,
+            "clicks": 1,
+            "spend": 6.01,
+            "sales": 0.0,
+            "cpc": 6.01
+          },
+          {
+            "date": "2026-08-31",
+            "impressions": 90,
+            "clicks": 2,
+            "spend": 6.61,
+            "sales": 0.0,
+            "cpc": 3.305
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 100,
+            "clicks": 1,
+            "spend": 5.18,
+            "sales": 75.0,
+            "cpc": 5.18
+          }
+        ],
+        "latest_cpc": 5.18,
+        "cpc_change_pct": 136.7
+      },
+      {
         "query": "arnica tablets",
         "spend": 78.64,
         "sales": 160.0,
         "acos": 49.15,
-        "impressions": 7335,
+        "impressions": 7423,
         "clicks": 48,
         "ctr": 0.0065,
         "cpc": 1.6383,
         "purchases": 4,
         "cvr": 0.0833,
         "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 45,
-            "clicks": 1,
-            "spend": 3.21,
-            "sales": 0.0,
-            "cpc": 3.21
-          },
           {
             "date": "2026-08-04",
             "impressions": 57,
@@ -16067,226 +16491,18 @@
             "spend": 3.21,
             "sales": 0.0,
             "cpc": 3.21
+          },
+          {
+            "date": "2026-09-01",
+            "impressions": 133,
+            "clicks": 1,
+            "spend": 3.21,
+            "sales": 0.0,
+            "cpc": 3.21
           }
         ],
         "latest_cpc": 3.21,
         "cpc_change_pct": 95.9
-      },
-      {
-        "query": "b0dxvvvvpr",
-        "spend": 14.98,
-        "sales": 0.0,
-        "acos": null,
-        "impressions": 66,
-        "clicks": 5,
-        "ctr": 0.0758,
-        "cpc": 2.996,
-        "purchases": 0,
-        "cvr": 0.0,
-        "daily": [
-          {
-            "date": "2026-08-01",
-            "impressions": 7,
-            "clicks": 1,
-            "spend": 1.5,
-            "sales": 0.0,
-            "cpc": 1.5
-          },
-          {
-            "date": "2026-08-08",
-            "impressions": 6,
-            "clicks": 1,
-            "spend": 1.2,
-            "sales": 0.0,
-            "cpc": 1.2
-          },
-          {
-            "date": "2026-08-09",
-            "impressions": 6,
-            "clicks": 1,
-            "spend": 5.4,
-            "sales": 0.0,
-            "cpc": 5.4
-          },
-          {
-            "date": "2026-08-15",
-            "impressions": 10,
-            "clicks": 1,
-            "spend": 1.5,
-            "sales": 0.0,
-            "cpc": 1.5
-          },
-          {
-            "date": "2026-08-20",
-            "impressions": 37,
-            "clicks": 1,
-            "spend": 5.38,
-            "sales": 0.0,
-            "cpc": 5.38
-          }
-        ],
-        "latest_cpc": 5.38,
-        "cpc_change_pct": 79.6
-      },
-      {
-        "query": "b0861cgwlf",
-        "spend": 152.61,
-        "sales": 607.98,
-        "acos": 25.1,
-        "impressions": 4953,
-        "clicks": 44,
-        "ctr": 0.0089,
-        "cpc": 3.4684,
-        "purchases": 6,
-        "cvr": 0.1364,
-        "daily": [
-          {
-            "date": "2026-08-04",
-            "impressions": 119,
-            "clicks": 2,
-            "spend": 1.46,
-            "sales": 0.0,
-            "cpc": 0.73
-          },
-          {
-            "date": "2026-08-05",
-            "impressions": 94,
-            "clicks": 3,
-            "spend": 11.0,
-            "sales": 0.0,
-            "cpc": 3.6667
-          },
-          {
-            "date": "2026-08-07",
-            "impressions": 117,
-            "clicks": 1,
-            "spend": 1.57,
-            "sales": 0.0,
-            "cpc": 1.57
-          },
-          {
-            "date": "2026-08-10",
-            "impressions": 87,
-            "clicks": 5,
-            "spend": 14.27,
-            "sales": 303.98,
-            "cpc": 2.854
-          },
-          {
-            "date": "2026-08-11",
-            "impressions": 97,
-            "clicks": 1,
-            "spend": 3.69,
-            "sales": 0.0,
-            "cpc": 3.69
-          },
-          {
-            "date": "2026-08-13",
-            "impressions": 178,
-            "clicks": 1,
-            "spend": 0.64,
-            "sales": 0.0,
-            "cpc": 0.64
-          },
-          {
-            "date": "2026-08-14",
-            "impressions": 1127,
-            "clicks": 4,
-            "spend": 17.54,
-            "sales": 0.0,
-            "cpc": 4.385
-          },
-          {
-            "date": "2026-08-15",
-            "impressions": 956,
-            "clicks": 4,
-            "spend": 17.55,
-            "sales": 0.0,
-            "cpc": 4.3875
-          },
-          {
-            "date": "2026-08-16",
-            "impressions": 70,
-            "clicks": 4,
-            "spend": 23.75,
-            "sales": 0.0,
-            "cpc": 5.9375
-          },
-          {
-            "date": "2026-08-17",
-            "impressions": 456,
-            "clicks": 6,
-            "spend": 22.52,
-            "sales": 0.0,
-            "cpc": 3.7533
-          },
-          {
-            "date": "2026-08-18",
-            "impressions": 583,
-            "clicks": 3,
-            "spend": 12.51,
-            "sales": 0.0,
-            "cpc": 4.17
-          },
-          {
-            "date": "2026-08-20",
-            "impressions": 443,
-            "clicks": 2,
-            "spend": 0.36,
-            "sales": 0.0,
-            "cpc": 0.18
-          },
-          {
-            "date": "2026-08-21",
-            "impressions": 469,
-            "clicks": 3,
-            "spend": 6.49,
-            "sales": 80.0,
-            "cpc": 2.1633
-          },
-          {
-            "date": "2026-08-22",
-            "impressions": 13,
-            "clicks": 1,
-            "spend": 5.53,
-            "sales": 0.0,
-            "cpc": 5.53
-          },
-          {
-            "date": "2026-08-23",
-            "impressions": 15,
-            "clicks": 1,
-            "spend": 1.5,
-            "sales": 0.0,
-            "cpc": 1.5
-          },
-          {
-            "date": "2026-08-25",
-            "impressions": 29,
-            "clicks": 1,
-            "spend": 4.78,
-            "sales": 224.0,
-            "cpc": 4.78
-          },
-          {
-            "date": "2026-08-26",
-            "impressions": 10,
-            "clicks": 1,
-            "spend": 1.5,
-            "sales": 0.0,
-            "cpc": 1.5
-          },
-          {
-            "date": "2026-08-28",
-            "impressions": 90,
-            "clicks": 1,
-            "spend": 5.95,
-            "sales": 0.0,
-            "cpc": 5.95
-          }
-        ],
-        "latest_cpc": 5.95,
-        "cpc_change_pct": 71.5
       },
       {
         "query": "dark spot remover for face",
@@ -16359,6 +16575,54 @@
         ],
         "latest_cpc": 5.06,
         "cpc_change_pct": 67.0
+      },
+      {
+        "query": "b0dxvvvvpr",
+        "spend": 13.48,
+        "sales": 0.0,
+        "acos": null,
+        "impressions": 59,
+        "clicks": 4,
+        "ctr": 0.0678,
+        "cpc": 3.37,
+        "purchases": 0,
+        "cvr": 0.0,
+        "daily": [
+          {
+            "date": "2026-08-08",
+            "impressions": 6,
+            "clicks": 1,
+            "spend": 1.2,
+            "sales": 0.0,
+            "cpc": 1.2
+          },
+          {
+            "date": "2026-08-09",
+            "impressions": 6,
+            "clicks": 1,
+            "spend": 5.4,
+            "sales": 0.0,
+            "cpc": 5.4
+          },
+          {
+            "date": "2026-08-15",
+            "impressions": 10,
+            "clicks": 1,
+            "spend": 1.5,
+            "sales": 0.0,
+            "cpc": 1.5
+          },
+          {
+            "date": "2026-08-20",
+            "impressions": 37,
+            "clicks": 1,
+            "spend": 5.38,
+            "sales": 0.0,
+            "cpc": 5.38
+          }
+        ],
+        "latest_cpc": 5.38,
+        "cpc_change_pct": 59.6
       },
       {
         "query": "skin nuva scar cream",
@@ -16463,70 +16727,6 @@
         ],
         "latest_cpc": 1.56,
         "cpc_change_pct": 57.5
-      },
-      {
-        "query": "arnica and bromelain",
-        "spend": 8.48,
-        "sales": 0.0,
-        "acos": null,
-        "impressions": 713,
-        "clicks": 6,
-        "ctr": 0.0084,
-        "cpc": 1.4133,
-        "purchases": 0,
-        "cvr": 0.0,
-        "daily": [
-          {
-            "date": "2026-08-05",
-            "impressions": 2,
-            "clicks": 1,
-            "spend": 2.7,
-            "sales": 0.0,
-            "cpc": 2.7
-          },
-          {
-            "date": "2026-08-11",
-            "impressions": 187,
-            "clicks": 1,
-            "spend": 0.86,
-            "sales": 0.0,
-            "cpc": 0.86
-          },
-          {
-            "date": "2026-08-12",
-            "impressions": 205,
-            "clicks": 1,
-            "spend": 0.26,
-            "sales": 0.0,
-            "cpc": 0.26
-          },
-          {
-            "date": "2026-08-22",
-            "impressions": 222,
-            "clicks": 1,
-            "spend": 0.26,
-            "sales": 0.0,
-            "cpc": 0.26
-          },
-          {
-            "date": "2026-08-26",
-            "impressions": 4,
-            "clicks": 1,
-            "spend": 2.2,
-            "sales": 0.0,
-            "cpc": 2.2
-          },
-          {
-            "date": "2026-08-28",
-            "impressions": 93,
-            "clicks": 1,
-            "spend": 2.2,
-            "sales": 0.0,
-            "cpc": 2.2
-          }
-        ],
-        "latest_cpc": 2.2,
-        "cpc_change_pct": 55.7
       }
     ]
   },
@@ -16536,141 +16736,141 @@
         "asin": "B09FQJMLPZ",
         "sku": "SVA0004",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (0.5 oz)",
-        "impressions": 58564,
-        "clicks": 634,
-        "spend": 1170.93,
-        "sales": 11665.39,
-        "purchases": 157,
-        "acos": 10.04,
-        "ctr": 0.0108,
-        "cpc": 1.8469,
-        "cvr": 0.2476
+        "impressions": 58477,
+        "clicks": 638,
+        "spend": 1158.29,
+        "sales": 11815.99,
+        "purchases": 159,
+        "acos": 9.8,
+        "ctr": 0.0109,
+        "cpc": 1.8155,
+        "cvr": 0.2492
       },
       {
         "asin": "B07RCJDFN4",
         "sku": "SVA0001-stickerless",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (1 oz)",
-        "impressions": 106896,
-        "clicks": 607,
-        "spend": 1418.12,
-        "sales": 7352.45,
-        "purchases": 82,
-        "acos": 19.29,
+        "impressions": 105978,
+        "clicks": 609,
+        "spend": 1392.79,
+        "sales": 7517.45,
+        "purchases": 84,
+        "acos": 18.53,
         "ctr": 0.0057,
-        "cpc": 2.3363,
-        "cvr": 0.1351
+        "cpc": 2.287,
+        "cvr": 0.1379
       },
       {
         "asin": "B0DXVVVVPR",
         "sku": "SVA0010",
         "title": "Skinuva\u00ae Stretch Mark Cream (2.5 oz)",
-        "impressions": 104936,
-        "clicks": 493,
-        "spend": 1475.26,
+        "impressions": 103679,
+        "clicks": 487,
+        "spend": 1449.75,
         "sales": 4622.9,
         "purchases": 41,
-        "acos": 31.91,
+        "acos": 31.36,
         "ctr": 0.0047,
-        "cpc": 2.9924,
-        "cvr": 0.0832
+        "cpc": 2.9769,
+        "cvr": 0.0842
       },
       {
         "asin": "B0861CGWLF",
         "sku": "SVA0003-stickerless",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)",
-        "impressions": 77998,
-        "clicks": 274,
-        "spend": 722.07,
+        "impressions": 78169,
+        "clicks": 271,
+        "spend": 709.26,
         "sales": 2622.0,
         "purchases": 29,
-        "acos": 27.54,
+        "acos": 27.05,
         "ctr": 0.0035,
-        "cpc": 2.6353,
-        "cvr": 0.1058
+        "cpc": 2.6172,
+        "cvr": 0.107
       },
       {
         "asin": "B0F45BTSB7",
         "sku": "SVA0011-SF",
         "title": "Skinuva\u00ae Bruise Advanced Recovery Cream (1 oz)",
-        "impressions": 21854,
-        "clicks": 223,
-        "spend": 459.62,
-        "sales": 1660.0,
-        "purchases": 32,
-        "acos": 27.69,
-        "ctr": 0.0102,
-        "cpc": 2.0611,
-        "cvr": 0.1435
+        "impressions": 21914,
+        "clicks": 221,
+        "spend": 439.51,
+        "sales": 1475.0,
+        "purchases": 29,
+        "acos": 29.8,
+        "ctr": 0.0101,
+        "cpc": 1.9887,
+        "cvr": 0.1312
       },
       {
         "asin": "B0BRNWSQ8H",
         "sku": "SVA0006",
         "title": "Skinuva\u00ae Scar+ Cream SPF 30 for Face & Body (1 oz)",
-        "impressions": 11560,
+        "impressions": 11657,
         "clicks": 75,
-        "spend": 237.01,
+        "spend": 238.59,
         "sales": 1450.0,
         "purchases": 16,
-        "acos": 16.35,
-        "ctr": 0.0065,
-        "cpc": 3.1601,
+        "acos": 16.45,
+        "ctr": 0.0064,
+        "cpc": 3.1812,
         "cvr": 0.2133
       },
       {
         "asin": "B0BRNVTD7T",
         "sku": "SVA0007",
         "title": "Skinuva\u00ae Scar+ Cream SPF 30 for Face & Body (0.5 oz)",
-        "impressions": 13028,
-        "clicks": 61,
-        "spend": 173.47,
-        "sales": 989.3,
-        "purchases": 11,
-        "acos": 17.53,
-        "ctr": 0.0047,
-        "cpc": 2.8438,
-        "cvr": 0.1803
+        "impressions": 13039,
+        "clicks": 65,
+        "spend": 187.37,
+        "sales": 1094.3,
+        "purchases": 12,
+        "acos": 17.12,
+        "ctr": 0.005,
+        "cpc": 2.8826,
+        "cvr": 0.1846
       },
       {
         "asin": "B0FRVVFPM5",
         "sku": "SVA0012-SF",
         "title": "Skinuva\u00ae Bruise Recovery Duo, Bromelain Supplement and Recovery Cream",
-        "impressions": 20928,
-        "clicks": 107,
-        "spend": 261.09,
-        "sales": 840.0,
-        "purchases": 13,
-        "acos": 31.08,
+        "impressions": 21315,
+        "clicks": 109,
+        "spend": 259.42,
+        "sales": 915.0,
+        "purchases": 14,
+        "acos": 28.35,
         "ctr": 0.0051,
-        "cpc": 2.4401,
-        "cvr": 0.1215
+        "cpc": 2.38,
+        "cvr": 0.1284
       },
       {
         "asin": "B0H3CLS4XW",
         "sku": "SVA0001.1-CA",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (1 oz)",
-        "impressions": 13123,
-        "clicks": 59,
-        "spend": 92.4,
+        "impressions": 11896,
+        "clicks": 55,
+        "spend": 87.6,
         "sales": 310.37,
         "purchases": 4,
-        "acos": 29.77,
-        "ctr": 0.0045,
-        "cpc": 1.5661,
-        "cvr": 0.0678
+        "acos": 28.22,
+        "ctr": 0.0046,
+        "cpc": 1.5927,
+        "cvr": 0.0727
       },
       {
         "asin": "B0H3CRJL78",
         "sku": "SVA0003-CA-SF",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)",
-        "impressions": 12252,
-        "clicks": 49,
-        "spend": 37.47,
+        "impressions": 12727,
+        "clicks": 50,
+        "spend": 38.81,
         "sales": 165.52,
         "purchases": 2,
-        "acos": 22.64,
-        "ctr": 0.004,
-        "cpc": 0.7647,
-        "cvr": 0.0408
+        "acos": 23.45,
+        "ctr": 0.0039,
+        "cpc": 0.7762,
+        "cvr": 0.04
       }
     ],
     "wasted_spend": [
@@ -16678,49 +16878,49 @@
         "asin": "B0D1W1WSFH",
         "sku": "SVA0003.2pk",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream (1 oz, 2 Pack)",
-        "impressions": 24233,
-        "clicks": 106,
-        "spend": 307.92,
+        "impressions": 23793,
+        "clicks": 105,
+        "spend": 304.01,
         "sales": 223.99,
         "purchases": 2,
-        "acos": 137.47,
+        "acos": 135.72,
         "ctr": 0.0044,
-        "cpc": 2.9049,
-        "cvr": 0.0189
+        "cpc": 2.8953,
+        "cvr": 0.019
       },
       {
         "asin": "B0HC8D1YWQ",
         "sku": "SVA0010-CA-SF",
         "title": "Skinuva\u00ae Stretch Mark Cream (2.5 oz)",
-        "impressions": 8883,
-        "clicks": 42,
-        "spend": 94.63,
+        "impressions": 9091,
+        "clicks": 43,
+        "spend": 98.21,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
         "ctr": 0.0047,
-        "cpc": 2.2531,
+        "cpc": 2.284,
         "cvr": 0.0
       },
       {
         "asin": "B08Z5GGG4G",
         "sku": "SVA0002+03",
         "title": null,
-        "impressions": 3454,
-        "clicks": 9,
-        "spend": 15.07,
+        "impressions": 3715,
+        "clicks": 10,
+        "spend": 16.61,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0026,
-        "cpc": 1.6744,
+        "ctr": 0.0027,
+        "cpc": 1.661,
         "cvr": 0.0
       },
       {
         "asin": "B0HC87D6MH",
         "sku": "SVA0003.2pk-CA-SF",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream (1 oz, 2 Pack)",
-        "impressions": 9126,
+        "impressions": 9219,
         "clicks": 13,
         "spend": 13.16,
         "sales": 0.0,
@@ -16734,14 +16934,14 @@
         "asin": "B0BXBJM2ZG",
         "sku": "SVA0003+05+06",
         "title": null,
-        "impressions": 1602,
-        "clicks": 6,
-        "spend": 8.76,
+        "impressions": 1647,
+        "clicks": 7,
+        "spend": 10.96,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0037,
-        "cpc": 1.46,
+        "ctr": 0.0043,
+        "cpc": 1.5657,
         "cvr": 0.0
       },
       {
@@ -16761,32 +16961,18 @@
     ],
     "opportunities": [
       {
-        "asin": "B0HC3R3DJM",
-        "sku": "SVA0004-CA-SF",
-        "title": "Skinuva\u00ae Scar Cream for Face & Body (0.5 oz)",
-        "impressions": 9573,
-        "clicks": 33,
-        "spend": 45.74,
-        "sales": 124.1,
-        "purchases": 2,
-        "acos": 36.86,
-        "ctr": 0.0034,
-        "cpc": 1.3861,
-        "cvr": 0.0606
-      },
-      {
         "asin": "B08Z4K68M7",
         "sku": "SVA0001+03",
         "title": null,
-        "impressions": 5220,
-        "clicks": 19,
-        "spend": 32.13,
+        "impressions": 5439,
+        "clicks": 18,
+        "spend": 30.14,
         "sales": 130.0,
         "purchases": 1,
-        "acos": 24.72,
-        "ctr": 0.0036,
-        "cpc": 1.6911,
-        "cvr": 0.0526
+        "acos": 23.18,
+        "ctr": 0.0033,
+        "cpc": 1.6744,
+        "cvr": 0.0556
       }
     ],
     "all": [
@@ -16794,183 +16980,183 @@
         "asin": "B07RCYZWNH",
         "sku": "SVA0002",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (1.7 oz)",
-        "impressions": 135229,
-        "clicks": 427,
-        "spend": 1521.86,
-        "sales": 3516.9,
-        "purchases": 34,
-        "acos": 43.27,
+        "impressions": 135060,
+        "clicks": 429,
+        "spend": 1494.49,
+        "sales": 3576.9,
+        "purchases": 35,
+        "acos": 41.78,
         "ctr": 0.0032,
-        "cpc": 3.5641,
-        "cvr": 0.0796
+        "cpc": 3.4837,
+        "cvr": 0.0816
       },
       {
         "asin": "B0DXVVVVPR",
         "sku": "SVA0010",
         "title": "Skinuva\u00ae Stretch Mark Cream (2.5 oz)",
-        "impressions": 104936,
-        "clicks": 493,
-        "spend": 1475.26,
+        "impressions": 103679,
+        "clicks": 487,
+        "spend": 1449.75,
         "sales": 4622.9,
         "purchases": 41,
-        "acos": 31.91,
+        "acos": 31.36,
         "ctr": 0.0047,
-        "cpc": 2.9924,
-        "cvr": 0.0832
+        "cpc": 2.9769,
+        "cvr": 0.0842
       },
       {
         "asin": "B07RCJDFN4",
         "sku": "SVA0001-stickerless",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (1 oz)",
-        "impressions": 106896,
-        "clicks": 607,
-        "spend": 1418.12,
-        "sales": 7352.45,
-        "purchases": 82,
-        "acos": 19.29,
+        "impressions": 105978,
+        "clicks": 609,
+        "spend": 1392.79,
+        "sales": 7517.45,
+        "purchases": 84,
+        "acos": 18.53,
         "ctr": 0.0057,
-        "cpc": 2.3363,
-        "cvr": 0.1351
+        "cpc": 2.287,
+        "cvr": 0.1379
       },
       {
         "asin": "B09FQJMLPZ",
         "sku": "SVA0004",
         "title": "Skinuva\u00ae Scar Cream for Face & Body (0.5 oz)",
-        "impressions": 58564,
-        "clicks": 634,
-        "spend": 1170.93,
-        "sales": 11665.39,
-        "purchases": 157,
-        "acos": 10.04,
-        "ctr": 0.0108,
-        "cpc": 1.8469,
-        "cvr": 0.2476
+        "impressions": 58477,
+        "clicks": 638,
+        "spend": 1158.29,
+        "sales": 11815.99,
+        "purchases": 159,
+        "acos": 9.8,
+        "ctr": 0.0109,
+        "cpc": 1.8155,
+        "cvr": 0.2492
       },
       {
         "asin": "B0B23BB6CB",
         "sku": "SVA0005",
         "title": "Skinuva\u00ae Bruise Tablets (14 Capsules)",
-        "impressions": 156476,
-        "clicks": 408,
-        "spend": 1081.01,
-        "sales": 2175.0,
-        "purchases": 49,
-        "acos": 49.7,
-        "ctr": 0.0026,
-        "cpc": 2.6495,
-        "cvr": 0.1201
+        "impressions": 154350,
+        "clicks": 412,
+        "spend": 1085.96,
+        "sales": 2055.0,
+        "purchases": 48,
+        "acos": 52.84,
+        "ctr": 0.0027,
+        "cpc": 2.6358,
+        "cvr": 0.1165
       },
       {
         "asin": "B0861CGWLF",
         "sku": "SVA0003-stickerless",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream for Face & Body (1 oz)",
-        "impressions": 77998,
-        "clicks": 274,
-        "spend": 722.07,
+        "impressions": 78169,
+        "clicks": 271,
+        "spend": 709.26,
         "sales": 2622.0,
         "purchases": 29,
-        "acos": 27.54,
+        "acos": 27.05,
         "ctr": 0.0035,
-        "cpc": 2.6353,
-        "cvr": 0.1058
+        "cpc": 2.6172,
+        "cvr": 0.107
       },
       {
         "asin": "B0F45BTSB7",
         "sku": "SVA0011-SF",
         "title": "Skinuva\u00ae Bruise Advanced Recovery Cream (1 oz)",
-        "impressions": 21854,
-        "clicks": 223,
-        "spend": 459.62,
-        "sales": 1660.0,
-        "purchases": 32,
-        "acos": 27.69,
-        "ctr": 0.0102,
-        "cpc": 2.0611,
-        "cvr": 0.1435
-      },
-      {
-        "asin": "B0DHYLCML2",
-        "sku": "SVA0008",
-        "title": "Skinuva\u00ae 24 Hour Care Kit, Scar Cream and Scar+ SPF 30 (1 oz each)",
-        "impressions": 12182,
-        "clicks": 37,
-        "spend": 310.95,
-        "sales": 319.98,
-        "purchases": 4,
-        "acos": 97.18,
-        "ctr": 0.003,
-        "cpc": 8.4041,
-        "cvr": 0.1081
+        "impressions": 21914,
+        "clicks": 221,
+        "spend": 439.51,
+        "sales": 1475.0,
+        "purchases": 29,
+        "acos": 29.8,
+        "ctr": 0.0101,
+        "cpc": 1.9887,
+        "cvr": 0.1312
       },
       {
         "asin": "B0D1W1WSFH",
         "sku": "SVA0003.2pk",
         "title": "Skinuva\u00ae Brite Dark Spot Treatment Cream (1 oz, 2 Pack)",
-        "impressions": 24233,
-        "clicks": 106,
-        "spend": 307.92,
+        "impressions": 23793,
+        "clicks": 105,
+        "spend": 304.01,
         "sales": 223.99,
         "purchases": 2,
-        "acos": 137.47,
+        "acos": 135.72,
         "ctr": 0.0044,
-        "cpc": 2.9049,
-        "cvr": 0.0189
+        "cpc": 2.8953,
+        "cvr": 0.019
+      },
+      {
+        "asin": "B0DHYLCML2",
+        "sku": "SVA0008",
+        "title": "Skinuva\u00ae 24 Hour Care Kit, Scar Cream and Scar+ SPF 30 (1 oz each)",
+        "impressions": 12296,
+        "clicks": 35,
+        "spend": 273.51,
+        "sales": 319.98,
+        "purchases": 4,
+        "acos": 85.48,
+        "ctr": 0.0028,
+        "cpc": 7.8146,
+        "cvr": 0.1143
       },
       {
         "asin": "B0FRVVFPM5",
         "sku": "SVA0012-SF",
         "title": "Skinuva\u00ae Bruise Recovery Duo, Bromelain Supplement and Recovery Cream",
-        "impressions": 20928,
-        "clicks": 107,
-        "spend": 261.09,
-        "sales": 840.0,
-        "purchases": 13,
-        "acos": 31.08,
+        "impressions": 21315,
+        "clicks": 109,
+        "spend": 259.42,
+        "sales": 915.0,
+        "purchases": 14,
+        "acos": 28.35,
         "ctr": 0.0051,
-        "cpc": 2.4401,
-        "cvr": 0.1215
+        "cpc": 2.38,
+        "cvr": 0.1284
       }
     ]
   },
   "placementInsights": [
     {
       "placement": "Top of Search",
-      "impressions": 38488,
-      "clicks": 1402,
-      "spend": 3541.77,
-      "sales": 22887.96,
-      "purchases": 298,
-      "acos": 15.47,
-      "ctr": 0.0364,
-      "cpc": 2.5262,
-      "cvr": 0.2126,
-      "spendShare": 36.5
+      "impressions": 37652,
+      "clicks": 1397,
+      "spend": 3448.36,
+      "sales": 22928.56,
+      "purchases": 299,
+      "acos": 15.04,
+      "ctr": 0.0371,
+      "cpc": 2.4684,
+      "cvr": 0.214,
+      "spendShare": 36.1
     },
     {
       "placement": "Rest of Search",
-      "impressions": 434952,
-      "clicks": 1895,
-      "spend": 4363.38,
-      "sales": 12149.98,
-      "purchases": 142,
-      "acos": 35.91,
+      "impressions": 435205,
+      "clicks": 1912,
+      "spend": 4399.13,
+      "sales": 12294.98,
+      "purchases": 143,
+      "acos": 35.78,
       "ctr": 0.0044,
-      "cpc": 2.3026,
-      "cvr": 0.0749,
-      "spendShare": 45.0
+      "cpc": 2.3008,
+      "cvr": 0.0748,
+      "spendShare": 46.0
     },
     {
       "placement": "Product Pages",
-      "impressions": 352305,
-      "clicks": 479,
-      "spend": 1785.51,
-      "sales": 3568.0,
+      "impressions": 349626,
+      "clicks": 478,
+      "spend": 1709.95,
+      "sales": 3573.0,
       "purchases": 43,
-      "acos": 50.04,
+      "acos": 47.86,
       "ctr": 0.0014,
-      "cpc": 3.7276,
-      "cvr": 0.0898,
-      "spendShare": 18.4
+      "cpc": 3.5773,
+      "cvr": 0.09,
+      "spendShare": 17.9
     }
   ]
 }
