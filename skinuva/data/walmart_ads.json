@@ -199,7 +199,7 @@
     "byBrand": {
       "Skinuva": {
         "spend": 319.57,
-        "adSales": 80,
+        "adSales": 80.0,
         "orders": 1,
         "clicks": 165,
         "impressions": 356298
@@ -235,65 +235,73 @@
     },
     "range": {
       "since": "2026-08-01",
-      "until": "2026-08-31"
+      "until": "2026-09-03"
     },
     "profileId": "224591",
-    "fetched_at": "2026-09-03T14:06:00Z",
+    "fetched_at": "2026-09-04T14:05:36Z",
     "source": "helium10-walmart"
   },
   "September 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 10.16,
-        "adSales": 0,
+        "spend": 17.76,
+        "adSales": 0.0,
         "orders": 0,
-        "clicks": 4,
-        "impressions": 6598
+        "clicks": 8,
+        "impressions": 14033
       },
       "Cloud Cafe": {
-        "spend": 2.3,
-        "adSales": 0,
+        "spend": 3.02,
+        "adSales": 0.0,
         "orders": 0,
-        "clicks": 2,
-        "impressions": 1403
+        "clicks": 3,
+        "impressions": 2965
       }
     },
     "campaigns": {
       "Skinuva": [
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 5.36,
+          "spend": 8.04,
           "adSales": 0,
           "orders": 0,
-          "clicks": 2,
-          "impressions": 6454
+          "clicks": 3,
+          "impressions": 13300
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
-          "spend": 4.8,
+          "spend": 5.95,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 3,
+          "impressions": 272
+        },
+        {
+          "name": "Skinuva - SB - M - video 3.26 v1",
+          "spend": 3.77,
           "adSales": 0,
           "orders": 0,
           "clicks": 2,
-          "impressions": 144
+          "impressions": 461
         }
       ],
       "Cloud Cafe": [
         {
           "name": "Cloud Cafe - SP - M - 8.26",
-          "spend": 2.3,
+          "spend": 3.02,
           "adSales": 0,
           "orders": 0,
-          "clicks": 2,
-          "impressions": 1403
+          "clicks": 3,
+          "impressions": 2965
         }
       ]
     },
     "range": {
-      "since": "2026-09-01",
-      "until": "2026-09-02"
+      "since": "2026-08-01",
+      "until": "2026-09-03"
     },
     "profileId": "224591",
-    "fetched_at": "2026-09-03T14:06:00Z",
+    "fetched_at": "2026-09-04T14:05:36Z",
     "source": "helium10-walmart"
   }
 }
