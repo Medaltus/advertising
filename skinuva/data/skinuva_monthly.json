@@ -525,54 +525,54 @@
   },
   "August 2026": {
     "amazon": {
-      "spend": 12208.01,
+      "spend": 12196.14,
       "adSales": 44305.82,
-      "totalSales": 125624.95,
+      "totalSales": 125434.95,
       "orders": 551,
-      "clicks": 4863,
-      "impressions": 1174516,
+      "clicks": 4860,
+      "impressions": 1174459,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 9977.57,
-      "adSales": 38074.16,
+      "adSales": 38105.92,
       "conversions": 246,
       "clicks": 4732,
       "impressions": 780556
     },
     "shopify": 48446.05,
-    "walmart": 1354.0,
-    "combinedTotalSales": 175425.0,
-    "fetched_at": "2026-09-06T10:49:05Z",
+    "walmart": 1314.0,
+    "combinedTotalSales": 175195.0,
+    "fetched_at": "2026-09-06T16:44:46Z",
     "refunds": 4895.76,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 120729.19,
-    "netCombinedTotalSales": 170529.24
+    "netAmazonSales": 120539.19,
+    "netCombinedTotalSales": 170299.24
   },
   "September 2026": {
     "amazon": {
       "spend": 1873.93,
-      "adSales": 6524.22,
-      "totalSales": 17374.98,
-      "orders": 78,
+      "adSales": 6719.22,
+      "totalSales": 20551.84,
+      "orders": 80,
       "clicks": 788,
-      "impressions": 192851,
+      "impressions": 191941,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 1011.26,
-      "adSales": 1763.12,
-      "conversions": 13,
-      "clicks": 447,
-      "impressions": 66651
+      "spend": 1255.52,
+      "adSales": 2944.09,
+      "conversions": 21,
+      "clicks": 547,
+      "impressions": 80238
     },
     "shopify": 6717.87,
-    "walmart": 200.0,
-    "combinedTotalSales": 24292.85,
-    "fetched_at": "2026-09-06T10:49:05Z",
+    "walmart": 280.0,
+    "combinedTotalSales": 27549.71,
+    "fetched_at": "2026-09-06T16:44:46Z",
     "refunds": 1019.99,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 16354.99,
-    "netCombinedTotalSales": 23272.86
+    "netAmazonSales": 19531.85,
+    "netCombinedTotalSales": 26529.72
   }
 }
