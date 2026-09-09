@@ -56,28 +56,28 @@
       "since": "2026-08-01",
       "until": "2026-08-31"
     },
-    "fetched_at": "2026-09-08T18:17:37Z",
+    "fetched_at": "2026-09-09T18:12:26Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   },
   "September 2026": {
-    "total": 8885.67,
+    "total": 10322.12,
     "byChannel": {
-      "Draft Orders": 8555.48,
-      "Online Store": 7938.31,
+      "Draft Orders": 10069.58,
+      "Online Store": 9269.81,
       "Seal Subscriptions": 795.11,
+      "TikTok": 170.2,
       "Shop": 87.0,
-      "TikTok": 65.25,
       "Shopify Mobile for iPhone": 0.0
     },
     "excludedChannels": [
       "Draft Orders"
     ],
-    "excludedTotal": 8555.48,
+    "excludedTotal": 10069.58,
     "range": {
       "since": "2026-09-01",
-      "until": "2026-09-07"
+      "until": "2026-09-08"
     },
-    "fetched_at": "2026-09-08T18:17:37Z",
+    "fetched_at": "2026-09-09T18:12:26Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   }
 }
