@@ -313,6 +313,43 @@ EXTERNAL_TRACKED = [
     ('skinuva/data/walmart_ads.json',     'Walmart ads',     36.0),
 ]
 
+# ── Known degradations, with an expiry ────────────────────────────────────────
+# A dataset that is stale for a KNOWN, accepted, temporary reason reports as WARN
+# instead of failing the run — but only until the date given, after which it fails
+# again automatically.
+#
+# The expiry is the point. Simply raising a threshold to silence a red X mutes it
+# forever, and the next genuine outage of that dataset goes unnoticed. This says
+# "we know, we expect it back by then" and re-arms itself if it doesn't come back.
+#
+# Every other dataset is unaffected: a real failure elsewhere still fails the run.
+KNOWN_DEGRADED = {
+    'skinuva/data/walmart_ads.json': {
+        'until':  '2026-10-02',
+        'reason': 'Helium 10 MCP credits exhausted for September — the walmart-data-refresh '
+                  'task cannot fetch Walmart ad spend until credits reset on Oct 1. '
+                  'Walmart REVENUE is unaffected and still refreshing daily.',
+        'impact': 'Walmart ad spend is frozen at its 2026-09-09 values, so September '
+                  'Walmart spend is understated and TACOS is very slightly flattered. '
+                  'Walmart is ~1% of total spend, so the effect on portfolio figures '
+                  'is under 0.1pp.',
+    },
+}
+
+
+def _known_degraded(path, now):
+    """Returns (reason, impact) when `path` is a known, unexpired degradation."""
+    info = KNOWN_DEGRADED.get(path)
+    if not info:
+        return None
+    try:
+        until = datetime.strptime(info['until'], '%Y-%m-%d').replace(tzinfo=timezone.utc)
+    except Exception:
+        return None
+    if now > until:
+        return None
+    return info
+
 # Files allowed to be absent without failing (not yet configured, etc).
 # Once a file exists it must still be fresh — absence is the only exemption.
 #
@@ -433,6 +470,7 @@ def main():
         report_failures.append(f)
 
     problems = []
+    warnings = []
     # Files this workflow produces: strict window. Then files owned by other
     # workflows, each with its own allowance.
     checklist = ([(p, l, args.max_age_hours) for p, l in TRACKED]
@@ -443,6 +481,18 @@ def main():
             status, detail = 'SKIP', detail + ' (optional)'
         mark = {'PASS': 'ok', 'SKIP': '--'}.get(status, status)
         note = '' if max_age == args.max_age_hours else f'  [external, {max_age:.0f}h allowance]'
+
+        # Downgrade a known, unexpired degradation to a warning rather than a failure.
+        degraded = _known_degraded(path, now) if status in ('STALE', 'MISSING', 'UNKNOWN') else None
+        if degraded:
+            print(f"  WARN     {label:26} {detail}{note}")
+            print(f"           ↳ known issue until {degraded['until']}: {degraded['reason']}")
+            print(f"           ↳ impact: {degraded['impact']}")
+            print(f"::warning file={path}::{label} is stale — known issue until "
+                  f"{degraded['until']}. {degraded['reason']}")
+            warnings.append((label, degraded))
+            continue
+
         print(f"  {mark:8} {label:26} {detail}{note}")
         if status in ('STALE', 'MISSING', 'UNKNOWN'):
             problems.append((label, path, status, detail))
@@ -469,7 +519,14 @@ def main():
         print()
 
     if not problems and not report_failures and not implausible:
-        print(f"All {len(checklist)} datasets refreshed, and every value looks plausible.")
+        ok_n = len(checklist) - len(warnings)
+        print(f"All {ok_n} of {len(checklist)} datasets refreshed, and every value "
+              f"looks plausible.")
+        if warnings:
+            print(f"\n{len(warnings)} dataset(s) stale for a KNOWN reason (not failing "
+                  f"the run, but they will start failing again on their expiry date):")
+            for label, info in warnings:
+                print(f"  - {label}: known until {info['until']} — {info['reason']}")
         return 0
 
     if not problems and (report_failures or implausible):
