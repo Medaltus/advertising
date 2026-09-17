@@ -1,9 +1,9 @@
 {
-  "fetched_at": "2026-09-17T11:37:37Z",
+  "fetched_at": "2026-09-17T18:23:22Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 68935,
+    "impressions": 68867,
     "clicks": 170,
     "spend": 448.07,
     "sales": 916.0,
@@ -12,7 +12,7 @@
     "cpc": 2.6357,
     "acos": 48.92,
     "roas": 2.04,
-    "totalSales": 2082.81
+    "totalSales": 2360.81
   },
   "timeline": [
     {
@@ -189,7 +189,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 5807.38
+      "totalSales": 5677.38
     },
     {
       "date": "2026-09-02",
@@ -237,7 +237,7 @@
     },
     {
       "date": "2026-09-06",
-      "impressions": 1472,
+      "impressions": 1471,
       "clicks": 4,
       "spend": 12.44,
       "sales": 0.0,
@@ -321,7 +321,7 @@
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": 4860.0
+      "totalSales": 4850.0
     },
     {
       "date": "2026-09-14",
@@ -332,11 +332,11 @@
       "purchases": 1,
       "acos": 23.28,
       "roas": 4.3,
-      "totalSales": 5975.31
+      "totalSales": 5966.31
     },
     {
       "date": "2026-09-15",
-      "impressions": 1622,
+      "impressions": 1621,
       "clicks": 4,
       "spend": 7.24,
       "sales": 0.0,
@@ -347,21 +347,21 @@
     },
     {
       "date": "2026-09-16",
-      "impressions": 1277,
+      "impressions": 1211,
       "clicks": 5,
       "spend": 10.54,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
       "roas": 0.0,
-      "totalSales": null
+      "totalSales": 6128.54
     }
   ],
   "campaigns": [
     {
       "id": 83906501217006,
       "name": "eraclea - SB - M - BambooExfoliant - 7.26",
-      "impressions": 42649,
+      "impressions": 42646,
       "clicks": 114,
       "spend": 352.25,
       "sales": 94.0,
@@ -374,7 +374,7 @@
     {
       "id": 248619547347593,
       "name": "eraclea - SP - A - BambooExfoliant 1 - 4.26",
-      "impressions": 5301,
+      "impressions": 5277,
       "clicks": 17,
       "spend": 36.9,
       "sales": 47.0,
@@ -387,7 +387,7 @@
     {
       "id": 309431604356282,
       "name": "eraclea - SP - M - Product Targeting",
-      "impressions": 1897,
+      "impressions": 1887,
       "clicks": 17,
       "spend": 27.76,
       "sales": 317.0,
@@ -400,7 +400,7 @@
     {
       "id": 166091452533342,
       "name": "eraclea - SP - A - Pure Hydration 6 - 4.26",
-      "impressions": 13788,
+      "impressions": 13775,
       "clicks": 11,
       "spend": 17.76,
       "sales": 285.0,
@@ -413,7 +413,7 @@
     {
       "id": 245252659571477,
       "name": "eraclea - SP - A - Gel Cleanser 3 - 4.26",
-      "impressions": 2507,
+      "impressions": 2499,
       "clicks": 4,
       "spend": 7.24,
       "sales": 0.0,
@@ -426,7 +426,7 @@
     {
       "id": 20573648193743,
       "name": "eraclea - SP - M - BambooExfoliant - 7.26",
-      "impressions": 1881,
+      "impressions": 1872,
       "clicks": 2,
       "spend": 3.99,
       "sales": 47.0,
@@ -439,7 +439,7 @@
     {
       "id": 163136390316507,
       "name": "eraclea - SP - A - All Products (minus HEROs 1/3/6) - 4.26",
-      "impressions": 912,
+      "impressions": 911,
       "clicks": 5,
       "spend": 2.17,
       "sales": 126.0,
@@ -1661,7 +1661,7 @@
     {
       "asin": "B075MPPFKF",
       "sku": "ERA0001",
-      "impressions": 7292,
+      "impressions": 7257,
       "clicks": 22,
       "spend": 43.35,
       "sales": 141.0,
@@ -1675,7 +1675,7 @@
     {
       "asin": "B075MM23VZ",
       "sku": "ERA0006",
-      "impressions": 14012,
+      "impressions": 13999,
       "clicks": 16,
       "spend": 22.94,
       "sales": 285.0,
@@ -1689,7 +1689,7 @@
     {
       "asin": "B075MLZ3S6",
       "sku": "ERA0003.1",
-      "impressions": 2667,
+      "impressions": 2659,
       "clicks": 4,
       "spend": 7.24,
       "sales": 0.0,
@@ -1717,7 +1717,7 @@
     {
       "asin": "B075MMNCL1",
       "sku": "ERA0016",
-      "impressions": 512,
+      "impressions": 508,
       "clicks": 3,
       "spend": 4.85,
       "sales": 0.0,
@@ -1745,13 +1745,13 @@
     {
       "asin": "B075MLB8ZW",
       "sku": "ERA0005.1",
-      "impressions": 205,
+      "impressions": 203,
       "clicks": 3,
       "spend": 3.92,
       "sales": 176.0,
       "purchases": 2,
       "acos": 2.23,
-      "ctr": 0.0146,
+      "ctr": 0.0148,
       "cpc": 1.3067,
       "cvr": 0.6667,
       "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)"
@@ -1759,13 +1759,13 @@
     {
       "asin": "B075MKWFQM",
       "sku": "ERA0004",
-      "impressions": 183,
+      "impressions": 180,
       "clicks": 2,
       "spend": 3.13,
       "sales": 156.0,
       "purchases": 2,
       "acos": 2.01,
-      "ctr": 0.0109,
+      "ctr": 0.0111,
       "cpc": 1.565,
       "cvr": 1.0,
       "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)"
@@ -1773,7 +1773,7 @@
     {
       "asin": "B075MM3977",
       "sku": "ERA0012",
-      "impressions": 183,
+      "impressions": 182,
       "clicks": 1,
       "spend": 0.29,
       "sales": 0.0,
@@ -1787,13 +1787,13 @@
     {
       "asin": "B075MM84DC",
       "sku": "ERA0002.1",
-      "impressions": 380,
+      "impressions": 377,
       "clicks": 1,
       "spend": 0.27,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.0026,
+      "ctr": 0.0027,
       "cpc": 0.27,
       "cvr": 0.0,
       "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)"
@@ -1801,7 +1801,7 @@
     {
       "asin": "B0C382DN6J",
       "sku": "ERA0001+3.1",
-      "impressions": 59,
+      "impressions": 58,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -1814,7 +1814,7 @@
     {
       "asin": "B09Q2SFYW4",
       "sku": "ERA0020",
-      "impressions": 85,
+      "impressions": 82,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -1828,7 +1828,7 @@
     {
       "asin": "B09Q2RY76K",
       "sku": "ERA0019",
-      "impressions": 154,
+      "impressions": 152,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -1842,7 +1842,7 @@
     {
       "asin": "B075MMCXMF",
       "sku": "ERA0008.1",
-      "impressions": 121,
+      "impressions": 119,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -1856,7 +1856,7 @@
     {
       "asin": "B075MKF9P3",
       "sku": "ERA0011",
-      "impressions": 72,
+      "impressions": 70,
       "clicks": 0,
       "spend": 0.0,
       "sales": 0.0,
@@ -1897,7 +1897,7 @@
   "placements": [
     {
       "placement": "Top of Search",
-      "impressions": 1978,
+      "impressions": 1974,
       "clicks": 31,
       "spend": 49.73,
       "sales": 744.0,
@@ -1910,20 +1910,20 @@
     },
     {
       "placement": "Rest of Search",
-      "impressions": 10276,
+      "impressions": 10216,
       "clicks": 21,
       "spend": 37.03,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.002,
+      "ctr": 0.0021,
       "cpc": 1.7633,
       "cvr": 0.0,
       "spendShare": 38.6
     },
     {
       "placement": "Product Pages",
-      "impressions": 14052,
+      "impressions": 14029,
       "clicks": 4,
       "spend": 9.06,
       "sales": 78.0,
@@ -2391,7 +2391,7 @@
         "asin": "B075MM23VZ",
         "sku": "ERA0006",
         "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
-        "impressions": 14012,
+        "impressions": 13999,
         "clicks": 16,
         "spend": 22.94,
         "sales": 285.0,
@@ -2405,7 +2405,7 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 7292,
+        "impressions": 7257,
         "clicks": 22,
         "spend": 43.35,
         "sales": 141.0,
@@ -2421,7 +2421,7 @@
         "asin": "B075MLZ3S6",
         "sku": "ERA0003.1",
         "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)",
-        "impressions": 2667,
+        "impressions": 2659,
         "clicks": 4,
         "spend": 7.24,
         "sales": 0.0,
@@ -2465,13 +2465,13 @@
         "asin": "B075MKWFQM",
         "sku": "ERA0004",
         "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)",
-        "impressions": 183,
+        "impressions": 180,
         "clicks": 2,
         "spend": 3.13,
         "sales": 156.0,
         "purchases": 2,
         "acos": 2.01,
-        "ctr": 0.0109,
+        "ctr": 0.0111,
         "cpc": 1.565,
         "cvr": 1.0
       },
@@ -2479,13 +2479,13 @@
         "asin": "B075MLB8ZW",
         "sku": "ERA0005.1",
         "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
-        "impressions": 205,
+        "impressions": 203,
         "clicks": 3,
         "spend": 3.92,
         "sales": 176.0,
         "purchases": 2,
         "acos": 2.23,
-        "ctr": 0.0146,
+        "ctr": 0.0148,
         "cpc": 1.3067,
         "cvr": 0.6667
       },
@@ -2493,7 +2493,7 @@
         "asin": "B075MM23VZ",
         "sku": "ERA0006",
         "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
-        "impressions": 14012,
+        "impressions": 13999,
         "clicks": 16,
         "spend": 22.94,
         "sales": 285.0,
@@ -2507,7 +2507,7 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 7292,
+        "impressions": 7257,
         "clicks": 22,
         "spend": 43.35,
         "sales": 141.0,
@@ -2523,7 +2523,7 @@
         "asin": "B075MPPFKF",
         "sku": "ERA0001",
         "title": "eraclea Daily Bamboo Exfoliant Face Wash with Hyaluronic Acid (4 fl oz)",
-        "impressions": 7292,
+        "impressions": 7257,
         "clicks": 22,
         "spend": 43.35,
         "sales": 141.0,
@@ -2537,7 +2537,7 @@
         "asin": "B075MM23VZ",
         "sku": "ERA0006",
         "title": "eraclea Pure Hydration Face Serum with Hyaluronic Acid and Zinc (1 fl oz)",
-        "impressions": 14012,
+        "impressions": 13999,
         "clicks": 16,
         "spend": 22.94,
         "sales": 285.0,
@@ -2551,7 +2551,7 @@
         "asin": "B075MLZ3S6",
         "sku": "ERA0003.1",
         "title": "eraclea Purifying Gel Cleanser with Hyaluronic Acid and Aloe (4 fl oz)",
-        "impressions": 2667,
+        "impressions": 2659,
         "clicks": 4,
         "spend": 7.24,
         "sales": 0.0,
@@ -2579,7 +2579,7 @@
         "asin": "B075MMNCL1",
         "sku": "ERA0016",
         "title": "eraclea Detox-Oxygenating Reaffirming Mask with Hyaluronic Acid (1 fl oz)",
-        "impressions": 512,
+        "impressions": 508,
         "clicks": 3,
         "spend": 4.85,
         "sales": 0.0,
@@ -2607,13 +2607,13 @@
         "asin": "B075MLB8ZW",
         "sku": "ERA0005.1",
         "title": "eraclea Intensive Hydrating Day Cream +PB, Hyaluronic Acid (1 fl oz)",
-        "impressions": 205,
+        "impressions": 203,
         "clicks": 3,
         "spend": 3.92,
         "sales": 176.0,
         "purchases": 2,
         "acos": 2.23,
-        "ctr": 0.0146,
+        "ctr": 0.0148,
         "cpc": 1.3067,
         "cvr": 0.6667
       },
@@ -2621,13 +2621,13 @@
         "asin": "B075MKWFQM",
         "sku": "ERA0004",
         "title": "eraclea Hydrating Day Lotion +PB with Hyaluronic Acid (1 fl oz)",
-        "impressions": 183,
+        "impressions": 180,
         "clicks": 2,
         "spend": 3.13,
         "sales": 156.0,
         "purchases": 2,
         "acos": 2.01,
-        "ctr": 0.0109,
+        "ctr": 0.0111,
         "cpc": 1.565,
         "cvr": 1.0
       },
@@ -2635,7 +2635,7 @@
         "asin": "B075MM3977",
         "sku": "ERA0012",
         "title": "eraclea Soothe and Calm Facial Sculpting Lotion, Hyaluronic Acid (1 fl oz)",
-        "impressions": 183,
+        "impressions": 182,
         "clicks": 1,
         "spend": 0.29,
         "sales": 0.0,
@@ -2649,13 +2649,13 @@
         "asin": "B075MM84DC",
         "sku": "ERA0002.1",
         "title": "eraclea Purifying Cream Cleanser with Hyaluronic Acid (4 fl oz)",
-        "impressions": 380,
+        "impressions": 377,
         "clicks": 1,
         "spend": 0.27,
         "sales": 0.0,
         "purchases": 0,
         "acos": null,
-        "ctr": 0.0026,
+        "ctr": 0.0027,
         "cpc": 0.27,
         "cvr": 0.0
       }
@@ -2664,7 +2664,7 @@
   "placementInsights": [
     {
       "placement": "Top of Search",
-      "impressions": 1978,
+      "impressions": 1974,
       "clicks": 31,
       "spend": 49.73,
       "sales": 744.0,
@@ -2677,20 +2677,20 @@
     },
     {
       "placement": "Rest of Search",
-      "impressions": 10276,
+      "impressions": 10216,
       "clicks": 21,
       "spend": 37.03,
       "sales": 0.0,
       "purchases": 0,
       "acos": null,
-      "ctr": 0.002,
+      "ctr": 0.0021,
       "cpc": 1.7633,
       "cvr": 0.0,
       "spendShare": 38.6
     },
     {
       "placement": "Product Pages",
-      "impressions": 14052,
+      "impressions": 14029,
       "clicks": 4,
       "spend": 9.06,
       "sales": 78.0,
