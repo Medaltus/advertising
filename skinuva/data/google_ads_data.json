@@ -1,15 +1,15 @@
 {
-  "fetched_at": "2026-09-21T13:03:10Z",
+  "fetched_at": "2026-09-21T19:19:47Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
     "impressions": 551166,
-    "clicks": 3791,
-    "spend": 7465.26,
+    "clicks": 3792,
+    "spend": 7465.29,
     "sales": 24474.68,
     "conversions": 161,
     "ctr": 0.0069,
-    "cpc": 1.9692,
+    "cpc": 1.9687,
     "acos": 30.5,
     "roas": 3.28
   },
@@ -317,8 +317,8 @@
     {
       "date": "2026-09-20",
       "impressions": 12356,
-      "clicks": 136,
-      "spend": 201.61,
+      "clicks": 137,
+      "spend": 201.64,
       "sales": 568.77,
       "conversions": 4.0,
       "acos": 35.45,
@@ -977,8 +977,8 @@
     {
       "date": "2026-09-20",
       "impressions": 12356,
-      "clicks": 136,
-      "spend": 201.61,
+      "clicks": 137,
+      "spend": 201.64,
       "sales": 568.77,
       "conversions": 4.0
     }
@@ -1084,11 +1084,11 @@
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "type": "PERFORMANCE_MAX",
       "impressions": 65311,
-      "clicks": 558,
-      "spend": 560.63,
+      "clicks": 559,
+      "spend": 560.66,
       "sales": 1625.11,
       "conversions": 8.490288,
-      "cpc": 1.0047,
+      "cpc": 1.003,
       "acos": 34.5,
       "roas": 2.9
     },
@@ -4626,8 +4626,8 @@
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "type": "PERFORMANCE_MAX",
       "impressions": 1949,
-      "clicks": 37,
-      "spend": 8.42,
+      "clicks": 38,
+      "spend": 8.45,
       "sales": 0.0,
       "conversions": 0.0
     },
@@ -4681,14 +4681,14 @@
       "id": "24018309787",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
       "state": "enabled",
-      "dailyBudget": 100.0,
+      "dailyBudget": 120.0,
       "recentSpend": 109.97,
-      "pacingPct": 110.0
+      "pacingPct": 91.6
     },
     {
       "id": "18209518057",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
-      "state": "enabled",
+      "state": "paused",
       "dailyBudget": 80.0,
       "recentSpend": 430.53,
       "pacingPct": 538.2
@@ -4712,7 +4712,7 @@
     {
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
-      "state": "enabled",
+      "state": "paused",
       "dailyBudget": 20.0,
       "recentSpend": 62.78,
       "pacingPct": 313.9
@@ -4722,7 +4722,7 @@
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 18.08,
+      "recentSpend": 18.09,
       "pacingPct": 90.4
     },
     {
@@ -4744,7 +4744,7 @@
     {
       "id": "21466459569",
       "name": "Skinuva Bruise Topical Leads",
-      "state": "enabled",
+      "state": "paused",
       "dailyBudget": 10.0,
       "recentSpend": 45.23,
       "pacingPct": 452.3
@@ -4840,7 +4840,7 @@
     {
       "id": "21714470857",
       "name": "Skinuva Bruise Search Campaign",
-      "state": "enabled",
+      "state": "paused",
       "dailyBudget": 0.1,
       "recentSpend": 0.27,
       "pacingPct": 271.3
@@ -4848,7 +4848,7 @@
     {
       "id": "21719229797",
       "name": "Skinuva Brite Search Campaign",
-      "state": "enabled",
+      "state": "paused",
       "dailyBudget": 0.1,
       "recentSpend": 0.26,
       "pacingPct": 264.2
