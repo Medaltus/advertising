@@ -2126,12 +2126,12 @@
   },
   "2026-09-09": {
     "amazon": {
-      "spend": 365.15,
+      "spend": 360.75,
       "adSales": 1689.99,
       "totalSales": null,
       "orders": 24,
-      "clicks": 168,
-      "impressions": 47117
+      "clicks": 166,
+      "impressions": 47112
     },
     "google": {
       "spend": 192.09,
@@ -2143,11 +2143,11 @@
   },
   "2026-09-10": {
     "amazon": {
-      "spend": 347.39,
-      "adSales": 1624.97,
+      "spend": 340.27,
+      "adSales": 1664.97,
       "totalSales": null,
-      "orders": 21,
-      "clicks": 173,
+      "orders": 22,
+      "clicks": 171,
       "impressions": 44323
     },
     "google": {
@@ -2267,7 +2267,7 @@
       "totalSales": null,
       "orders": 14,
       "clicks": 163,
-      "impressions": 71259
+      "impressions": 71256
     },
     "google": {
       "spend": 237.76,
@@ -2288,10 +2288,10 @@
     },
     "google": {
       "spend": 176.93,
-      "adSales": 473.59,
-      "conversions": 3.0,
+      "adSales": 681.78,
+      "conversions": 5.0,
       "clicks": 81,
-      "impressions": 11368
+      "impressions": 11367
     }
   },
   "2026-09-19": {
@@ -2314,18 +2314,18 @@
   "2026-09-20": {
     "amazon": {
       "spend": 435.31,
-      "adSales": 1122.04,
+      "adSales": 1182.04,
       "totalSales": null,
-      "orders": 15,
+      "orders": 16,
       "clicks": 167,
       "impressions": 62727
     },
     "google": {
       "spend": 201.64,
-      "adSales": 568.77,
-      "conversions": 4.0,
+      "adSales": 791.96,
+      "conversions": 6.0,
       "clicks": 137,
-      "impressions": 12356
+      "impressions": 12355
     }
   },
   "2026-09-21": {
@@ -2335,14 +2335,14 @@
       "totalSales": null,
       "orders": 22,
       "clicks": 173,
-      "impressions": 66852
+      "impressions": 66654
     },
     "google": {
       "spend": 89.47,
       "adSales": 542.6,
       "conversions": 4.0,
       "clicks": 94,
-      "impressions": 10014
+      "impressions": 10013
     }
   },
   "2026-09-22": {
@@ -2352,8 +2352,14 @@
       "totalSales": null,
       "orders": 17,
       "clicks": 179,
-      "impressions": 67786
+      "impressions": 65537
     },
-    "google": {}
+    "google": {
+      "spend": 55.97,
+      "adSales": 0.0,
+      "conversions": 0.0,
+      "clicks": 58,
+      "impressions": 9294
+    }
   }
 }
