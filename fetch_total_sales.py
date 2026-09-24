@@ -132,6 +132,11 @@ _BUDGET_DEADLINE = None  # epoch seconds; None = no cap
 # $159,976.50 this way. The map must retain at least this fraction of the previously
 # cached ASINs to be trusted; a real catalogue does not shrink by 40% overnight.
 ASIN_MAP_MIN_RETENTION = 0.6
+
+# Did the most recent _fetch_one_account() actually succeed? A list so the nested
+# assignment doesn't need `global`. Read it immediately after the call — it is not
+# thread-safe and is only meaningful for the call that just returned.
+_LAST_FETCH_OK = [True]
 # Populated when a map is rejected, so the workflow's verify step can fail the run
 # instead of committing a quietly-degraded refresh.
 ASIN_MAP_FAILURES = []
@@ -702,8 +707,17 @@ def _fetch_one_account(cfg, refresh_token_key, start_str, end_str,
             print(f"  ✓ Adjusted total (excl. excluded brands): ${adj:,.2f}")
         print(f"  ✓ Per-brand totals: {len(brand_sales)} brands")
     except Exception as e:
+        # An empty brand_sales here means "we could not measure this account", NOT
+        # "this account sold nothing". Callers that merge several marketplaces MUST
+        # distinguish the two — see fetch_brand_sales_for_period. This is the failure
+        # that let Canada-only revenue be published as Skinuva's entire business from
+        # 2026-08-20: the US fetch threw, returned {}, and the CA figure was then
+        # added to nothing and written as the month's total.
         print(f"  ⚠ Per-brand sales failed: {e}")
+        _LAST_FETCH_OK[0] = False
+        return daily_sales, brand_sales
 
+    _LAST_FETCH_OK[0] = True
     return daily_sales, brand_sales
 
 
@@ -809,18 +823,49 @@ def ts_fx_to_usd(cfg, currency):
     return rate
 
 
-def fetch_brand_sales_for_period(cfg, start_str, end_str):
+def fetch_brand_sales_for_period(cfg, start_str, end_str, include_extra_marketplaces=None):
     """
     Fetches per-brand total sales for an explicit date range from SP-API.
     Combines Medaltus + HighOnLove accounts if both are configured.
-    Returns {brand_name: total_sales_usd}.
+    Returns {brand_name: total_sales_usd}. Empty dict means UNKNOWN, not zero.
+
+    include_extra_marketplaces — defaults to True for multi-day ranges and False for
+    single-day calls. The daily archive calls this once per day; adding a second
+    marketplace there doubled SP-API report submissions against the quota that has
+    repeatedly broken this pipeline, for a marketplace that is ~3% of revenue. Canada
+    is still counted in every monthly figure, which is what the dashboards display.
     """
+    if include_extra_marketplaces is None:
+        include_extra_marketplaces = (start_str != end_str)
     print(f"  Fetching brand sales {start_str} → {end_str}…")
 
     _, brand_sales = _fetch_one_account(
         cfg, "sp_refresh_token", start_str, end_str,
         cache_name="asin_brand_cache.json",
     )
+    primary_ok = _LAST_FETCH_OK[0]
+
+    # ── The US account is the business. Never publish a partial stand-in. ──────
+    #
+    # If the primary fetch failed it returns {}, and everything below would then add
+    # Canada to nothing and hand back a CA-only figure as though it were the whole
+    # period. That is exactly what happened from 2026-08-20: Skinuva's daily revenue
+    # went from ~$3,500/day to ~$400/day — the Canadian figure alone — and the monthly
+    # totals fell from ~$132K to ~$17K on both dashboards, roughly tripling reported
+    # TACOS. Adding Canada doubled the SP-API calls per day, which is what started
+    # pushing the US call into failure in the first place.
+    #
+    # Empty is the honest answer: downstream (_invalidate_total_sales) already treats
+    # "no brands" as unknown and keeps the last good value rather than overwriting it.
+    if not primary_ok:
+        print("  ✗ PRIMARY (US) brand sales fetch FAILED — returning empty rather than "
+              "a partial figure. Extra marketplaces are NOT added, because a "
+              "Canada-only number published as the period total understates revenue "
+              "by ~90% and inflates TACOS to match.")
+        record_integrity_failure(
+            f"Primary US brand-sales fetch failed for {start_str}..{end_str} — period "
+            f"reported as unknown rather than publishing a partial (non-US) total")
+        return {}
 
     if cfg.get("hol_sp_refresh_token") and cfg.get("hol_seller_id"):
         print(f"  Fetching HighOnLove sales {start_str} → {end_str}…")
@@ -831,7 +876,8 @@ def fetch_brand_sales_for_period(cfg, start_str, end_str):
         for brand, amount in hol_brands.items():
             brand_sales[brand] = round(brand_sales.get(brand, 0) + amount, 2)
 
-    _add_extra_marketplaces(cfg, start_str, end_str, brand_sales)
+    if include_extra_marketplaces:
+        _add_extra_marketplaces(cfg, start_str, end_str, brand_sales)
 
     return brand_sales
 
