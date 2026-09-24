@@ -23,6 +23,11 @@ import re
 import sys
 import time
 import unicodedata   # accent-stripping for branded search-term detection
+
+# A re-fetch must return at least this fraction of the stored value to replace it.
+# Deliberately loose — a genuine halving of a month is rare but possible, whereas the
+# measurement failures seen on this pipeline land at 12-20%.
+REFETCH_COLLAPSE_FLOOR = 0.5
 from pathlib import Path
 from collections import defaultdict
 from datetime import datetime, date, timedelta
@@ -543,6 +548,29 @@ def enrich_with_sp_sales(supplement: dict, cfg: dict, existing: dict = None) -> 
         # fall back to the last known value rather than zeroing it out.
         for b in entry['brands']:
             ts = brand_sales.get(b['name'])
+            pb_guard = prev_brands.get(b['name']) or {}
+            prev_ts  = pb_guard.get('totalSales')
+            # Never let a re-fetch destroy a known-good month. A completed month's
+            # revenue does not fall 80%+ on a later re-fetch while ad spend holds —
+            # that is the measurement breaking, not the business. Happened twice:
+            # the Canada ASIN-cache incident, then again from 2026-08-20 when Skinuva
+            # fell from ~$132K to ~$17K. Both times correct history was overwritten
+            # and served for weeks. See REFETCH_COLLAPSE_FLOOR.
+            if (ts is not None and isinstance(prev_ts, (int, float)) and prev_ts > 0
+                    and ts < prev_ts * REFETCH_COLLAPSE_FLOOR):
+                print(f"  ✗ [{mk}] {b['name']}: re-fetch returned ${ts:,.2f} against a "
+                      f"stored ${prev_ts:,.2f} ({ts / prev_ts * 100:.1f}%) — REJECTED, "
+                      f"keeping the stored value.")
+                try:
+                    from fetch_total_sales import record_integrity_failure
+                    record_integrity_failure(
+                        f"{b['name']} {mk}: re-fetched totalSales ${ts:,.2f} is only "
+                        f"{ts / prev_ts * 100:.1f}% of the stored ${prev_ts:,.2f} — kept "
+                        f"the stored value, investigate the SP-API brand split")
+                except Exception:
+                    pass
+                ts = None   # fall through to the "reuse previous" branch below
+
             if ts is not None:
                 b['totalSales'] = ts
                 b['tacos']      = acos_pct(b['spend'], ts) if ts else None

@@ -370,6 +370,11 @@ TOTAL_SALES_SOURCE_OK = 'sp-api-brand-filtered'
 # number that must never be resurrected as a brand's revenue.
 TRUSTED_TOTAL_SALES_SOURCES = (TOTAL_SALES_SOURCE_OK, 'helium10-asin-attributed')
 
+# A re-fetch must return at least this fraction of the stored value to replace it.
+# 0.5 is deliberately loose — a genuine halving of a month's revenue is rare but
+# possible, whereas the failures seen here land at 12-20%.
+REFETCH_COLLAPSE_FLOOR = 0.5
+
 
 def _is_trusted_total_sales(src) -> bool:
     s = str(src or '')
@@ -643,6 +648,43 @@ def backfill_brand_total_sales(monthly: dict, daily: dict, brand_name: str, cfg,
 
         total = round(float(brand_sales.get(brand_name) or 0), 2)
         amz = entry.setdefault('amazon', {})
+        # ── Never let a re-fetch destroy a known-good month ────────────────────
+        #
+        # A completed month's revenue does not fall by 80%+ on a later re-fetch. When
+        # that happens it is the measurement that broke, not the business. This has
+        # now happened twice: the Canada ASIN-cache incident in August, and again from
+        # 2026-08-20 when Skinuva's monthly totals fell from ~$151K/$160K/$132K to
+        # ~$19K/$20K/$17K while ad spend was unchanged.
+        #
+        # Both times the pipeline overwrote correct history with the broken figure and
+        # the dashboards served it for weeks. Keeping the stored value costs nothing if
+        # the drop was real (it re-fetches next run and the guard clears once the
+        # stored value is no longer the outlier); publishing a wrong one costs
+        # budget decisions.
+        prev_val = (existing.get(mk, {}).get('amazon') or {}).get('totalSales')
+        prev_src = str((existing.get(mk, {}).get('amazon') or {}).get('totalSalesSource') or '')
+        if (isinstance(prev_val, (int, float)) and prev_val > 0
+                and _is_trusted_total_sales(prev_src)
+                and total < prev_val * REFETCH_COLLAPSE_FLOOR):
+            print(f"  ✗ [{mk}] {brand_name}: re-fetch returned ${total:,.2f} against a "
+                  f"stored ${prev_val:,.2f} ({total / prev_val * 100:.1f}%) — REJECTED, "
+                  f"keeping the stored value. Revenue does not drop like that while ad "
+                  f"spend holds; this is a measurement failure.")
+            try:
+                from fetch_total_sales import record_integrity_failure
+                record_integrity_failure(
+                    f"{brand_name} {mk}: re-fetched totalSales ${total:,.2f} is only "
+                    f"{total / prev_val * 100:.1f}% of the stored ${prev_val:,.2f} — "
+                    f"kept the stored value, investigate the SP-API brand split")
+            except Exception:
+                pass
+            amz['totalSales'] = prev_val
+            amz['totalSalesSource'] = f'{TOTAL_SALES_SOURCE_OK} (retained: re-fetch collapsed)'
+            shopify = float(entry.get('shopify', 0) or 0)
+            walmart = float(entry.get('walmart', 0) or 0)
+            entry['combinedTotalSales'] = round(prev_val + shopify + walmart, 2)
+            continue
+
         amz['totalSales'] = total
         amz['totalSalesSource'] = TOTAL_SALES_SOURCE_OK
         shopify = float(entry.get('shopify', 0) or 0)
