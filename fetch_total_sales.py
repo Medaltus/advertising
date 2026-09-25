@@ -133,6 +133,11 @@ _BUDGET_DEADLINE = None  # epoch seconds; None = no cap
 # cached ASINs to be trusted; a real catalogue does not shrink by 40% overnight.
 ASIN_MAP_MIN_RETENTION = 0.6
 
+# Share of measured revenue that may go unattributed before it is treated as a fault
+# rather than a footnote. Real unmapped revenue is a few percent of odds and ends;
+# the child-vs-parent ASIN mismatch pushed it to 55-70%.
+UNMAPPED_SALES_ALARM_PCT = 15.0
+
 # Did the most recent _fetch_one_account() actually succeed? A list so the nested
 # assignment doesn't need `global`. Read it immediately after the call — it is not
 # thread-safe and is only meaningful for the call that just returned.
@@ -227,7 +232,17 @@ def submit_sales_report(cfg, token, start_date, end_date, marketplace_id):
         "dataEndTime":   end_date,
         "reportOptions": {
             "dateGranularity": "DAY",
-            "asinGranularity": "PARENT",
+            # CHILD, not PARENT. The brand map is keyed by asin1 from the merchant
+            # listings report, which is the CHILD (listing) ASIN. Asking for PARENT
+            # meant every product sold in a variation family came back under a parent
+            # ASIN that is not in the map, so it fell through to "unmapped" and its
+            # revenue was silently dropped.
+            #
+            # That is the whole bug: Skinuva sells in size variations, so essentially
+            # none of its revenue matched, while eraclea — single-ASIN products where
+            # parent == child — matched perfectly. $100K-$151K per month was landing in
+            # the unmapped bucket and Skinuva's monthly total read ~13% of actual.
+            "asinGranularity": "CHILD",
         },
     })
     path = "/reports/2021-06-30/reports"
@@ -626,12 +641,17 @@ def parse_brand_sales(report_data, asin_brand_map, excluded_brands=None):
     unmapped_sales = 0.0
 
     for entry in report_data.get("salesAndTrafficByAsin", []):
-        asin  = entry.get("parentAsin", "")
+        # childAsin first — that is what the brand map is keyed by (asin1 from the
+        # listings report). parentAsin is the fallback for simple products, where the
+        # report omits childAsin and the two are the same thing anyway.
+        asin  = entry.get("childAsin") or entry.get("parentAsin") or ""
         sales = entry.get("salesByAsin", {}).get("orderedProductSales", {})
         amt   = sales.get("amount", 0) or 0
         if amt <= 0:
             continue
         brand = asin_brand_map.get(asin)
+        if brand is None and entry.get("parentAsin"):
+            brand = asin_brand_map.get(entry["parentAsin"])   # belt and braces
         if brand in excluded_brands:
             excluded_sales += amt   # count separately so we can subtract from portfolio
         elif brand:
@@ -641,8 +661,26 @@ def parse_brand_sales(report_data, asin_brand_map, excluded_brands=None):
 
     if excluded_sales > 0:
         print(f"  ✓ Excluded {len(excluded_brands)} brands: ${excluded_sales:,.2f} removed from totals")
+
+    # Unmapped revenue is money the report measured that we failed to attribute to
+    # anyone. A little is normal (genuinely non-advertised odds and ends). A LOT means
+    # the ASIN map and the report are keyed differently — which is exactly what
+    # happened here: PARENT-granularity ASINs looked up in a CHILD-keyed map put
+    # $100K-$151K a month in this bucket, and Skinuva's total read 13% of actual for
+    # five weeks. This was printed as a friendly "ℹ" the whole time.
+    measured = sum(brand_sales.values()) + excluded_sales + unmapped_sales
     if unmapped_sales > 0:
-        print(f"  ℹ  ${unmapped_sales:,.2f} in sales not mapped (non-advertised ASINs)")
+        pct = (unmapped_sales / measured * 100) if measured else 0
+        if pct >= UNMAPPED_SALES_ALARM_PCT:
+            msg = (f"{pct:.1f}% of measured sales (${unmapped_sales:,.2f}) could not be "
+                   f"attributed to any brand — the ASIN→brand map and the sales report "
+                   f"are probably keyed differently (child vs parent ASIN). Per-brand "
+                   f"totals are understated by roughly this much.")
+            print(f"  ✗ {msg}")
+            record_integrity_failure(msg)
+        else:
+            print(f"  ℹ  ${unmapped_sales:,.2f} in sales not mapped "
+                  f"({pct:.1f}% — non-advertised ASINs)")
     return brand_sales, round(excluded_sales, 2)
 
 
