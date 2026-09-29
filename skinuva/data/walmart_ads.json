@@ -199,7 +199,7 @@
     "byBrand": {
       "Skinuva": {
         "spend": 319.57,
-        "adSales": 80.0,
+        "adSales": 80,
         "orders": 1,
         "clicks": 165,
         "impressions": 356298
@@ -207,14 +207,6 @@
     },
     "campaigns": {
       "Skinuva": [
-        {
-          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 243.49,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 112,
-          "impressions": 338503
-        },
         {
           "name": "Skinuva - SB - M - video 3.26 v1",
           "spend": 38.55,
@@ -230,6 +222,14 @@
           "orders": 0,
           "clicks": 20,
           "impressions": 3481
+        },
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
+          "spend": 243.49,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 112,
+          "impressions": 338503
         }
       ]
     },
@@ -238,53 +238,27 @@
       "until": "2026-08-31"
     },
     "profileId": "224591",
-    "fetched_at": "2026-09-09T14:05:44Z",
+    "fetched_at": "2026-09-29T14:11:55Z",
     "source": "helium10-walmart"
   },
   "September 2026": {
     "byBrand": {
-      "Skinuva": {
-        "spend": 196.91,
-        "adSales": 760.0,
-        "orders": 10,
-        "clicks": 103,
-        "impressions": 187036
-      },
       "Cloud Cafe": {
         "spend": 98.43,
-        "adSales": 68.0,
+        "adSales": 68,
         "orders": 4,
         "clicks": 168,
         "impressions": 30416
+      },
+      "Skinuva": {
+        "spend": 204.47,
+        "adSales": 760,
+        "orders": 10,
+        "clicks": 107,
+        "impressions": 191936
       }
     },
     "campaigns": {
-      "Skinuva": [
-        {
-          "name": "Skinuva - SB - M - video 3.26 v1",
-          "spend": 18.21,
-          "adSales": 160,
-          "orders": 2,
-          "clicks": 17,
-          "impressions": 8192
-        },
-        {
-          "name": "Skinuva - SP - Manual - Scar v1 - Branded",
-          "spend": 89.96,
-          "adSales": 600,
-          "orders": 8,
-          "clicks": 52,
-          "impressions": 2737
-        },
-        {
-          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 88.74,
-          "adSales": 0,
-          "orders": 0,
-          "clicks": 34,
-          "impressions": 176107
-        }
-      ],
       "Cloud Cafe": [
         {
           "name": "Cloud Cafe - SP - M - 8.26",
@@ -294,14 +268,40 @@
           "clicks": 168,
           "impressions": 30416
         }
+      ],
+      "Skinuva": [
+        {
+          "name": "Skinuva - SB - M - video 3.26 v1",
+          "spend": 18.21,
+          "adSales": 160,
+          "orders": 2,
+          "clicks": 17,
+          "impressions": 8195
+        },
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Branded",
+          "spend": 92.32,
+          "adSales": 600,
+          "orders": 8,
+          "clicks": 53,
+          "impressions": 2804
+        },
+        {
+          "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
+          "spend": 93.94,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 37,
+          "impressions": 180937
+        }
       ]
     },
     "range": {
       "since": "2026-09-01",
-      "until": "2026-09-27"
+      "until": "2026-09-28"
     },
     "profileId": "224591",
-    "fetched_at": "2026-09-28T14:41:21Z",
+    "fetched_at": "2026-09-29T14:11:55Z",
     "source": "helium10-walmart"
   }
 }
