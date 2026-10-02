@@ -78,7 +78,25 @@
       "since": "2026-09-01",
       "until": "2026-09-30"
     },
-    "fetched_at": "2026-10-01T19:10:29Z",
+    "fetched_at": "2026-10-02T12:35:04Z",
+    "source": "shopifyql-total_sales-by-sales_channel"
+  },
+  "October 2026": {
+    "total": 1622.12,
+    "byChannel": {
+      "Draft Orders": 2391.8,
+      "Online Store": 1552.9,
+      "Shop": 69.22
+    },
+    "excludedChannels": [
+      "Draft Orders"
+    ],
+    "excludedTotal": 2391.8,
+    "range": {
+      "since": "2026-10-01",
+      "until": "2026-10-01"
+    },
+    "fetched_at": "2026-10-02T12:35:04Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   }
 }

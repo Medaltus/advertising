@@ -1,29 +1,19 @@
 {
-  "fetched_at": "2026-10-01T19:25:31Z",
+  "fetched_at": "2026-10-02T12:58:50Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
-    "impressions": 416245,
-    "clicks": 3075,
-    "spend": 5327.42,
-    "sales": 16690.53,
-    "conversions": 118,
+    "impressions": 401532,
+    "clicks": 2990,
+    "spend": 5193.09,
+    "sales": 15716.81,
+    "conversions": 111,
     "ctr": 0.0074,
-    "cpc": 1.7325,
-    "acos": 31.92,
-    "roas": 3.13
+    "cpc": 1.7368,
+    "acos": 33.04,
+    "roas": 3.03
   },
   "timeline": [
-    {
-      "date": "2026-08-31",
-      "impressions": 18979,
-      "clicks": 130,
-      "spend": 189.96,
-      "sales": 1123.72,
-      "conversions": 8.3,
-      "acos": 16.9,
-      "roas": 5.92
-    },
     {
       "date": "2026-09-01",
       "impressions": 17228,
@@ -323,257 +313,19 @@
       "conversions": 1.0,
       "acos": 21.05,
       "roas": 4.75
+    },
+    {
+      "date": "2026-10-01",
+      "impressions": 4266,
+      "clicks": 45,
+      "spend": 55.63,
+      "sales": 150.0,
+      "conversions": 1.0,
+      "acos": 37.09,
+      "roas": 2.7
     }
   ],
   "daily_history": [
-    {
-      "date": "2026-07-01",
-      "impressions": 16083,
-      "clicks": 168,
-      "spend": 216.18,
-      "sales": 1893.08,
-      "conversions": 13.01
-    },
-    {
-      "date": "2026-07-02",
-      "impressions": 24697,
-      "clicks": 248,
-      "spend": 275.29,
-      "sales": 1160.04,
-      "conversions": 7.0
-    },
-    {
-      "date": "2026-07-03",
-      "impressions": 23658,
-      "clicks": 221,
-      "spend": 245.27,
-      "sales": 1537.25,
-      "conversions": 9.02
-    },
-    {
-      "date": "2026-07-04",
-      "impressions": 22130,
-      "clicks": 161,
-      "spend": 246.5,
-      "sales": 765.36,
-      "conversions": 7.0
-    },
-    {
-      "date": "2026-07-05",
-      "impressions": 19627,
-      "clicks": 163,
-      "spend": 250.56,
-      "sales": 1492.77,
-      "conversions": 10.02
-    },
-    {
-      "date": "2026-07-06",
-      "impressions": 26164,
-      "clicks": 194,
-      "spend": 282.71,
-      "sales": 1120.13,
-      "conversions": 5.99
-    },
-    {
-      "date": "2026-07-07",
-      "impressions": 29586,
-      "clicks": 209,
-      "spend": 288.81,
-      "sales": 915.88,
-      "conversions": 7.0
-    },
-    {
-      "date": "2026-07-08",
-      "impressions": 25532,
-      "clicks": 231,
-      "spend": 333.6,
-      "sales": 1324.14,
-      "conversions": 7.0
-    },
-    {
-      "date": "2026-07-09",
-      "impressions": 26112,
-      "clicks": 208,
-      "spend": 325.36,
-      "sales": 912.42,
-      "conversions": 4.67
-    },
-    {
-      "date": "2026-07-10",
-      "impressions": 24601,
-      "clicks": 237,
-      "spend": 330.18,
-      "sales": 394.57,
-      "conversions": 3.0
-    },
-    {
-      "date": "2026-07-11",
-      "impressions": 25407,
-      "clicks": 165,
-      "spend": 287.51,
-      "sales": 1402.24,
-      "conversions": 10.0
-    },
-    {
-      "date": "2026-07-12",
-      "impressions": 25243,
-      "clicks": 187,
-      "spend": 367.64,
-      "sales": 1872.81,
-      "conversions": 12.97
-    },
-    {
-      "date": "2026-07-13",
-      "impressions": 27231,
-      "clicks": 238,
-      "spend": 366.41,
-      "sales": 2038.98,
-      "conversions": 10.98
-    },
-    {
-      "date": "2026-07-14",
-      "impressions": 23388,
-      "clicks": 213,
-      "spend": 374.89,
-      "sales": 1170.33,
-      "conversions": 10.0
-    },
-    {
-      "date": "2026-07-15",
-      "impressions": 35204,
-      "clicks": 227,
-      "spend": 326.66,
-      "sales": 1485.96,
-      "conversions": 9.8
-    },
-    {
-      "date": "2026-07-16",
-      "impressions": 38449,
-      "clicks": 228,
-      "spend": 370.63,
-      "sales": 1275.52,
-      "conversions": 10.0
-    },
-    {
-      "date": "2026-07-17",
-      "impressions": 22343,
-      "clicks": 180,
-      "spend": 297.12,
-      "sales": 2816.35,
-      "conversions": 7.26
-    },
-    {
-      "date": "2026-07-18",
-      "impressions": 23304,
-      "clicks": 139,
-      "spend": 294.68,
-      "sales": 767.7,
-      "conversions": 6.0
-    },
-    {
-      "date": "2026-07-19",
-      "impressions": 19029,
-      "clicks": 150,
-      "spend": 247.9,
-      "sales": 209.5,
-      "conversions": 2.07
-    },
-    {
-      "date": "2026-07-20",
-      "impressions": 32200,
-      "clicks": 189,
-      "spend": 386.84,
-      "sales": 995.3,
-      "conversions": 6.95
-    },
-    {
-      "date": "2026-07-21",
-      "impressions": 27793,
-      "clicks": 187,
-      "spend": 324.07,
-      "sales": 1013.16,
-      "conversions": 7.02
-    },
-    {
-      "date": "2026-07-22",
-      "impressions": 27763,
-      "clicks": 224,
-      "spend": 448.43,
-      "sales": 2986.3,
-      "conversions": 17.17
-    },
-    {
-      "date": "2026-07-23",
-      "impressions": 18134,
-      "clicks": 155,
-      "spend": 264.44,
-      "sales": 1372.74,
-      "conversions": 5.03
-    },
-    {
-      "date": "2026-07-24",
-      "impressions": 23608,
-      "clicks": 167,
-      "spend": 272.51,
-      "sales": 1401.12,
-      "conversions": 9.53
-    },
-    {
-      "date": "2026-07-25",
-      "impressions": 33043,
-      "clicks": 196,
-      "spend": 321.83,
-      "sales": 1171.86,
-      "conversions": 8.31
-    },
-    {
-      "date": "2026-07-26",
-      "impressions": 38054,
-      "clicks": 225,
-      "spend": 427.43,
-      "sales": 842.06,
-      "conversions": 6.02
-    },
-    {
-      "date": "2026-07-27",
-      "impressions": 37396,
-      "clicks": 237,
-      "spend": 465.11,
-      "sales": 930.55,
-      "conversions": 6.9
-    },
-    {
-      "date": "2026-07-28",
-      "impressions": 25481,
-      "clicks": 178,
-      "spend": 279.86,
-      "sales": 1461.82,
-      "conversions": 10.0
-    },
-    {
-      "date": "2026-07-29",
-      "impressions": 31749,
-      "clicks": 199,
-      "spend": 347.86,
-      "sales": 727.06,
-      "conversions": 5.38
-    },
-    {
-      "date": "2026-07-30",
-      "impressions": 23693,
-      "clicks": 181,
-      "spend": 406.6,
-      "sales": 1538.1,
-      "conversions": 11.1
-    },
-    {
-      "date": "2026-07-31",
-      "impressions": 23115,
-      "clicks": 142,
-      "spend": 315.16,
-      "sales": 1961.73,
-      "conversions": 11.9
-    },
     {
       "date": "2026-08-01",
       "impressions": 26433,
@@ -1061,411 +813,153 @@
       "spend": 35.4,
       "sales": 168.19,
       "conversions": 1.0
+    },
+    {
+      "date": "2026-10-01",
+      "impressions": 4266,
+      "clicks": 45,
+      "spend": 55.63,
+      "sales": 150.0,
+      "conversions": 1.0
     }
   ],
   "history_range": {
-    "since": "2026-07-01",
-    "until": "2026-09-30"
+    "since": "2026-08-01",
+    "until": "2026-10-01"
   },
   "campaigns": [
     {
       "id": "18209518057",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
       "type": "PERFORMANCE_MAX",
-      "impressions": 1137441,
-      "clicks": 6288,
-      "spend": 13371.59,
-      "sales": 50420.56,
-      "conversions": 309.170308,
-      "cpc": 2.1265,
-      "acos": 26.52,
-      "roas": 3.77
+      "impressions": 543908,
+      "clicks": 2921,
+      "spend": 7284.06,
+      "sales": 24428.28,
+      "conversions": 156.398157,
+      "cpc": 2.4937,
+      "acos": 29.82,
+      "roas": 3.35
     },
     {
       "id": "24018309787",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
       "type": "PERFORMANCE_MAX",
-      "impressions": 437987,
-      "clicks": 2438,
-      "spend": 3724.42,
-      "sales": 11523.7,
-      "conversions": 71.70223,
-      "cpc": 1.5277,
-      "acos": 32.32,
-      "roas": 3.09
+      "impressions": 372894,
+      "clicks": 2024,
+      "spend": 3269.56,
+      "sales": 10122.37,
+      "conversions": 63.655128,
+      "cpc": 1.6154,
+      "acos": 32.3,
+      "roas": 3.1
     },
     {
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
       "type": "SEARCH",
-      "impressions": 3975,
-      "clicks": 767,
-      "spend": 1951.0,
-      "sales": 11041.2,
-      "conversions": 96.51876899999999,
-      "cpc": 2.5437,
-      "acos": 17.67,
-      "roas": 5.66
-    },
-    {
-      "id": "21466459569",
-      "name": "Skinuva Bruise Topical Leads",
-      "type": "SEARCH",
-      "impressions": 5496,
-      "clicks": 457,
-      "spend": 1407.17,
-      "sales": 7285.84,
-      "conversions": 43.096123000000006,
-      "cpc": 3.0791,
-      "acos": 19.31,
-      "roas": 5.18
+      "impressions": 2315,
+      "clicks": 446,
+      "spend": 1190.7,
+      "sales": 6593.04,
+      "conversions": 56.31201800000001,
+      "cpc": 2.6697,
+      "acos": 18.06,
+      "roas": 5.54
     },
     {
       "id": "23944321916",
       "name": "PMax: Skinuva Smart Shopping CANADA",
       "type": "PERFORMANCE_MAX",
-      "impressions": 139370,
-      "clicks": 1074,
-      "spend": 1377.32,
-      "sales": 3923.49,
-      "conversions": 23.365403,
-      "cpc": 1.2824,
-      "acos": 35.1,
-      "roas": 2.85
+      "impressions": 92776,
+      "clicks": 687,
+      "spend": 959.76,
+      "sales": 2916.83,
+      "conversions": 18.298105,
+      "cpc": 1.397,
+      "acos": 32.9,
+      "roas": 3.04
+    },
+    {
+      "id": "21466459569",
+      "name": "Skinuva Bruise Topical Leads",
+      "type": "SEARCH",
+      "impressions": 2971,
+      "clicks": 253,
+      "spend": 799.07,
+      "sales": 4769.57,
+      "conversions": 25.565098,
+      "cpc": 3.1584,
+      "acos": 16.75,
+      "roas": 5.97
     },
     {
       "id": "24022316578",
       "name": "PMax: Skinuva Smart Shopping UK",
       "type": "PERFORMANCE_MAX",
-      "impressions": 145481,
-      "clicks": 707,
-      "spend": 1188.86,
-      "sales": 3035.16,
-      "conversions": 18.0,
-      "cpc": 1.6816,
-      "acos": 39.17,
-      "roas": 2.55
+      "impressions": 87001,
+      "clicks": 420,
+      "spend": 705.65,
+      "sales": 1679.81,
+      "conversions": 11.0,
+      "cpc": 1.6801,
+      "acos": 42.01,
+      "roas": 2.38
     },
     {
       "id": "23939195988",
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "type": "PERFORMANCE_MAX",
-      "impressions": 80407,
-      "clicks": 811,
-      "spend": 610.82,
-      "sales": 1625.11,
-      "conversions": 8.490288,
-      "cpc": 0.7532,
-      "acos": 37.59,
-      "roas": 2.66
-    },
-    {
-      "id": "23613752580",
-      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING",
-      "type": "SEARCH",
-      "impressions": 4710,
-      "clicks": 179,
-      "spend": 595.76,
-      "sales": 2209.98,
-      "conversions": 14.505464,
-      "cpc": 3.3283,
-      "acos": 26.96,
-      "roas": 3.71
+      "impressions": 73287,
+      "clicks": 708,
+      "spend": 517.01,
+      "sales": 1127.18,
+      "conversions": 6.0,
+      "cpc": 0.7302,
+      "acos": 45.87,
+      "roas": 2.18
     },
     {
       "id": "24085322763",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v3",
       "type": "SEARCH",
-      "impressions": 5633,
-      "clicks": 163,
-      "spend": 425.64,
-      "sales": 2581.22,
-      "conversions": 18.637812,
-      "cpc": 2.6113,
-      "acos": 16.49,
-      "roas": 6.06
-    },
-    {
-      "id": "24014053364",
-      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v2 *",
-      "type": "SEARCH",
-      "impressions": 1248,
-      "clicks": 51,
-      "spend": 112.52,
-      "sales": 1004.7,
-      "conversions": 6.471169,
-      "cpc": 2.2063,
-      "acos": 11.2,
-      "roas": 8.93
-    },
-    {
-      "id": "23980438719",
-      "name": "Skinuva - NYC Blitz - 2026",
-      "type": "DISPLAY",
-      "impressions": 17956,
-      "clicks": 290,
-      "spend": 69.98,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.2413,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "24017770751",
-      "name": "Skinuva - NYC Blitz - 2026 #2",
-      "type": "DISPLAY",
-      "impressions": 9118,
-      "clicks": 93,
-      "spend": 42.02,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.4518,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23824649207",
-      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Competitor Targeting - LP v2",
-      "type": "SEARCH",
-      "impressions": 484,
-      "clicks": 25,
-      "spend": 40.23,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 1.6092,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23620605037",
-      "name": "4 Skinuva Bruise - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 566,
-      "clicks": 39,
-      "spend": 26.98,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.6918,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23605094807",
-      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 362,
-      "clicks": 34,
-      "spend": 26.5,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.7794,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23610643809",
-      "name": "5 Skinuva Bruise ARC - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 579,
-      "clicks": 29,
-      "spend": 25.06,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.8641,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23605103939",
-      "name": "2 Skinuva Scar+ - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 436,
-      "clicks": 47,
-      "spend": 25.03,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.5326,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23710714741",
-      "name": "1 Skinuva Scar - Display Campaign - Sales Objective - Non-Branded v1",
-      "type": "DISPLAY",
-      "impressions": 2191,
-      "clicks": 46,
-      "spend": 24.98,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.543,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23612955814",
-      "name": "3 Skinuva Brite - Search Campaign - Sales Objective - Non-Branded KW",
-      "type": "SEARCH",
-      "impressions": 615,
-      "clicks": 43,
-      "spend": 24.14,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 0.5614,
-      "acos": null,
-      "roas": 0.0
-    },
-    {
-      "id": "23948635093",
-      "name": "1 Skinuva Scar - Awareness Campaign - YouTube",
-      "type": "VIDEO",
-      "impressions": 1751,
-      "clicks": 1,
-      "spend": 16.45,
-      "sales": 0.0,
-      "conversions": 0.0,
-      "cpc": 16.45,
-      "acos": null,
-      "roas": 0.0
+      "impressions": 5838,
+      "clicks": 167,
+      "spend": 434.36,
+      "sales": 2411.22,
+      "conversions": 17.637812,
+      "cpc": 2.601,
+      "acos": 18.01,
+      "roas": 5.55
     },
     {
       "id": "21714470857",
       "name": "Skinuva Bruise Search Campaign",
       "type": "SEARCH",
-      "impressions": 359,
-      "clicks": 69,
-      "spend": 8.41,
-      "sales": 1276.57,
-      "conversions": 8.5,
-      "cpc": 0.1219,
-      "acos": 0.66,
-      "roas": 151.79
+      "impressions": 252,
+      "clicks": 48,
+      "spend": 5.31,
+      "sales": 1132.38,
+      "conversions": 7.5,
+      "cpc": 0.1106,
+      "acos": 0.47,
+      "roas": 213.25
     },
     {
       "id": "21719229797",
       "name": "Skinuva Brite Search Campaign",
       "type": "SEARCH",
-      "impressions": 1474,
-      "clicks": 73,
-      "spend": 8.19,
-      "sales": 965.88,
-      "conversions": 4.5,
-      "cpc": 0.1122,
-      "acos": 0.85,
-      "roas": 117.93
+      "impressions": 846,
+      "clicks": 48,
+      "spend": 5.18,
+      "sales": 905.88,
+      "conversions": 3.5,
+      "cpc": 0.1079,
+      "acos": 0.57,
+      "roas": 174.88
     }
   ],
   "campaigns_daily": [
-    {
-      "date": "2026-08-31",
-      "id": "18209518057",
-      "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 4515,
-      "clicks": 33,
-      "spend": 46.27,
-      "sales": 526.76,
-      "conversions": 4.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "21401554549",
-      "name": "Skinuva Stretch Mark Search Campaign",
-      "type": "SEARCH",
-      "impressions": 23,
-      "clicks": 9,
-      "spend": 19.97,
-      "sales": 161.7583,
-      "conversions": 1.34
-    },
-    {
-      "date": "2026-08-31",
-      "id": "21466459569",
-      "name": "Skinuva Bruise Topical Leads",
-      "type": "SEARCH",
-      "impressions": 3,
-      "clicks": 2,
-      "spend": 8.22,
-      "sales": 0.0,
-      "conversions": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "21714470857",
-      "name": "Skinuva Bruise Search Campaign",
-      "type": "SEARCH",
-      "impressions": 3,
-      "clicks": 2,
-      "spend": 0.26,
-      "sales": 0.0,
-      "conversions": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "21719229797",
-      "name": "Skinuva Brite Search Campaign",
-      "type": "SEARCH",
-      "impressions": 4,
-      "clicks": 2,
-      "spend": 0.07,
-      "sales": 0.0,
-      "conversions": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "23939195988",
-      "name": "PMax: Skinuva Smart Shopping EUROPE",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 838,
-      "clicks": 4,
-      "spend": 2.28,
-      "sales": 0.0,
-      "conversions": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "23944321916",
-      "name": "PMax: Skinuva Smart Shopping CANADA",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 1959,
-      "clicks": 12,
-      "spend": 12.3,
-      "sales": 0.0,
-      "conversions": 0.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "24018309787",
-      "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 10410,
-      "clicks": 58,
-      "spend": 90.06,
-      "sales": 130.0,
-      "conversions": 1.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "24022316578",
-      "name": "PMax: Skinuva Smart Shopping UK",
-      "type": "PERFORMANCE_MAX",
-      "impressions": 1144,
-      "clicks": 3,
-      "spend": 3.34,
-      "sales": 162.0142,
-      "conversions": 1.0
-    },
-    {
-      "date": "2026-08-31",
-      "id": "24085322763",
-      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v3",
-      "type": "SEARCH",
-      "impressions": 80,
-      "clicks": 5,
-      "spend": 7.19,
-      "sales": 143.19,
-      "conversions": 1.0
-    },
     {
       "date": "2026-09-01",
       "id": "18209518057",
@@ -4259,6 +3753,61 @@
       "spend": 6.76,
       "sales": 0.0,
       "conversions": 0.0
+    },
+    {
+      "date": "2026-10-01",
+      "id": "23939195988",
+      "name": "PMax: Skinuva Smart Shopping EUROPE",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 681,
+      "clicks": 6,
+      "spend": 3.89,
+      "sales": 0.0,
+      "conversions": 0.0
+    },
+    {
+      "date": "2026-10-01",
+      "id": "23944321916",
+      "name": "PMax: Skinuva Smart Shopping CANADA",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 969,
+      "clicks": 8,
+      "spend": 7.31,
+      "sales": 0.0,
+      "conversions": 0.0
+    },
+    {
+      "date": "2026-10-01",
+      "id": "24018309787",
+      "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 2016,
+      "clicks": 21,
+      "spend": 22.3,
+      "sales": 150.0,
+      "conversions": 1.0
+    },
+    {
+      "date": "2026-10-01",
+      "id": "24022316578",
+      "name": "PMax: Skinuva Smart Shopping UK",
+      "type": "PERFORMANCE_MAX",
+      "impressions": 385,
+      "clicks": 5,
+      "spend": 4.45,
+      "sales": 0.0,
+      "conversions": 0.0
+    },
+    {
+      "date": "2026-10-01",
+      "id": "24085322763",
+      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v3",
+      "type": "SEARCH",
+      "impressions": 215,
+      "clicks": 5,
+      "spend": 17.68,
+      "sales": 0.0,
+      "conversions": 0.0
     }
   ],
   "pacing": [
@@ -4267,177 +3816,439 @@
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES - Non-Branded *",
       "state": "enabled",
       "dailyBudget": 120.0,
-      "recentSpend": 120.14,
-      "pacingPct": 100.1
+      "recentSpend": 105.47,
+      "pacingPct": 87.9
     },
     {
       "id": "18209518057",
       "name": "PMax: Skinuva Smart Shopping ALL COUNTRIES",
       "state": "paused",
       "dailyBudget": 80.0,
-      "recentSpend": 431.34,
-      "pacingPct": 539.2
-    },
-    {
-      "id": "23613752580",
-      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING",
-      "state": "paused",
-      "dailyBudget": 70.0,
-      "recentSpend": 19.22,
-      "pacingPct": 27.5
+      "recentSpend": 234.97,
+      "pacingPct": 293.7
     },
     {
       "id": "23944321916",
       "name": "PMax: Skinuva Smart Shopping CANADA",
       "state": "enabled",
       "dailyBudget": 30.0,
-      "recentSpend": 44.43,
-      "pacingPct": 148.1
+      "recentSpend": 30.96,
+      "pacingPct": 103.2
     },
     {
       "id": "21401554549",
       "name": "Skinuva Stretch Mark Search Campaign",
       "state": "paused",
       "dailyBudget": 20.0,
-      "recentSpend": 62.94,
-      "pacingPct": 314.7
+      "recentSpend": 38.41,
+      "pacingPct": 192.0
     },
     {
       "id": "23939195988",
       "name": "PMax: Skinuva Smart Shopping EUROPE",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 19.7,
-      "pacingPct": 98.5
+      "recentSpend": 16.68,
+      "pacingPct": 83.4
     },
     {
       "id": "24085322763",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v3",
       "state": "enabled",
       "dailyBudget": 20.0,
-      "recentSpend": 13.73,
-      "pacingPct": 68.7
-    },
-    {
-      "id": "24014053364",
-      "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v2 *",
-      "state": "paused",
-      "dailyBudget": 15.0,
-      "recentSpend": 3.63,
-      "pacingPct": 24.2
+      "recentSpend": 14.01,
+      "pacingPct": 70.1
     },
     {
       "id": "21466459569",
       "name": "Skinuva Bruise Topical Leads",
       "state": "paused",
       "dailyBudget": 10.0,
-      "recentSpend": 45.39,
-      "pacingPct": 453.9
-    },
-    {
-      "id": "23824649207",
-      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Competitor Targeting - LP v2",
-      "state": "paused",
-      "dailyBudget": 5.0,
-      "recentSpend": 1.3,
-      "pacingPct": 26.0
+      "recentSpend": 25.78,
+      "pacingPct": 257.8
     },
     {
       "id": "24022316578",
       "name": "PMax: Skinuva Smart Shopping UK",
       "state": "enabled",
       "dailyBudget": 5.0,
-      "recentSpend": 38.35,
-      "pacingPct": 767.0
-    },
-    {
-      "id": "23605094807",
-      "name": "1 Skinuva Scar - Search Campaign - Sales Objective - Non-Branded KW",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.85,
-      "pacingPct": 28.5
-    },
-    {
-      "id": "23605103939",
-      "name": "2 Skinuva Scar+ - Search Campaign - Sales Objective - Non-Branded KW",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.81,
-      "pacingPct": 26.9
-    },
-    {
-      "id": "23610643809",
-      "name": "5 Skinuva Bruise ARC - Search Campaign - Sales Objective - Non-Branded KW",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.81,
-      "pacingPct": 26.9
-    },
-    {
-      "id": "23612955814",
-      "name": "3 Skinuva Brite - Search Campaign - Sales Objective - Non-Branded KW",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.78,
-      "pacingPct": 26.0
-    },
-    {
-      "id": "23620605037",
-      "name": "4 Skinuva Bruise - Search Campaign - Sales Objective - Non-Branded KW",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.87,
-      "pacingPct": 29.0
-    },
-    {
-      "id": "23710714741",
-      "name": "1 Skinuva Scar - Display Campaign - Sales Objective - Non-Branded v1",
-      "state": "paused",
-      "dailyBudget": 3.0,
-      "recentSpend": 0.81,
-      "pacingPct": 26.9
-    },
-    {
-      "id": "23948635093",
-      "name": "1 Skinuva Scar - Awareness Campaign - YouTube",
-      "state": "paused",
-      "dailyBudget": 2.0,
-      "recentSpend": 0.53,
-      "pacingPct": 26.5
-    },
-    {
-      "id": "23980438719",
-      "name": "Skinuva - NYC Blitz - 2026",
-      "state": "paused",
-      "dailyBudget": 1.0,
-      "recentSpend": 2.26,
-      "pacingPct": 225.7
-    },
-    {
-      "id": "24017770751",
-      "name": "Skinuva - NYC Blitz - 2026 #2",
-      "state": "paused",
-      "dailyBudget": 1.0,
-      "recentSpend": 1.36,
-      "pacingPct": 135.5
-    },
-    {
-      "id": "21714470857",
-      "name": "Skinuva Bruise Search Campaign",
-      "state": "paused",
-      "dailyBudget": 0.1,
-      "recentSpend": 0.27,
-      "pacingPct": 271.3
+      "recentSpend": 22.76,
+      "pacingPct": 455.3
     },
     {
       "id": "21719229797",
       "name": "Skinuva Brite Search Campaign",
       "state": "paused",
       "dailyBudget": 0.1,
-      "recentSpend": 0.26,
-      "pacingPct": 264.2
+      "recentSpend": 0.17,
+      "pacingPct": 167.1
+    },
+    {
+      "id": "21714470857",
+      "name": "Skinuva Bruise Search Campaign",
+      "state": "paused",
+      "dailyBudget": 0.1,
+      "recentSpend": 0.17,
+      "pacingPct": 171.3
     }
   ],
-  "geo_by_state": []
+  "geo_by_state": [
+    {
+      "state": "California",
+      "impressions": 134007,
+      "clicks": 790,
+      "spend": 1984.25,
+      "conversions": 49.0
+    },
+    {
+      "state": "Florida",
+      "impressions": 95067,
+      "clicks": 811,
+      "spend": 1898.05,
+      "conversions": 68.0
+    },
+    {
+      "state": "Texas",
+      "impressions": 78231,
+      "clicks": 430,
+      "spend": 1080.78,
+      "conversions": 23.0
+    },
+    {
+      "state": "New York",
+      "impressions": 70482,
+      "clicks": 370,
+      "spend": 986.4,
+      "conversions": 25.0
+    },
+    {
+      "state": "New Jersey",
+      "impressions": 31326,
+      "clicks": 183,
+      "spend": 492.52,
+      "conversions": 17.0
+    },
+    {
+      "state": "North Carolina",
+      "impressions": 28447,
+      "clicks": 143,
+      "spend": 345.54,
+      "conversions": 8.0
+    },
+    {
+      "state": "Massachusetts",
+      "impressions": 22266,
+      "clicks": 126,
+      "spend": 340.56,
+      "conversions": 8.0
+    },
+    {
+      "state": "Illinois",
+      "impressions": 33508,
+      "clicks": 126,
+      "spend": 311.49,
+      "conversions": 10.0
+    },
+    {
+      "state": "Colorado",
+      "impressions": 21206,
+      "clicks": 92,
+      "spend": 284.54,
+      "conversions": 3.0
+    },
+    {
+      "state": "Georgia",
+      "impressions": 29459,
+      "clicks": 127,
+      "spend": 280.58,
+      "conversions": 7.0
+    },
+    {
+      "state": "Arizona",
+      "impressions": 18613,
+      "clicks": 101,
+      "spend": 274.81,
+      "conversions": 10.0
+    },
+    {
+      "state": "Pennsylvania",
+      "impressions": 25358,
+      "clicks": 141,
+      "spend": 267.35,
+      "conversions": 9.0
+    },
+    {
+      "state": "Michigan",
+      "impressions": 18452,
+      "clicks": 93,
+      "spend": 237.24,
+      "conversions": 4.0
+    },
+    {
+      "state": "Ohio",
+      "impressions": 20011,
+      "clicks": 96,
+      "spend": 220.75,
+      "conversions": 5.0
+    },
+    {
+      "state": "Tennessee",
+      "impressions": 17304,
+      "clicks": 75,
+      "spend": 213.39,
+      "conversions": 2.0
+    },
+    {
+      "state": "Virginia",
+      "impressions": 22900,
+      "clicks": 103,
+      "spend": 207.91,
+      "conversions": 6.0
+    },
+    {
+      "state": "Maryland",
+      "impressions": 15587,
+      "clicks": 87,
+      "spend": 189.61,
+      "conversions": 7.0
+    },
+    {
+      "state": "Washington",
+      "impressions": 21764,
+      "clicks": 80,
+      "spend": 179.55,
+      "conversions": 3.0
+    },
+    {
+      "state": "Minnesota",
+      "impressions": 12400,
+      "clicks": 69,
+      "spend": 157.1,
+      "conversions": 2.0
+    },
+    {
+      "state": "Kentucky",
+      "impressions": 8198,
+      "clicks": 51,
+      "spend": 156.73,
+      "conversions": 6.0
+    },
+    {
+      "state": "Connecticut",
+      "impressions": 11275,
+      "clicks": 73,
+      "spend": 152.36,
+      "conversions": 8.0
+    },
+    {
+      "state": "Indiana",
+      "impressions": 11082,
+      "clicks": 63,
+      "spend": 147.86,
+      "conversions": 3.0
+    },
+    {
+      "state": "South Carolina",
+      "impressions": 12858,
+      "clicks": 67,
+      "spend": 131.11,
+      "conversions": 0.0
+    },
+    {
+      "state": "Louisiana",
+      "impressions": 9177,
+      "clicks": 51,
+      "spend": 115.55,
+      "conversions": 3.0
+    },
+    {
+      "state": "Missouri",
+      "impressions": 9899,
+      "clicks": 46,
+      "spend": 110.53,
+      "conversions": 2.0
+    },
+    {
+      "state": "Oregon",
+      "impressions": 9602,
+      "clicks": 56,
+      "spend": 101.29,
+      "conversions": 3.0
+    },
+    {
+      "state": "Utah",
+      "impressions": 7367,
+      "clicks": 43,
+      "spend": 100.28,
+      "conversions": 1.0
+    },
+    {
+      "state": "Nebraska",
+      "impressions": 3615,
+      "clicks": 19,
+      "spend": 90.67,
+      "conversions": 0.0
+    },
+    {
+      "state": "Oklahoma",
+      "impressions": 7044,
+      "clicks": 33,
+      "spend": 87.0,
+      "conversions": 2.0
+    },
+    {
+      "state": "Iowa",
+      "impressions": 4527,
+      "clicks": 24,
+      "spend": 86.96,
+      "conversions": 0.0
+    },
+    {
+      "state": "Nevada",
+      "impressions": 9307,
+      "clicks": 44,
+      "spend": 73.7,
+      "conversions": 3.0
+    },
+    {
+      "state": "Kansas",
+      "impressions": 5199,
+      "clicks": 37,
+      "spend": 68.93,
+      "conversions": 2.0
+    },
+    {
+      "state": "Hawaii",
+      "impressions": 5171,
+      "clicks": 25,
+      "spend": 64.11,
+      "conversions": 0.0
+    },
+    {
+      "state": "Alabama",
+      "impressions": 10861,
+      "clicks": 49,
+      "spend": 60.32,
+      "conversions": 1.0
+    },
+    {
+      "state": "Montana",
+      "impressions": 2906,
+      "clicks": 23,
+      "spend": 56.44,
+      "conversions": 1.0
+    },
+    {
+      "state": "Idaho",
+      "impressions": 4442,
+      "clicks": 22,
+      "spend": 56.24,
+      "conversions": 1.0
+    },
+    {
+      "state": "West Virginia",
+      "impressions": 2521,
+      "clicks": 17,
+      "spend": 54.83,
+      "conversions": 0.0
+    },
+    {
+      "state": "Wisconsin",
+      "impressions": 9817,
+      "clicks": 34,
+      "spend": 53.07,
+      "conversions": 5.0
+    },
+    {
+      "state": "New Mexico",
+      "impressions": 4487,
+      "clicks": 26,
+      "spend": 50.1,
+      "conversions": 1.0
+    },
+    {
+      "state": "Arkansas",
+      "impressions": 4668,
+      "clicks": 27,
+      "spend": 47.18,
+      "conversions": 2.0
+    },
+    {
+      "state": "District of Columbia",
+      "impressions": 3317,
+      "clicks": 21,
+      "spend": 46.75,
+      "conversions": 0.0
+    },
+    {
+      "state": "Mississippi",
+      "impressions": 4894,
+      "clicks": 24,
+      "spend": 43.84,
+      "conversions": 3.0
+    },
+    {
+      "state": "Rhode Island",
+      "impressions": 2869,
+      "clicks": 17,
+      "spend": 34.49,
+      "conversions": 1.0
+    },
+    {
+      "state": "New Hampshire",
+      "impressions": 3410,
+      "clicks": 13,
+      "spend": 32.85,
+      "conversions": 1.0
+    },
+    {
+      "state": "Maine",
+      "impressions": 3384,
+      "clicks": 12,
+      "spend": 30.76,
+      "conversions": 0.0
+    },
+    {
+      "state": "Delaware",
+      "impressions": 2485,
+      "clicks": 15,
+      "spend": 26.06,
+      "conversions": 0.0
+    },
+    {
+      "state": "North Dakota",
+      "impressions": 1569,
+      "clicks": 8,
+      "spend": 21.0,
+      "conversions": 0.0
+    },
+    {
+      "state": "Vermont",
+      "impressions": 1546,
+      "clicks": 11,
+      "spend": 18.35,
+      "conversions": 0.0
+    },
+    {
+      "state": "Alaska",
+      "impressions": 1623,
+      "clicks": 5,
+      "spend": 13.56,
+      "conversions": 0.0
+    },
+    {
+      "state": "South Dakota",
+      "impressions": 1431,
+      "clicks": 5,
+      "spend": 12.24,
+      "conversions": 0.0
+    },
+    {
+      "state": "Wyoming",
+      "impressions": 1226,
+      "clicks": 6,
+      "spend": 10.75,
+      "conversions": 1.0
+    }
+  ]
 }
