@@ -2522,7 +2522,7 @@
       "totalSales": null,
       "orders": 18,
       "clicks": 183,
-      "impressions": 71574
+      "impressions": 71131
     },
     "google": {
       "spend": 37.16,
@@ -2534,13 +2534,19 @@
   },
   "2026-10-03": {
     "amazon": {
-      "spend": 466.04,
-      "adSales": 835.0,
+      "spend": 464.64,
+      "adSales": 897.05,
       "totalSales": null,
-      "orders": 12,
-      "clicks": 170,
-      "impressions": 70887
+      "orders": 13,
+      "clicks": 169,
+      "impressions": 69992
     },
-    "google": {}
+    "google": {
+      "spend": 73.5,
+      "adSales": 162.42,
+      "conversions": 1.0,
+      "clicks": 38,
+      "impressions": 5573
+    }
   }
 }
