@@ -695,6 +695,17 @@ body.hide-amazon #dow-section { display: none !important; }
         <span style="font-size:13px;line-height:1;">&#10098;a&#10099;</span>
         <span class="amz-toggle-label">With Amazon Data</span>
       </button>
+      <!-- Walmart toggle. Same contract as the Amazon one: always visible, default off,
+           not persisted. Walmart is ~1-2% of revenue but occupies a full channel row,
+           so by default it is out of the headline numbers entirely. -->
+      <button id="walmart-toggle-btn" onclick="toggleWalmartData()" title="Walmart excluded — click to include Walmart spend, revenue and its channel row"
+              style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;
+                     background:linear-gradient(135deg,rgba(0,113,206,0.14),rgba(0,113,206,0.05));
+                     border:1px solid rgba(0,113,206,0.3);color:rgba(124,192,255,0.85);
+                     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;">
+        <span style="font-size:13px;line-height:1;">&#10022;</span>
+        <span class="wmt-toggle-label">With Walmart Data</span>
+      </button>
       <div class="refresh-timer" id="refresh-timer" style="display:none;">
         <div class="refresh-ring-wrap">
           <svg class="refresh-ring-bg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
@@ -1428,6 +1439,16 @@ let selectedOzleeBrand='All', selectedEracleaMonth=null;
 // to off on every load, and the button's active state is always visible.
 let showAmazonData = false;
 
+// Walmart is excluded from the default view for the same reason as Amazon, plus one
+// of its own: it is ~1-2% of revenue ($1,314 of $174,775 in August, $2,780 of
+// $155,683 in September) but gets a full channel row, so it reads as a peer of
+// Amazon/Google/Shopify while being a rounding error. Its ad data is also the least
+// reliable feed here -- Helium 10 credit exhaustion froze walmart_ads.json for weeks.
+//
+// Same contract as showAmazonData: default OFF, never persisted, mode stated on the
+// button and in the subtitle.
+let showWalmartData = false;
+
 // Sections whose data comes from the Amazon Ads supplement. Hidden in non-Amazon
 // mode. Google Ads Live API and US Geographic are Google-sourced and stay visible.
 const AMAZON_SECTION_IDS = [
@@ -1482,6 +1503,43 @@ function syncAmazonToggleButton(){
 // order in which the renderers happen to run no longer matters.
 function applyAmazonVisibility(){
   document.body.classList.toggle('hide-amazon', !showAmazonData);
+}
+
+function toggleWalmartData(){
+  showWalmartData = !showWalmartData;
+  syncWalmartToggleButton();
+  render();
+}
+
+function syncWalmartToggleButton(){
+  const b=document.getElementById('walmart-toggle-btn');
+  if(!b) return;
+  b.classList.toggle('active', showWalmartData);
+  // Walmart blue, filled when included / outlined when excluded — same visual
+  // grammar as the Amazon toggle so the two read as a pair.
+  if(showWalmartData){
+    b.style.background='linear-gradient(135deg,rgba(0,113,206,0.45),rgba(0,113,206,0.22))';
+    b.style.borderColor='rgba(0,113,206,0.75)';
+    b.style.color='#7cc0ff';
+  } else {
+    b.style.background='linear-gradient(135deg,rgba(0,113,206,0.14),rgba(0,113,206,0.05))';
+    b.style.borderColor='rgba(0,113,206,0.3)';
+    b.style.color='rgba(124,192,255,0.85)';
+  }
+  const lbl=b.querySelector('.wmt-toggle-label');
+  if(lbl) lbl.textContent = showWalmartData ? 'Walmart Data: ON' : 'With Walmart Data';
+  b.title = showWalmartData
+    ? 'Walmart included — click to hide Walmart spend and revenue'
+    : 'Walmart excluded — click to include Walmart spend, revenue and its channel row';
+}
+
+// One place that answers "which channels is this view actually showing?", so the
+// subtitle, the KPI rebuild and the channel table can never disagree about it.
+function _excludedChannelLabels(){
+  const out=[];
+  if(!showAmazonData)  out.push('Amazon');
+  if(!showWalmartData) out.push('Walmart');
+  return out;
 }
 let ACTIVE_SUPPLEMENT=null;
 
@@ -1949,7 +2007,11 @@ function buildChannelRows(monthKey, era){
   // It has no spend/clicks/orders, so it never contributed to any other total.
   const canonCh=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
   let rows=src.filter(c=>c.channel!=='Total Paid Media'&&canonCh(c.channel)!=='websitesales');
-  if(!showAmazonData) rows=rows.filter(c=>canonCh(c.channel)!=='amazon');
+  if(!showAmazonData)  rows=rows.filter(c=>canonCh(c.channel)!=='amazon');
+  // Dropping the row here (rather than hiding it at render time) is what keeps the
+  // Total Paid Media subtotal, the KPI cards and the bottom Total Sales line all
+  // computed from the same set of channels.
+  if(!showWalmartData) rows=rows.filter(c=>canonCh(c.channel)!=='walmart');
   // totalSales counts as presence, not just ad activity. eraclea ran no Amazon ads
   // before July 2025 but was still selling -- January 2025 was $3,075.40 -- and a
   // spend/adSales-only test skipped those months, so the Amazon row showed Skinuva
@@ -2028,6 +2090,7 @@ function render(){
   // mode, so calling this further down would leave the Amazon sections on screen in
   // exactly the paths where a reader is least likely to notice.
   syncAmazonToggleButton();
+  syncWalmartToggleButton();
   applyAmazonVisibility();
   if(selectedOzleeBrand==='eraclea'){renderEracleaView();return;}
   // Restore sections that eraclea view may have hidden
@@ -2104,15 +2167,26 @@ function render(){
   // Revenue becomes Walmart marketplace revenue + Shopify DTC. Amazon revenue leaves
   // with Amazon spend; keeping it would produce a TACOS of ~5% that means nothing.
   // partial/daysElapsed/daysInMonth are preserved so the forecast block still works.
-  if(!showAmazonData){
-    const _nonAmz=(monthKey)=>{
+  if(!showAmazonData || !showWalmartData){
+    const _rebuild=(monthKey)=>{
       const rows=buildChannelRows(monthKey,null);
       const tpm=rows.find(c=>c.channel==='Total Paid Media')||{};
-      const wm=_walmartSalesFor(monthKey);
       const sh=_shopifySalesFor(monthKey);
-      // Unknown stays unknown: if neither revenue source is available the card shows
-      // "—" rather than a confident zero.
-      const ts=(wm!=null||sh!=null)?((wm||0)+(sh||0)):null;
+      // tpm.totalSales is the MARKETPLACE revenue of whichever channels survived the
+      // filters above — Amazon and/or Walmart, or neither. Shopify is added here
+      // because it is a separate row, exactly as in the full view.
+      //
+      // The unknown rule still applies: when Amazon is INCLUDED, a null marketplace
+      // total means its SP-API fetch failed, and the honest answer is "—" rather than
+      // Shopify presented as the whole business. With Amazon excluded there is no
+      // dominant side left to be unknown about, so Shopify alone is correct.
+      let ts;
+      if(showAmazonData && tpm.totalSales==null){
+        ts=null;
+      } else {
+        const mkt=tpm.totalSales;
+        ts=(mkt!=null||sh!=null)?((mkt||0)+(sh||0)):null;
+      }
       const spend=tpm.adSpend!=null?tpm.adSpend:null;
       return {
         adSpend:spend, adSales:tpm.adSales, orders:tpm.orders, clicks:tpm.clicks,
@@ -2122,8 +2196,8 @@ function render(){
         ctr:tpm.ctr, cpc:tpm.cpc, aov:tpm.aov,
       };
     };
-    md={...md, ..._nonAmz(md.month)};
-    if(prev) prev={...prev, ..._nonAmz(prev.month)};
+    md={...md, ..._rebuild(md.month)};
+    if(prev) prev={...prev, ..._rebuild(prev.month)};
   }
 
   const ip=md.partial, days=ip?`${md.daysElapsed}/${md.daysInMonth} days`:null;
@@ -2171,7 +2245,9 @@ function render(){
   // a KPI card needs the caption to say which basis the numbers are on.
   document.getElementById('subtitle').textContent=
     `Live from Google Sheets · Data from ${ms[0]}–${ms[ms.length-1]} ${yr}`
-    + (showAmazonData ? '' : ' · Amazon EXCLUDED (Google + Walmart + Shopify only)');
+    + (_excludedChannelLabels().length
+        ? ' · ' + _excludedChannelLabels().join(' + ').toUpperCase() + ' EXCLUDED'
+        : '');
 
   // Month dropdown
   (function buildMonthDropdown(){
@@ -2656,15 +2732,18 @@ function renderTrend(){
   // Series label reflects the mode, so a reader can never mistake one TACOS
   // definition for the other. Net-of-refunds only exists when Amazon is included,
   // because refunds are Amazon-only.
-  const _tacosLabel = showAmazonData ? 'TACOS (net of refunds)' : 'TACOS (excl. Amazon)';
+  const _tacosLabel = showAmazonData
+    ? (showWalmartData ? 'TACOS (net of refunds)' : 'TACOS (excl. Walmart)')
+    : 'TACOS (excl. ' + _excludedChannelLabels().join(' + ') + ')';
   const td=DATA.monthly.map(m=>{
-    // Non-Amazon mode: source the series from the same non-Amazon channel rows the
-    // KPI cards use, so chart and cards agree by construction.
-    if(!showAmazonData){
+    // Whenever a channel is excluded, source the series from the same filtered channel
+    // rows the KPI cards use, so chart and cards agree by construction.
+    if(!showAmazonData || !showWalmartData){
       const rows=buildChannelRows(m.month,null);
       const tpm=rows.find(c=>c.channel==='Total Paid Media')||{};
-      const wm=_walmartSalesFor(m.month), sh=_shopifySalesFor(m.month);
-      const ts=(wm!=null||sh!=null)?((wm||0)+(sh||0)):null;
+      const sh=_shopifySalesFor(m.month);
+      const mkt=tpm.totalSales;
+      const ts=(mkt!=null||sh!=null)?((mkt||0)+(sh||0)):null;
       const spend=tpm.adSpend||0, sales=tpm.adSales||0;
       return {month:m.month, adSpend:spend, adSales:sales, totalSales:ts,
         acos:sales>0?spend/sales*100:null,
@@ -4769,6 +4848,10 @@ function computeRangeMetrics(s,e){
       (DATA.channels[mk]||[]).forEach(c=>{
         if(c.channel==='Total Paid Media'||c.channel==='Amazon'||c.channel==='Google') return;
         if(_isWebsiteSalesLabel(c.channel)) return;
+        // Walmart is a monthly-only channel, so it enters the range view here rather
+        // than through buildChannelRows. Without this the range view would keep
+        // showing Walmart while the monthly view hides it.
+        if(!showWalmartData && String(c.channel).toLowerCase().replace(/[^a-z]/g,'')==='walmart') return;
         if(single){ agg[c.channel]={...c,_verbatim:true}; return; }
         const k=c.channel;
         // Every field starts null and only becomes a number when a month actually
