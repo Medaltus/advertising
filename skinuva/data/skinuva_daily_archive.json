@@ -2488,7 +2488,7 @@
       "totalSales": null,
       "orders": 24,
       "clicks": 157,
-      "impressions": 69976
+      "impressions": 69973
     },
     "google": {
       "spend": 35.4,
@@ -2505,13 +2505,13 @@
       "totalSales": null,
       "orders": 22,
       "clicks": 166,
-      "impressions": 69992
+      "impressions": 69991
     },
     "google": {
-      "spend": 55.63,
+      "spend": 55.16,
       "adSales": 150.0,
       "conversions": 1.0,
-      "clicks": 45,
+      "clicks": 44,
       "impressions": 4267
     }
   },
@@ -2522,7 +2522,7 @@
       "totalSales": null,
       "orders": 21,
       "clicks": 183,
-      "impressions": 71135
+      "impressions": 71134
     },
     "google": {
       "spend": 37.16,
@@ -2539,12 +2539,12 @@
       "totalSales": null,
       "orders": 17,
       "clicks": 169,
-      "impressions": 68491
+      "impressions": 68490
     },
     "google": {
       "spend": 73.5,
-      "adSales": 162.42,
-      "conversions": 1.0,
+      "adSales": 330.61,
+      "conversions": 2.0,
       "clicks": 38,
       "impressions": 5573
     }
@@ -2552,9 +2552,9 @@
   "2026-10-04": {
     "amazon": {
       "spend": 341.93,
-      "adSales": 1560.58,
+      "adSales": 1632.58,
       "totalSales": null,
-      "orders": 22,
+      "orders": 23,
       "clicks": 129,
       "impressions": 76355
     },
@@ -2568,12 +2568,12 @@
   },
   "2026-10-05": {
     "amazon": {
-      "spend": 445.12,
+      "spend": 448.7,
       "adSales": 971.04,
       "totalSales": null,
       "orders": 12,
-      "clicks": 168,
-      "impressions": 103412
+      "clicks": 169,
+      "impressions": 103415
     },
     "google": {
       "spend": 58.79,
@@ -2585,13 +2585,19 @@
   },
   "2026-10-06": {
     "amazon": {
-      "spend": 1513.97,
-      "adSales": 3897.56,
+      "spend": 1510.66,
+      "adSales": 4325.55,
       "totalSales": null,
-      "orders": 50,
-      "clicks": 403,
-      "impressions": 181058
+      "orders": 57,
+      "clicks": 402,
+      "impressions": 177587
     },
-    "google": {}
+    "google": {
+      "spend": 63.31,
+      "adSales": 215.26,
+      "conversions": 2.0,
+      "clicks": 47,
+      "impressions": 5694
+    }
   }
 }
