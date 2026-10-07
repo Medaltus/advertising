@@ -307,39 +307,47 @@
   "October 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 30.46,
+        "spend": 40.79,
         "adSales": 105,
         "orders": 1,
-        "clicks": 13,
-        "impressions": 21395
+        "clicks": 17,
+        "impressions": 27428
       }
     },
     "campaigns": {
       "Skinuva": [
+        {
+          "name": "Skinuva - SB - M - video 3.26 v1",
+          "spend": 2.29,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 1,
+          "impressions": 81
+        },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
           "spend": 14.38,
           "adSales": 0,
           "orders": 0,
           "clicks": 7,
-          "impressions": 256
+          "impressions": 296
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 16.08,
+          "spend": 24.12,
           "adSales": 105,
           "orders": 1,
-          "clicks": 6,
-          "impressions": 21139
+          "clicks": 9,
+          "impressions": 27051
         }
       ]
     },
     "range": {
       "since": "2026-10-01",
-      "until": "2026-10-05"
+      "until": "2026-10-06"
     },
     "profileId": "224591",
-    "fetched_at": "2026-10-06T14:12:40Z",
+    "fetched_at": "2026-10-07T14:12:54Z",
     "source": "helium10-walmart"
   }
 }
