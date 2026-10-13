@@ -1081,7 +1081,10 @@ function parseSheet(text) {
 // month — there are eight — the mode rebuilds DATA.monthly ONCE from a pristine
 // Amazon-only copy, so every consumer (KPIs, leaderboard, charts, agents, QC panel,
 // exports) sees a consistent set of numbers without knowing the mode exists.
-let channelMode = 'both';
+// Default is Amazon only. Walmart is ~1% of portfolio revenue, so blending it into the
+// headline numbers moves them barely at all while making every figure ambiguous about
+// what it covers. The selector makes including it one click.
+let channelMode = 'amazon';
 let WALMART_ADS = {}, WALMART_REV = {};
 
 // Walmart ad data only exists for the brands that actually run Walmart campaigns
