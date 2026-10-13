@@ -439,17 +439,6 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
           <div class="audio-spinner"></div>
           <span style="font-size:11px;font-weight:600;color:rgba(129,140,248,0.8);letter-spacing:0.5px;">Executive Summary</span>
         </button>
-        <!-- Channel selector. Defaults to Amazon + Walmart; the other two isolate a
-             single marketplace. Segmented so the three read as one choice rather than
-             three independent switches. -->
-        <div style="display:inline-flex;border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);">
-          <button id="chan-both" onclick="setChannelMode('both')" title="Amazon and Walmart combined"
-            style="padding:7px 12px;border:none;border-right:1px solid rgba(255,255,255,0.08);background:linear-gradient(135deg,rgba(129,140,248,0.42),rgba(129,140,248,0.2));color:#c7d2fe;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">Amazon + Walmart</button>
-          <button id="chan-amazon" onclick="setChannelMode('amazon')" title="Amazon only"
-            style="padding:7px 12px;border:none;border-right:1px solid rgba(255,255,255,0.08);background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));color:rgba(255,255,255,0.5);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Amazon</button>
-          <button id="chan-walmart" onclick="setChannelMode('walmart')" title="Walmart only — note that only brands running Walmart campaigns appear"
-            style="padding:7px 12px;border:none;background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));color:rgba(255,255,255,0.5);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Walmart</button>
-        </div>
         <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08));border:1px solid rgba(56,189,248,0.25);color:rgba(56,189,248,0.8);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.35),rgba(56,189,248,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08))'">&#9741; QC Check</button>
         <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
       </div>
@@ -2059,6 +2048,30 @@ function renderBrandSelector(md) {
   wrap.appendChild(dropBtn);
   el.appendChild(wrap);
   // ── Medaltus Internal Ads button ──
+  // ── Channel selector: Amazon + Walmart / Amazon / Walmart ──────────────────
+  // Built here rather than as static markup in the header, because this bar is wiped
+  // and rebuilt on every render — anything placed in the HTML would survive exactly
+  // one render. Sits with the brand controls since it is the same kind of choice:
+  // which slice of the business am I looking at.
+  const chanWrap = document.createElement('div');
+  chanWrap.id = 'channel-selector';
+  chanWrap.style.cssText = 'display:inline-flex;border-radius:9px;overflow:hidden;'
+    + 'border:1px solid rgba(255,255,255,0.1);margin-left:14px;flex-shrink:0;';
+  [['both','Amazon + Walmart','Amazon and Walmart combined'],
+   ['amazon','Amazon','Amazon only'],
+   ['walmart','Walmart','Walmart only — only brands that sell on Walmart appear']
+  ].forEach(([mode,label,tip],i)=>{
+    const b=document.createElement('button');
+    b.id='chan-'+mode; b.textContent=label; b.title=tip;
+    b.style.cssText='padding:7px 12px;border:none;font-size:12px;cursor:pointer;'
+      + 'font-family:inherit;white-space:nowrap;transition:all 0.2s;'
+      + (i<2?'border-right:1px solid rgba(255,255,255,0.08);':'');
+    b.onclick=()=>setChannelMode(mode);
+    chanWrap.appendChild(b);
+  });
+  el.appendChild(chanWrap);
+  syncChannelModeButtons();
+
   const intBtn = document.createElement('button');
   intBtn.className = 'brand-pill internal-pill' + (internalAdsMode ? ' active' : ''); intBtn.style.marginLeft = 'auto';
   intBtn.textContent = 'Medaltus Internal Ads';
