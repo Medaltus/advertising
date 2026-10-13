@@ -684,28 +684,11 @@ body.hide-amazon #dow-section { display: none !important; }
         <div class="audio-spinner"></div>
         <span style="font-size:11px;font-weight:600;color:rgba(129,140,248,0.8);letter-spacing:0.5px;">Executive Summary</span>
       </button>
-      <!-- Amazon visibility toggle. Sits beside Executive Summary but is ALWAYS visible:
-           the audio button above hides itself on completed months (display:none unless
-           the month is partial), and this control must not disappear with it. -->
-      <button id="amazon-toggle-btn" onclick="toggleAmazonData()" title="Amazon excluded — click to include Amazon spend, sales and sections"
-              style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;
-                     background:linear-gradient(135deg,rgba(255,153,0,0.14),rgba(255,153,0,0.05));
-                     border:1px solid rgba(255,153,0,0.25);color:rgba(255,153,0,0.85);
-                     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;">
-        <span style="font-size:13px;line-height:1;">&#10098;a&#10099;</span>
-        <span class="amz-toggle-label">With Amazon Data</span>
-      </button>
-      <!-- Walmart toggle. Same contract as the Amazon one: always visible, default off,
-           not persisted. Walmart is ~1-2% of revenue but occupies a full channel row,
-           so by default it is out of the headline numbers entirely. -->
-      <button id="walmart-toggle-btn" onclick="toggleWalmartData()" title="Walmart excluded — click to include Walmart spend, revenue and its channel row"
-              style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;
-                     background:linear-gradient(135deg,rgba(0,113,206,0.14),rgba(0,113,206,0.05));
-                     border:1px solid rgba(0,113,206,0.3);color:rgba(124,192,255,0.85);
-                     font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;white-space:nowrap;">
-        <span style="font-size:13px;line-height:1;">&#10022;</span>
-        <span class="wmt-toggle-label">With Walmart Data</span>
-      </button>
+      <!-- The Amazon and Walmart toggles used to sit here. Two extra buttons overflowed
+           this row, which forced the month dropdown onto a second line indented to the
+           width of the button row above it — the header looked broken. They now live in
+           the brand bar with All/Skinuva/eraclea, which is the same kind of control
+           (which slice of the business) and has room. See buildBrandSelector. -->
       <div class="refresh-timer" id="refresh-timer" style="display:none;">
         <div class="refresh-ring-wrap">
           <svg class="refresh-ring-bg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
@@ -1533,6 +1516,33 @@ function syncWalmartToggleButton(){
     : 'Walmart excluded — click to include Walmart spend, revenue and its channel row';
 }
 
+// Builds the Amazon/Walmart toggles into the brand bar. Called from
+// buildBrandSelector, because that bar is wiped and rebuilt on every render —
+// markup placed in the HTML would survive exactly one render and then disappear.
+function _mountChannelToggles(bar){
+  if(!bar) return;
+  const spec=[
+    ['amazon-toggle-btn','amz-toggle-label','With Amazon Data','&#10098;a&#10099;', 'toggleAmazonData'],
+    ['walmart-toggle-btn','wmt-toggle-label','With Walmart Data','&#10022;',        'toggleWalmartData'],
+  ];
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:inline-flex;gap:8px;margin-left:14px;flex-shrink:0;';
+  spec.forEach(([id,lblCls,text,icon,fn])=>{
+    const b=document.createElement('button');
+    b.id=id;
+    b.style.cssText='display:inline-flex;align-items:center;gap:6px;padding:7px 14px;'
+      +'border-radius:9px;border:1px solid;font-size:12px;font-weight:600;cursor:pointer;'
+      +'font-family:inherit;transition:all 0.2s;white-space:nowrap;';
+    b.innerHTML='<span style="font-size:13px;line-height:1;">'+icon+'</span>'
+      +'<span class="'+lblCls+'">'+text+'</span>';
+    b.onclick=()=>window[fn]();
+    wrap.appendChild(b);
+  });
+  bar.appendChild(wrap);
+  syncAmazonToggleButton();
+  syncWalmartToggleButton();
+}
+
 // One place that answers "which channels is this view actually showing?", so the
 // subtitle, the KPI rebuild and the channel table can never disagree about it.
 function _excludedChannelLabels(){
@@ -1673,6 +1683,7 @@ function buildBrandSelector(){
     };
     bar.appendChild(btn);
   });
+  _mountChannelToggles(bar);
 }
 
 // ── Week-over-Week delta helper ────────────────────────────────────────────
