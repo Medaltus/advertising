@@ -439,6 +439,17 @@ tbody tr.highlighted { background:rgba(129,140,248,0.08); }
           <div class="audio-spinner"></div>
           <span style="font-size:11px;font-weight:600;color:rgba(129,140,248,0.8);letter-spacing:0.5px;">Executive Summary</span>
         </button>
+        <!-- Channel selector. Defaults to Amazon + Walmart; the other two isolate a
+             single marketplace. Segmented so the three read as one choice rather than
+             three independent switches. -->
+        <div style="display:inline-flex;border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);">
+          <button id="chan-both" onclick="setChannelMode('both')" title="Amazon and Walmart combined"
+            style="padding:7px 12px;border:none;border-right:1px solid rgba(255,255,255,0.08);background:linear-gradient(135deg,rgba(129,140,248,0.42),rgba(129,140,248,0.2));color:#c7d2fe;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;">Amazon + Walmart</button>
+          <button id="chan-amazon" onclick="setChannelMode('amazon')" title="Amazon only"
+            style="padding:7px 12px;border:none;border-right:1px solid rgba(255,255,255,0.08);background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));color:rgba(255,255,255,0.5);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Amazon</button>
+          <button id="chan-walmart" onclick="setChannelMode('walmart')" title="Walmart only — note that only brands running Walmart campaigns appear"
+            style="padding:7px 12px;border:none;background:linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));color:rgba(255,255,255,0.5);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;">Walmart</button>
+        </div>
         <button id="qc-btn" onclick="openQC()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08));border:1px solid rgba(56,189,248,0.25);color:rgba(56,189,248,0.8);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.35),rgba(56,189,248,0.15))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(56,189,248,0.2),rgba(56,189,248,0.08))'">&#9741; QC Check</button>
         <button id="pdf-export-btn" onclick="exportPDF()" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:9px;background:linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1));border:1px solid rgba(129,140,248,0.3);color:rgba(129,140,248,0.9);font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;" onmouseover="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.4),rgba(129,140,248,0.2))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(129,140,248,0.25),rgba(129,140,248,0.1))'">&#8595; Export PDF</button>
       </div>
@@ -1073,6 +1084,125 @@ function parseSheet(text) {
 // threw on JSON.parse, got swallowed by a bare `.catch(() => ({}))`, and produced a
 // 2573.9% TACOS with nothing in the console. These helpers keep the page rendering but
 // make the failure impossible to overlook.
+// ── Channel mode: Amazon + Walmart ───────────────────────────────────────────
+// 'both' (default) | 'amazon' | 'walmart'
+//
+// api_supplement.json is Amazon-only. Walmart is layered on top from the two files
+// the Walmart refresh task maintains. Rather than patch every place that reads a
+// month — there are eight — the mode rebuilds DATA.monthly ONCE from a pristine
+// Amazon-only copy, so every consumer (KPIs, leaderboard, charts, agents, QC panel,
+// exports) sees a consistent set of numbers without knowing the mode exists.
+let channelMode = 'both';
+let WALMART_ADS = {}, WALMART_REV = {};
+
+// Walmart ad data only exists for the brands that actually run Walmart campaigns
+// (Skinuva throughout, Cloud Cafe and Just Bjorn occasionally). Revenue covers seven
+// brands. In 'walmart' mode the portfolio is therefore legitimately small — that is
+// the business, not a gap in the data.
+function _walmartFor(monthKey, brandName){
+  const ads = ((WALMART_ADS[monthKey]||{}).byBrand||{})[brandName];
+  const rev = ((WALMART_REV[monthKey]||{}).byBrand||{})[brandName];
+  if(!ads && !rev) return null;
+  return {
+    spend:       ads ? (ads.spend||0)       : 0,
+    adSales:     ads ? (ads.adSales||0)     : 0,
+    orders:      ads ? (ads.orders||0)      : 0,
+    clicks:      ads ? (ads.clicks||0)      : 0,
+    impressions: ads ? (ads.impressions||0) : 0,
+    // null, not 0 — a brand with Walmart ads but no revenue row is unmeasured, and
+    // dividing spend by a fabricated zero is how TACOS ends up in the thousands.
+    totalSales:  rev ? (rev.total||0) : null,
+  };
+}
+
+function _recalcBrand(b){
+  b.acos  = (b.adSales > 0 && b.spend != null) ? Math.round(b.spend / b.adSales * 1000) / 10 : null;
+  b.tacos = (b.totalSales > 0 && b.spend != null) ? Math.round(b.spend / b.totalSales * 1000) / 10 : null;
+  b.ctr   = b.impressions > 0 ? Math.round(b.clicks / b.impressions * 10000) / 100 : null;
+  b.cpc   = b.clicks > 0 ? Math.round(b.spend / b.clicks * 100) / 100 : null;
+  b.aov   = b.orders > 0 ? Math.round(b.adSales / b.orders * 100) / 100 : null;
+  b.cr    = (b.clicks > 0 && b.orders != null) ? Math.round(b.orders / b.clicks * 1000) / 10 : null;
+  return b;
+}
+
+// Rebuilds DATA.monthly from the untouched Amazon-only baseline according to the mode.
+function applyChannelMode(){
+  if(!DATA || !DATA._baseMonthly) return;
+  DATA.monthly = DATA._baseMonthly.map(src => {
+    const m = JSON.parse(JSON.stringify(src));
+    const names = new Set(m.brands.map(b => b.name));
+    // A brand can sell on Walmart without appearing in the Amazon supplement for that
+    // month; in 'walmart'/'both' mode it still belongs in the portfolio.
+    Object.keys(((WALMART_REV[m.month]||{}).byBrand)||{})
+      .concat(Object.keys(((WALMART_ADS[m.month]||{}).byBrand)||{}))
+      .forEach(n => { if(!names.has(n)){ names.add(n);
+        m.brands.push({name:n, spend:0, adSales:0, totalSales:null, orders:0, clicks:0, impressions:0}); } });
+
+    m.brands = m.brands.map(b => {
+      const w = _walmartFor(m.month, b.name);
+      if(channelMode === 'amazon') return b;                 // untouched baseline
+      if(channelMode === 'walmart'){
+        if(!w) return {...b, spend:0, adSales:0, totalSales:null, orders:0, clicks:0, impressions:0,
+                       acos:null, tacos:null, ctr:null, cpc:null, aov:null, cr:null};
+        return _recalcBrand({...b, ...w});
+      }
+      if(!w) return b;                                        // both, no Walmart data
+      return _recalcBrand({
+        ...b,
+        spend:       (b.spend||0)       + w.spend,
+        adSales:     (b.adSales||0)     + w.adSales,
+        orders:      (b.orders||0)      + w.orders,
+        clicks:      (b.clicks||0)      + w.clicks,
+        impressions: (b.impressions||0) + w.impressions,
+        // Unknown on either side keeps the combined figure unknown. Adding Walmart's
+        // revenue to a null Amazon figure would publish Walmart alone as the brand's
+        // whole business — the exact failure that put Canada-only numbers on this
+        // dashboard for five weeks.
+        totalSales: (b.totalSales != null && w.totalSales != null)
+                      ? b.totalSales + w.totalSales
+                      : (channelModeBothRevenueFallback(b, w)),
+      });
+    });
+
+    // Drop brands with nothing at all in this mode, so 'walmart' doesn't render a
+    // leaderboard of empty rows.
+    if(channelMode === 'walmart')
+      m.brands = m.brands.filter(b => (b.spend||0) > 0 || b.totalSales != null);
+
+    const t = computeTotals(m.brands);
+    return {...m, ...t};
+  });
+}
+
+// If exactly one side is known, the combined total is unknowable — but Walmart is
+// ~1% of revenue, so a missing WALMART figure should not blank an otherwise good
+// Amazon number. A missing AMAZON figure must still blank it.
+function channelModeBothRevenueFallback(b, w){
+  if(b.totalSales == null) return null;          // Amazon unknown -> unknown
+  return b.totalSales;                           // Walmart unknown -> Amazon alone
+}
+
+function setChannelMode(mode){
+  channelMode = mode;
+  applyChannelMode();
+  syncChannelModeButtons();
+  render();
+}
+
+function syncChannelModeButtons(){
+  [['both','Amazon + Walmart'],['amazon','Amazon only'],['walmart','Walmart only']]
+    .forEach(([m])=>{
+      const b=document.getElementById('chan-'+m);
+      if(!b) return;
+      const on = channelMode===m;
+      b.style.background = on ? 'linear-gradient(135deg,rgba(129,140,248,0.42),rgba(129,140,248,0.2))'
+                              : 'linear-gradient(135deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02))';
+      b.style.borderColor = on ? 'rgba(129,140,248,0.75)' : 'rgba(255,255,255,0.1)';
+      b.style.color       = on ? '#c7d2fe' : 'rgba(255,255,255,0.5)';
+      b.style.fontWeight  = on ? '700' : '600';
+    });
+}
+
 const _MED_LOAD_FAILURES = [];
 
 function _loadJsonOrWarn(path, fallback, opts) {
@@ -1117,9 +1247,18 @@ function computeTotals(brands) {
   // when only SOME brands do -- a partial sum understates revenue and therefore
   // overstates TACOS, which is the number this dashboard sets budgets from. `||0`
   // collapsed both cases into a confident "$0".
-  const tsBrands = brands.filter(b => (b.spend || 0) > 0);
-  const tsComplete = tsBrands.length > 0 && tsBrands.every(b => b.totalSales != null);
-  const totalSales = tsComplete ? tsBrands.reduce((s, b) => s + b.totalSales, 0) : null;
+  //
+  // Two different questions, and conflating them was a bug: "is the figure complete?"
+  // is answered by the brands carrying SPEND (if one of those has no revenue, TACOS
+  // would be wrong), but "what is the revenue?" must sum EVERY brand that reports
+  // revenue — including ones with no spend this month. Summing only the spending
+  // brands lost $311.95 of Walmart revenue in the Walmart-only view, because evolis,
+  // dearcloud and PB & Jay sell there without running campaigns.
+  const spendBrands = brands.filter(b => (b.spend || 0) > 0);
+  const tsComplete  = spendBrands.length > 0 && spendBrands.every(b => b.totalSales != null);
+  const revBrands   = brands.filter(b => b.totalSales != null);
+  const totalSales  = (tsComplete && revBrands.length)
+                      ? revBrands.reduce((s, b) => s + b.totalSales, 0) : null;
   return {
     spend, adSales, totalSales,
     acos: adSales > 0 ? (spend / adSales) * 100 : null,
@@ -3924,7 +4063,7 @@ speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
 // ── Init ──
 async function init() {
   try {
-    const [text, _supplement, _daily, _gads] = await Promise.all([
+    const [text, _supplement, _daily, _gads, _wmtAds, _wmtRev] = await Promise.all([
       fetch('/api/sheets').then(r => { if (!r.ok) throw new Error('Sheets API error: ' + r.status); return r.text(); }),
       // These used to be `.catch(() => ({}))` — a silent swallow that made a corrupt or
       // missing file look like an empty-but-valid one. On the Ozlee dashboard that exact
@@ -3934,7 +4073,12 @@ async function init() {
       // fallback still keeps the page alive but now says so, loudly.
       _loadJsonOrWarn('/data/api_supplement.json', {}),
       _loadJsonOrWarn('/data/medaltus_daily_archive.json', {}, {cache:'no-store'}),
-      _loadJsonOrWarn('/data/medaltus_google_ads_monthly.json', {monthly_summary:{},by_month_campaign:[]})
+      _loadJsonOrWarn('/data/medaltus_google_ads_monthly.json', {monthly_summary:{},by_month_campaign:[]}),
+      // Walmart lives under skinuva/data because that is where the refresh task writes
+      // it. This deployment is rooted at deploy/, so the files are served from here too
+      // — no copy, no second source of truth that can drift.
+      _loadJsonOrWarn('/skinuva/data/walmart_ads.json', {}),
+      _loadJsonOrWarn('/skinuva/data/walmart_revenue.json', {})
     ]);
     _showDataLoadBanner(_MED_LOAD_FAILURES);
     if (_daily) MEDALTUS_DAILY = _daily;
@@ -3945,6 +4089,13 @@ async function init() {
     DATA = parseSheet(text);
     mergeApiSupplement(DATA);
     if (!DATA.monthly.length) throw new Error('No brand data found. The sheet format may have changed.');
+    // Pristine Amazon-only baseline. Every mode switch rebuilds from this, so toggling
+    // back and forth can never compound Walmart in twice.
+    DATA._baseMonthly = JSON.parse(JSON.stringify(DATA.monthly));
+    if (_wmtAds) WALMART_ADS = _wmtAds;
+    if (_wmtRev) WALMART_REV = _wmtRev;
+    applyChannelMode();
+    syncChannelModeButtons();
     selectedMonth = DATA.monthly[DATA.monthly.length - 1].month;
     document.getElementById('loading').style.display = 'none';
     document.getElementById('dashboard').style.display = 'block';
