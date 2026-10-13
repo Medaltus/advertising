@@ -151,69 +151,349 @@
     "orders": 0,
     "units": 15,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-29T20:00:00Z"
+    "fetched_at": "2026-07-29T20:00:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1155.01,
+        "orders": 0,
+        "units": 15
+      },
+      "evolis": {
+        "total": 269.73,
+        "orders": 0,
+        "units": 7
+      },
+      "Cloud Cafe": {
+        "total": 20.0,
+        "orders": 0,
+        "units": 1
+      },
+      "Just Bjorn": {
+        "total": 0.0,
+        "orders": 0,
+        "units": 0
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "February 2026": {
     "total": 1105.0,
     "orders": 0,
     "units": 19,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-29T20:00:00Z"
+    "fetched_at": "2026-07-29T20:00:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1105.0,
+        "orders": 0,
+        "units": 19
+      },
+      "evolis": {
+        "total": 227.96,
+        "orders": 0,
+        "units": 5
+      },
+      "Cloud Cafe": {
+        "total": 20.0,
+        "orders": 0,
+        "units": 1
+      },
+      "Just Bjorn": {
+        "total": 0.0,
+        "orders": 0,
+        "units": 0
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "March 2026": {
     "total": 1250.0,
     "orders": 0,
     "units": 17,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-29T20:00:00Z"
+    "fetched_at": "2026-07-29T20:00:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1250.0,
+        "orders": 0,
+        "units": 17
+      },
+      "evolis": {
+        "total": 19.99,
+        "orders": 0,
+        "units": 1
+      },
+      "Cloud Cafe": {
+        "total": 60.0,
+        "orders": 0,
+        "units": 6
+      },
+      "Just Bjorn": {
+        "total": 0.0,
+        "orders": 0,
+        "units": 0
+      },
+      "PB & Jay": {
+        "total": 133.0,
+        "orders": 11,
+        "units": 20
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "April 2026": {
     "total": 1355.0,
     "orders": 0,
     "units": 18,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-29T20:00:00Z"
+    "fetched_at": "2026-07-29T20:00:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1355.0,
+        "orders": 0,
+        "units": 18
+      },
+      "evolis": {
+        "total": 0.0,
+        "orders": 0,
+        "units": 0
+      },
+      "Cloud Cafe": {
+        "total": 36.0,
+        "orders": 0,
+        "units": 3
+      },
+      "Just Bjorn": {
+        "total": 77.0,
+        "orders": 0,
+        "units": 5
+      },
+      "PB & Jay": {
+        "total": 172.9,
+        "orders": 22,
+        "units": 23
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "May 2026": {
     "total": 1595.0,
     "orders": 23,
     "units": 25,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-29T20:00:00Z"
+    "fetched_at": "2026-07-29T20:00:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1595.0,
+        "orders": 23,
+        "units": 25
+      },
+      "evolis": {
+        "total": 79.98,
+        "orders": 2,
+        "units": 2
+      },
+      "dearcloud": {
+        "total": 364.0,
+        "orders": 25,
+        "units": 32
+      },
+      "Cloud Cafe": {
+        "total": 12.0,
+        "orders": 1,
+        "units": 1
+      },
+      "Just Bjorn": {
+        "total": 298.0,
+        "orders": 10,
+        "units": 10
+      },
+      "PB & Jay": {
+        "total": 179.0,
+        "orders": 19,
+        "units": 21
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "June 2026": {
     "total": 1750.0,
     "orders": 26,
     "units": 26,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-07-31T15:11:17Z"
+    "fetched_at": "2026-07-31T15:11:17Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1750.0,
+        "orders": 26,
+        "units": 26
+      },
+      "evolis": {
+        "total": 99.98,
+        "orders": 2,
+        "units": 2
+      },
+      "dearcloud": {
+        "total": 402.0,
+        "orders": 26,
+        "units": 32
+      },
+      "Cloud Cafe": {
+        "total": 152.0,
+        "orders": 10,
+        "units": 12
+      },
+      "Just Bjorn": {
+        "total": 158.0,
+        "orders": 2,
+        "units": 2
+      },
+      "Hillside": {
+        "total": 59.98,
+        "orders": 2,
+        "units": 2
+      },
+      "PB & Jay": {
+        "total": 152.0,
+        "orders": 18,
+        "units": 20
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "July 2026": {
     "total": 1059.99,
     "orders": 16,
     "units": 16,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-08-31T13:20:00Z"
+    "fetched_at": "2026-08-31T13:20:00Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1059.99,
+        "orders": 16,
+        "units": 16
+      },
+      "evolis": {
+        "total": 39.99,
+        "orders": 2,
+        "units": 2
+      },
+      "dearcloud": {
+        "total": 93.99,
+        "orders": 8,
+        "units": 9
+      },
+      "Cloud Cafe": {
+        "total": 64.0,
+        "orders": 4,
+        "units": 5
+      },
+      "PB & Jay": {
+        "total": 57.5,
+        "orders": 7,
+        "units": 8
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "August 2026": {
     "total": 1314.0,
     "orders": 17,
     "units": 17,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-09-28T01:42:55Z"
+    "fetched_at": "2026-09-28T01:42:55Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1314.0,
+        "orders": 17,
+        "units": 17
+      },
+      "dearcloud": {
+        "total": 146.99,
+        "orders": 10,
+        "units": 10
+      },
+      "Cloud Cafe": {
+        "total": 44.0,
+        "orders": 3,
+        "units": 3
+      },
+      "Hillside": {
+        "total": 29.99,
+        "orders": 1,
+        "units": 1
+      },
+      "PB & Jay": {
+        "total": 47.0,
+        "orders": 6,
+        "units": 7
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "September 2026": {
     "total": 2779.99,
     "orders": 37,
     "units": 39,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-10-13T17:43:03Z"
+    "fetched_at": "2026-10-13T17:43:03Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 2779.99,
+        "orders": 37,
+        "units": 39
+      },
+      "evolis": {
+        "total": 49.99,
+        "orders": 1,
+        "units": 1
+      },
+      "dearcloud": {
+        "total": 158.0,
+        "orders": 10,
+        "units": 10
+      },
+      "Cloud Cafe": {
+        "total": 68.0,
+        "orders": 5,
+        "units": 5
+      },
+      "PB & Jay": {
+        "total": 103.96,
+        "orders": 12,
+        "units": 13
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   },
   "October 2026": {
     "total": 1095.0,
     "orders": 14,
     "units": 14,
     "source": "google-sheet:Newderm - Walmart Revenue/skinuva",
-    "fetched_at": "2026-10-13T17:43:03Z"
+    "fetched_at": "2026-10-13T17:43:03Z",
+    "byBrand": {
+      "Skinuva": {
+        "total": 1095.0,
+        "orders": 14,
+        "units": 14
+      },
+      "evolis": {
+        "total": 19.99,
+        "orders": 1,
+        "units": 1
+      },
+      "dearcloud": {
+        "total": 62.0,
+        "orders": 5,
+        "units": 6
+      },
+      "PB & Jay": {
+        "total": 5.1,
+        "orders": 1,
+        "units": 1
+      }
+    },
+    "byBrandFetchedAt": "2026-10-13T17:46:03Z"
   }
 }
