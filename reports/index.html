@@ -1655,23 +1655,36 @@ function renderPacing(md, prev) {
     const projDiff = projected - target;
     const projDiffPct = target > 0 ? (projDiff / target * 100) : 0;
 
-    let statusLabel, statusColor, barColor;
-    if (Math.abs(pace) <= 8)         { statusLabel='ON TRACK';                         statusColor='#4ade80'; barColor='rgba(74,222,128,0.7)'; }
-    else if (pace < -8 && pace >=-20){ statusLabel=`UNDER ${Math.abs(pace).toFixed(0)}%`; statusColor='#f59e0b'; barColor='rgba(245,158,11,0.7)'; }
-    else if (pace < -20)             { statusLabel=`UNDER ${Math.abs(pace).toFixed(0)}%`; statusColor='#ff6b6b'; barColor='rgba(255,107,107,0.7)'; }
-    else if (pace > 8 && pace <= 20) { statusLabel=`OVER ${pace.toFixed(0)}%`;          statusColor='#f59e0b'; barColor='rgba(245,158,11,0.7)'; }
-    else                             { statusLabel=`OVER ${pace.toFixed(0)}%`;          statusColor='#ff6b6b'; barColor='rgba(255,107,107,0.7)'; }
+    // Neutral palette on purpose. Red/amber/green framed any deviation from budget as
+    // a problem, but pacing ahead is often exactly right — October 2026 ran over
+    // because of a Prime event, which is a decision, not a fault. The dashboard should
+    // report the number and let you judge it.
+    //
+    // Distance from plan is still legible: the further off pace, the brighter the
+    // label and bar, so an outlier still draws the eye without being colour-coded as
+    // good or bad. The white marker on the track shows where today sits in the month.
+    let statusLabel, statusColor, statusBg, barColor;
+    const offPace = Math.abs(pace);
+    if (offPace <= 8) {
+      statusColor='rgba(255,255,255,0.45)'; statusBg='rgba(255,255,255,0.05)'; barColor='rgba(255,255,255,0.28)';
+    } else if (offPace <= 20) {
+      statusColor='rgba(255,255,255,0.65)'; statusBg='rgba(255,255,255,0.07)'; barColor='rgba(255,255,255,0.42)';
+    } else {
+      statusColor='rgba(255,255,255,0.88)'; statusBg='rgba(255,255,255,0.10)'; barColor='rgba(255,255,255,0.60)';
+    }
+    statusLabel = offPace <= 8 ? 'ON PACE'
+                : (pace < 0 ? `UNDER ${offPace.toFixed(0)}%` : `OVER ${pace.toFixed(0)}%`);
 
     const projStr = projDiff > 0
       ? `<span style="color:${statusColor};">+$${projDiff.toLocaleString()} over</span>`
       : projDiff < 0
       ? `<span style="color:${statusColor};">$${Math.abs(projDiff).toLocaleString()} under</span>`
-      : `<span style="color:#4ade80;">on budget</span>`;
+      : `<span style="color:rgba(255,255,255,0.65);">on budget</span>`;
 
     cards += `<div class="pacing-card">
       <div class="pacing-card-header">
         <span class="pacing-brand-name" style="color:${color}">${b.name}</span>
-        <span class="pacing-status" style="color:${statusColor};background:${statusColor}18;">${statusLabel}</span>
+        <span class="pacing-status" style="color:${statusColor};background:${statusBg};">${statusLabel}</span>
       </div>
       <div class="pacing-bar-track">
         <div class="pacing-bar-fill" style="width:${Math.min(spendPct,100)}%;background:${barColor};"></div>
