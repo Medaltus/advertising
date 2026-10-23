@@ -311,7 +311,14 @@
         "adSales": 315,
         "orders": 3,
         "clicks": 72,
-        "impressions": 126692
+        "impressions": 133817
+      },
+      "Just Bjorn": {
+        "spend": 4.91,
+        "adSales": 0,
+        "orders": 0,
+        "clicks": 3,
+        "impressions": 419
       }
     },
     "campaigns": {
@@ -322,7 +329,7 @@
           "adSales": 105,
           "orders": 1,
           "clicks": 10,
-          "impressions": 3439
+          "impressions": 3588
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Branded",
@@ -338,16 +345,26 @@
           "adSales": 210,
           "orders": 2,
           "clicks": 55,
-          "impressions": 122957
+          "impressions": 129933
+        }
+      ],
+      "Just Bjorn": [
+        {
+          "name": "just bjorn - SP - M - travel",
+          "spend": 4.91,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 3,
+          "impressions": 419
         }
       ]
     },
     "range": {
       "since": "2026-10-01",
-      "until": "2026-10-21"
+      "until": "2026-10-22"
     },
     "profileId": "224591",
-    "fetched_at": "2026-10-22T10:10:19Z",
+    "fetched_at": "2026-10-23T13:01:24Z",
     "source": "helium10-walmart"
   }
 }
