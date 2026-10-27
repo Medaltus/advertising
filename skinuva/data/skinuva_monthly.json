@@ -449,11 +449,11 @@
     "amazon": {
       "spend": 13882.31,
       "adSales": 72664.97,
-      "totalSales": 151383.39,
+      "totalSales": null,
       "orders": 902,
       "clicks": 5449,
       "impressions": 1336571,
-      "totalSalesSource": "sp-api-brand-filtered"
+      "totalSalesSource": "unavailable (SP-API fetch failed)"
     },
     "google": {
       "spend": 3846.21,
@@ -464,12 +464,10 @@
     },
     "shopify": 51054.29,
     "walmart": 1595.0,
-    "combinedTotalSales": 204032.68,
+    "combinedTotalSales": null,
     "backfilled": true,
     "refunds": 3793.51,
-    "refundsSource": "helium10-asin-attributed",
-    "netAmazonSales": 147589.88,
-    "netCombinedTotalSales": 200239.17
+    "refundsSource": "helium10-asin-attributed"
   },
   "June 2026": {
     "amazon": {
@@ -569,7 +567,7 @@
     "shopify": 34674.67,
     "walmart": 2779.99,
     "combinedTotalSales": 154448.34,
-    "fetched_at": "2026-10-27T12:21:53Z",
+    "fetched_at": "2026-10-27T19:24:15Z",
     "refunds": 4399.75,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 112593.93,
@@ -577,28 +575,28 @@
   },
   "October 2026": {
     "amazon": {
-      "spend": 14624.44,
-      "adSales": 47675.09,
-      "totalSales": 114787.96,
-      "orders": 607,
+      "spend": 14625.81,
+      "adSales": 47745.09,
+      "totalSales": 118662.98,
+      "orders": 608,
       "clicks": 5255,
-      "impressions": 2123232,
+      "impressions": 2120336,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
-      "spend": 2202.42,
-      "adSales": 8078.13,
-      "conversions": 53,
-      "clicks": 1334,
-      "impressions": 190183
+      "spend": 2400.66,
+      "adSales": 8480.51,
+      "conversions": 55,
+      "clicks": 1398,
+      "impressions": 202998
     },
-    "shopify": 27792.12,
-    "walmart": 2429.0,
-    "combinedTotalSales": 145009.08,
-    "fetched_at": "2026-10-27T12:21:53Z",
+    "shopify": 27772.86,
+    "walmart": 2569.0,
+    "combinedTotalSales": 149004.84,
+    "fetched_at": "2026-10-27T19:24:15Z",
     "refunds": 3573.34,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 111214.62,
-    "netCombinedTotalSales": 141435.74
+    "netAmazonSales": 115089.64,
+    "netCombinedTotalSales": 145431.5
   }
 }

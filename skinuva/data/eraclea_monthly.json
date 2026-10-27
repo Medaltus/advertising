@@ -469,11 +469,11 @@
     "amazon": {
       "spend": 241.78,
       "adSales": 292.36,
-      "totalSales": 1401.32,
+      "totalSales": null,
       "orders": 8,
       "clicks": 200,
       "impressions": 50880,
-      "totalSalesSource": "sp-api-brand-filtered"
+      "totalSalesSource": "unavailable (SP-API fetch failed)"
     },
     "google": {
       "spend": 0.0,
@@ -485,12 +485,10 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "fetched_at": "backfill",
-    "combinedTotalSales": 1401.32,
+    "combinedTotalSales": null,
     "backfilled": true,
     "refunds": 330.82,
-    "refundsSource": "helium10-asin-attributed",
-    "netAmazonSales": 1070.5,
-    "netCombinedTotalSales": 1070.5
+    "refundsSource": "helium10-asin-attributed"
   },
   "June 2026": {
     "amazon": {
@@ -590,7 +588,7 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "combinedTotalSales": 2307.89,
-    "fetched_at": "2026-10-27T12:21:53Z",
+    "fetched_at": "2026-10-27T19:24:15Z",
     "refunds": 317.99,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 1989.9,
@@ -603,7 +601,7 @@
       "totalSales": 1976.19,
       "orders": 14,
       "clicks": 214,
-      "impressions": 265977,
+      "impressions": 265629,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -616,7 +614,7 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "combinedTotalSales": 1976.19,
-    "fetched_at": "2026-10-27T12:21:53Z",
+    "fetched_at": "2026-10-27T19:24:15Z",
     "refunds": 89.99,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 1886.2,
