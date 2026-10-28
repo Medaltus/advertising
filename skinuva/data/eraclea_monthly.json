@@ -469,11 +469,11 @@
     "amazon": {
       "spend": 241.78,
       "adSales": 292.36,
-      "totalSales": null,
+      "totalSales": 1401.32,
       "orders": 8,
       "clicks": 200,
       "impressions": 50880,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 0.0,
@@ -485,10 +485,12 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "fetched_at": "backfill",
-    "combinedTotalSales": null,
+    "combinedTotalSales": 1401.32,
     "backfilled": true,
     "refunds": 330.82,
-    "refundsSource": "helium10-asin-attributed"
+    "refundsSource": "helium10-asin-attributed",
+    "netAmazonSales": 1070.5,
+    "netCombinedTotalSales": 1070.5
   },
   "June 2026": {
     "amazon": {
@@ -546,11 +548,11 @@
     "amazon": {
       "spend": 461.11,
       "adSales": 1012.97,
-      "totalSales": 1941.77,
+      "totalSales": null,
       "orders": 15,
       "clicks": 156,
       "impressions": 59019,
-      "totalSalesSource": "sp-api-brand-filtered"
+      "totalSalesSource": "unavailable (SP-API fetch failed)"
     },
     "google": {
       "spend": 0.0,
@@ -561,12 +563,10 @@
     },
     "shopify": 0.0,
     "walmart": 0.0,
-    "combinedTotalSales": 1941.77,
+    "combinedTotalSales": null,
     "fetched_at": "2026-10-01T18:55:19Z",
     "refunds": 86.99,
-    "refundsSource": "sp-api-finances",
-    "netAmazonSales": 1854.78,
-    "netCombinedTotalSales": 1854.78
+    "refundsSource": "sp-api-finances"
   },
   "September 2026": {
     "amazon": {
@@ -588,7 +588,7 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "combinedTotalSales": 2307.89,
-    "fetched_at": "2026-10-27T19:24:15Z",
+    "fetched_at": "2026-10-28T12:32:09Z",
     "refunds": 317.99,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 1989.9,
@@ -596,12 +596,12 @@
   },
   "October 2026": {
     "amazon": {
-      "spend": 614.52,
+      "spend": 640.71,
       "adSales": 719.42,
       "totalSales": 1976.19,
       "orders": 14,
-      "clicks": 214,
-      "impressions": 265629,
+      "clicks": 224,
+      "impressions": 275654,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -614,7 +614,7 @@
     "shopify": 0.0,
     "walmart": 0.0,
     "combinedTotalSales": 1976.19,
-    "fetched_at": "2026-10-27T19:24:15Z",
+    "fetched_at": "2026-10-28T12:32:09Z",
     "refunds": 89.99,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 1886.2,
