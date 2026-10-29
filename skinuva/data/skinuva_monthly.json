@@ -501,11 +501,11 @@
     "amazon": {
       "spend": 14277.64,
       "adSales": 55524.46,
-      "totalSales": null,
+      "totalSales": 132613.99,
       "orders": 700,
       "clicks": 6356,
       "impressions": 1373325,
-      "totalSalesSource": "unavailable (SP-API fetch failed)"
+      "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 9988.04,
@@ -516,10 +516,12 @@
     },
     "shopify": 50039.42,
     "walmart": 1059.99,
-    "combinedTotalSales": null,
+    "combinedTotalSales": 183713.4,
     "fetched_at": "2026-09-01T11:45:32Z",
     "refunds": 5935.99,
-    "refundsSource": "sp-api-finances"
+    "refundsSource": "sp-api-finances",
+    "netAmazonSales": 126678.0,
+    "netCombinedTotalSales": 177777.41
   },
   "August 2026": {
     "amazon": {
@@ -567,7 +569,7 @@
     "shopify": 34674.67,
     "walmart": 2779.99,
     "combinedTotalSales": 154448.34,
-    "fetched_at": "2026-10-28T19:21:31Z",
+    "fetched_at": "2026-10-29T13:12:57Z",
     "refunds": 4399.75,
     "refundsSource": "sp-api-finances",
     "netAmazonSales": 112593.93,
@@ -575,28 +577,28 @@
   },
   "October 2026": {
     "amazon": {
-      "spend": 15120.05,
-      "adSales": 48531.35,
+      "spend": 15637.52,
+      "adSales": 50405.75,
       "totalSales": 122725.59,
-      "orders": 619,
-      "clicks": 5479,
-      "impressions": 2201726,
+      "orders": 645,
+      "clicks": 5673,
+      "impressions": 2279912,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
       "spend": 2643.66,
-      "adSales": 9264.27,
-      "conversions": 59,
+      "adSales": 9381.27,
+      "conversions": 60,
       "clicks": 1496,
       "impressions": 225092
     },
-    "shopify": 29750.74,
-    "walmart": 2689.0,
-    "combinedTotalSales": 155165.33,
-    "fetched_at": "2026-10-28T19:21:31Z",
-    "refunds": 3858.34,
+    "shopify": 31153.24,
+    "walmart": 2879.0,
+    "combinedTotalSales": 156757.83,
+    "fetched_at": "2026-10-29T13:12:57Z",
+    "refunds": 4175.6,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 118867.25,
-    "netCombinedTotalSales": 151306.99
+    "netAmazonSales": 118549.99,
+    "netCombinedTotalSales": 152582.23
   }
 }
