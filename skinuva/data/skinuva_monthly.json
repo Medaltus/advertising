@@ -577,12 +577,12 @@
   },
   "October 2026": {
     "amazon": {
-      "spend": 17036.77,
-      "adSales": 54346.61,
-      "totalSales": 137328.15,
+      "spend": 17029.58,
+      "adSales": 54316.61,
+      "totalSales": 137178.15,
       "orders": 696,
-      "clicks": 6172,
-      "impressions": 2464029,
+      "clicks": 6171,
+      "impressions": 2462202,
       "totalSalesSource": "sp-api-brand-filtered"
     },
     "google": {
@@ -594,11 +594,37 @@
     },
     "shopify": 34304.45,
     "walmart": 3289.0,
-    "combinedTotalSales": 174921.6,
-    "fetched_at": "2026-11-01T18:54:57Z",
+    "combinedTotalSales": 174771.6,
+    "fetched_at": "2026-11-02T15:14:19Z",
     "refunds": 4827.58,
     "refundsSource": "sp-api-finances",
-    "netAmazonSales": 132500.57,
-    "netCombinedTotalSales": 170094.02
+    "netAmazonSales": 132350.57,
+    "netCombinedTotalSales": 169944.02
+  },
+  "November 2026": {
+    "amazon": {
+      "spend": 490.01,
+      "adSales": 2004.18,
+      "totalSales": 5832.16,
+      "orders": 26,
+      "clicks": 174,
+      "impressions": 60941,
+      "totalSalesSource": "sp-api-brand-filtered"
+    },
+    "google": {
+      "spend": 0.0,
+      "adSales": 0.0,
+      "conversions": 0,
+      "clicks": 0,
+      "impressions": 0
+    },
+    "shopify": 821.95,
+    "walmart": 0.0,
+    "combinedTotalSales": 6654.11,
+    "fetched_at": "2026-11-02T15:14:19Z",
+    "refunds": 135.0,
+    "refundsSource": "sp-api-finances",
+    "netAmazonSales": 5697.16,
+    "netCombinedTotalSales": 6519.11
   }
 }

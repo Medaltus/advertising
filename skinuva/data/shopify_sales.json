@@ -97,7 +97,25 @@
       "since": "2026-10-01",
       "until": "2026-10-31"
     },
-    "fetched_at": "2026-11-01T19:09:44Z",
+    "fetched_at": "2026-11-02T15:29:05Z",
+    "source": "shopifyql-total_sales-by-sales_channel"
+  },
+  "November 2026": {
+    "total": 821.95,
+    "byChannel": {
+      "Online Store": 614.95,
+      "Seal Subscriptions": 117.0,
+      "Shop": 90.0
+    },
+    "excludedChannels": [
+      "Draft Orders"
+    ],
+    "excludedTotal": 0.0,
+    "range": {
+      "since": "2026-11-01",
+      "until": "2026-11-01"
+    },
+    "fetched_at": "2026-11-02T15:29:04Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   }
 }
