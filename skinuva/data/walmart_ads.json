@@ -370,48 +370,56 @@
   "November 2026": {
     "byBrand": {
       "Skinuva": {
-        "spend": 5.36,
+        "spend": 8.55,
         "adSales": 0,
         "orders": 0,
-        "clicks": 2,
-        "impressions": 1108
+        "clicks": 4,
+        "impressions": 2612
       },
       "Just Bjorn": {
-        "spend": 4.86,
+        "spend": 7.09,
         "adSales": 0,
         "orders": 0,
-        "clicks": 3,
-        "impressions": 1413
+        "clicks": 4,
+        "impressions": 2632
       }
     },
     "campaigns": {
       "Skinuva": [
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 5.36,
+          "spend": 8.04,
           "adSales": 0,
           "orders": 0,
-          "clicks": 2,
-          "impressions": 1108
+          "clicks": 3,
+          "impressions": 2190
+        },
+        {
+          "name": "Skinuva - SB - M - video 3.26 v1",
+          "spend": 0.51,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 1,
+          "impressions": 422
         }
       ],
       "Just Bjorn": [
         {
           "name": "just bjorn - SP - M - travel",
-          "spend": 4.86,
+          "spend": 7.09,
           "adSales": 0,
           "orders": 0,
-          "clicks": 3,
-          "impressions": 1413
+          "clicks": 4,
+          "impressions": 2632
         }
       ]
     },
     "range": {
       "since": "2026-11-01",
-      "until": "2026-11-02"
+      "until": "2026-11-03"
     },
     "profileId": "224591",
-    "fetched_at": "2026-11-03T11:13:22Z",
+    "fetched_at": "2026-11-04T14:25:30Z",
     "source": "helium10-walmart"
   }
 }
