@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-05T15:43:44Z",
+  "fetched_at": "2026-11-05T21:25:11Z",
   "lookback_days": 31,
   "currency": "USD",
   "summary": {
@@ -919,7 +919,7 @@
     },
     {
       "id": "21401554549",
-      "name": "Skinuva Stretch Mark Search Campaign",
+      "name": "Skinuva Stretch Mark Search Campaign - Non-Branded",
       "type": "SEARCH",
       "impressions": 775,
       "clicks": 140,
@@ -984,7 +984,7 @@
     },
     {
       "id": "21719229797",
-      "name": "Skinuva Brite Search Campaign",
+      "name": "Skinuva Brite Search Campaign - Non-Branded",
       "type": "SEARCH",
       "impressions": 221,
       "clicks": 21,
@@ -2941,14 +2941,6 @@
       "pacingPct": 221.1
     },
     {
-      "id": "21401554549",
-      "name": "Skinuva Stretch Mark Search Campaign",
-      "state": "paused",
-      "dailyBudget": 20.0,
-      "recentSpend": 13.75,
-      "pacingPct": 68.7
-    },
-    {
       "id": "24085322763",
       "name": "Skinuva Scar/Scar+ - Search Campaign - Sales Objective - Non-Branded KW - BROAD HARVESTING v3 US",
       "state": "enabled",
@@ -2957,12 +2949,28 @@
       "pacingPct": 136.2
     },
     {
+      "id": "21401554549",
+      "name": "Skinuva Stretch Mark Search Campaign - Non-Branded",
+      "state": "enabled",
+      "dailyBudget": 10.0,
+      "recentSpend": 13.75,
+      "pacingPct": 137.5
+    },
+    {
       "id": "21466459569",
       "name": "Skinuva Bruise Topical Leads",
       "state": "paused",
       "dailyBudget": 10.0,
       "recentSpend": 7.01,
       "pacingPct": 70.1
+    },
+    {
+      "id": "21719229797",
+      "name": "Skinuva Brite Search Campaign - Non-Branded",
+      "state": "enabled",
+      "dailyBudget": 10.0,
+      "recentSpend": 0.07,
+      "pacingPct": 0.7
     },
     {
       "id": "23939195988",
@@ -2999,14 +3007,6 @@
     {
       "id": "21714470857",
       "name": "Skinuva Bruise Search Campaign",
-      "state": "paused",
-      "dailyBudget": 0.1,
-      "recentSpend": 0.07,
-      "pacingPct": 69.0
-    },
-    {
-      "id": "21719229797",
-      "name": "Skinuva Brite Search Campaign",
       "state": "paused",
       "dailyBudget": 0.1,
       "recentSpend": 0.07,
