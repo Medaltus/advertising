@@ -1246,8 +1246,17 @@ function computeTotals(brands) {
   // revenue — including ones with no spend this month. Summing only the spending
   // brands lost $311.95 of Walmart revenue in the Walmart-only view, because evolis,
   // dearcloud and PB & Jay sell there without running campaigns.
-  const spendBrands = brands.filter(b => (b.spend || 0) > 0);
-  const tsComplete  = spendBrands.length > 0 && spendBrands.every(b => b.totalSales != null);
+  //
+  // Materiality, not perfection. Requiring EVERY spending brand to report revenue
+  // blanked November 2026 entirely: Amala spent $5.98 and had no sales row, so a
+  // correct $49,756.35 portfolio total and its TACOS both rendered as "—". Spend
+  // that small cannot move TACOS by even 0.01 points, so withholding the headline
+  // revenue over it is far worse than publishing it. Blank the figure only when the
+  // brands missing revenue hold enough spend to actually distort TACOS.
+  const spendBrands   = brands.filter(b => (b.spend || 0) > 0);
+  const missingRev    = spendBrands.filter(b => b.totalSales == null);
+  const missingSpend  = missingRev.reduce((s, b) => s + (b.spend || 0), 0);
+  const tsComplete    = spendBrands.length > 0 && missingSpend <= spend * 0.01;
   const revBrands   = brands.filter(b => b.totalSales != null);
   const totalSales  = (tsComplete && revBrands.length)
                       ? revBrands.reduce((s, b) => s + b.totalSales, 0) : null;
