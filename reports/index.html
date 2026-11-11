@@ -1895,7 +1895,22 @@ function render() {
     { l: 'Ad Sales', v: fmt(bdata.adSales), k: 'adSales', wk: 'adSales' },
     { l: 'CVR', v: cvr != null ? cvr.toFixed(2) + '%' : '—', pf: prevCvr != null ? prevCvr.toFixed(2) + '%' : null, mm: momPct(cvr, prevCvr), ff: fCvr, ffm: fCvr != null ? fCvr.toFixed(2) + '%' : null, fmm: (fCvr != null && prevCvr != null) ? momPct(fCvr, prevCvr) : null, wk: 'cvr' },
     { l: 'ACOS', v: pct(bdata.acos), k: 'acos', wk: 'acos', inv: true },
-    { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales', wk: 'totalSales' },
+    // Net of refunds, to match the TACOS card beside it. These two sat next to each
+    // other for weeks showing gross revenue and net-of-refund TACOS, so the pair did
+    // not reconcile: you could not divide the spend card by the revenue card and get
+    // the TACOS card. TACOS is the number budgets are set from here, so the revenue
+    // shown is the revenue TACOS is actually computed against.
+    // Falls back to gross when refunds are unknown — same rule as TACOS, since null
+    // refunds means UNMEASURED, not zero returns.
+    (_netTotKpi != null
+      ? { l: 'Total Sales', v: fmt(_netTotKpi),
+          pf: _pNetTotKpi != null ? fmt(_pNetTotKpi) : null,
+          mm: (!ip && _pNetTotKpi != null) ? momPct(_netTotKpi, _pNetTotKpi) : null,
+          ff: _fNetTotKpi, ffm: _fNetTotKpi != null ? fmt(_fNetTotKpi) : null,
+          fmm: (_fNetTotKpi != null && _pNetTotKpi != null)
+                ? momPct(_fNetTotKpi, _pNetTotKpi) : null,
+          wk: 'totalSales', sub: 'net of refunds' }
+      : { l: 'Total Sales', v: fmt(bdata.totalSales), k: 'totalSales', wk: 'totalSales' }),
     // TACOS is reported NET of refunds when we have them, matching the Net Sales row
     // at the bottom of the Channel Breakdown. Gross TACOS always flatters efficiency
     // because refunds are 2-5% of revenue every month.
