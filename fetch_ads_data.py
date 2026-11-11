@@ -68,6 +68,16 @@ def get_access_token(cfg: dict, region_urls: dict) -> str:
         headers={"Content-Type": "application/x-www-form-urlencoded"},
         timeout=20,
     )
+    # Amazon explains WHY it rejected a token request, and this used to throw that
+    # explanation away: the run showed a bare "401 Unauthorized" and nothing else.
+    # The distinction matters and is not guessable from the status code —
+    #   invalid_client  the client_secret is wrong for this client_id
+    #   invalid_grant   the refresh_token belongs to a different application
+    # Cost a whole day of credential guesswork on 2026-11-11. Only runs when auth has
+    # already failed, so a successful run is byte-for-byte unaffected.
+    if not resp.ok:
+        print(f"✗ Amazon rejected the Ads credentials: HTTP {resp.status_code}")
+        print(f"  Amazon's reason: {resp.text[:300]}")
     resp.raise_for_status()
     print("✓ Access token obtained")
     return resp.json()["access_token"]
