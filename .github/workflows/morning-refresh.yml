@@ -36,6 +36,7 @@ jobs:
         env:
           CONFIG_JSON: ${{ secrets.CONFIGJSON }}
           SHOPIFY_CONFIG: ${{ secrets.SHOPIFY_CONFIG }}
+          SP_CREDS: ${{ secrets.SP_CREDS }}
         run: |
           echo "$CONFIG_JSON" > config.json
           python3 - <<'PYEOF'
@@ -91,6 +92,45 @@ jobs:
           else:
               print('SHOPIFY_CONFIG not set — Shopify fetch will skip, '
                     'manual_totals.json values remain in use')
+
+          # ── Rotated LWA secrets ───────────────────────────────────────────────
+          # Amazon forces a client-secret rotation every 180 days. The new secret goes
+          # in its OWN GitHub secret rather than into CONFIGJSON, for the same reason
+          # Shopify does: GitHub secrets are write-only, so editing CONFIGJSON means
+          # re-pasting every Amazon and Google credential from scratch and risking
+          # losing one that cannot be read back. This merge is additive and reversible
+          # — delete the secret and the CONFIGJSON values are used again.
+          #
+          # Accepts any of: sp_client_secret / sp_client_id   (Seller Central app)
+          #                 client_secret    / client_id      (Ads app)
+          #                 hol_sp_client_secret              (HighOnLove, see below)
+          raw = (os.environ.get('SP_CREDS') or '').strip()
+          if raw:
+              try:
+                  ov = json.loads(raw)
+                  # One SP-API application can be authorized by several selling
+                  # partners: the refresh token is per-seller, but the client secret
+                  # belongs to the app. HOL therefore shares the Seller Central app's
+                  # secret. If CONFIGJSON carries an explicit hol_sp_client_secret, it
+                  # would keep the OLD value and silently break HOL's revenue while
+                  # everything else kept working. Mirror the new secret onto it — but
+                  # only when the two currently match, which is what proves they are
+                  # the same app. If they differ, HOL is a separate app and must be
+                  # rotated on its own.
+                  if ('sp_client_secret' in ov
+                          and 'hol_sp_client_secret' not in ov
+                          and c.get('hol_sp_client_secret')
+                          and c.get('hol_sp_client_secret') == c.get('sp_client_secret')):
+                      ov['hol_sp_client_secret'] = ov['sp_client_secret']
+                      print('mirrored rotated secret onto hol_sp_client_secret '
+                            '(same application)')
+                  c.update(ov)
+                  # key names only — never log the values
+                  print('SP_CREDS keys merged:', sorted(ov.keys()))
+              except Exception as e:
+                  print('WARNING: SP_CREDS is not valid JSON, ignoring:', e)
+          else:
+              print('SP_CREDS not set — using LWA credentials from CONFIGJSON')
 
           with open('config.json', 'w') as f:
               json.dump(c, f)
