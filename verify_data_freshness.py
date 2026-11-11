@@ -396,6 +396,25 @@ def inspect(path, now, max_age, max_lag, run_start):
                 return ('STALE', f'newest day {newest} is {lag}d old (limit {max_lag}d)')
             return ('PASS', f'newest day {newest} ({lag}d lag)')
 
+        # ── Liveness beats change ─────────────────────────────────────────────
+        # `last_checked_at` answers "did the producer run?", which is the question
+        # this check is actually asking. `fetched_at` answers "did a number change?",
+        # which is a different thing and produced a week of false red runs: the
+        # Walmart account was inactive, so spend and revenue were genuinely flat, the
+        # refresh correctly committed nothing, and the gate then reported the dataset
+        # as not refreshed. A red X that means "nothing happened" is worse than no
+        # check at all, because it teaches you to ignore the real ones.
+        #
+        # A producer that DIES mid-run still never writes this, so genuine outages
+        # stay red — which is the whole point of the check.
+        ts = parse_iso(data.get('last_checked_at'))
+        if ts:
+            age = (now - ts).total_seconds() / 3600
+            if age > max_age:
+                return ('STALE', f'last_checked_at {age:.1f}h old (limit {max_age}h) '
+                                 f'— the refresh task has not run')
+            return ('PASS', f'checked {age:.1f}h ago')
+
         # flat fetched_at
         ts = parse_iso(data.get('fetched_at'))
         if ts:
