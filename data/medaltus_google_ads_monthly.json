@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-11-10T21:14:05Z",
+  "fetched_at": "2026-11-11T14:57:40Z",
   "monthly_summary": {
     "July 2025": {
       "impressions": 26,
@@ -159,6 +159,16 @@
       "revenue": 0.0,
       "cpc": 2.84,
       "ctr": 0.0603,
+      "cpl": null
+    },
+    "November 2026": {
+      "impressions": 16,
+      "clicks": 0,
+      "spend": 0.0,
+      "conversions": 0,
+      "revenue": 0.0,
+      "cpc": null,
+      "ctr": 0.0,
       "cpl": null
     }
   },
@@ -917,6 +927,34 @@
       "revenue": 0.0,
       "cpc": 2.07,
       "ctr": 0.1333,
+      "cpl": null
+    },
+    {
+      "month": "November 2026",
+      "campaign_id": "24447289122",
+      "campaign_name": "Medaltus - Search - 3PL Leads 11.26",
+      "type": "SEARCH",
+      "impressions": 3,
+      "clicks": 0,
+      "spend": 0.0,
+      "conversions": 0,
+      "revenue": 0.0,
+      "cpc": null,
+      "ctr": 0.0,
+      "cpl": null
+    },
+    {
+      "month": "November 2026",
+      "campaign_id": "24447310929",
+      "campaign_name": "Medaltus - Search - eComm Leads 11.26",
+      "type": "SEARCH",
+      "impressions": 13,
+      "clicks": 0,
+      "spend": 0.0,
+      "conversions": 0,
+      "revenue": 0.0,
+      "cpc": null,
+      "ctr": 0.0,
       "cpl": null
     }
   ]
