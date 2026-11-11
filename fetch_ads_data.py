@@ -78,6 +78,13 @@ def get_access_token(cfg: dict, region_urls: dict) -> str:
     if not resp.ok:
         print(f"✗ Amazon rejected the Ads credentials: HTTP {resp.status_code}")
         print(f"  Amazon's reason: {resp.text[:300]}")
+        # The client_id identifies WHICH application these credentials belong to. It
+        # is not a secret — it travels in the clear in the Amazon-Advertising-API-
+        # ClientId header on every single API call. Printing it on failure is what
+        # lets you match the pipeline against the right app in the Developer Console;
+        # without it, "invalid_client" cannot tell you whether the secret is wrong or
+        # the app is.
+        print(f"  client_id in use: {cfg.get('client_id')}")
     resp.raise_for_status()
     print("✓ Access token obtained")
     return resp.json()["access_token"]
