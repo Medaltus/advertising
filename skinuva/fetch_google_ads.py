@@ -114,6 +114,12 @@ def fetch_all_pages(access_token: str, query: str) -> list:
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
+# Which source each campaign-day row's sales figure came from. Printed at the end of
+# the run so a silent slide back to conversion value — e.g. cart-data reporting being
+# switched off — is visible instead of just making ad sales quietly inflate again.
+_REV_SOURCE_COUNTS = {}
+
+
 def micros(v) -> float:
     return round(int(v or 0) / 1_000_000, 2)
 
@@ -200,6 +206,7 @@ def main():
           metrics.cost_micros,
           metrics.conversions,
           metrics.conversions_value,
+          metrics.revenue_micros,
           segments.date
         FROM campaign
         WHERE segments.date BETWEEN '{start}' AND '{end}'
@@ -208,7 +215,27 @@ def main():
         ORDER BY segments.date ASC
     """
 
-    rows = fetch_all_pages(access_token, query)
+    # metrics.revenue_micros is real order revenue from cart data, not Google's
+    # attributed conversion value. Conversion value was overstating badly — in August
+    # 2026 it claimed $40,370 against a $48,446 total store month, 83% of every sale.
+    #
+    # It is only populated for campaigns reporting conversions with cart data, so it
+    # cannot simply replace conversionsValue: campaigns without cart data return 0 and
+    # would silently zero out their sales. Per row, revenue wins when present and
+    # conversion value is the fallback. See the rev/rev_src assignment below.
+    #
+    # The field is also newer than this script's API version, so a hard swap risks the
+    # whole fetch failing on an unknown-field error. Falling back to the original query
+    # keeps a bad guess here from costing a day of Google data.
+    try:
+        rows = fetch_all_pages(access_token, query)
+    except Exception as e:
+        if 'revenue_micros' not in str(e):
+            raise
+        print(f"  ⚠  revenue_micros unavailable on this API version ({str(e)[:120]})")
+        print(f"  ↩  retrying without it — ad sales fall back to conversion value")
+        query = query.replace("          metrics.revenue_micros,\n", "")
+        rows = fetch_all_pages(access_token, query)
     print(f"  ✓ {len(rows)} campaign-day rows")
 
     by_date, by_campaign, budgets, campaigns_daily = {}, {}, {}, []
@@ -227,7 +254,11 @@ def main():
         clk   = int(met.get("clicks", 0) or 0)
         spd   = micros(met.get("costMicros", 0))
         conv  = float(met.get("conversions", 0) or 0)
-        rev   = float(met.get("conversionsValue", 0) or 0)
+        # Real order revenue first, attributed conversion value only as a fallback.
+        _cart = micros(met.get("revenueMicros", 0))
+        rev     = _cart if _cart > 0 else float(met.get("conversionsValue", 0) or 0)
+        rev_src = 'revenue' if _cart > 0 else 'conversion_value'
+        _REV_SOURCE_COUNTS[rev_src] = _REV_SOURCE_COUNTS.get(rev_src, 0) + 1
 
         # Rows older than the rolling lookback exist only to refresh daily_history.
         # They must NOT reach campaigns_daily/by_campaign or the campaign table's
@@ -408,6 +439,16 @@ def main():
     for s in geo_list:
         s["spend"]       = round(s["spend"], 2)
         s["conversions"] = round(s["conversions"], 1)
+
+    _n_rev  = _REV_SOURCE_COUNTS.get('revenue', 0)
+    _n_conv = _REV_SOURCE_COUNTS.get('conversion_value', 0)
+    if _n_rev or _n_conv:
+        print(f"  Sales basis: {_n_rev} rows real revenue (cart data), "
+              f"{_n_conv} rows conversion value")
+        if _n_rev == 0:
+            print("  ⚠  NO rows returned cart-data revenue — every figure is still "
+                  "attributed conversion value. Check that conversions with cart data "
+                  "are enabled, or this is the old inflated number.")
 
     imp  = sum(r["impressions"] for r in timeline)
     clk  = sum(r["clicks"]     for r in timeline)
