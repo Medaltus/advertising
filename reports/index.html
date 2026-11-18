@@ -422,6 +422,17 @@ body.gpu-idle *, body.gpu-idle *::before, body.gpu-idle *::after {
 .header, .market-ticker, .ticker-bar, #error-banner {
   background-color: rgba(14,14,24,0.92);
 }
+
+/* Hover has to re-assert the solid base. The hover rules above use the
+   `background:` SHORTHAND, which resets background-color to transparent — so the
+   dark base added when backdrop-filter was removed vanished on hover, the card
+   went see-through onto the gold weave, and a brighter white overlay was laid on
+   top of it. The numbers became unreadable exactly when you pointed at them.
+   Slightly lighter than the resting state so the hover still registers. */
+.glass:hover, .kpi-card:hover, .chart-card:hover, .pacing-card:hover,
+.agent-panel:hover, .wlos-card:hover {
+  background-color: rgba(26,26,40,0.96) !important;
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js" integrity="sha384-iU8HYtnGQ8Cy4zl7gbNMOhsDTTKX02BTXptVP/vqAWIaTfM7isw76iyZCsjL2eVi" crossorigin="anonymous"></script>
 </head>
