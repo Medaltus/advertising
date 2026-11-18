@@ -1315,6 +1315,25 @@ Chart.defaults.color = 'rgba(255,255,255,0.4)';
 Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
+// selectedBrands is the real selection; empty Set means "All". selectedBrand is kept
+// as a derived scalar so the many single-brand code paths (titles, accent colour,
+// chart highlighting) keep working untouched: it reads as the brand name when exactly
+// one is picked, and 'All' otherwise. Anything that must respect a MULTI selection
+// asks selHas()/selIsAll() instead of comparing this string.
+let selectedBrands = new Set();
+let brandMenuOpen = false;
+function selIsAll(){ return selectedBrands.size === 0; }
+function selHas(n){ return selIsAll() || selectedBrands.has(n); }
+function selCount(){ return selectedBrands.size; }
+function selSync(){ selectedBrand = selectedBrands.size === 1 ? [...selectedBrands][0] : 'All'; }
+function selToggle(n){ selectedBrands.has(n) ? selectedBrands.delete(n) : selectedBrands.add(n); selSync(); }
+function selClear(){ selectedBrands.clear(); selSync(); }
+function selOnly(n){ selectedBrands = new Set([n]); selSync(); }
+function selLabel(){
+  if (selIsAll()) return 'Select Brand';
+  if (selectedBrands.size === 1) return [...selectedBrands][0];
+  return selectedBrands.size + ' brands';
+}
 let DATA = null, selectedMonth = null, selectedBrand = 'All', trendMode = 'spend_vs_sales', brandBarMode = 'spend', charts = {}, sortKey = 'name', sortDir = 1;
 let internalAdsMode = false, INTERNAL_ADS_DATA = [], internalPlatformFilter = 'All', MEDALTUS_GADS_DATA = {monthly_summary:{},by_month_campaign:[]};
 let initialLoadDone = false;
@@ -1417,7 +1436,7 @@ function computeRangeMetrics(s,e){
     if(d<s||d>e) return;
     const dayBrands={};
     Object.entries(entry.brands||{}).forEach(([bname,brow])=>{
-      if(selectedBrand!=='All'&&bname!==selectedBrand) return;
+      if(!selHas(bname)) return;
       if(!brands[bname]) brands[bname]={spend:0,adSales:0,orders:0,clicks:0,impressions:0,campaigns:{},totalSales:0,tsDays:0};
       brands[bname].spend+=brow.spend||0; brands[bname].adSales+=brow.adSales||0;
       brands[bname].orders+=brow.orders||0; brands[bname].clicks+=brow.clicks||0; brands[bname].impressions+=brow.impressions||0;
@@ -1521,7 +1540,7 @@ function renderRange(){
         <td>${bCpm!=null?'$'+bCpm.toFixed(2):'—'}</td>
         <td>${bCr!=null?bCr.toFixed(1)+'%':'—'}</td>
         <td>${bSv!=null?bSv.toFixed(1)+'%':'—'}</td>`;
-      tr.onclick = () => { selectedBrand = selectedBrand === b.name ? 'All' : b.name; render(); };
+      tr.onclick = () => { (selectedBrands.size === 1 && selectedBrands.has(b.name)) ? selClear() : selOnly(b.name); render(); };
       tableEl.appendChild(tr);
     });
     // The old fixed note claimed Total Sales/TACOS were unavailable here while the
@@ -1568,7 +1587,7 @@ function renderRangeCampaigns(m){
     .sort((a,b2)=>a.name.localeCompare(b2.name));
 
   const hasCampData=activeBrands.length>0;
-  const label=(selectedBrand!=='All'?selectedBrand+' · ':'')+'Campaign detail · '+rangeStart+' → '+rangeEnd+(hasCampData?'':' · no campaign data in archive for this range');
+  const label=(!selIsAll()?selLabel()+' · ':'')+'Campaign detail · '+rangeStart+' → '+rangeEnd+(hasCampData?'':' · no campaign data in archive for this range');
   document.getElementById('campaigns-sub').textContent=label;
 
   if(!hasCampData){
@@ -1578,7 +1597,7 @@ function renderRangeCampaigns(m){
 
   activeBrands.forEach(brand=>{
     const color=BRAND_COLORS[brand.name]||'#666';
-    const isSelected=selectedBrand===brand.name;
+    const isSelected=!selIsAll()&&selectedBrands.has(brand.name);
     const acosColor=brand.acos!=null?(brand.acos<30?'#4ade80':brand.acos<46?'#f59e0b':'#ff6b6b'):'rgba(255,255,255,0.4)';
     const hdr=document.createElement('div');
     hdr.style.cssText='display:flex;align-items:center;gap:10px;padding:13px 20px 10px;background:'+(isSelected?color+'18':'rgba(255,255,255,0.025)')+';border-top:1px solid rgba(255,255,255,0.07);';
@@ -2052,6 +2071,36 @@ function render() {
 }
 
 function getBrandData(md, brand) {
+  // A multi-brand selection has no precomputed row anywhere, so sum one here.
+  // Ratios are RE-DERIVED from the summed components, never averaged: averaging
+  // four brands' ACOS weights a $17 campaign the same as a $17,000 one.
+  if (!selIsAll() && selectedBrands.size > 1) {
+    const picked = (md.brands || []).filter(b => selectedBrands.has(b.name));
+    const sum = k => picked.reduce((t, b) => t + (b[k] || 0), 0);
+    const spend = sum('spend'), adSales = sum('adSales');
+    const impressions = sum('impressions'), clicks = sum('clicks'), orders = sum('orders');
+    // Revenue stays unknown unless every selected brand carrying spend reports it,
+    // otherwise the total is short and TACOS reads low. Same rule as computeTotals.
+    const spenders = picked.filter(b => (b.spend || 0) > 0);
+    const tsOk = spenders.length > 0 && spenders.every(b => b.totalSales != null);
+    const revB = picked.filter(b => b.totalSales != null);
+    const totalSales = (tsOk && revB.length) ? revB.reduce((t, b) => t + b.totalSales, 0) : null;
+    const refB = picked.filter(b => b.refunds != null);
+    const refunds = refB.length === picked.length && refB.length ? refB.reduce((t, b) => t + b.refunds, 0) : null;
+    const netTotalSales = (totalSales != null && refunds != null) ? totalSales - refunds : null;
+    return {
+      spend, adSales, impressions, clicks, orders,
+      acos: adSales > 0 ? spend / adSales * 100 : null,
+      totalSales,
+      tacos: (totalSales && totalSales > 0) ? spend / totalSales * 100 : null,
+      ctr: impressions > 0 ? clicks / impressions * 100 : null,
+      cpc: clicks > 0 ? spend / clicks : null,
+      cr: clicks > 0 ? orders / clicks * 100 : null,
+      aov: orders > 0 ? adSales / orders : null,
+      refunds, netTotalSales,
+      netTacos: (netTotalSales && netTotalSales > 0) ? spend / netTotalSales * 100 : null,
+    };
+  }
   if (brand === 'All') {
     return {
       spend: md.spend, adSales: md.adSales, acos: md.acos, totalSales: md.totalSales,
@@ -2079,51 +2128,77 @@ function renderBrandSelector(md) {
 
   // All Brands pill
   const allBtn = document.createElement('button');
-  allBtn.className = 'brand-pill all-pill' + (selectedBrand === 'All' ? ' active' : '');
+  allBtn.className = 'brand-pill all-pill' + (selIsAll() ? ' active' : '');
   allBtn.textContent = 'All Brands';
-  allBtn.onclick = () => { selectedBrand = 'All'; internalAdsMode = false; render(); };
+  allBtn.onclick = () => { selClear(); internalAdsMode = false; render(); };
   el.appendChild(allBtn);
 
   // Brand dropdown
   const brands = md.brands.filter(b => b.spend > 0).sort((a, b) => (b.spend || 0) - (a.spend || 0));
-  const selBrand = brands.find(b => b.name === selectedBrand);
+  const selBrand = selectedBrands.size === 1 ? brands.find(b => b.name === [...selectedBrands][0]) : null;
   const selColor = selBrand ? (BRAND_COLORS[selBrand.name] || '#818cf8') : null;
+  const anySel = !selIsAll();
 
   const wrap = document.createElement('div');
   wrap.className = 'brand-dropdown-wrap';
 
   const dropBtn = document.createElement('button');
-  dropBtn.className = 'brand-dropdown-btn' + (selBrand ? ' has-selection' : '');
+  dropBtn.className = 'brand-dropdown-btn' + (anySel ? ' has-selection' : '');
   if (selColor) { dropBtn.style.setProperty('--sel-color', selColor + '88'); dropBtn.style.setProperty('--sel-bg', selColor + '22'); }
   const dot = selBrand ? `<span style="width:8px;height:8px;border-radius:50%;background:${selColor};flex-shrink:0;display:inline-block;"></span>` : '';
-  dropBtn.innerHTML = `${dot}<span>${selBrand ? selBrand.name : 'Select Brand'}</span><span style="opacity:0.4;font-size:10px;margin-left:2px;">▾</span>`;
+  dropBtn.innerHTML = `${dot}<span>${selLabel()}</span><span style="opacity:0.4;font-size:10px;margin-left:2px;">▾</span>`;
 
   const menu = document.createElement('div');
   menu.className = 'brand-dropdown-menu';
 
+  const clearRow = document.createElement('div');
+  clearRow.className = 'brand-dropdown-item';
+  clearRow.style.cssText = 'opacity:0.6;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:4px;';
+  clearRow.innerHTML = '<span style="width:13px;"></span><span>All brands (clear)</span>';
+  clearRow.onclick = (ev) => { ev.stopPropagation(); selClear(); internalAdsMode = false; render(); };
+  menu.appendChild(clearRow);
+
   brands.forEach(b => {
     const color = BRAND_COLORS[b.name] || '#666';
     const item = document.createElement('div');
-    item.className = 'brand-dropdown-item' + (selectedBrand === b.name ? ' active' : '');
-    item.innerHTML = `<span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>${b.name}`;
-    item.onclick = () => { selectedBrand = b.name; internalAdsMode = false; menu.classList.remove('open'); render(); };
+    const on = selectedBrands.has(b.name);
+    item.className = 'brand-dropdown-item' + (on ? ' active' : '');
+    // Checkbox, and the menu deliberately STAYS OPEN on click: picking three brands
+    // should not mean reopening the menu three times.
+    item.innerHTML = `<span style="width:13px;height:13px;border-radius:3px;flex-shrink:0;`
+      + `border:1px solid ${on ? color : 'rgba(255,255,255,0.25)'};background:${on ? color : 'transparent'};`
+      + `display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#0b0b14;font-weight:800;">`
+      + `${on ? '&#10003;' : ''}</span>`
+      + `<span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;"></span>${b.name}`;
+    item.onclick = (ev) => { ev.stopPropagation(); selToggle(b.name); internalAdsMode = false; render(); };
     menu.appendChild(item);
   });
 
-  dropBtn.onclick = (e) => {
-    e.stopPropagation();
-    const existing = document.getElementById('brand-dd-portal');
-    if (existing) { existing.remove(); return; }
+  // Ticking a brand calls render(), which rebuilds this whole bar and destroys the
+  // portal menu. Without remembering the open state, picking three brands would mean
+  // reopening the menu three times. brandMenuOpen survives the rebuild and the menu
+  // is restored below.
+  const openMenu = () => {
     const r = dropBtn.getBoundingClientRect();
     menu.style.top = (r.bottom + 6) + 'px';
     menu.style.left = r.left + 'px';
     menu.id = 'brand-dd-portal';
     menu.classList.add('open');
     document.body.appendChild(menu);
-    setTimeout(() => document.addEventListener('click', () => { menu.remove(); }, { once: true }), 0);
+    setTimeout(() => document.addEventListener('click', () => {
+      brandMenuOpen = false; menu.remove();
+    }, { once: true }), 0);
+  };
+  dropBtn.onclick = (e) => {
+    e.stopPropagation();
+    const existing = document.getElementById('brand-dd-portal');
+    if (existing) { brandMenuOpen = false; existing.remove(); return; }
+    brandMenuOpen = true;
+    openMenu();
   };
 
   wrap.appendChild(dropBtn);
+  if (brandMenuOpen) openMenu();
   el.appendChild(wrap);
   // ── Medaltus Internal Ads button ──
   // ── Channel selector: Amazon + Walmart / Amazon / Walmart ──────────────────
@@ -2153,7 +2228,7 @@ function renderBrandSelector(md) {
   const intBtn = document.createElement('button');
   intBtn.className = 'brand-pill internal-pill' + (internalAdsMode ? ' active' : ''); intBtn.style.marginLeft = 'auto';
   intBtn.textContent = 'Medaltus Internal Ads';
-  intBtn.onclick = () => { internalAdsMode = !internalAdsMode; if(internalAdsMode) selectedBrand='All'; intBtn.classList.toggle('active',internalAdsMode); render(); };
+  intBtn.onclick = () => { internalAdsMode = !internalAdsMode; if(internalAdsMode) selClear(); intBtn.classList.toggle('active',internalAdsMode); render(); };
   el.appendChild(intBtn);
 
   const ozleeBtn = document.createElement('a');
@@ -2179,7 +2254,7 @@ function renderBrandBar(md) {
   const brands = md.brands.filter(b => (b[brandBarMode] || 0) > 0).sort((a, b) => (b[brandBarMode] || 0) - (a[brandBarMode] || 0));
   const colors = brands.map(b => {
     const base = BRAND_COLORS[b.name] || '#666';
-    return selectedBrand === 'All' || selectedBrand === b.name ? base + 'EE' : base + '55';
+    return selHas(b.name) ? base + 'EE' : base + '55';
   });
 
   kill('brand-bar');
@@ -2209,7 +2284,7 @@ function renderAcosBar(md) {
   const colors = brands.map(b => {
     const a = b.acos || 0;
     const base = a < 30 ? '#4ade80' : a < 46 ? '#f59e0b' : '#ff6b6b';
-    return selectedBrand === 'All' || selectedBrand === b.name ? base + 'EE' : base + '44';
+    return selHas(b.name) ? base + 'EE' : base + '44';
   });
 
   kill('acos-bar');
@@ -2246,7 +2321,7 @@ function renderTrend() {
     const bd = getBrandData(m, selectedBrand);
     return { month: m.month, ...bd, roas: bd.spend > 0 ? bd.adSales / bd.spend : 0 };
   });
-  titleEl.textContent = selectedBrand === 'All' ? 'Portfolio Monthly Trend' : selectedBrand + ' — Monthly Trend';
+  titleEl.textContent = selIsAll() ? 'Portfolio Monthly Trend' : selLabel() + ' — Monthly Trend';
 
   const base = {
     responsive: true, maintainAspectRatio: false,
@@ -2358,7 +2433,7 @@ function renderTable(md, prev) {
 
   sorted.forEach(b => {
     const color = BRAND_COLORS[b.name] || '#666';
-    const isSelected = selectedBrand === b.name;
+    const isSelected = !selIsAll()&&selectedBrands.has(b.name);
     const ac = b.acos != null ? (b.acos < 30 ? 'acos-good' : b.acos < 46 ? 'acos-mid' : 'acos-bad') : '';
     const tr = document.createElement('tr');
     if (isSelected) tr.className = 'highlighted';
@@ -2414,7 +2489,7 @@ function renderTable(md, prev) {
       <td>${cell(bCpm, fCpm, pbCpm, fDol2, true)}</td>
       <td>${cell(bCr, fCr, pbCr, fPct, false)}</td>
       <td>${cell(bSv, fSv, pbSv, v => v.toFixed(1) + '%', false)}</td>`;
-    tr.onclick = () => { selectedBrand = selectedBrand === b.name ? 'All' : b.name; render(); };
+    tr.onclick = () => { (selectedBrands.size === 1 && selectedBrands.has(b.name)) ? selClear() : selOnly(b.name); render(); };
     tbody.appendChild(tr);
   });
 
@@ -2531,7 +2606,7 @@ function renderCampaignsByBrand(filterBrand, monthOverride) {
 
   const subLabel = filterBrand
     ? `Campaign detail · ${effectiveMonth} · ${filterBrand}${monthOverride?' (nearest month)':''}`
-    : `Campaign detail · ${effectiveMonth}${selectedBrand!=='All'?' · '+selectedBrand:''}${monthOverride?' (nearest month)':''}`;
+    : `Campaign detail · ${effectiveMonth}${!selIsAll()?' · '+selLabel():''}${monthOverride?' (nearest month)':''}`;
   document.getElementById('campaigns-sub').textContent = subLabel;
 
   // In normal monthly view show all brands; when called from range mode filter to selected brand
@@ -2553,7 +2628,7 @@ function renderCampaignsByBrand(filterBrand, monthOverride) {
   activeBrands.forEach(brand => {
     const campaigns = brand.campaigns;
     const color = BRAND_COLORS[brand.name] || '#666';
-    const isSelected = selectedBrand === brand.name;
+    const isSelected = !selIsAll()&&selectedBrands.has(brand.name);
     const acosColor = brand.acos != null ? (brand.acos < 30 ? '#4ade80' : brand.acos < 46 ? '#f59e0b' : '#ff6b6b') : 'rgba(255,255,255,0.4)';
 
     const hdr = document.createElement('div');
@@ -2638,7 +2713,7 @@ function renderSearchTermInsights() {
       b.searchTermInsights.wasted_spend.length ||
       b.searchTermInsights.opportunities.length ||
       (b.searchTermInsights.cpc_changes || []).length
-    ) && (selectedBrand === 'All' || selectedBrand === b.name)
+    ) && selHas(b.name)
   ).sort((a, b2) => a.name.localeCompare(b2.name));
 
   sec.style.display = 'block';
@@ -2844,9 +2919,16 @@ function buildDataSummary() {
   if (md) {
     if (md.partial) s += ` [PARTIAL: ${md.daysElapsed}/${md.daysInMonth} days]`;
     s += `\nPortfolio Totals: Spend=$${md.spend?.toLocaleString()}, AdSales=$${md.adSales?.toLocaleString()}, ACOS=${md.acos?.toFixed(1)}%, TotalSales=$${md.totalSales?.toLocaleString()}, TACOS=${md.tacos?.toFixed(1)}%, Orders=${md.orders}\n`;
-    if (selectedBrand !== 'All') {
-      const b = md.brands.find(x => x.name === selectedBrand);
-      if (b) s += `\nSelected Brand (${b.name}): Spend=$${b.spend}, AdSales=$${b.adSales}, ACOS=${b.acos}%, TotalSales=$${b.totalSales}, TACOS=${b.tacos}%, Orders=${b.orders}, CPC=$${b.cpc}, CVR=${b.cr}%\n`;
+    // The agents answer about what is ON SCREEN. With a multi-brand filter active,
+    // omitting the selection would have them reason about the whole portfolio while
+    // the user is looking at three brands.
+    if (!selIsAll()) {
+      const picked = md.brands.filter(x => selectedBrands.has(x.name));
+      s += `\nACTIVE FILTER — ${selLabel()} (${picked.map(b=>b.name).join(', ')}). `
+         + `The figures on screen cover ONLY these brands.\n`;
+      picked.forEach(b => {
+        s += `  ${b.name}: Spend=$${b.spend}, AdSales=$${b.adSales}, ACOS=${b.acos}%, TotalSales=$${b.totalSales}, TACOS=${b.tacos}%, Orders=${b.orders}, CPC=$${b.cpc}, CVR=${b.cr}%\n`;
+      });
     }
     s += '\nBrand Breakdown:\n';
     md.brands.filter(b => b.spend > 0).sort((a, b2) => (b2.spend||0) - (a.spend||0)).forEach(b => {
@@ -3602,7 +3684,7 @@ function renderDayOfWeekHeatmap() {
     const dow = (d.getDay() + 6) % 7; // Mon=0 … Sun=6
     let daySpend=0, daySales=0, dayOrders=0, dayClicks=0;
     for (const [bName, bData] of Object.entries(entry.brands || {})) {
-      if (selectedBrand !== 'All' && bName !== selectedBrand) continue;
+      if (!selHas(bName)) continue;
       daySpend  += bData.spend   || 0;
       daySales  += bData.adSales || 0;
       dayOrders += bData.orders  || 0;
@@ -3659,7 +3741,7 @@ function renderDayOfWeekHeatmap() {
 
   container.appendChild(grid);
   document.getElementById('dow-sub').textContent =
-    (selectedBrand!=='All'?selectedBrand+' · ':'All brands · ')+'ACOS & CVR by day of week · '+selectedMonth;
+    (!selIsAll()?selLabel()+' · ':'All brands · ')+'ACOS & CVR by day of week · '+selectedMonth;
 }
 
 function renderPlacementPerformance() {
@@ -3683,7 +3765,7 @@ function renderPlacementPerformance() {
 
   const brandsWithData = md.brands.filter(b =>
     b.placementInsights && b.placementInsights.length &&
-    (selectedBrand === 'All' || selectedBrand === b.name)
+    selHas(b.name)
   ).sort((a, b2) => a.name.localeCompare(b2.name));
 
   if (!brandsWithData.length) { sec.style.display='none'; return; }
@@ -3792,7 +3874,7 @@ function renderProductPerformance() {
       b.productInsights.top_performers.length ||
       b.productInsights.wasted_spend.length ||
       b.productInsights.opportunities.length
-    ) && (selectedBrand === 'All' || selectedBrand === b.name)
+    ) && selHas(b.name)
   ).sort((a, b2) => a.name.localeCompare(b2.name));
 
   if (!brandsWithData.length) { sec.style.display='none'; return; }
