@@ -369,58 +369,75 @@
   },
   "November 2026": {
     "byBrand": {
-      "Skinuva": {
-        "spend": 29.99,
+      "Cloud Cafe": {
+        "spend": 20,
         "adSales": 0,
         "orders": 0,
-        "clicks": 12,
-        "impressions": 8445
+        "clicks": 27,
+        "impressions": 5158
+      },
+      "Skinuva": {
+        "spend": 38.96,
+        "adSales": 0,
+        "orders": 0,
+        "clicks": 15,
+        "impressions": 10077
       },
       "Just Bjorn": {
-        "spend": 41.41,
+        "spend": 48.15,
         "adSales": 0,
         "orders": 0,
-        "clicks": 20,
-        "impressions": 7824
+        "clicks": 23,
+        "impressions": 8594
       }
     },
     "campaigns": {
+      "Cloud Cafe": [
+        {
+          "name": "Cloud Cafe - SP - M - 8.26",
+          "spend": 20,
+          "adSales": 0,
+          "orders": 0,
+          "clicks": 27,
+          "impressions": 5158
+        }
+      ],
       "Skinuva": [
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
-          "spend": 29.48,
+          "spend": 32.16,
           "adSales": 0,
           "orders": 0,
-          "clicks": 11,
-          "impressions": 7098
+          "clicks": 12,
+          "impressions": 8447
         },
         {
           "name": "Skinuva - SB - M - video 3.26 v1",
-          "spend": 0.51,
+          "spend": 6.8,
           "adSales": 0,
           "orders": 0,
-          "clicks": 1,
-          "impressions": 1347
+          "clicks": 3,
+          "impressions": 1630
         }
       ],
       "Just Bjorn": [
         {
           "name": "just bjorn - SP - M - travel",
-          "spend": 41.41,
+          "spend": 48.15,
           "adSales": 0,
           "orders": 0,
-          "clicks": 20,
-          "impressions": 7824
+          "clicks": 23,
+          "impressions": 8594
         }
       ]
     },
     "range": {
       "since": "2026-11-01",
-      "until": "2026-11-16"
+      "until": "2026-11-17"
     },
     "profileId": "224591",
-    "fetched_at": "2026-11-17T14:49:59Z",
+    "fetched_at": "2026-11-18T14:20:21Z",
     "source": "helium10-walmart"
   },
-  "last_checked_at": "2026-11-17T15:13:49Z"
+  "last_checked_at": "2026-11-18T14:20:21Z"
 }
