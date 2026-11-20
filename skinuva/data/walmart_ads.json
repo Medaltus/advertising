@@ -370,36 +370,36 @@
   "November 2026": {
     "byBrand": {
       "Cloud Cafe": {
-        "spend": 40,
+        "spend": 60,
         "adSales": 12,
         "orders": 1,
-        "clicks": 55,
-        "impressions": 10407
+        "clicks": 83,
+        "impressions": 13948
       },
       "Skinuva": {
         "spend": 44.42,
         "adSales": 0,
         "orders": 0,
         "clicks": 17,
-        "impressions": 11239
+        "impressions": 12258
       },
       "Just Bjorn": {
-        "spend": 57.17,
+        "spend": 63.91,
         "adSales": 25,
         "orders": 1,
-        "clicks": 27,
-        "impressions": 9370
+        "clicks": 30,
+        "impressions": 10064
       }
     },
     "campaigns": {
       "Cloud Cafe": [
         {
           "name": "Cloud Cafe - SP - M - 8.26",
-          "spend": 40,
+          "spend": 60,
           "adSales": 12,
           "orders": 1,
-          "clicks": 55,
-          "impressions": 10407
+          "clicks": 83,
+          "impressions": 13948
         }
       ],
       "Skinuva": [
@@ -409,7 +409,7 @@
           "adSales": 0,
           "orders": 0,
           "clicks": 4,
-          "impressions": 1844
+          "impressions": 2110
         },
         {
           "name": "Skinuva - SP - Manual - Scar v1 - Non-Branded",
@@ -417,27 +417,27 @@
           "adSales": 0,
           "orders": 0,
           "clicks": 13,
-          "impressions": 9395
+          "impressions": 10148
         }
       ],
       "Just Bjorn": [
         {
           "name": "just bjorn - SP - M - travel",
-          "spend": 57.17,
+          "spend": 63.91,
           "adSales": 25,
           "orders": 1,
-          "clicks": 27,
-          "impressions": 9370
+          "clicks": 30,
+          "impressions": 10064
         }
       ]
     },
     "range": {
       "since": "2026-11-01",
-      "until": "2026-11-18"
+      "until": "2026-11-19"
     },
     "profileId": "224591",
-    "fetched_at": "2026-11-19T13:30:42Z",
+    "fetched_at": "2026-11-20T11:09:59Z",
     "source": "helium10-walmart"
   },
-  "last_checked_at": "2026-11-19T15:12:41Z"
+  "last_checked_at": "2026-11-20T11:09:59Z"
 }
