@@ -97,28 +97,28 @@
       "since": "2026-10-01",
       "until": "2026-10-31"
     },
-    "fetched_at": "2026-11-20T21:32:47Z",
+    "fetched_at": "2026-11-21T15:13:51Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   },
   "November 2026": {
-    "total": 21820.23,
+    "total": 22545.61,
     "byChannel": {
-      "Online Store": 18844.62,
-      "Draft Orders": 2000.38,
-      "Seal Subscriptions": 1406.25,
-      "Shop": 1345.91,
+      "Draft Orders": 27270.74,
+      "Online Store": 19420.78,
+      "Seal Subscriptions": 1478.25,
+      "Shop": 1423.13,
       "Meta AI and Muse": 138.45,
       "TikTok": 85.0
     },
     "excludedChannels": [
       "Draft Orders"
     ],
-    "excludedTotal": 2000.38,
+    "excludedTotal": 27270.74,
     "range": {
       "since": "2026-11-01",
-      "until": "2026-11-19"
+      "until": "2026-11-20"
     },
-    "fetched_at": "2026-11-20T21:32:47Z",
+    "fetched_at": "2026-11-21T15:13:50Z",
     "source": "shopifyql-total_sales-by-sales_channel"
   }
 }
